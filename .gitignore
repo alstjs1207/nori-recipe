@@ -1,0 +1,6 @@
+.env
+results/
+.claude/skills/
+.claude/settings.local.json
+data/
+docs/
