@@ -21,7 +21,7 @@ export default function OnboardingLayout() {
         header: () => <OnboardingProgressHeader currentStep={currentStep} />,
       }}
     >
-      <Stack.Screen name="index" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="index" options={{ gestureEnabled: false, headerShown: false }} />
       <Stack.Screen name="child-info" options={{ title: "" }} />
       <Stack.Screen name="materials" options={{ title: "" }} />
       <Stack.Screen name="first-result" options={{ title: "" }} />
@@ -31,15 +31,15 @@ export default function OnboardingLayout() {
 
 function getCurrentStep(pathname: string): number {
   if (pathname.endsWith("/child-info")) {
-    return 1;
+    return 0;
   }
 
   if (pathname.endsWith("/materials")) {
-    return 2;
+    return 1;
   }
 
   if (pathname.endsWith("/first-result")) {
-    return 3;
+    return 1;
   }
 
   return 0;

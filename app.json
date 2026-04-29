@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "놀이 레시피",
+    "slug": "nori-recipe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "norirecipe",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f4efe6"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.paperclip.norirecipe"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#f4efe6"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.paperclip.norirecipe"
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+    "assetBundlePatterns": [
+      "assets/*",
+      "images/**/*"
+    ]
+  }
+}

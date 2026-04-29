@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 
+import { fadeInUp, layoutTransition } from "@/animations/motion";
+import { MotionPressable } from "@/components/motion/MotionPressable";
 import { CHILD_REACTION_OPTIONS, type ChildReaction } from "@/constants/feedback";
 import { DEV_AREA_LABELS, DEV_AREA_THEME } from "@/constants/devAreas";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
@@ -37,9 +38,10 @@ function StarButton({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="button"
       accessibilityLabel={`${index}점`}
+      containerStyle={styles.starButtonContainer}
       onPress={onPress}
       style={({ pressed }) => [
         styles.starButton,
@@ -49,7 +51,7 @@ function StarButton({
     >
       <Text style={[styles.starText, active && styles.starTextActive]}>★</Text>
       <Text style={[styles.starMeta, active && styles.starMetaActive]}>{index}</Text>
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -63,7 +65,7 @@ function ReactionChip({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
       onPress={onPress}
@@ -76,7 +78,7 @@ function ReactionChip({
       <Text style={[styles.reactionChipText, active && styles.reactionChipTextActive]}>
         {label}
       </Text>
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -89,6 +91,14 @@ export default function FeedbackScreen() {
   const [selectedReactions, setSelectedReactions] = useState<ChildReaction[]>([]);
   const [memo, setMemo] = useState("");
   const [saving, setSaving] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    setRating(0);
+    setSelectedReactions([]);
+    setMemo("");
+    setSaving(false);
+  }, [playId]);
 
   function toggleReaction(reaction: ChildReaction) {
     setSelectedReactions((current) =>
@@ -121,7 +131,10 @@ export default function FeedbackScreen() {
       );
 
       useSessionStore.setState({ userContext: nextUserContext });
-      router.replace("/(main)");
+      router.replace({
+        pathname: "/(main)",
+        params: { completedPlayId: play.id },
+      });
     } catch {
       Alert.alert("저장하지 못했어요", "잠시 후 다시 시도해 주세요.");
     } finally {
@@ -135,7 +148,7 @@ export default function FeedbackScreen() {
         options={{
           headerShown: true,
           title: "피드백",
-          headerStyle: { backgroundColor: APP_COLORS.surface },
+          headerStyle: { backgroundColor: APP_COLORS.background },
           headerTintColor: APP_COLORS.ink,
           headerShadowVisible: false,
         }}
@@ -144,15 +157,22 @@ export default function FeedbackScreen() {
         style={styles.keyboard}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Animated.ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           {play ? (
             <>
-              <View style={styles.heroCard}>
+              <Animated.View
+                entering={reduceMotion ? undefined : fadeInUp()}
+                layout={reduceMotion ? undefined : layoutTransition}
+                style={styles.heroCard}
+              >
                 <Text style={styles.eyebrow}>놀이 기록</Text>
                 <Text style={styles.title}>{play.name}</Text>
                 <Text style={styles.body}>
                   오늘 어땠는지 가볍게 남겨두면 다음 추천이 조금 더 맞아집니다.
                 </Text>
+                <View style={styles.completionBadge}>
+                  <Text style={styles.completionBadgeText}>TODAY · 완료</Text>
+                </View>
                 <View style={styles.tagRow}>
                   {play.devAreas.map((devArea) => (
                     <View
@@ -173,9 +193,13 @@ export default function FeedbackScreen() {
                     </View>
                   ))}
                 </View>
-              </View>
+              </Animated.View>
 
-              <View style={styles.sectionCard}>
+              <Animated.View
+                entering={reduceMotion ? undefined : fadeInUp(60)}
+                layout={reduceMotion ? undefined : layoutTransition}
+                style={styles.sectionCard}
+              >
                 <Text style={styles.sectionTitle}>전체 만족도</Text>
                 <Text style={styles.sectionBody}>별점 1개부터 5개까지 선택해 주세요.</Text>
                 <View style={styles.starsRow}>
@@ -188,9 +212,13 @@ export default function FeedbackScreen() {
                     />
                   ))}
                 </View>
-              </View>
+              </Animated.View>
 
-              <View style={styles.sectionCard}>
+              <Animated.View
+                entering={reduceMotion ? undefined : fadeInUp(100)}
+                layout={reduceMotion ? undefined : layoutTransition}
+                style={styles.sectionCard}
+              >
                 <Text style={styles.sectionTitle}>아이 반응</Text>
                 <Text style={styles.sectionBody}>해당되는 반응은 여러 개 함께 고를 수 있어요.</Text>
                 <View style={styles.reactionGrid}>
@@ -203,9 +231,13 @@ export default function FeedbackScreen() {
                     />
                   ))}
                 </View>
-              </View>
+              </Animated.View>
 
-              <View style={styles.sectionCard}>
+              <Animated.View
+                entering={reduceMotion ? undefined : fadeInUp(140)}
+                layout={reduceMotion ? undefined : layoutTransition}
+                style={styles.sectionCard}
+              >
                 <Text style={styles.sectionTitle}>메모</Text>
                 <Text style={styles.sectionBody}>선택 항목이에요.</Text>
                 <TextInput
@@ -217,32 +249,37 @@ export default function FeedbackScreen() {
                   onChangeText={setMemo}
                   textAlignVertical="top"
                 />
-              </View>
+              </Animated.View>
 
-              <Pressable
-                accessibilityRole="button"
-                disabled={rating === 0 || saving}
-                onPress={() => {
-                  void handleSave();
-                }}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  (rating === 0 || saving) && styles.primaryButtonDisabled,
-                  pressed && rating !== 0 && !saving && styles.primaryButtonPressed,
-                ]}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {saving ? "저장 중..." : "기록 저장"}
-                </Text>
-              </Pressable>
+              <Animated.View entering={reduceMotion ? undefined : fadeInUp(180)}>
+                <MotionPressable
+                  accessibilityRole="button"
+                  disabled={rating === 0 || saving}
+                  onPress={() => {
+                    void handleSave();
+                  }}
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    (rating === 0 || saving) && styles.primaryButtonDisabled,
+                    pressed && rating !== 0 && !saving && styles.primaryButtonPressed,
+                  ]}
+                >
+                  <Text style={styles.primaryButtonText}>
+                    {saving ? "저장 중..." : "기록 저장"}
+                  </Text>
+                </MotionPressable>
+              </Animated.View>
             </>
           ) : (
-            <View style={styles.sectionCard}>
+            <Animated.View
+              entering={reduceMotion ? undefined : fadeInUp()}
+              style={styles.sectionCard}
+            >
               <Text style={styles.title}>놀이를 찾지 못했어요</Text>
               <Text style={styles.body}>홈으로 돌아가 다시 선택해 주세요.</Text>
-            </View>
+            </Animated.View>
           )}
-        </ScrollView>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
     </>
   );
@@ -262,30 +299,45 @@ const styles = StyleSheet.create({
   heroCard: {
     gap: 12,
     padding: 22,
-    borderRadius: 24,
+    borderRadius: 28,
     backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
     ...APP_SHADOWS.cardLifted,
   },
   eyebrow: {
-    color: APP_COLORS.accent,
+    color: APP_COLORS.muted,
     fontSize: 12,
     textTransform: "uppercase",
     letterSpacing: 1.2,
     fontFamily: APP_FONTS.mono,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   title: {
     color: APP_COLORS.ink,
     fontSize: 26,
     lineHeight: 34,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   body: {
     color: APP_COLORS.muted,
     fontSize: 15,
     lineHeight: 22,
     fontFamily: APP_FONTS.body,
+  },
+  completionBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.mustard,
+  },
+  completionBadgeText: {
+    color: "#4E3B0F",
+    fontSize: 12,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
   },
   tagRow: {
     flexDirection: "row",
@@ -296,24 +348,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(31,37,25,0.06)",
   },
   devTagText: {
     fontSize: 13,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   sectionCard: {
     gap: 14,
     padding: 20,
-    borderRadius: 24,
+    borderRadius: 28,
     backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
     ...APP_SHADOWS.card,
   },
   sectionTitle: {
     color: APP_COLORS.ink,
     fontSize: 19,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   sectionBody: {
     color: APP_COLORS.muted,
@@ -325,39 +381,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
   },
-  starButton: {
+  starButtonContainer: {
     flex: 1,
+  },
+  starButton: {
     alignItems: "center",
     gap: 6,
     paddingVertical: 14,
-    borderRadius: 18,
+    borderRadius: 20,
     backgroundColor: APP_COLORS.background,
     borderWidth: 1,
     borderColor: APP_COLORS.line,
   },
   starButtonActive: {
-    backgroundColor: "#fff1d6",
-    borderColor: "#cf8b18",
+    backgroundColor: APP_COLORS.mustardSoft,
+    borderColor: APP_COLORS.mustard,
   },
   starButtonPressed: {
     opacity: 0.88,
   },
   starText: {
-    color: "#c1b8a4",
+    color: "#B9AF93",
     fontSize: 22,
     lineHeight: 22,
   },
   starTextActive: {
-    color: "#cf8b18",
+    color: "#B38A18",
   },
   starMeta: {
     color: APP_COLORS.muted,
     fontSize: 12,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   starMetaActive: {
-    color: "#915700",
+    color: "#6F5715",
   },
   reactionGrid: {
     flexDirection: "row",
@@ -373,7 +431,7 @@ const styles = StyleSheet.create({
     borderColor: APP_COLORS.line,
   },
   reactionChipActive: {
-    backgroundColor: APP_COLORS.pill,
+    backgroundColor: APP_COLORS.sageSoft,
     borderColor: APP_COLORS.accent,
   },
   reactionChipPressed: {
@@ -383,7 +441,7 @@ const styles = StyleSheet.create({
     color: APP_COLORS.ink,
     fontSize: 14,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   reactionChipTextActive: {
     color: APP_COLORS.ink,
@@ -392,7 +450,7 @@ const styles = StyleSheet.create({
     minHeight: 128,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: APP_COLORS.line,
     backgroundColor: APP_COLORS.background,
@@ -406,20 +464,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 18,
     paddingVertical: 18,
-    borderRadius: 20,
+    borderRadius: 24,
     backgroundColor: APP_COLORS.accent,
     ...APP_SHADOWS.card,
   },
   primaryButtonDisabled: {
-    backgroundColor: APP_COLORS.line,
+    backgroundColor: "#A69C84",
   },
   primaryButtonPressed: {
     opacity: 0.88,
   },
   primaryButtonText: {
-    color: "#ffffff",
+    color: APP_COLORS.accentText,
     fontSize: 16,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
 });

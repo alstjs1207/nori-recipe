@@ -1,8 +1,11 @@
 import { useCallback, useState } from "react";
 import { router, useFocusEffect } from "expo-router";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 
+import { fadeInUp, layoutTransition, quickFadeIn } from "@/animations/motion";
+import { MotionPressable } from "@/components/motion/MotionPressable";
 import { DEV_AREA_LABELS, DEV_AREA_SLUGS, DEV_AREA_THEME, type DevArea } from "@/constants/devAreas";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getDevAreaStats, getFavorites, getPlayLogs } from "@/db/queries";
@@ -65,6 +68,7 @@ function renderStars(value: number | null): string {
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
+  const reduceMotion = useReducedMotion();
   const guestId = useSessionStore((state) => state.guestId);
   const plays = usePlaysStore((state) => state.plays);
   const [historyData, setHistoryData] = useState<HistoryData>({
@@ -129,8 +133,12 @@ export default function HistoryScreen() {
   );
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 16 }]}>
-      <View style={styles.summaryCard}>
+    <Animated.ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 16 }]}>
+      <Animated.View
+        entering={reduceMotion ? undefined : fadeInUp()}
+        layout={reduceMotion ? undefined : layoutTransition}
+        style={styles.summaryCard}
+      >
         <Text style={styles.eyebrow}>이번 달 요약</Text>
         <Text style={styles.title}>{monthLogs.length}번 놀았어요.</Text>
         <Text style={styles.body}>
@@ -153,14 +161,20 @@ export default function HistoryScreen() {
         <View style={styles.chartCard}>
           <Text style={styles.chartTitle}>발달 영역 커버리지</Text>
           <View style={styles.chartList}>
-            {coverageRows.map((row) => (
-              <View key={row.devArea} style={styles.chartRow}>
+            {coverageRows.map((row, index) => (
+              <Animated.View
+                key={row.devArea}
+                entering={reduceMotion ? undefined : quickFadeIn(60 + index * 30)}
+                layout={reduceMotion ? undefined : layoutTransition}
+                style={styles.chartRow}
+              >
                 <View style={styles.chartMeta}>
                   <Text style={styles.chartLabel}>{DEV_AREA_LABELS[row.devArea]}</Text>
                   <Text style={styles.chartValue}>{row.percent}%</Text>
                 </View>
                 <View style={styles.chartTrack}>
-                  <View
+                  <Animated.View
+                    layout={reduceMotion ? undefined : layoutTransition}
                     style={[
                       styles.chartFill,
                       {
@@ -170,13 +184,17 @@ export default function HistoryScreen() {
                     ]}
                   />
                 </View>
-              </View>
+              </Animated.View>
             ))}
           </View>
         </View>
-      </View>
+      </Animated.View>
 
-      <Pressable
+      <Animated.View
+        entering={reduceMotion ? undefined : fadeInUp(60)}
+        layout={reduceMotion ? undefined : layoutTransition}
+      >
+      <MotionPressable
         accessibilityRole="button"
         onPress={() =>
           Alert.alert(
@@ -192,17 +210,22 @@ export default function HistoryScreen() {
           있어요 →
         </Text>
         <Text style={styles.bannerBody}>Phase 1에서는 계정 만들기 버튼을 눌러 Coming Soon 안내를 확인할 수 있어요.</Text>
-      </Pressable>
+      </MotionPressable>
+      </Animated.View>
 
       {historyData.favorites.length > 0 ? (
-        <View style={styles.sectionCard}>
+        <Animated.View
+          entering={reduceMotion ? undefined : fadeInUp(100)}
+          layout={reduceMotion ? undefined : layoutTransition}
+          style={styles.sectionCard}
+        >
           <Text style={styles.sectionTitle}>즐겨찾기</Text>
           <View style={styles.favoriteRow}>
             {historyData.favorites.map((favorite) => {
               const play = playMap.get(favorite.playId);
 
               return (
-                <Pressable
+                <MotionPressable
                   key={favorite.id}
                   accessibilityRole="button"
                   onPress={() =>
@@ -217,14 +240,18 @@ export default function HistoryScreen() {
                   ]}
                 >
                   <Text style={styles.favoriteChipText}>{play?.name ?? favorite.playId}</Text>
-                </Pressable>
+                </MotionPressable>
               );
             })}
           </View>
-        </View>
+        </Animated.View>
       ) : null}
 
-      <View style={styles.sectionCard}>
+      <Animated.View
+        entering={reduceMotion ? undefined : fadeInUp(140)}
+        layout={reduceMotion ? undefined : layoutTransition}
+        style={styles.sectionCard}
+      >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>완료한 놀이</Text>
           {status === "loading" ? <Text style={styles.sectionMeta}>불러오는 중...</Text> : null}
@@ -240,7 +267,17 @@ export default function HistoryScreen() {
           const play = playMap.get(log.playId);
 
           return (
-            <View key={log.id} style={styles.logCard}>
+            <MotionPressable
+              key={log.id}
+              accessibilityRole="button"
+              onPress={() =>
+                router.push({
+                  pathname: "/(main)/play/[id]",
+                  params: { id: log.playId },
+                })
+              }
+              style={({ pressed }) => [styles.logCard, pressed && styles.logCardPressed]}
+            >
               <View style={styles.logHeader}>
                 <View style={styles.logBody}>
                   <Text style={styles.logTitle}>{play?.name ?? log.playId}</Text>
@@ -252,11 +289,11 @@ export default function HistoryScreen() {
                 <Text style={styles.logReaction}>{log.childReaction.join(" · ")}</Text>
               ) : null}
               {log.memo ? <Text style={styles.logMemo}>{log.memo}</Text> : null}
-            </View>
+            </MotionPressable>
           );
         })}
-      </View>
-    </ScrollView>
+      </Animated.View>
+    </Animated.ScrollView>
   );
 }
 
@@ -281,14 +318,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1.2,
     fontFamily: APP_FONTS.mono,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   title: {
     color: APP_COLORS.ink,
     fontSize: 26,
     lineHeight: 34,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   body: {
     color: APP_COLORS.muted,
@@ -311,14 +348,14 @@ const styles = StyleSheet.create({
     color: APP_COLORS.muted,
     fontSize: 12,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   countBadgeValue: {
     color: APP_COLORS.ink,
     fontSize: 28,
     lineHeight: 34,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   chartCard: {
     gap: 12,
@@ -330,7 +367,7 @@ const styles = StyleSheet.create({
     color: APP_COLORS.ink,
     fontSize: 16,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   chartList: {
     gap: 10,
@@ -347,7 +384,7 @@ const styles = StyleSheet.create({
     color: APP_COLORS.ink,
     fontSize: 14,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   chartValue: {
     color: APP_COLORS.muted,
@@ -380,14 +417,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1.2,
     fontFamily: APP_FONTS.mono,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   bannerTitle: {
     color: APP_COLORS.ink,
     fontSize: 21,
     lineHeight: 30,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   bannerBody: {
     color: "#71573e",
@@ -412,7 +449,7 @@ const styles = StyleSheet.create({
     color: APP_COLORS.ink,
     fontSize: 19,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   sectionMeta: {
     color: APP_COLORS.muted,
@@ -439,7 +476,7 @@ const styles = StyleSheet.create({
     color: APP_COLORS.ink,
     fontSize: 14,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   emptyBody: {
     color: APP_COLORS.muted,
@@ -452,6 +489,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 20,
     backgroundColor: APP_COLORS.background,
+  },
+  logCardPressed: {
+    opacity: 0.9,
   },
   logHeader: {
     flexDirection: "row",
@@ -468,7 +508,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 23,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   logDate: {
     color: APP_COLORS.muted,
@@ -479,14 +519,14 @@ const styles = StyleSheet.create({
     color: "#c17a07",
     fontSize: 13,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   logReaction: {
     color: APP_COLORS.ink,
     fontSize: 14,
     lineHeight: 21,
     fontFamily: APP_FONTS.body,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   logMemo: {
     color: APP_COLORS.muted,

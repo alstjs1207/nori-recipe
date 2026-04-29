@@ -47,12 +47,13 @@ play-recipe/
 - `prepTime`: 준비 시간(분)
 - `difficulty`: 1(쉬움) | 2(보통) | 3(어려움)
 - `devAreas`: 발달영역 enum 배열
-- `materials`: `{ required, optional, substitutes }` — slug 또는 한글(수집 직후)
+- `materials`: `{ required, optional, substitutes }` — slug 또는 한글(수집 직후); `substitutes`는 항상 빈 배열 `[]` (대체 재료는 재료 설명 텍스트로 처리)
 - `steps`: string[] (순서 = 배열 인덱스)
+- `tip`: string (선택 필드) — 놀이 팁/응용 제안
 - `safetyNotes`: string[]
 - `educationalEffects`: string[] (서술형)
 - `tags`: string[] (연령 태그 제외)
-- `source`: `{ type, url, instagramAccount }`
+- `source`: `{ type, url, instagramAccount }` — type: youtube | instagram | naver_blog | chaisplay | tistory | brunch | manual
 - `status`: live | draft | archived
 
 ## 데이터 컨벤션
@@ -69,17 +70,21 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 
 | 카테고리 | slug |
 |---------|------|
-| 종이류 | paper, cardboard, tissue, sticker |
-| 주방 | flour, rice_flour, water, bowl, cup, spoon, chopsticks, bottle |
+| 종이류 | paper, cardboard, tissue, sticker, cloth, blanket |
+| 주방 | flour, rice_flour, water, bowl, cup, spoon, chopsticks, bottle, soft_food |
 | 공작 | crayon, paint, glue, tape, string, rubber_band, straw |
 | 감각 | sand, kinetic_sand, water_bin, water_beads, bubble, balloon, slime |
-| 블록/장난감 | block, magnetic_tile, ball, puzzle |
+| 블록/장난감 | block, magnetic_tile, ball, puzzle, book, mirror, doll, marble, bead, car_toy |
 | 조형 | clay, foam, play_corn |
-| 도구 | scissors, tongs |
+| 도구 | scissors, tongs, smartphone, flashlight, mat, shape_ruler |
 
 제거된 slug: newspaper (→ paper), plastic_bag (안전 이슈)
 
 ## 규칙
+
+### 홈 추천
+- 홈 추천 관련 작업 전 `HOME_RECOMMENDATION_RULES.md`를 먼저 확인
+- 홈 추천 동작은 `HOME_RECOMMENDATION_RULES.md`의 고정 규칙을 기준으로 유지
 
 ### 데이터
 - 재료는 반드시 표준 slug 마스터에 있는 것만 사용 (없으면 사용자 확인)
