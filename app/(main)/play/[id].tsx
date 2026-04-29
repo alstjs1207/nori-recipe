@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Image,
-  Linking,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -13,12 +13,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEV_AREA_LABELS, DEV_AREA_THEME } from "@/constants/devAreas";
 import {
+  MATERIAL_CATEGORIES,
   MATERIAL_DISPLAY_NAMES,
   MATERIAL_SLUGS,
   type MaterialSlug,
 } from "@/constants/materials";
+import { getMaterialVisualSpec } from "@/constants/materialVisuals";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
-import { getLatestPlayLog, isFavorite, toggleFavorite } from "@/db/queries";
+import { isFavorite, toggleFavorite } from "@/db/queries";
 import {
   advanceAutoProgress,
   completeStep,
@@ -26,13 +28,9 @@ import {
 } from "@/play/stepProgress";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
-import type { Play, PlayLogRecord, PlaySource } from "@/types";
+import type { Play } from "@/types";
 
-type DetailTab = "overview" | "materials" | "steps";
-
-type YoutubePreview =
-  | { status: "idle" | "loading" | "error" }
-  | { status: "ready"; title: string; thumbnailUrl: string | null };
+type DetailTab = "overview" | "steps" | "safety";
 
 type MaterialReadinessSummary = {
   body: string;
@@ -48,8 +46,8 @@ type StepRowProps = {
   text: string;
 };
 
-type MaterialRowProps = {
-  label: string;
+type MaterialCheckCardProps = {
+  material: MaterialSlug;
   missing: boolean;
   requirementLabel: string;
 };
@@ -65,9 +63,9 @@ type IconCircleButtonProps = {
 type ArtworkVariant = "bath" | "dough" | "plate" | "paper" | "book" | "blocks";
 
 const DETAIL_TABS: Array<{ key: DetailTab; label: string }> = [
-  { key: "overview", label: "소개" },
-  { key: "materials", label: "준비물" },
-  { key: "steps", label: "순서" },
+  { key: "overview", label: "요약" },
+  { key: "steps", label: "놀이방법" },
+  { key: "safety", label: "주의사항" },
 ];
 
 const PLACE_LABELS: Record<Play["place"], string> = {
@@ -76,14 +74,10 @@ const PLACE_LABELS: Record<Play["place"], string> = {
   any: "어디서나",
 };
 
-const SOURCE_LABELS: Record<PlaySource["type"], string> = {
-  youtube: "유튜브",
-  instagram: "인스타그램",
-  naver_blog: "블로그",
-  chaisplay: "차이의 놀이",
-  tistory: "티스토리",
-  brunch: "브런치",
-  manual: "에디터 정리",
+const DIFFICULTY_LABELS: Record<Play["difficulty"], string> = {
+  1: "쉬워요",
+  2: "보통이에요",
+  3: "어려워요",
 };
 
 function readParam(value: string | string[] | undefined): string | null {
@@ -108,64 +102,60 @@ function readMaterialParams(value: string | string[] | undefined): MaterialSlug[
   );
 }
 
-function isYoutubeSource(source: PlaySource): boolean {
-  return source.type === "youtube" && typeof source.url === "string" && source.url.length > 0;
-}
-
 function formatDuration(play: Play): string {
   if (play.durationMin === play.durationMax) {
     return `${play.durationMin}분`;
   }
 
-  return `${play.durationMin}-${play.durationMax}분`;
+  return `${play.durationMin}~${play.durationMax}분`;
 }
 
 function formatAgeRange(play: Play): string {
-  return `${play.ageMin}-${play.ageMax}개월`;
+  if (play.ageMin === play.ageMax) {
+    return `${play.ageMin}개월`;
+  }
+
+  return `${play.ageMin}~${play.ageMax}개월`;
 }
 
-function getSourceTitle(play: Play, preview: YoutubePreview): string {
-  if (preview.status === "ready") {
-    return preview.title;
-  }
-
-  return isYoutubeSource(play.source)
-    ? "유튜브에서 보기"
-    : `${SOURCE_LABELS[play.source.type]} 열기`;
+function getPrepTimeLabel(play: Play): string {
+  return play.prepTime === 0 ? "준비 없음" : `준비 ${play.prepTime}분`;
 }
 
-function getSourceDescription(play: Play, preview: YoutubePreview): string {
-  if (preview.status === "loading") {
-    return "영상 정보를 불러오는 중이에요.";
-  }
+function getMaterialCategoryName(material: MaterialSlug): string {
+  const category = Object.entries(MATERIAL_CATEGORIES).find(([, materials]) =>
+    (materials as string[]).includes(material),
+  );
 
-  if (preview.status === "error") {
-    return "미리보기를 불러오지 못해도 링크는 바로 열 수 있어요.";
-  }
-
-  return "앱을 벗어나 원문 링크를 열어요.";
+  return category?.[0] ?? "도구";
 }
 
-function formatCompletedAt(value: string): string {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "최근 완료 기록";
+function getPrimaryActionLabel({
+  allStepsCompleted,
+  hasStartedPlay,
+  isAutoProgressing,
+  nextIncompleteStepIndex,
+}: {
+  allStepsCompleted: boolean;
+  hasStartedPlay: boolean;
+  isAutoProgressing: boolean;
+  nextIncompleteStepIndex: number;
+}): string {
+  if (!hasStartedPlay) {
+    return "놀이 시작하기";
   }
 
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "numeric",
-    day: "numeric",
-    weekday: "short",
-  }).format(date);
-}
-
-function renderStars(value: number | null): string {
-  if (!value) {
-    return "평가 없음";
+  if (allStepsCompleted) {
+    return "놀이 마치고 기록하기";
   }
 
-  return `${"★".repeat(value)}${"☆".repeat(5 - value)}`;
+  if (isAutoProgressing) {
+    return "자동 진행 중";
+  }
+
+  return nextIncompleteStepIndex >= 0
+    ? `${nextIncompleteStepIndex + 1}단계 완료하기`
+    : "놀이 기록하기";
 }
 
 function getMaterialReadinessSummary(
@@ -285,27 +275,37 @@ function IconCircleButton({
   );
 }
 
-function MaterialRow({ label, missing, requirementLabel }: MaterialRowProps) {
+function MaterialImage({ material, size = 40 }: { material: MaterialSlug; size?: number }) {
+  const visual = getMaterialVisualSpec(material, getMaterialCategoryName(material));
+
   return (
-    <View style={styles.materialRow}>
-      <View style={styles.materialIcon}>
-        <View style={styles.materialIconInner} />
+    <Image
+      accessibilityIgnoresInvertColors
+      resizeMode="contain"
+      source={visual.imageSource}
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
+function MaterialCheckCard({ material, missing, requirementLabel }: MaterialCheckCardProps) {
+  return (
+    <View style={styles.materialCheckCard}>
+      <View style={styles.materialCheckImageSlot}>
+        <MaterialImage material={material} size={38} />
       </View>
-      <Text style={styles.materialLabel}>{label}</Text>
-      <Text style={styles.materialAmount}>{requirementLabel}</Text>
-      <View
-        style={[
-          styles.materialStatus,
-          missing ? styles.materialStatusMissing : styles.materialStatusReady,
-        ]}
-      >
+      <Text style={styles.materialCheckRequirement}>{requirementLabel}</Text>
+      <Text numberOfLines={2} style={styles.materialCheckLabel}>
+        {MATERIAL_DISPLAY_NAMES[material]}
+      </Text>
+      <View style={[styles.materialMiniStatus, missing && styles.materialMiniStatusMissing]}>
         <Text
           style={[
-            styles.materialStatusText,
-            missing ? styles.materialStatusTextMissing : styles.materialStatusTextReady,
+            styles.materialMiniStatusText,
+            missing && styles.materialMiniStatusTextMissing,
           ]}
         >
-          {missing ? "!" : "✓"}
+          {missing ? "" : "✓"}
         </Text>
       </View>
     </View>
@@ -332,9 +332,6 @@ function StepRow({ active, completed, index, onPress, text }: StepRowProps) {
       </View>
       <View style={styles.stepBody}>
         <Text style={[styles.stepText, completed && styles.stepTextCompleted]}>{text}</Text>
-        <Text style={[styles.stepMeta, active && styles.stepMetaActive]}>
-          {completed ? "완료됨" : active ? "지금 단계" : "탭해서 완료 표시"}
-        </Text>
       </View>
     </Pressable>
   );
@@ -406,13 +403,11 @@ export default function PlayDetailScreen() {
   const playId = readParam(params.id);
   const guestId = useSessionStore((state) => state.guestId);
   const play = usePlaysStore((state) => state.plays.find((item) => item.id === playId));
-  const [activeTab, setActiveTab] = useState<DetailTab>("materials");
+  const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [hasStartedPlay, setHasStartedPlay] = useState(false);
   const [isAutoProgressing, setIsAutoProgressing] = useState(false);
   const [favorite, setFavorite] = useState(false);
-  const [youtubePreview, setYoutubePreview] = useState<YoutubePreview>({ status: "idle" });
-  const [latestLog, setLatestLog] = useState<PlayLogRecord | null>(null);
 
   function clearAutoProgressTimer() {
     if (!autoProgressTimerRef.current) {
@@ -425,12 +420,11 @@ export default function PlayDetailScreen() {
 
   useEffect(() => {
     clearAutoProgressTimer();
-    setActiveTab("materials");
+    setActiveTab("overview");
     setCompletedSteps([]);
     setHasStartedPlay(false);
     setIsAutoProgressing(false);
     setFavorite(false);
-    setLatestLog(null);
   }, [playId]);
 
   useEffect(() => clearAutoProgressTimer, []);
@@ -460,81 +454,6 @@ export default function PlayDetailScreen() {
     };
   }, [guestId, playId]);
 
-  useEffect(() => {
-    if (!guestId || !playId) {
-      setLatestLog(null);
-      return;
-    }
-
-    let active = true;
-
-    void getLatestPlayLog(guestId, playId)
-      .then((value) => {
-        if (active) {
-          setLatestLog(value);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setLatestLog(null);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [guestId, playId]);
-
-  useEffect(() => {
-    if (!play || !isYoutubeSource(play.source) || !play.source.url) {
-      setYoutubePreview({ status: "idle" });
-      return;
-    }
-
-    let active = true;
-
-    setYoutubePreview({ status: "loading" });
-
-    void fetch(
-      `https://www.youtube.com/oembed?url=${encodeURIComponent(play.source.url)}&format=json`,
-    )
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("oEmbed request failed");
-        }
-
-        const payload = (await response.json()) as {
-          title?: unknown;
-          thumbnail_url?: unknown;
-        };
-
-        if (!active) {
-          return;
-        }
-
-        setYoutubePreview({
-          status: "ready",
-          title:
-            typeof payload.title === "string" && payload.title.length > 0
-              ? payload.title
-              : "유튜브에서 보기",
-          thumbnailUrl:
-            typeof payload.thumbnail_url === "string" && payload.thumbnail_url.length > 0
-              ? payload.thumbnail_url
-              : null,
-        });
-      })
-      .catch(() => {
-        if (active) {
-          setYoutubePreview({ status: "error" });
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [play]);
-
   async function handleToggleFavorite() {
     if (!guestId || !play) {
       return;
@@ -548,15 +467,18 @@ export default function PlayDetailScreen() {
     }
   }
 
-  async function handleOpenSource() {
-    if (!play?.source.url) {
+  async function handleShare() {
+    if (!play) {
       return;
     }
 
     try {
-      await Linking.openURL(play.source.url);
+      await Share.share({
+        title: play.name,
+        message: `${play.name}\n${formatAgeRange(play)} · ${formatDuration(play)} · ${getPrepTimeLabel(play)}`,
+      });
     } catch {
-      // Opening an external app can fail offline or when the OS blocks the scheme.
+      // Native share sheets can fail on unsupported platforms or cancelled flows.
     }
   }
 
@@ -626,39 +548,18 @@ export default function PlayDetailScreen() {
         ...optionalMaterials.map((material) => ({ material, optional: true })),
       ]
     : [];
-  const hasMissingMaterials = allMaterials.some(
-    ({ material }) => !selectedMaterialsSet.has(material),
-  );
-  const missingRequiredCount = requiredMaterials.filter(
-    (material) => !selectedMaterialsSet.has(material),
-  ).length;
   const materialReadiness = play
     ? getMaterialReadinessSummary(play, selectedMaterialsSet)
     : null;
-  const hasPreviousLog = Boolean(latestLog);
   const totalStepCount = play?.steps.length ?? 0;
   const allStepsCompleted = totalStepCount > 0 && completedSteps.length === totalStepCount;
   const nextIncompleteStepIndex = getNextIncompleteStepIndex(totalStepCount, completedSteps);
-  const footerLabel = !hasStartedPlay
-    ? hasPreviousLog
-      ? "다시 놀이하기"
-      : "첫 번째 단계 시작"
-    : allStepsCompleted
-      ? "놀이 마치고 기록하기"
-      : isAutoProgressing
-        ? "자동 진행 중"
-        : nextIncompleteStepIndex >= 0
-          ? `${nextIncompleteStepIndex + 1}단계 완료하기`
-          : "놀이 기록하기";
-  const footerHelperText = allStepsCompleted
-    ? "단계를 모두 체크했어요. 기록 화면으로 넘어갑니다."
-    : hasStartedPlay
-      ? isAutoProgressing
-        ? `${nextIncompleteStepIndex + 1}단계로 자동 진행 중이에요.`
-        : `${play?.steps.length ?? 0}단계 · 약 ${play?.durationMax ?? 0}분 소요`
-      : hasPreviousLog
-        ? `${formatCompletedAt(latestLog!.completedAt)}에 완료한 기록이 있어요.`
-        : `${play?.steps.length ?? 0}단계 · 약 ${play?.durationMax ?? 0}분 소요`;
+  const primaryActionLabel = getPrimaryActionLabel({
+    allStepsCompleted,
+    hasStartedPlay,
+    isAutoProgressing,
+    nextIncompleteStepIndex,
+  });
 
   useEffect(() => {
     if (!hasStartedPlay || !isAutoProgressing) {
@@ -690,50 +591,89 @@ export default function PlayDetailScreen() {
           contentContainerStyle={[
             styles.container,
             {
-              paddingTop: insets.top + 16,
-              paddingBottom: play ? 150 + Math.max(insets.bottom, 16) : 32,
+              paddingTop: insets.top + 12,
+              paddingBottom: play ? 110 + Math.max(insets.bottom, 16) : 32,
             },
           ]}
         >
-          <View style={styles.topBar}>
-            <IconCircleButton label="뒤로 가기" onPress={handleBack} text="‹" />
-            <View style={styles.topBarActions}>
-              <IconCircleButton
-                accent
-                label={favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
-                onPress={handleToggleFavorite}
-                text={favorite ? "★" : "☆"}
-              />
-            </View>
-          </View>
-
           {play ? (
             <>
-              <View style={styles.heroCard}>
+              <View style={styles.heroImageCard}>
+                <View style={styles.heroTopBar}>
+                  <IconCircleButton label="뒤로 가기" onPress={handleBack} text="‹" />
+                  <IconCircleButton
+                    label={favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+                    onPress={handleToggleFavorite}
+                    text={favorite ? "★" : "☆"}
+                  />
+                </View>
                 <PlayHeroArtwork play={play} />
-                <View style={styles.heroChipRow}>
-                  {play.devAreas[0] ? (
-                    <View
-                      style={[
-                        styles.heroPrimaryChip,
-                        {
-                          backgroundColor: DEV_AREA_THEME[play.devAreas[0]].textColor,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.heroPrimaryChipText}>
-                        {DEV_AREA_LABELS[play.devAreas[0]]} 놀이
-                      </Text>
-                    </View>
-                  ) : null}
-                  <View style={styles.heroSecondaryChip}>
-                    <Text style={styles.heroSecondaryChipText}>{formatDuration(play)}</Text>
-                  </View>
+                <View style={styles.heroFallbackLabel}>
+                  <Text style={styles.heroFallbackLabelText}>대표 이미지 준비 중</Text>
+                </View>
+              </View>
+
+              <View style={styles.summaryPanel}>
+                <View style={styles.agePill}>
+                  <Text style={styles.agePillText}>{formatAgeRange(play)}</Text>
                 </View>
                 <Text style={styles.heroTitle}>{play.name}</Text>
-                <Text style={styles.heroSubtitle}>
-                  {formatAgeRange(play)} · 엄마 {play.prepTime}분 준비
-                </Text>
+
+                <View style={styles.heroMetaRow}>
+                  <View style={styles.heroMetaItem}>
+                    <Text style={styles.heroMetaIcon}>◷</Text>
+                    <Text style={styles.heroMetaText}>{formatDuration(play)}</Text>
+                  </View>
+                  <View style={styles.heroMetaDivider} />
+                  <View style={styles.heroMetaItem}>
+                    <Text style={styles.heroMetaIcon}>⏱</Text>
+                    <Text style={styles.heroMetaText}>{getPrepTimeLabel(play)}</Text>
+                  </View>
+                  <View style={styles.heroMetaDivider} />
+                  <View style={styles.heroMetaItem}>
+                    <Text style={styles.heroMetaIcon}>▥</Text>
+                    <Text style={styles.heroMetaText}>{DIFFICULTY_LABELS[play.difficulty]}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.materialCheckHeader}>
+                  <Text style={styles.materialCheckTitle}>준비물 체크</Text>
+                </View>
+                {allMaterials.length > 0 ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.materialCheckRow}
+                  >
+                    {allMaterials.map(({ material, optional }) => (
+                      <MaterialCheckCard
+                        key={`${play.id}-summary-material-${material}-${optional ? "optional" : "required"}`}
+                        material={material}
+                        missing={!selectedMaterialsSet.has(material)}
+                        requirementLabel={optional ? "선택" : "필수"}
+                      />
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <View style={styles.readinessBar}>
+                    <Text style={styles.readinessIcon}>✓</Text>
+                    <Text style={styles.readinessText}>준비물이 없는 놀이예요.</Text>
+                  </View>
+                )}
+
+                {materialReadiness ? (
+                  <View
+                    style={[
+                      styles.readinessBar,
+                      materialReadiness.tone === "missing" && styles.readinessBarMissing,
+                    ]}
+                  >
+                    <Text style={styles.readinessIcon}>
+                      {materialReadiness.tone === "missing" ? "!" : "✓"}
+                    </Text>
+                    <Text style={styles.readinessText}>{materialReadiness.title}</Text>
+                  </View>
+                ) : null}
               </View>
 
               <View style={styles.tabBar}>
@@ -742,10 +682,7 @@ export default function PlayDetailScreen() {
                     key={tab.key}
                     accessibilityRole="button"
                     onPress={() => setActiveTab(tab.key)}
-                    style={[
-                      styles.tabButton,
-                      activeTab === tab.key && styles.tabButtonActive,
-                    ]}
+                    style={styles.tabButton}
                   >
                     <Text
                       style={[
@@ -755,37 +692,27 @@ export default function PlayDetailScreen() {
                     >
                       {tab.label}
                     </Text>
+                    <View style={[styles.tabUnderline, activeTab === tab.key && styles.tabUnderlineActive]} />
                   </Pressable>
                 ))}
               </View>
 
               {activeTab === "overview" ? (
-                <>
-                  {materialReadiness ? (
-                    <View
-                      style={[
-                        styles.infoCard,
-                        materialReadiness.tone === "missing"
-                          ? styles.infoCardMissing
-                          : styles.infoCardReady,
-                      ]}
-                    >
-                      <Text style={styles.infoCardTitle}>{materialReadiness.title}</Text>
-                      <Text style={styles.infoCardBody}>{materialReadiness.body}</Text>
-                    </View>
-                  ) : null}
-
+                <View style={styles.contentSection}>
                   <View style={styles.infoCard}>
                     <Text style={styles.sectionTitle}>놀이 정보</Text>
-                    <View style={styles.metaRow}>
-                      <View style={styles.metaChip}>
-                        <Text style={styles.metaChipText}>{PLACE_LABELS[play.place]}</Text>
+                    <View style={styles.summaryGrid}>
+                      <View style={styles.summaryGridItem}>
+                        <Text style={styles.summaryGridLabel}>장소</Text>
+                        <Text style={styles.summaryGridValue}>{PLACE_LABELS[play.place]}</Text>
                       </View>
-                      <View style={styles.metaChip}>
-                        <Text style={styles.metaChipText}>난이도 {play.difficulty}/3</Text>
+                      <View style={styles.summaryGridItem}>
+                        <Text style={styles.summaryGridLabel}>난이도</Text>
+                        <Text style={styles.summaryGridValue}>{DIFFICULTY_LABELS[play.difficulty]}</Text>
                       </View>
-                      <View style={styles.metaChip}>
-                        <Text style={styles.metaChipText}>{play.steps.length}단계</Text>
+                      <View style={styles.summaryGridItem}>
+                        <Text style={styles.summaryGridLabel}>단계</Text>
+                        <Text style={styles.summaryGridValue}>{play.steps.length}단계</Text>
                       </View>
                     </View>
                     <View style={styles.devTagRow}>
@@ -810,17 +737,17 @@ export default function PlayDetailScreen() {
                     </View>
                   </View>
 
-                  {latestLog ? (
+                  {play.educationalEffects.length > 0 ? (
                     <View style={styles.infoCard}>
-                      <Text style={styles.sectionTitle}>최근 완료 기록</Text>
-                      <Text style={styles.historyDate}>{formatCompletedAt(latestLog.completedAt)}</Text>
-                      <Text style={styles.historyStars}>{renderStars(latestLog.starRating)}</Text>
-                      {latestLog.childReaction.length > 0 ? (
-                        <Text style={styles.bodyText}>
-                          반응: {latestLog.childReaction.join(" · ")}
-                        </Text>
-                      ) : null}
-                      {latestLog.memo ? <Text style={styles.subtleText}>{latestLog.memo}</Text> : null}
+                      <Text style={styles.sectionTitle}>이 놀이가 좋은 점</Text>
+                      <View style={styles.effectGrid}>
+                        {play.educationalEffects.slice(0, 3).map((effect, index) => (
+                          <View key={`${play.id}-effect-card-${index}`} style={styles.effectCard}>
+                            <Text style={styles.effectIcon}>{index === 0 ? "◌" : index === 1 ? "◉" : "✋"}</Text>
+                            <Text numberOfLines={2} style={styles.effectText}>{effect}</Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
                   ) : null}
 
@@ -830,91 +757,15 @@ export default function PlayDetailScreen() {
                       <Text style={styles.bodyText}>{play.tip}</Text>
                     </View>
                   ) : null}
-
-                  {play.safetyNotes.length > 0 ? (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.sectionTitle}>안전 메모</Text>
-                      <View style={styles.noteList}>
-                        {play.safetyNotes.map((note, index) => (
-                          <View key={`${play.id}-safety-${index}`} style={styles.noteRow}>
-                            <View style={styles.noteBullet} />
-                            <Text style={styles.bodyText}>{note}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  ) : null}
-
-                  {play.educationalEffects.length > 0 ? (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.sectionTitle}>기대 효과</Text>
-                      <View style={styles.noteList}>
-                        {play.educationalEffects.map((effect, index) => (
-                          <View key={`${play.id}-effect-${index}`} style={styles.noteRow}>
-                            <View style={styles.noteBullet} />
-                            <Text style={styles.bodyText}>{effect}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  ) : null}
-
-                  {play.source.url ? (
-                    <Pressable
-                      accessibilityRole="button"
-                      onPress={handleOpenSource}
-                      style={({ pressed }) => [styles.sourceCard, pressed && styles.sourceCardPressed]}
-                    >
-                      {youtubePreview.status === "ready" && youtubePreview.thumbnailUrl ? (
-                        <Image source={{ uri: youtubePreview.thumbnailUrl }} style={styles.sourceThumbnail} />
-                      ) : null}
-                      <View style={styles.sourceBody}>
-                        <View style={styles.sourceBadge}>
-                          <Text style={styles.sourceBadgeText}>{SOURCE_LABELS[play.source.type]}</Text>
-                        </View>
-                        <Text style={styles.sourceTitle}>{getSourceTitle(play, youtubePreview)}</Text>
-                        <Text style={styles.subtleText}>
-                          {getSourceDescription(play, youtubePreview)}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  ) : null}
-                </>
-              ) : null}
-
-              {activeTab === "materials" ? (
-                <View style={styles.sectionBlock}>
-                  <Text style={styles.sectionHeading}>필요한 재료 · {allMaterials.length}개</Text>
-                  {allMaterials.length > 0 ? (
-                    <>
-                      {allMaterials.map(({ material, optional }) => (
-                        <MaterialRow
-                          key={`${material}-${optional ? "optional" : "required"}`}
-                          label={MATERIAL_DISPLAY_NAMES[material]}
-                          missing={!selectedMaterialsSet.has(material)}
-                          requirementLabel={optional ? "선택" : "필수"}
-                        />
-                      ))}
-                      {play.materials.substitutes.length > 0 ? (
-                        <Text style={styles.subtleText}>
-                          대체 재료:{" "}
-                          {play.materials.substitutes
-                            .map((material) => MATERIAL_DISPLAY_NAMES[material])
-                            .join(", ")}
-                        </Text>
-                      ) : null}
-                    </>
-                  ) : (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.bodyText}>준비물이 없는 놀이예요.</Text>
-                    </View>
-                  )}
                 </View>
               ) : null}
 
               {activeTab === "steps" ? (
-                <View style={styles.sectionBlock}>
-                  <Text style={styles.sectionHeading}>놀이 순서</Text>
+                <View style={styles.contentSection}>
+                  <View style={styles.sectionHeadingRow}>
+                    <Text style={styles.sectionHeadingIcon}>✋</Text>
+                    <Text style={styles.sectionHeading}>놀이방법</Text>
+                  </View>
                   <View style={styles.stepList}>
                     {play.steps.map((step, index) => (
                       <StepRow
@@ -927,6 +778,50 @@ export default function PlayDetailScreen() {
                       />
                     ))}
                   </View>
+                  {play.safetyNotes.length > 0 ? (
+                    <>
+                      <View style={styles.sectionDivider} />
+                      <View style={styles.sectionHeadingRow}>
+                        <Text style={styles.sectionHeadingIcon}>◆</Text>
+                        <Text style={styles.sectionHeading}>주의사항</Text>
+                      </View>
+                      <View style={styles.infoCard}>
+                        <View style={styles.noteList}>
+                          {play.safetyNotes.map((note, index) => (
+                            <View key={`${play.id}-steps-safety-${index}`} style={styles.noteRow}>
+                              <View style={styles.noteBullet} />
+                              <Text style={styles.bodyText}>{note}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    </>
+                  ) : null}
+                </View>
+              ) : null}
+
+              {activeTab === "safety" ? (
+                <View style={styles.contentSection}>
+                  <View style={styles.sectionHeadingRow}>
+                    <Text style={styles.sectionHeadingIcon}>◆</Text>
+                    <Text style={styles.sectionHeading}>주의사항</Text>
+                  </View>
+                  {play.safetyNotes.length > 0 ? (
+                    <View style={styles.infoCard}>
+                      <View style={styles.noteList}>
+                        {play.safetyNotes.map((note, index) => (
+                          <View key={`${play.id}-safety-${index}`} style={styles.noteRow}>
+                            <View style={styles.noteBullet} />
+                            <Text style={styles.bodyText}>{note}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  ) : (
+                    <View style={styles.infoCard}>
+                      <Text style={styles.bodyText}>따로 등록된 주의사항이 없어요.</Text>
+                    </View>
+                  )}
                 </View>
               ) : null}
             </>
@@ -942,23 +837,21 @@ export default function PlayDetailScreen() {
 
         {play ? (
           <View style={[styles.footerWrap, { paddingBottom: Math.max(insets.bottom, 16) }]}>
-            <View style={styles.footerCard}>
-              <View style={styles.footerTextWrap}>
-                <Text style={styles.footerTitle}>{footerLabel}</Text>
-                <Text style={styles.footerSubtitle}>{footerHelperText}</Text>
-              </View>
+            <View style={styles.footerBar}>
+              <IconCircleButton label="공유하기" onPress={handleShare} text="⇧" />
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ disabled: isAutoProgressing }}
                 disabled={isAutoProgressing}
                 onPress={handlePrimaryAction}
                 style={({ pressed }) => [
-                  styles.footerAction,
-                  isAutoProgressing && styles.footerActionDisabled,
-                  pressed && !isAutoProgressing && styles.footerActionPressed,
+                  styles.footerPrimaryButton,
+                  isAutoProgressing && styles.footerPrimaryButtonDisabled,
+                  pressed && !isAutoProgressing && styles.footerPrimaryButtonPressed,
                 ]}
               >
-                <Text style={styles.footerActionText}>{allStepsCompleted ? "✓" : "▶"}</Text>
+                <Text style={styles.footerPrimaryIcon}>{allStepsCompleted ? "✓" : "▶"}</Text>
+                <Text style={styles.footerPrimaryText}>{primaryActionLabel}</Text>
               </Pressable>
             </View>
           </View>
@@ -974,28 +867,39 @@ const styles = StyleSheet.create({
     backgroundColor: APP_COLORS.background,
   },
   container: {
-    paddingHorizontal: 20,
-    gap: 16,
+    paddingHorizontal: 16,
     backgroundColor: APP_COLORS.background,
   },
-  topBar: {
+  heroImageCard: {
+    height: 240,
+    overflow: "hidden",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: "#FFF1D4",
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: "#EFE1C7",
+  },
+  heroTopBar: {
+    position: "absolute",
+    top: 14,
+    left: 14,
+    right: 14,
+    zIndex: 2,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  topBarActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
   iconButton: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.52)",
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderWidth: 1,
-    borderColor: "#D8CBAE",
+    borderColor: "#E7E0D3",
+    ...APP_SHADOWS.control,
   },
   iconButtonAccent: {
     backgroundColor: APP_COLORS.mustard,
@@ -1009,151 +913,303 @@ const styles = StyleSheet.create({
   },
   iconButtonText: {
     color: APP_COLORS.ink,
-    fontSize: 18,
-    lineHeight: 20,
+    fontSize: 24,
+    lineHeight: 26,
     fontFamily: APP_FONTS.heading,
   },
   iconButtonTextAccent: {
     color: "#4E3B0F",
   },
-  heroCard: {
-    paddingHorizontal: 18,
-    paddingTop: 22,
-    paddingBottom: 18,
-    borderRadius: 32,
-    backgroundColor: "#F1D7C8",
-    gap: 14,
-  },
-  heroChipRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  heroPrimaryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-  },
-  heroPrimaryChipText: {
-    color: APP_COLORS.accentText,
-    fontSize: 12,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  heroSecondaryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: "#FAF3E5",
-  },
-  heroSecondaryChipText: {
-    color: "#8B7F68",
-    fontSize: 12,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  heroTitle: {
-    color: APP_COLORS.ink,
-    fontSize: 30,
-    lineHeight: 38,
-    textAlign: "center",
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  heroSubtitle: {
-    color: "#7F7566",
-    fontSize: 16,
-    textAlign: "center",
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  tabBar: {
-    flexDirection: "row",
-    padding: 4,
-    borderRadius: 999,
-    backgroundColor: "#F9F0DB",
-    borderWidth: 1,
-    borderColor: "#DCCFB1",
-  },
-  tabButton: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  heroFallbackLabel: {
+    position: "absolute",
+    top: 88,
+    alignSelf: "center",
+    paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 999,
+    borderRadius: 4,
+    backgroundColor: "rgba(255,250,238,0.74)",
+    borderWidth: 1,
+    borderColor: "rgba(211,179,111,0.32)",
+    transform: [{ rotate: "-4deg" }],
   },
-  tabButtonActive: {
-    backgroundColor: APP_COLORS.accent,
-  },
-  tabButtonText: {
-    color: "#6E705C",
+  heroFallbackLabelText: {
+    color: "#59462A",
     fontSize: 16,
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
   },
-  tabButtonTextActive: {
-    color: APP_COLORS.accentText,
-  },
-  sectionBlock: {
-    gap: 12,
-  },
-  sectionHeading: {
-    color: APP_COLORS.ink,
-    fontSize: 24,
-    lineHeight: 30,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  infoCard: {
-    gap: 10,
-    padding: 18,
-    borderRadius: 24,
+  summaryPanel: {
+    marginTop: 0,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     backgroundColor: APP_COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E0D4B7",
-    ...APP_SHADOWS.card,
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderColor: APP_COLORS.line,
   },
-  infoCardReady: {
-    backgroundColor: APP_COLORS.sageSoft,
+  agePill: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.mustard,
   },
-  infoCardMissing: {
-    backgroundColor: APP_COLORS.coralSoft,
+  agePillText: {
+    color: APP_COLORS.accentText,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
   },
-  infoCardTitle: {
+  heroTitle: {
+    marginTop: 14,
+    color: APP_COLORS.ink,
+    fontSize: 28,
+    lineHeight: 36,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "600",
+  },
+  heroMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 12,
+    marginTop: 14,
+  },
+  heroMetaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  heroMetaIcon: {
+    color: "#6D6D6D",
+    fontSize: 18,
+    fontFamily: APP_FONTS.body,
+  },
+  heroMetaText: {
+    color: "#4F4F4F",
+    fontSize: 16,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  heroMetaDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: APP_COLORS.line,
+  },
+  materialCheckHeader: {
+    marginTop: 20,
+  },
+  materialCheckTitle: {
     color: APP_COLORS.ink,
     fontSize: 18,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
-  infoCardBody: {
+  materialCheckRow: {
+    gap: 8,
+    paddingTop: 12,
+    paddingRight: 4,
+  },
+  materialCheckCard: {
+    width: 82,
+    minHeight: 98,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 8,
+    paddingTop: 10,
+    paddingBottom: 8,
+    borderRadius: 12,
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  materialCheckImageSlot: {
+    width: 48,
+    height: 42,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  materialCheckRequirement: {
+    marginTop: 2,
     color: APP_COLORS.muted,
+    fontSize: 11,
+    lineHeight: 15,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  materialCheckLabel: {
+    minHeight: 32,
+    marginTop: 2,
+    color: APP_COLORS.ink,
+    fontSize: 12,
+    lineHeight: 17,
+    textAlign: "center",
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  materialMiniStatus: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 18,
+    height: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 9,
+    backgroundColor: APP_COLORS.mustard,
+  },
+  materialMiniStatusMissing: {
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1.5,
+    borderColor: "#8B8B8B",
+  },
+  materialMiniStatusText: {
+    color: APP_COLORS.accentText,
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: APP_FONTS.heading,
+  },
+  materialMiniStatusTextMissing: {
+    color: "transparent",
+  },
+  readinessBar: {
+    minHeight: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: "#FFF7E5",
+  },
+  readinessBarMissing: {
+    backgroundColor: "#FFF3D6",
+  },
+  readinessIcon: {
+    width: 24,
+    height: 24,
+    overflow: "hidden",
+    borderRadius: 12,
+    color: APP_COLORS.surface,
+    backgroundColor: APP_COLORS.mustard,
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
+  },
+  readinessText: {
+    flex: 1,
+    color: "#514A3E",
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 19,
     fontFamily: APP_FONTS.body,
   },
-  sectionTitle: {
+  tabBar: {
+    flexDirection: "row",
+    minHeight: 58,
+    marginTop: 0,
+    backgroundColor: APP_COLORS.surface,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 14,
+  },
+  tabButtonText: {
+    color: "#6F6F6F",
+    fontSize: 15,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  tabButtonTextActive: {
     color: APP_COLORS.ink,
-    fontSize: 20,
+    fontFamily: APP_FONTS.heading,
+  },
+  tabUnderline: {
+    width: 54,
+    height: 2,
+    marginTop: 13,
+    borderRadius: 999,
+    backgroundColor: "transparent",
+  },
+  tabUnderlineActive: {
+    backgroundColor: APP_COLORS.mustard,
+  },
+  contentSection: {
+    gap: 16,
+    paddingTop: 24,
+  },
+  sectionDivider: {
+    height: 1,
+    marginTop: 8,
+    backgroundColor: APP_COLORS.line,
+  },
+  sectionHeading: {
+    color: APP_COLORS.ink,
+    fontSize: 23,
+    lineHeight: 30,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
-  metaRow: {
+  sectionHeadingRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 10,
+  },
+  sectionHeadingIcon: {
+    color: APP_COLORS.mustard,
+    fontSize: 24,
+    lineHeight: 30,
+    fontFamily: APP_FONTS.heading,
+  },
+  infoCard: {
+    gap: 12,
+    padding: 16,
+    borderRadius: 14,
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  sectionTitle: {
+    color: APP_COLORS.ink,
+    fontSize: 18,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "600",
+  },
+  summaryGrid: {
+    flexDirection: "row",
     gap: 8,
   },
-  metaChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 999,
+  summaryGridItem: {
+    flex: 1,
+    gap: 4,
+    padding: 12,
+    borderRadius: 12,
     backgroundColor: APP_COLORS.background,
     borderWidth: 1,
     borderColor: APP_COLORS.line,
   },
-  metaChipText: {
+  summaryGridLabel: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    fontFamily: APP_FONTS.body,
+  },
+  summaryGridValue: {
     color: APP_COLORS.ink,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
   },
@@ -1164,22 +1220,41 @@ const styles = StyleSheet.create({
   },
   devTag: {
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 999,
   },
   devTagText: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
   },
-  historyDate: {
-    color: APP_COLORS.muted,
-    fontSize: 13,
-    fontFamily: APP_FONTS.body,
+  effectGrid: {
+    flexDirection: "row",
+    gap: 10,
   },
-  historyStars: {
-    color: "#B38A18",
-    fontSize: 13,
+  effectCard: {
+    flex: 1,
+    minHeight: 88,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: APP_COLORS.background,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  effectIcon: {
+    color: APP_COLORS.mustard,
+    fontSize: 27,
+    lineHeight: 30,
+    fontFamily: APP_FONTS.heading,
+  },
+  effectText: {
+    color: APP_COLORS.ink,
+    fontSize: 12,
+    lineHeight: 17,
+    textAlign: "center",
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
   },
@@ -1204,157 +1279,51 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   noteBullet: {
-    width: 8,
-    height: 8,
+    width: 5,
+    height: 5,
     marginTop: 7,
     borderRadius: 999,
-    backgroundColor: APP_COLORS.mustard,
-  },
-  sourceCard: {
-    flexDirection: "row",
-    gap: 14,
-    padding: 18,
-    borderRadius: 24,
-    backgroundColor: APP_COLORS.surface,
-    borderWidth: 1,
-    borderColor: "#E0D4B7",
-    ...APP_SHADOWS.card,
-  },
-  sourceCardPressed: {
-    opacity: 0.88,
-  },
-  sourceThumbnail: {
-    width: 110,
-    height: 80,
-    borderRadius: 16,
-    backgroundColor: APP_COLORS.line,
-  },
-  sourceBody: {
-    flex: 1,
-    gap: 8,
-  },
-  sourceBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: APP_COLORS.card,
-  },
-  sourceBadgeText: {
-    color: APP_COLORS.ink,
-    fontSize: 12,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  sourceTitle: {
-    color: APP_COLORS.ink,
-    fontSize: 16,
-    lineHeight: 22,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  materialRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderRadius: 22,
-    backgroundColor: APP_COLORS.surface,
-    borderWidth: 1,
-    borderColor: "#E0D4B7",
-    ...APP_SHADOWS.card,
-  },
-  materialIcon: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    backgroundColor: "#E5E8D6",
-  },
-  materialIconInner: {
-    width: 14,
-    height: 12,
-    borderRadius: 2,
-    borderWidth: 1.5,
-    borderColor: "#5C624B",
-  },
-  materialLabel: {
-    flex: 1,
-    color: APP_COLORS.ink,
-    fontSize: 18,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  materialAmount: {
-    color: "#817766",
-    fontSize: 15,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  materialStatus: {
-    width: 28,
-    height: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 14,
-  },
-  materialStatusReady: {
-    backgroundColor: APP_COLORS.accent,
-  },
-  materialStatusMissing: {
-    backgroundColor: APP_COLORS.coralSoft,
-  },
-  materialStatusText: {
-    fontSize: 14,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "700",
-  },
-  materialStatusTextReady: {
-    color: APP_COLORS.accentText,
-  },
-  materialStatusTextMissing: {
-    color: "#7A5646",
+    backgroundColor: APP_COLORS.ink,
   },
   stepList: {
     gap: 12,
   },
   stepRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-    padding: 16,
-    borderRadius: 22,
+    alignItems: "center",
+    gap: 14,
+    minHeight: 64,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 14,
     backgroundColor: APP_COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E0D4B7",
-    ...APP_SHADOWS.card,
+    borderColor: APP_COLORS.line,
   },
   stepRowActive: {
     borderColor: APP_COLORS.accent,
-    backgroundColor: "#EEF2E2",
+    backgroundColor: "#FFFBEC",
   },
   stepRowCompleted: {
-    backgroundColor: "#F4EFE1",
+    backgroundColor: "#F8F6F1",
   },
   stepRowPressed: {
     opacity: 0.92,
   },
   stepBadge: {
-    width: 34,
-    height: 34,
+    width: 36,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 17,
-    backgroundColor: APP_COLORS.background,
+    borderRadius: 18,
+    backgroundColor: APP_COLORS.mustard,
   },
   stepBadgeActive: {
     backgroundColor: APP_COLORS.mustard,
   },
   stepBadgeText: {
-    color: APP_COLORS.ink,
-    fontSize: 14,
+    color: APP_COLORS.accentText,
+    fontSize: 15,
     fontFamily: APP_FONTS.body,
     fontWeight: "700",
   },
@@ -1363,98 +1332,88 @@ const styles = StyleSheet.create({
   },
   stepBody: {
     flex: 1,
-    gap: 6,
   },
   stepText: {
     color: APP_COLORS.ink,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 23,
     fontFamily: APP_FONTS.body,
   },
   stepTextCompleted: {
     color: APP_COLORS.muted,
-  },
-  stepMeta: {
-    color: APP_COLORS.muted,
-    fontSize: 12,
-    fontFamily: APP_FONTS.body,
-  },
-  stepMetaActive: {
-    color: APP_COLORS.accent,
-    fontWeight: "600",
   },
   footerWrap: {
     position: "absolute",
     right: 0,
     bottom: 0,
     left: 0,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
-  footerCard: {
+  footerBar: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 28,
-    backgroundColor: "#46552F",
-    ...APP_SHADOWS.cardLifted,
+    gap: 12,
+    padding: 12,
+    borderRadius: 18,
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    ...APP_SHADOWS.card,
   },
-  footerTextWrap: {
+  footerPrimaryButton: {
     flex: 1,
-    gap: 2,
+    height: 56,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    borderRadius: 14,
+    backgroundColor: APP_COLORS.mustard,
   },
-  footerTitle: {
+  footerPrimaryButtonDisabled: {
+    backgroundColor: "#E0D7BD",
+  },
+  footerPrimaryButtonPressed: {
+    opacity: 0.9,
+  },
+  footerPrimaryIcon: {
+    width: 28,
+    height: 28,
+    overflow: "hidden",
+    borderRadius: 14,
+    color: APP_COLORS.mustard,
+    backgroundColor: APP_COLORS.surface,
+    fontSize: 15,
+    lineHeight: 28,
+    textAlign: "center",
+    fontFamily: APP_FONTS.heading,
+  },
+  footerPrimaryText: {
     color: APP_COLORS.accentText,
-    fontSize: 28,
-    lineHeight: 32,
+    fontSize: 18,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
-  footerSubtitle: {
-    color: "rgba(244,235,214,0.72)",
-    fontSize: 15,
-    fontFamily: APP_FONTS.body,
-  },
-  footerAction: {
-    width: 56,
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 28,
-    backgroundColor: APP_COLORS.mustard,
-  },
-  footerActionDisabled: {
-    backgroundColor: "#A69C84",
-  },
-  footerActionPressed: {
-    opacity: 0.88,
-  },
-  footerActionText: {
-    color: "#4E3B0F",
-    fontSize: 20,
-    lineHeight: 22,
-    fontFamily: APP_FONTS.heading,
-  },
   artFrame: {
-    minHeight: 230,
+    height: 240,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
   artShadow: {
     position: "absolute",
-    bottom: 53,
-    width: 136,
-    height: 24,
+    bottom: 42,
+    width: 190,
+    height: 28,
     borderRadius: 999,
-    backgroundColor: "rgba(40,36,26,0.12)",
+    backgroundColor: "rgba(126,90,31,0.08)",
   },
   artStage: {
-    width: 220,
-    height: 150,
+    width: 260,
+    height: 170,
     alignItems: "center",
     justifyContent: "center",
+    transform: [{ translateY: 28 }],
   },
   artPlateOuter: {
     position: "absolute",
@@ -1600,29 +1559,28 @@ const styles = StyleSheet.create({
   artPaperSheet: {
     position: "absolute",
     bottom: 40,
-    width: 66,
-    height: 50,
-    borderRadius: 14,
+    width: 98,
+    height: 68,
+    borderRadius: 4,
     backgroundColor: APP_COLORS.surface,
-    borderWidth: 2,
-    borderColor: "#5E594D",
+    transform: [{ rotate: "7deg" }],
   },
   artPaperMarkOne: {
     position: "absolute",
-    bottom: 66,
-    width: 26,
-    height: 4,
+    bottom: 73,
+    width: 32,
+    height: 18,
     borderRadius: 999,
-    backgroundColor: APP_COLORS.coral,
+    backgroundColor: "rgba(255,142,134,0.72)",
     transform: [{ rotate: "-20deg" }],
   },
   artPaperMarkTwo: {
     position: "absolute",
-    bottom: 56,
-    width: 28,
-    height: 4,
+    bottom: 53,
+    width: 34,
+    height: 20,
     borderRadius: 999,
-    backgroundColor: APP_COLORS.lavender,
+    backgroundColor: "rgba(97,214,179,0.62)",
     transform: [{ rotate: "18deg" }],
   },
   artBookLeft: {
