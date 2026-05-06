@@ -1,5 +1,6 @@
-import { CHILD_REACTION_OPTIONS, type ChildReaction } from "@/constants/feedback";
+import { CHILD_REACTION_PARSE_OPTIONS, type ChildReaction } from "@/constants/feedback";
 import { randomUUID } from "expo-crypto";
+import { Platform } from "react-native";
 
 import type { DevArea } from "@/constants/devAreas";
 import { initializeDatabase } from "@/db";
@@ -23,6 +24,18 @@ type UserContextRow = {
 };
 
 const playIndex = new Map(loadPlaysBundle().plays.map((play) => [play.id, play]));
+
+async function runWriteBatch(
+  database: Awaited<ReturnType<typeof initializeDatabase>>,
+  task: () => Promise<void>,
+) {
+  if (Platform.OS === "web") {
+    await task();
+    return;
+  }
+
+  await database.withTransactionAsync(task);
+}
 
 function parseStringArray<T extends string>(value: string | null | undefined): T[] {
   if (!value) {
@@ -64,7 +77,7 @@ function parseScoreMap(value: string | null | undefined): AreaScoreMap {
 }
 
 function parseChildReactions(value: string | null | undefined): ChildReaction[] {
-  const options = new Set<string>(CHILD_REACTION_OPTIONS);
+  const options = new Set<string>(CHILD_REACTION_PARSE_OPTIONS);
 
   return parseStringArray<string>(value).filter(
     (reaction): reaction is ChildReaction => options.has(reaction),
@@ -139,7 +152,7 @@ export async function insertPlayLog(
   const playLogId = randomUUID();
   const completedAt = new Date().toISOString();
 
-  await database.withTransactionAsync(async () => {
+  await runWriteBatch(database, async () => {
     await database.runAsync(
       `INSERT INTO play_logs (
         id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo
@@ -390,8 +403,20 @@ export async function applyPlayFeedbackSignals(
     }
   }
 
-  if (reactions.includes("더 하고 싶어했어요")) {
+  if (
+    reactions.includes("더 하고 싶어했어요") ||
+    reactions.includes("집중했어요") ||
+    reactions.includes("스스로 했어요")
+  ) {
     devGaps = adjustAreaScores(devGaps, play.devAreas, -10);
+  }
+
+  if (reactions.includes("도움이 필요했어요") || reactions.includes("어려워했어요")) {
+    devGaps = adjustAreaScores(devGaps, play.devAreas, 10);
+  }
+
+  if (reactions.includes("흥미가 적었어요") || reactions.includes("별로였어요")) {
+    userFeedback = adjustAreaScores(userFeedback, play.devAreas, -10);
   }
 
   return upsertUserContext(guestId, {
@@ -410,7 +435,7 @@ export async function resetUserActivity(guestId: string): Promise<UserContext> {
     userFeedback: {},
   };
 
-  await database.withTransactionAsync(async () => {
+  await runWriteBatch(database, async () => {
     await database.runAsync("DELETE FROM play_logs WHERE guest_id = ?", guestId);
     await database.runAsync("DELETE FROM dev_logs WHERE guest_id = ?", guestId);
     await database.runAsync("DELETE FROM favorites WHERE guest_id = ?", guestId);

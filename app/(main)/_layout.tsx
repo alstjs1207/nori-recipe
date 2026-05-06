@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { type ComponentProps, useEffect } from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Redirect, Tabs } from "expo-router";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -13,7 +14,19 @@ import { MOTION } from "@/animations/motion";
 import { APP_COLORS, APP_FONTS } from "@/constants/theme";
 import { useSessionStore } from "@/store/sessionStore";
 
+type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 type TabGlyph = "home" | "search" | "record" | "heart" | "person";
+
+const TAB_ICONS: Record<
+  TabGlyph,
+  { active: MaterialCommunityIconName; inactive: MaterialCommunityIconName; size: number }
+> = {
+  home: { active: "home-variant", inactive: "home-variant-outline", size: 27 },
+  search: { active: "magnify", inactive: "magnify", size: 28 },
+  record: { active: "clipboard-check", inactive: "clipboard-check-outline", size: 27 },
+  heart: { active: "heart", inactive: "heart-outline", size: 27 },
+  person: { active: "account-circle", inactive: "account-circle-outline", size: 27 },
+};
 
 function TabIcon({ focused, glyph }: { focused: boolean; glyph: TabGlyph }) {
   const scale = useSharedValue(focused ? 1 : 0.94);
@@ -43,7 +56,7 @@ function TabIcon({ focused, glyph }: { focused: boolean; glyph: TabGlyph }) {
   }));
 
   return (
-    <Animated.View style={[styles.iconWrap, glyph === "record" && styles.recordIconWrap, animatedStyle]}>
+    <Animated.View style={[styles.iconWrap, animatedStyle]}>
       {renderGlyph(glyph, focused)}
     </Animated.View>
   );
@@ -51,42 +64,14 @@ function TabIcon({ focused, glyph }: { focused: boolean; glyph: TabGlyph }) {
 
 function renderGlyph(glyph: TabGlyph, focused: boolean) {
   const color = focused ? APP_COLORS.accentText : "#8F8F8F";
-
-  if (glyph === "home") {
-    return (
-      <View style={styles.homeGlyph}>
-        <View style={[styles.homeRoof, { backgroundColor: color }]} />
-        <View style={[styles.homeBody, { borderColor: color }]} />
-      </View>
-    );
-  }
-
-  if (glyph === "search") {
-    return (
-      <View style={styles.searchGlyph}>
-        <View style={[styles.searchRing, { borderColor: color }]} />
-        <View style={[styles.searchHandle, { backgroundColor: color }]} />
-      </View>
-    );
-  }
-
-  if (glyph === "record") {
-    return (
-      <View style={styles.recordGlyph}>
-        <Text style={styles.recordGlyphText}>+</Text>
-      </View>
-    );
-  }
-
-  if (glyph === "heart") {
-    return <Text style={[styles.symbolGlyph, { color }]}>{focused ? "♥" : "♡"}</Text>;
-  }
+  const icon = TAB_ICONS[glyph];
 
   return (
-    <View style={styles.personGlyph}>
-      <View style={[styles.personHead, { backgroundColor: color }]} />
-      <View style={[styles.personBody, { borderColor: color }]} />
-    </View>
+    <MaterialCommunityIcons
+      name={focused ? icon.active : icon.inactive}
+      size={icon.size}
+      color={color}
+    />
   );
 }
 
@@ -185,100 +170,5 @@ const styles = StyleSheet.create({
     height: 28,
     alignItems: "center",
     justifyContent: "center",
-  },
-  recordIconWrap: {
-    width: 56,
-    height: 36,
-  },
-  homeGlyph: {
-    width: 24,
-    height: 22,
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  homeRoof: {
-    position: "absolute",
-    top: 1,
-    width: 11,
-    height: 11,
-    transform: [{ rotate: "45deg" }],
-    borderTopLeftRadius: 3,
-  },
-  homeBody: {
-    width: 15,
-    height: 11,
-    borderWidth: 2,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
-  },
-  searchGlyph: {
-    width: 24,
-    height: 24,
-  },
-  searchRing: {
-    position: "absolute",
-    top: 3,
-    left: 3,
-    width: 15,
-    height: 15,
-    borderRadius: 999,
-    borderWidth: 2,
-  },
-  searchHandle: {
-    position: "absolute",
-    right: 3,
-    bottom: 4,
-    width: 9,
-    height: 2,
-    borderRadius: 999,
-    transform: [{ rotate: "45deg" }],
-  },
-  recordGlyph: {
-    width: 50,
-    height: 50,
-    marginTop: -16,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 999,
-    backgroundColor: APP_COLORS.accent,
-    shadowColor: "#1D1D1D",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-    elevation: 4,
-  },
-  recordGlyphText: {
-    color: APP_COLORS.accentText,
-    fontSize: 34,
-    lineHeight: 36,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  symbolGlyph: {
-    fontSize: 26,
-    lineHeight: 28,
-    fontFamily: APP_FONTS.heading,
-  },
-  personGlyph: {
-    width: 24,
-    height: 24,
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  personHead: {
-    position: "absolute",
-    top: 2,
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-  },
-  personBody: {
-    width: 16,
-    height: 10,
-    borderWidth: 2,
-    borderTopLeftRadius: 9,
-    borderTopRightRadius: 9,
-    borderBottomWidth: 0,
   },
 });

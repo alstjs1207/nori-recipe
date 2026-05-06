@@ -1,35 +1,67 @@
 import { useMemo, useState } from "react";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
+import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
+import { useSessionStore } from "@/store/sessionStore";
+import type { PlayPlace } from "@/types";
 
 function formatDuration(min: number, max: number): string {
   return min === max ? `${min}분` : `${min}-${max}분`;
 }
 
+function readParam(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+
+  return typeof value === "string" ? value : null;
+}
+
+function readPlaceParam(value: string | string[] | undefined): PlayPlace | null {
+  const place = readParam(value);
+
+  return place === "indoor" || place === "outdoor" || place === "any" ? place : null;
+}
+
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams<{ label?: string | string[]; place?: string | string[] }>();
   const plays = usePlaysStore((state) => state.plays);
+  const childBirthMonth = useSessionStore((state) => state.userContext.childBirthMonth);
   const [query, setQuery] = useState("");
+  const selectedPlace = readPlaceParam(params.place);
+  const selectedPlaceLabel = readParam(params.label);
+  const selectedAgeMonths =
+    childBirthMonth === null ? null : getAgeMonthsFromBirthMonth(childBirthMonth);
+  const selectedAgeLabel = selectedAgeMonths === null ? "아이" : `${selectedAgeMonths}개월 아이`;
 
   const results = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
+    const placeFiltered = selectedPlace === null
+      ? plays
+      : plays.filter((play) => play.place === selectedPlace);
+    const ageFiltered = selectedAgeMonths === null
+      ? placeFiltered
+      : placeFiltered.filter(
+          (play) => play.ageMin <= selectedAgeMonths && play.ageMax >= selectedAgeMonths,
+        );
 
     if (normalizedQuery.length === 0) {
-      return plays.slice(0, 24);
+      return ageFiltered.slice(0, 24);
     }
 
-    return plays
+    return ageFiltered
       .filter((play) => {
         const target = [play.name, ...play.tags, ...play.steps].join(" ").toLowerCase();
         return target.includes(normalizedQuery);
       })
       .slice(0, 30);
-  }, [plays, query]);
+  }, [plays, query, selectedAgeMonths, selectedPlace]);
 
   return (
     <ScrollView
@@ -38,7 +70,11 @@ export default function SearchScreen() {
     >
       <View style={styles.header}>
         <Text style={styles.title}>검색</Text>
-        <Text style={styles.subtitle}>놀이, 재료, 상황으로 찾아보세요.</Text>
+        <Text style={styles.subtitle}>
+          {selectedPlaceLabel
+            ? `${selectedPlaceLabel}에 맞는 ${selectedAgeLabel} 놀이를 찾아보세요.`
+            : `${selectedAgeLabel}에게 맞는 놀이, 재료, 상황으로 찾아보세요.`}
+        </Text>
       </View>
 
       <View style={styles.searchBox}>
@@ -54,7 +90,7 @@ export default function SearchScreen() {
       </View>
 
       <View style={styles.resultHeader}>
-        <Text style={styles.sectionTitle}>놀이 목록</Text>
+        <Text style={styles.sectionTitle}>{selectedPlaceLabel ?? "놀이 목록"}</Text>
         <Text style={styles.sectionMeta}>{results.length}개</Text>
       </View>
 

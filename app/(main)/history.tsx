@@ -1,32 +1,69 @@
-import { useCallback, useState } from "react";
+import { type ComponentProps, useCallback, useMemo, useState } from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect } from "expo-router";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 
-import { fadeInUp, layoutTransition, quickFadeIn } from "@/animations/motion";
+import { fadeInUp, layoutTransition } from "@/animations/motion";
 import { MotionPressable } from "@/components/motion/MotionPressable";
 import { DEV_AREA_LABELS, DEV_AREA_SLUGS, DEV_AREA_THEME, type DevArea } from "@/constants/devAreas";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
-import { getDevAreaStats, getFavorites, getPlayLogs } from "@/db/queries";
-import type { DevAreaStat, FavoriteRecord, PlayLogRecord } from "@/types";
+import { getDevAreaStats, getPlayLogs } from "@/db/queries";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
+import type { DevAreaStat, Play, PlayLogRecord } from "@/types";
 
 type HistoryData = {
   logs: PlayLogRecord[];
   stats: DevAreaStat[];
-  favorites: FavoriteRecord[];
 };
 
 type LoadState = "idle" | "loading" | "ready" | "error";
+type AgeFilter = "all" | 1 | 2 | 3 | 4;
+
+type CoverageRow = {
+  devArea: DevArea;
+  count: number;
+  strength: number;
+};
+
+type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
+
+const AGE_FILTERS: Array<{ label: string; value: AgeFilter }> = [
+  { label: "전체", value: "all" },
+  { label: "1세", value: 1 },
+  { label: "2세", value: 2 },
+  { label: "3세", value: 3 },
+  { label: "4세", value: 4 },
+];
+
+const THUMBNAIL_BACKGROUNDS = [
+  "#FFF2BF",
+  "#E4F8F1",
+  "#EFE7FF",
+  "#FFE7E3",
+  "#E5F5FE",
+];
+
+const DEV_AREA_ICONS: Record<DevArea, MaterialCommunityIconName> = {
+  fine_motor: "hand-front-right",
+  gross_motor: "run-fast",
+  cognitive: "lightbulb-on",
+  language: "chat-processing-outline",
+  emotional: "heart-outline",
+  social: "account-group",
+  sensory: "eye-outline",
+};
 
 function formatLogDate(value: string): string {
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "numeric",
-    day: "numeric",
-    weekday: "short",
-  }).format(new Date(value));
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const weekday = new Intl.DateTimeFormat("ko-KR", { weekday: "short" }).format(date);
+
+  return `${year}.${month}.${day} (${weekday})`;
 }
 
 function isSameMonth(value: string, referenceDate: Date): boolean {
@@ -38,8 +75,8 @@ function isSameMonth(value: string, referenceDate: Date): boolean {
   );
 }
 
-function buildCoverageRows(stats: DevAreaStat[]) {
-  const total = stats.reduce((sum, item) => sum + item.total, 0);
+function buildCoverageRows(stats: DevAreaStat[]): CoverageRow[] {
+  const maxCount = Math.max(0, ...stats.map((item) => item.total));
   const statMap = new Map(stats.map((item) => [item.devArea, item.total]));
 
   return DEV_AREA_SLUGS.map((devArea) => {
@@ -48,22 +85,161 @@ function buildCoverageRows(stats: DevAreaStat[]) {
     return {
       devArea,
       count,
-      percent: total > 0 ? Math.round((count / total) * 100) : 0,
+      strength: maxCount > 0 ? count / maxCount : 0,
     };
   });
 }
 
-function getLackingArea(rows: ReturnType<typeof buildCoverageRows>): DevArea | null {
+function getLackingArea(rows: CoverageRow[]): DevArea | null {
   const sorted = [...rows].sort((left, right) => left.count - right.count);
   return sorted[0]?.devArea ?? null;
 }
 
-function renderStars(value: number | null): string {
-  if (!value) {
-    return "평가 없음";
+function getPlayAgeYear(play: Play | undefined): AgeFilter | null {
+  if (!play) {
+    return null;
   }
 
-  return `${"★".repeat(value)}${"☆".repeat(5 - value)}`;
+  const midpointMonths = (play.ageMin + play.ageMax) / 2;
+  const ageYear = Math.floor(midpointMonths / 12);
+
+  return Math.max(1, Math.min(4, ageYear)) as AgeFilter;
+}
+
+function formatPlayAge(play: Play | undefined): string {
+  const ageYear = getPlayAgeYear(play);
+
+  return ageYear === null ? "연령 정보 없음" : `${ageYear}세`;
+}
+
+function getMoodIcon(value: number | null): MaterialCommunityIconName {
+  if (!value) {
+    return "emoticon-outline";
+  }
+
+  if (value >= 5) {
+    return "emoticon-excited-outline";
+  }
+
+  if (value >= 4) {
+    return "emoticon-happy-outline";
+  }
+
+  if (value >= 3) {
+    return "emoticon-neutral-outline";
+  }
+
+  return "emoticon-sad-outline";
+}
+
+function getMoodColor(value: number | null): string {
+  if (!value) {
+    return APP_COLORS.muted;
+  }
+
+  if (value >= 5) {
+    return APP_COLORS.coral;
+  }
+
+  if (value >= 4) {
+    return "#B38A18";
+  }
+
+  if (value >= 3) {
+    return "#45A27E";
+  }
+
+  return "#8B8D95";
+}
+
+function getMoodTone(value: number | null): string {
+  if (!value) {
+    return APP_COLORS.lineSoft;
+  }
+
+  if (value >= 5) {
+    return "#FFD9E5";
+  }
+
+  if (value >= 4) {
+    return APP_COLORS.mustardSoft;
+  }
+
+  if (value >= 3) {
+    return APP_COLORS.sageSoft;
+  }
+
+  return APP_COLORS.lineSoft;
+}
+
+function getLogPreview(log: PlayLogRecord): string {
+  if (log.memo) {
+    return log.memo;
+  }
+
+  if (log.childReaction.length > 0) {
+    return log.childReaction.join(" · ");
+  }
+
+  return "짧은 기록이 없어요.";
+}
+
+function CoverageWheel({ rows, total }: { rows: CoverageRow[]; total: number }) {
+  const step = 360 / rows.length;
+
+  return (
+    <View style={styles.coverageWheel}>
+      {rows.map((row, index) => {
+        const theme = DEV_AREA_THEME[row.devArea];
+        const strength = row.count === 0 ? 0.45 : 0.58 + row.strength * 0.42;
+
+        return (
+          <View
+            key={row.devArea}
+            style={[
+              styles.coveragePetal,
+              {
+                backgroundColor: theme.backgroundColor,
+                borderColor: theme.accentColor,
+                opacity: row.count === 0 ? 0.36 : 1,
+                transform: [
+                  { rotate: `${index * step}deg` },
+                  { translateY: -58 },
+                  { scaleY: strength },
+                ],
+              },
+            ]}
+          />
+        );
+      })}
+      <View style={styles.coverageCenter}>
+        <Text style={styles.coverageCenterValue}>{total}</Text>
+        <Text style={styles.coverageCenterLabel}>기록</Text>
+      </View>
+    </View>
+  );
+}
+
+function PlayThumbnailSlot({ index, play }: { index: number; play: Play | undefined }) {
+  const devArea = play?.devAreas[0];
+  const theme = devArea ? DEV_AREA_THEME[devArea] : null;
+  const backgroundColor = theme?.backgroundColor ?? THUMBNAIL_BACKGROUNDS[index % THUMBNAIL_BACKGROUNDS.length];
+  const accentColor = theme?.accentColor ?? "rgba(255,255,255,0.72)";
+  const iconName = devArea ? DEV_AREA_ICONS[devArea] : "clipboard-check-outline";
+  const iconColor = theme?.textColor ?? APP_COLORS.accentText;
+
+  return (
+    <View style={[styles.thumbnailSlot, { backgroundColor }]}>
+      <View style={[styles.thumbnailShapeLarge, { backgroundColor: accentColor }]} />
+      <View style={styles.thumbnailShapeSmall} />
+      <MaterialCommunityIcons
+        name={iconName}
+        size={32}
+        color={iconColor}
+        style={styles.thumbnailIcon}
+      />
+    </View>
+  );
 }
 
 export default function HistoryScreen() {
@@ -74,26 +250,42 @@ export default function HistoryScreen() {
   const [historyData, setHistoryData] = useState<HistoryData>({
     logs: [],
     stats: [],
-    favorites: [],
   });
   const [status, setStatus] = useState<LoadState>("idle");
   const [error, setError] = useState<string | null>(null);
-  const playMap = new Map(plays.map((play) => [play.id, play]));
+  const [selectedAgeFilter, setSelectedAgeFilter] = useState<AgeFilter>("all");
+  const playMap = useMemo(() => new Map(plays.map((play) => [play.id, play])), [plays]);
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
-  const referenceMonthDate = new Date(currentYear, currentMonth - 1, 1);
-  const monthLogs = historyData.logs.filter((log) =>
-    isSameMonth(log.completedAt, referenceMonthDate),
+  const referenceMonthDate = useMemo(
+    () => new Date(currentYear, currentMonth - 1, 1),
+    [currentMonth, currentYear],
   );
-  const coverageRows = buildCoverageRows(historyData.stats);
+  const monthLogs = useMemo(
+    () => historyData.logs.filter((log) => isSameMonth(log.completedAt, referenceMonthDate)),
+    [historyData.logs, referenceMonthDate],
+  );
+  const coverageRows = useMemo(() => buildCoverageRows(historyData.stats), [historyData.stats]);
   const lackingArea = getLackingArea(coverageRows);
+  const filteredLogs = useMemo(
+    () =>
+      historyData.logs.filter((log) => {
+        if (selectedAgeFilter === "all") {
+          return true;
+        }
+
+        const play = playMap.get(log.playId);
+        return getPlayAgeYear(play) === selectedAgeFilter;
+      }),
+    [historyData.logs, playMap, selectedAgeFilter],
+  );
 
   useFocusEffect(
     useCallback(() => {
       let active = true;
 
       if (!guestId) {
-        setHistoryData({ logs: [], stats: [], favorites: [] });
+        setHistoryData({ logs: [], stats: [] });
         setStatus("ready");
         setError(null);
         return () => {
@@ -107,14 +299,13 @@ export default function HistoryScreen() {
       void Promise.all([
         getPlayLogs(guestId, 60),
         getDevAreaStats(guestId, currentYear, currentMonth),
-        getFavorites(guestId, 8),
       ])
-        .then(([logs, stats, favorites]) => {
+        .then(([logs, stats]) => {
           if (!active) {
             return;
           }
 
-          setHistoryData({ logs, stats, favorites });
+          setHistoryData({ logs, stats });
           setStatus("ready");
         })
         .catch(() => {
@@ -133,128 +324,90 @@ export default function HistoryScreen() {
   );
 
   return (
-    <Animated.ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 16 }]}>
+    <Animated.ScrollView
+      contentContainerStyle={[styles.container, { paddingTop: insets.top + 18 }]}
+      showsVerticalScrollIndicator={false}
+    >
       <Animated.View
         entering={reduceMotion ? undefined : fadeInUp()}
         layout={reduceMotion ? undefined : layoutTransition}
-        style={styles.summaryCard}
+        style={styles.header}
       >
-        <Text style={styles.eyebrow}>이번 달 요약</Text>
-        <Text style={styles.title}>{monthLogs.length}번 놀았어요.</Text>
-        <Text style={styles.body}>
-          {monthLogs.length > 0 && lackingArea
-            ? `${DEV_AREA_LABELS[lackingArea]} 영역을 더 채워볼까요?`
-            : "첫 기록을 남기면 발달 영역 커버리지가 여기서 보입니다."}
-        </Text>
-
-        <View style={styles.countRow}>
-          <View style={styles.countBadge}>
-            <Text style={styles.countBadgeLabel}>총 놀이 횟수</Text>
-            <Text style={styles.countBadgeValue}>{monthLogs.length}</Text>
-          </View>
-          <View style={styles.countBadge}>
-            <Text style={styles.countBadgeLabel}>즐겨찾기</Text>
-            <Text style={styles.countBadgeValue}>{historyData.favorites.length}</Text>
-          </View>
-        </View>
-
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>발달 영역 커버리지</Text>
-          <View style={styles.chartList}>
-            {coverageRows.map((row, index) => (
-              <Animated.View
-                key={row.devArea}
-                entering={reduceMotion ? undefined : quickFadeIn(60 + index * 30)}
-                layout={reduceMotion ? undefined : layoutTransition}
-                style={styles.chartRow}
-              >
-                <View style={styles.chartMeta}>
-                  <Text style={styles.chartLabel}>{DEV_AREA_LABELS[row.devArea]}</Text>
-                  <Text style={styles.chartValue}>{row.percent}%</Text>
-                </View>
-                <View style={styles.chartTrack}>
-                  <Animated.View
-                    layout={reduceMotion ? undefined : layoutTransition}
-                    style={[
-                      styles.chartFill,
-                      {
-                        width: `${row.percent}%`,
-                        backgroundColor: DEV_AREA_THEME[row.devArea].textColor,
-                      },
-                    ]}
-                  />
-                </View>
-              </Animated.View>
-            ))}
-          </View>
-        </View>
+        <Text style={styles.pageTitle}>놀이 기록</Text>
+        <Text style={styles.pageSubtitle}>아이와 함께한 놀이를 한눈에 돌아봐요.</Text>
       </Animated.View>
 
       <Animated.View
-        entering={reduceMotion ? undefined : fadeInUp(60)}
+        entering={reduceMotion ? undefined : fadeInUp(40)}
         layout={reduceMotion ? undefined : layoutTransition}
+        style={styles.coverageCard}
       >
-      <MotionPressable
-        accessibilityRole="button"
-        onPress={() =>
-          Alert.alert(
-            "Coming Soon",
-            "계정 기반 발달 리포트와 소셜 로그인 연동은 Phase 2에서 연결됩니다.",
-          )
-        }
-        style={({ pressed }) => [styles.bannerCard, pressed && styles.bannerCardPressed]}
-      >
-        <Text style={styles.bannerEyebrow}>발달 리포트 맛보기</Text>
-        <Text style={styles.bannerTitle}>
-          이번 달 {monthLogs.length}번 놀았어요. 3개월 트렌드와 맞춤 추천은 계정을 만들면 볼 수
-          있어요 →
-        </Text>
-        <Text style={styles.bannerBody}>Phase 1에서는 계정 만들기 버튼을 눌러 Coming Soon 안내를 확인할 수 있어요.</Text>
-      </MotionPressable>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionTitleGroup}>
+            <Text style={styles.sectionTitle}>발달 영역 커버리지</Text>
+            <Text style={styles.sectionDescription}>
+              {monthLogs.length > 0 && lackingArea
+                ? `${currentMonth}월에는 ${DEV_AREA_LABELS[lackingArea]} 놀이를 조금 더 채워볼 수 있어요.`
+                : "기록이 쌓이면 영역별 놀이 균형을 볼 수 있어요."}
+            </Text>
+          </View>
+          <View style={styles.monthBadge}>
+            <Text style={styles.monthBadgeText}>{currentMonth}월</Text>
+          </View>
+        </View>
+
+        <CoverageWheel rows={coverageRows} total={monthLogs.length} />
+
+        <View style={styles.coverageLegend}>
+          {coverageRows.map((row) => {
+            const theme = DEV_AREA_THEME[row.devArea];
+
+            return (
+              <View key={row.devArea} style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: theme.accentColor }]} />
+                <Text style={styles.legendLabel}>{DEV_AREA_LABELS[row.devArea]}</Text>
+                <Text style={styles.legendValue}>{row.count}회</Text>
+              </View>
+            );
+          })}
+        </View>
       </Animated.View>
 
-      {historyData.favorites.length > 0 ? (
-        <Animated.View
-          entering={reduceMotion ? undefined : fadeInUp(100)}
-          layout={reduceMotion ? undefined : layoutTransition}
-          style={styles.sectionCard}
-        >
-          <Text style={styles.sectionTitle}>즐겨찾기</Text>
-          <View style={styles.favoriteRow}>
-            {historyData.favorites.map((favorite) => {
-              const play = playMap.get(favorite.playId);
-
-              return (
-                <MotionPressable
-                  key={favorite.id}
-                  accessibilityRole="button"
-                  onPress={() =>
-                    router.push({
-                      pathname: "/(main)/play/[id]",
-                      params: { id: favorite.playId },
-                    })
-                  }
-                  style={({ pressed }) => [
-                    styles.favoriteChip,
-                    pressed && styles.favoriteChipPressed,
-                  ]}
-                >
-                  <Text style={styles.favoriteChipText}>{play?.name ?? favorite.playId}</Text>
-                </MotionPressable>
-              );
-            })}
-          </View>
-        </Animated.View>
-      ) : null}
-
       <Animated.View
-        entering={reduceMotion ? undefined : fadeInUp(140)}
+        entering={reduceMotion ? undefined : fadeInUp(90)}
         layout={reduceMotion ? undefined : layoutTransition}
         style={styles.sectionCard}
       >
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>완료한 놀이</Text>
+          <View style={styles.sectionTitleGroup}>
+            <Text style={styles.sectionTitle}>완료한 놀이</Text>
+            <Text style={styles.sectionDescription}>저장한 기록을 나이별로 빠르게 찾아볼 수 있어요.</Text>
+          </View>
           {status === "loading" ? <Text style={styles.sectionMeta}>불러오는 중...</Text> : null}
+        </View>
+
+        <View style={styles.filterRow}>
+          {AGE_FILTERS.map((filter) => {
+            const active = selectedAgeFilter === filter.value;
+
+            return (
+              <MotionPressable
+                key={filter.label}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                onPress={() => setSelectedAgeFilter(filter.value)}
+                style={({ pressed }) => [
+                  styles.filterChip,
+                  active && styles.filterChipActive,
+                  pressed && styles.filterChipPressed,
+                ]}
+              >
+                <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>
+                  {filter.label}
+                </Text>
+              </MotionPressable>
+            );
+          })}
         </View>
 
         {status === "error" ? <Text style={styles.emptyBody}>{error}</Text> : null}
@@ -263,35 +416,50 @@ export default function HistoryScreen() {
           <Text style={styles.emptyBody}>아직 저장된 놀이 기록이 없어요.</Text>
         ) : null}
 
-        {historyData.logs.map((log) => {
-          const play = playMap.get(log.playId);
+        {status !== "error" && historyData.logs.length > 0 && filteredLogs.length === 0 ? (
+          <Text style={styles.emptyBody}>선택한 나이의 기록이 아직 없어요.</Text>
+        ) : null}
 
-          return (
-            <MotionPressable
-              key={log.id}
-              accessibilityRole="button"
-              onPress={() =>
-                router.push({
-                  pathname: "/(main)/play/[id]",
-                  params: { id: log.playId },
-                })
-              }
-              style={({ pressed }) => [styles.logCard, pressed && styles.logCardPressed]}
-            >
-              <View style={styles.logHeader}>
-                <View style={styles.logBody}>
-                  <Text style={styles.logTitle}>{play?.name ?? log.playId}</Text>
-                  <Text style={styles.logDate}>{formatLogDate(log.completedAt)}</Text>
+        <View style={styles.logList}>
+          {filteredLogs.map((log, index) => {
+            const play = playMap.get(log.playId);
+
+            return (
+              <MotionPressable
+                key={log.id}
+                accessibilityRole="button"
+                onPress={() =>
+                  router.push({
+                    pathname: "/(main)/play/[id]",
+                    params: { id: log.playId },
+                  })
+                }
+                style={({ pressed }) => [styles.logCard, pressed && styles.logCardPressed]}
+              >
+                <PlayThumbnailSlot index={index} play={play} />
+                <View style={styles.logContent}>
+                  <Text style={styles.logTitle} numberOfLines={2}>
+                    {play?.name ?? log.playId}
+                  </Text>
+                  <View style={styles.logMetaRow}>
+                    <Text style={styles.ageBadge}>{formatPlayAge(play)}</Text>
+                    <Text style={styles.logDate}>{formatLogDate(log.completedAt)}</Text>
+                  </View>
+                  <Text style={styles.logPreview} numberOfLines={1}>
+                    {getLogPreview(log)}
+                  </Text>
                 </View>
-                <Text style={styles.logStars}>{renderStars(log.starRating)}</Text>
-              </View>
-              {log.childReaction.length > 0 ? (
-                <Text style={styles.logReaction}>{log.childReaction.join(" · ")}</Text>
-              ) : null}
-              {log.memo ? <Text style={styles.logMemo}>{log.memo}</Text> : null}
-            </MotionPressable>
-          );
-        })}
+                <View style={[styles.moodBadge, { backgroundColor: getMoodTone(log.starRating) }]}>
+                  <MaterialCommunityIcons
+                    name={getMoodIcon(log.starRating)}
+                    size={26}
+                    color={getMoodColor(log.starRating)}
+                  />
+                </View>
+              </MotionPressable>
+            );
+          })}
+        </View>
       </Animated.View>
     </Animated.ScrollView>
   );
@@ -299,239 +467,298 @@ export default function HistoryScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 32,
     gap: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
     backgroundColor: APP_COLORS.background,
   },
-  summaryCard: {
-    gap: 14,
-    padding: 22,
-    borderRadius: 24,
-    backgroundColor: APP_COLORS.surface,
-    ...APP_SHADOWS.cardLifted,
+  header: {
+    gap: 5,
   },
-  eyebrow: {
-    color: APP_COLORS.accent,
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-    fontFamily: APP_FONTS.mono,
-    fontWeight: "600",
-  },
-  title: {
+  pageTitle: {
     color: APP_COLORS.ink,
-    fontSize: 26,
-    lineHeight: 34,
+    fontSize: 32,
+    lineHeight: 38,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
-  body: {
+  pageSubtitle: {
     color: APP_COLORS.muted,
-    fontSize: 15,
-    lineHeight: 22,
-    fontFamily: APP_FONTS.body,
-  },
-  countRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  countBadge: {
-    flex: 1,
-    gap: 6,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: APP_COLORS.background,
-  },
-  countBadgeLabel: {
-    color: APP_COLORS.muted,
-    fontSize: 12,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  countBadgeValue: {
-    color: APP_COLORS.ink,
-    fontSize: 28,
-    lineHeight: 34,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  chartCard: {
-    gap: 12,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: APP_COLORS.background,
-  },
-  chartTitle: {
-    color: APP_COLORS.ink,
-    fontSize: 16,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  chartList: {
-    gap: 10,
-  },
-  chartRow: {
-    gap: 6,
-  },
-  chartMeta: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  chartLabel: {
-    color: APP_COLORS.ink,
     fontSize: 14,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  chartValue: {
-    color: APP_COLORS.muted,
-    fontSize: 13,
+    lineHeight: 20,
     fontFamily: APP_FONTS.body,
   },
-  chartTrack: {
-    overflow: "hidden",
-    height: 10,
-    borderRadius: 999,
-    backgroundColor: APP_COLORS.line,
-  },
-  chartFill: {
-    height: "100%",
-    borderRadius: 999,
-  },
-  bannerCard: {
-    gap: 10,
+  coverageCard: {
+    gap: 18,
     padding: 20,
     borderRadius: 24,
-    backgroundColor: "#f4ead8",
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
     ...APP_SHADOWS.card,
-  },
-  bannerCardPressed: {
-    opacity: 0.9,
-  },
-  bannerEyebrow: {
-    color: "#8f5722",
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-    fontFamily: APP_FONTS.mono,
-    fontWeight: "600",
-  },
-  bannerTitle: {
-    color: APP_COLORS.ink,
-    fontSize: 21,
-    lineHeight: 30,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  bannerBody: {
-    color: "#71573e",
-    fontSize: 14,
-    lineHeight: 21,
-    fontFamily: APP_FONTS.body,
   },
   sectionCard: {
     gap: 14,
-    padding: 20,
+    padding: 18,
     borderRadius: 24,
     backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
     ...APP_SHADOWS.card,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 12,
+  },
+  sectionTitleGroup: {
+    flex: 1,
+    gap: 6,
   },
   sectionTitle: {
     color: APP_COLORS.ink,
-    fontSize: 19,
+    fontSize: 20,
+    lineHeight: 26,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
+  },
+  sectionDescription: {
+    color: APP_COLORS.muted,
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: APP_FONTS.body,
   },
   sectionMeta: {
     color: APP_COLORS.muted,
     fontSize: 13,
     fontFamily: APP_FONTS.body,
   },
-  favoriteRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
+  monthBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.mustardSoft,
   },
-  favoriteChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+  monthBadgeText: {
+    color: APP_COLORS.accentText,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
+  coverageWheel: {
+    position: "relative",
+    width: 220,
+    height: 220,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 999,
     backgroundColor: APP_COLORS.background,
     borderWidth: 1,
+    borderColor: APP_COLORS.lineSoft,
+  },
+  coveragePetal: {
+    position: "absolute",
+    left: 88,
+    top: 66,
+    width: 44,
+    height: 88,
+    borderTopLeftRadius: 999,
+    borderTopRightRadius: 999,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    borderWidth: 1,
+  },
+  coverageCenter: {
+    width: 72,
+    height: 72,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
     borderColor: APP_COLORS.line,
+    ...APP_SHADOWS.control,
   },
-  favoriteChipPressed: {
-    opacity: 0.88,
-  },
-  favoriteChipText: {
+  coverageCenterValue: {
     color: APP_COLORS.ink,
-    fontSize: 14,
+    fontSize: 24,
+    lineHeight: 27,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "600",
+  },
+  coverageCenterLabel: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
+  },
+  coverageLegend: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  legendItem: {
+    minWidth: "31%",
+    flexGrow: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+    borderRadius: 14,
+    backgroundColor: APP_COLORS.background,
+    borderWidth: 1,
+    borderColor: APP_COLORS.lineSoft,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+  },
+  legendLabel: {
+    flex: 1,
+    color: APP_COLORS.ink,
+    fontSize: 12,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  legendValue: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    fontFamily: APP_FONTS.body,
+  },
+  filterRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  filterChip: {
+    flex: 1,
+    minHeight: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  filterChipActive: {
+    backgroundColor: APP_COLORS.accent,
+    borderColor: APP_COLORS.accent,
+  },
+  filterChipPressed: {
+    opacity: 0.88,
+  },
+  filterChipText: {
+    color: APP_COLORS.ink,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  filterChipTextActive: {
+    color: APP_COLORS.accentText,
+    fontWeight: "700",
+  },
+  logList: {
+    gap: 8,
+  },
+  logCard: {
+    minHeight: 90,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: APP_COLORS.lineSoft,
+  },
+  logCardPressed: {
+    opacity: 0.88,
+  },
+  thumbnailSlot: {
+    width: 68,
+    height: 68,
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(34,34,34,0.04)",
+  },
+  thumbnailShapeLarge: {
+    position: "absolute",
+    right: -18,
+    bottom: -20,
+    width: 68,
+    height: 68,
+    borderRadius: 999,
+    opacity: 0.58,
+  },
+  thumbnailShapeSmall: {
+    position: "absolute",
+    left: 12,
+    top: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.58)",
+  },
+  thumbnailIcon: {
+    position: "absolute",
+    left: 18,
+    top: 18,
+  },
+  logContent: {
+    flex: 1,
+    minWidth: 0,
+    gap: 6,
+  },
+  logTitle: {
+    color: APP_COLORS.ink,
+    fontSize: 16,
+    lineHeight: 22,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "600",
+  },
+  logMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  ageBadge: {
+    overflow: "hidden",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.accent,
+    color: APP_COLORS.accentText,
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
+  logDate: {
+    flexShrink: 1,
+    color: APP_COLORS.muted,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+  },
+  logPreview: {
+    color: APP_COLORS.muted,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: APP_FONTS.body,
+  },
+  moodBadge: {
+    width: 46,
+    height: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 999,
   },
   emptyBody: {
     color: APP_COLORS.muted,
     fontSize: 15,
     lineHeight: 22,
-    fontFamily: APP_FONTS.body,
-  },
-  logCard: {
-    gap: 8,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: APP_COLORS.background,
-  },
-  logCardPressed: {
-    opacity: 0.9,
-  },
-  logHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 12,
-  },
-  logBody: {
-    flex: 1,
-    gap: 4,
-  },
-  logTitle: {
-    color: APP_COLORS.ink,
-    fontSize: 16,
-    lineHeight: 23,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  logDate: {
-    color: APP_COLORS.muted,
-    fontSize: 13,
-    fontFamily: APP_FONTS.body,
-  },
-  logStars: {
-    color: "#c17a07",
-    fontSize: 13,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  logReaction: {
-    color: APP_COLORS.ink,
-    fontSize: 14,
-    lineHeight: 21,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  logMemo: {
-    color: APP_COLORS.muted,
-    fontSize: 14,
-    lineHeight: 21,
     fontFamily: APP_FONTS.body,
   },
 });

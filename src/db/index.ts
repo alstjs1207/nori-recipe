@@ -31,7 +31,7 @@ export async function initializeDatabase(): Promise<SQLiteDatabase> {
       const currentVersion = currentVersionRow?.version ?? 0;
 
       if (currentVersion < DATABASE_VERSION) {
-        await database.withTransactionAsync(async () => {
+        const runMigrations = async () => {
           for (const migration of MIGRATIONS) {
             if (migration.version <= currentVersion) {
               continue;
@@ -42,7 +42,13 @@ export async function initializeDatabase(): Promise<SQLiteDatabase> {
               `DELETE FROM schema_version; INSERT INTO schema_version (version) VALUES (${migration.version});`,
             );
           }
-        });
+        };
+
+        if (Platform.OS === "web") {
+          await runMigrations();
+        } else {
+          await database.withTransactionAsync(runMigrations);
+        }
       }
 
       return database;

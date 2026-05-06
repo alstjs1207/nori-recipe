@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { type ComponentProps, useCallback, useEffect, useMemo, useState } from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Image, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,31 +20,15 @@ import {
 } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
-import type { Play, PlayLogRecord } from "@/types";
+import type { Play, PlayLogRecord, PlayPlace } from "@/types";
 
-type AgeBand = {
-  label: string;
-  max: number;
-  min: number;
-  value: number | null;
-};
-
+type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 type MaterialTone = "ready" | "partial" | "missing";
 
-const AGE_BANDS: AgeBand[] = [
-  { label: "전체", value: null, min: 0, max: 48 },
-  { label: "1세", value: 1, min: 12, max: 23 },
-  { label: "2세", value: 2, min: 24, max: 35 },
-  { label: "3세", value: 3, min: 36, max: 47 },
-  { label: "4세", value: 4, min: 48, max: 59 },
-];
-
 const SITUATION_CARDS = [
-  { label: "비 오는 날", icon: "☂", tone: "sky" },
-  { label: "집콕 놀이", icon: "⌂", tone: "coral" },
-  { label: "밖에서 놀 때", icon: "☀", tone: "yellow" },
-  { label: "잠들기 전", icon: "☾", tone: "purple" },
-  { label: "식사 후 놀이", icon: "♨", tone: "mint" },
+  { label: "집콕 놀이", icon: "⌂", place: "indoor", tone: "coral" },
+  { label: "밖에서 놀 때", icon: "☀", place: "outdoor", tone: "yellow" },
+  { label: "어디서나", icon: "○", place: "any", tone: "mint" },
 ] as const;
 
 const visibleCategories = getVisibleMaterialCategories();
@@ -133,6 +118,18 @@ function getMaterialFitScore(play: Play, selectedMaterials: MaterialSlug[]): num
   const matchedOptional = play.materials.optional.filter((material) => selectedMaterialsSet.has(material)).length;
 
   return matchedRequired * 100 + matchedOptional * 10 - play.prepTime;
+}
+
+function playMatchesAgeMonths(play: Play, childAgeMonths: number): boolean {
+  return play.ageMin <= childAgeMonths && play.ageMax >= childAgeMonths;
+}
+
+function hasBlockedMaterial(play: Play, blockedMaterialsSet: Set<MaterialSlug>): boolean {
+  return [
+    ...play.materials.required,
+    ...play.materials.optional,
+    ...play.materials.substitutes,
+  ].some((material) => blockedMaterialsSet.has(material));
 }
 
 function pickFeaturedPlay(plays: Play[], selectedMaterials: MaterialSlug[]): Play | null {
@@ -236,10 +233,6 @@ function openPlayDetail(play: Play, selectedMaterials: MaterialSlug[], usedFallb
   });
 }
 
-function playOverlapsAgeBand(play: Play, ageBand: AgeBand): boolean {
-  return play.ageMin <= ageBand.max && play.ageMax >= ageBand.min;
-}
-
 function ImageSlot({ index, large = false }: { index: number; large?: boolean }) {
   return (
     <View
@@ -263,18 +256,20 @@ function ImageSlot({ index, large = false }: { index: number; large?: boolean })
 }
 
 function HeaderIconButton({
+  icon,
   label,
   onPress,
-  symbol,
 }: {
+  icon: MaterialCommunityIconName;
   label: string;
   onPress?: () => void;
-  symbol: string;
 }) {
+  const iconElement = <MaterialCommunityIcons name={icon} size={23} color={APP_COLORS.ink} />;
+
   if (!onPress) {
     return (
       <View accessibilityLabel={label} style={styles.headerIconButton}>
-        <Text style={styles.headerIconText}>{symbol}</Text>
+        {iconElement}
       </View>
     );
   }
@@ -286,33 +281,8 @@ function HeaderIconButton({
       onPress={onPress}
       style={({ pressed }) => [styles.headerIconButton, pressed && styles.pressed]}
     >
-      <Text style={styles.headerIconText}>{symbol}</Text>
+      {iconElement}
     </Pressable>
-  );
-}
-
-function AgeChip({
-  active,
-  label,
-  onPress,
-}: {
-  active: boolean;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <MotionPressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.ageChip,
-        active && styles.ageChipActive,
-        pressed && styles.pressed,
-      ]}
-    >
-      <Text style={[styles.ageChipText, active && styles.ageChipTextActive]}>{label}</Text>
-    </MotionPressable>
   );
 }
 
@@ -382,30 +352,33 @@ function PlayCard({
 function SituationCard({
   icon,
   label,
+  place,
   tone,
 }: {
   icon: string;
   label: string;
+  place: PlayPlace;
   tone: (typeof SITUATION_CARDS)[number]["tone"];
 }) {
   return (
     <MotionPressable
       accessibilityRole="button"
-      onPress={() => router.push("/(main)/search")}
+      onPress={() =>
+        router.push({
+          pathname: "/(main)/search",
+          params: { label, place },
+        })
+      }
       style={({ pressed }) => [styles.situationCard, pressed && styles.pressed]}
     >
       <View
         style={[
           styles.situationIcon,
-          tone === "sky"
-            ? styles.situationSky
-            : tone === "coral"
-              ? styles.situationCoral
-              : tone === "yellow"
-                ? styles.situationYellow
-                : tone === "purple"
-                  ? styles.situationPurple
-                  : styles.situationMint,
+          tone === "coral"
+            ? styles.situationCoral
+            : tone === "yellow"
+              ? styles.situationYellow
+              : styles.situationMint,
         ]}
       >
         <Text style={styles.situationIconText}>{icon}</Text>
@@ -422,7 +395,6 @@ export default function MainScreen() {
   const params = useLocalSearchParams<{ completedPlayId?: string | string[] }>();
   const [returningCompletedPlayId, setReturningCompletedPlayId] = useState<string | null>(null);
   const [materialsEditorOpen, setMaterialsEditorOpen] = useState(false);
-  const [selectedAgeValue, setSelectedAgeValue] = useState<number | null>(null);
   const plays = usePlaysStore((state) => state.plays);
   const guestId = useSessionStore((state) => state.guestId);
   const childName = useSessionStore((state) => state.childName);
@@ -452,7 +424,6 @@ export default function MainScreen() {
     userContext.childBirthMonth === null
       ? null
       : getAgeMonthsFromBirthMonth(userContext.childBirthMonth);
-  const selectedAgeBand = AGE_BANDS.find((band) => band.value === selectedAgeValue) ?? AGE_BANDS[0];
 
   useEffect(() => {
     const completedPlayId = readParam(params.completedPlayId);
@@ -577,13 +548,44 @@ export default function MainScreen() {
     [visibleRecommendations, selectedMaterials],
   );
 
-  const agePlayCards = useMemo(() => {
-    const ageFiltered = selectedAgeValue === null
-      ? plays
-      : plays.filter((play) => playOverlapsAgeBand(play, selectedAgeBand));
+  const ageMatchedOtherPlays = useMemo(() => {
+    if (childAgeMonths === null) {
+      return [];
+    }
 
-    return mergeRecommendedPlays(visibleRecommendations, ageFiltered, 8);
-  }, [plays, selectedAgeBand, selectedAgeValue, visibleRecommendations]);
+    const recommendedIds = new Set(visibleRecommendations.map((play) => play.id));
+    const blockedMaterialsSet = new Set(userContext.blockedMaterials);
+
+    return plays
+      .filter((play) =>
+        play.status === "live" &&
+        playMatchesAgeMonths(play, childAgeMonths) &&
+        !recommendedIds.has(play.id) &&
+        !hasBlockedMaterial(play, blockedMaterialsSet),
+      )
+      .sort((left, right) => {
+        const materialFitDiff =
+          getMaterialFitScore(right, selectedMaterials) -
+          getMaterialFitScore(left, selectedMaterials);
+
+        if (materialFitDiff !== 0) {
+          return materialFitDiff;
+        }
+
+        if (left.prepTime !== right.prepTime) {
+          return left.prepTime - right.prepTime;
+        }
+
+        return left.name.localeCompare(right.name, "ko");
+      })
+      .slice(0, 8);
+  }, [
+    childAgeMonths,
+    plays,
+    selectedMaterials,
+    userContext.blockedMaterials,
+    visibleRecommendations,
+  ]);
 
   const allRecommendedCompleted =
     visibleRecommendations.length > 0 &&
@@ -633,8 +635,12 @@ export default function MainScreen() {
           <Text style={styles.headerDate}>{formatTodayLabel()}</Text>
         </View>
         <View style={styles.headerActions}>
-          <HeaderIconButton label="알림" symbol="🔔" />
-          <HeaderIconButton label="찜으로 이동" onPress={() => router.push("/(main)/favorites")} symbol="♡" />
+          <HeaderIconButton icon="bell-outline" label="알림" />
+          <HeaderIconButton
+            icon="heart-outline"
+            label="찜으로 이동"
+            onPress={() => router.push("/(main)/favorites")}
+          />
         </View>
       </Animated.View>
 
@@ -730,23 +736,6 @@ export default function MainScreen() {
         </Animated.View>
       ) : null}
 
-      <Animated.View entering={reduceMotion ? undefined : fadeInUp(80)}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.ageRow}
-        >
-          {AGE_BANDS.map((band) => (
-            <AgeChip
-              key={band.label}
-              active={selectedAgeValue === band.value}
-              label={band.label}
-              onPress={() => setSelectedAgeValue(band.value)}
-            />
-          ))}
-        </ScrollView>
-      </Animated.View>
-
       <Animated.View
         entering={reduceMotion ? undefined : fadeInUp(100)}
         layout={reduceMotion ? undefined : layoutTransition}
@@ -837,25 +826,34 @@ export default function MainScreen() {
         style={styles.section}
       >
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>연령별 인기 놀이</Text>
-          <Text style={styles.sectionMeta}>{selectedAgeBand.label}</Text>
+          <Text style={styles.sectionTitle}>아이 개월수에 맞는 다른 놀이</Text>
+          {childAgeMonths !== null ? (
+            <Text style={styles.sectionMeta}>{childAgeMonths}개월</Text>
+          ) : null}
         </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.playCardRow}
-        >
-          {agePlayCards.slice(0, 6).map((play, index) => (
-            <PlayCard
-              key={`${selectedAgeBand.label}-${play.id}`}
-              completedAt={latestCompletedAtByPlayId.get(play.id)}
-              index={index + 3}
-              materialSummary={getMaterialSummary(play, selectedMaterialsSet)}
-              onPress={() => openPlayDetail(play, selectedMaterials, false)}
-              play={play}
-            />
-          ))}
-        </ScrollView>
+        {ageMatchedOtherPlays.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.playCardRow}
+          >
+            {ageMatchedOtherPlays.slice(0, 6).map((play, index) => (
+              <PlayCard
+                key={play.id}
+                completedAt={latestCompletedAtByPlayId.get(play.id)}
+                index={index + 3}
+                materialSummary={getMaterialSummary(play, selectedMaterialsSet)}
+                onPress={() => openPlayDetail(play, selectedMaterials, false)}
+                play={play}
+              />
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyTitle}>다른 놀이를 찾고 있어요</Text>
+            <Text style={styles.emptyBody}>아이 월령에 맞는 놀이가 더 쌓이면 이곳에 보여드릴게요.</Text>
+          </View>
+        )}
       </Animated.View>
 
       <Animated.View
@@ -936,11 +934,6 @@ const styles = StyleSheet.create({
     backgroundColor: APP_COLORS.surface,
     borderWidth: 1,
     borderColor: APP_COLORS.line,
-  },
-  headerIconText: {
-    color: APP_COLORS.ink,
-    fontSize: 22,
-    lineHeight: 23,
   },
   searchRow: {
     flexDirection: "row",
@@ -1122,35 +1115,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 15,
     fontFamily: APP_FONTS.heading,
-    fontWeight: "700",
-  },
-  ageRow: {
-    gap: 12,
-    paddingVertical: 2,
-  },
-  ageChip: {
-    minWidth: 118,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 18,
-    paddingVertical: 13,
-    borderRadius: 999,
-    backgroundColor: APP_COLORS.surface,
-    borderWidth: 1,
-    borderColor: APP_COLORS.line,
-  },
-  ageChipActive: {
-    backgroundColor: APP_COLORS.accent,
-    borderColor: APP_COLORS.accent,
-  },
-  ageChipText: {
-    color: APP_COLORS.ink,
-    fontSize: 16,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  ageChipTextActive: {
-    color: APP_COLORS.accentText,
     fontWeight: "700",
   },
   heroBanner: {
@@ -1428,17 +1392,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 20,
   },
-  situationSky: {
-    backgroundColor: APP_COLORS.skySoft,
-  },
   situationCoral: {
     backgroundColor: APP_COLORS.coralSoft,
   },
   situationYellow: {
     backgroundColor: APP_COLORS.mustardSoft,
-  },
-  situationPurple: {
-    backgroundColor: APP_COLORS.lavenderSoft,
   },
   situationMint: {
     backgroundColor: APP_COLORS.sageSoft,
