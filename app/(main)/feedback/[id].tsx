@@ -3,6 +3,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -21,6 +22,7 @@ import {
   type ChildReaction,
   type ChildReactionOption,
 } from "@/constants/feedback";
+import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { applyPlayFeedbackSignals, insertPlayLog } from "@/db/queries";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
@@ -128,20 +130,32 @@ function formatAgeBadge(play: Play, childBirthMonth: number | null): string {
 
 function PlaySummaryArt({ playId }: { playId: string }) {
   const palette = PLAY_ART_PALETTES[getPaletteIndex(playId)];
+  const imageSource = getPlayImageSource(playId);
 
   return (
     <View style={[styles.playArt, { backgroundColor: palette[0] }]}>
-      <View style={[styles.artBlob, styles.artBlobOne, { backgroundColor: palette[1] }]} />
-      <View style={[styles.artBlob, styles.artBlobTwo, { backgroundColor: palette[2] }]} />
-      <View style={[styles.artBlob, styles.artBlobThree, { backgroundColor: palette[3] }]} />
-      <View style={[styles.artDot, styles.artDotOne]} />
-      <View style={[styles.artDot, styles.artDotTwo]} />
-      <MaterialCommunityIcons
-        name="clipboard-check-outline"
-        size={42}
-        color="rgba(34,34,34,0.72)"
-        style={styles.playArtIcon}
-      />
+      {imageSource ? (
+        <Image
+          accessibilityIgnoresInvertColors
+          resizeMode="cover"
+          source={imageSource}
+          style={styles.playArtImage}
+        />
+      ) : (
+        <>
+          <View style={[styles.artBlob, styles.artBlobOne, { backgroundColor: palette[1] }]} />
+          <View style={[styles.artBlob, styles.artBlobTwo, { backgroundColor: palette[2] }]} />
+          <View style={[styles.artBlob, styles.artBlobThree, { backgroundColor: palette[3] }]} />
+          <View style={[styles.artDot, styles.artDotOne]} />
+          <View style={[styles.artDot, styles.artDotTwo]} />
+          <MaterialCommunityIcons
+            name="clipboard-check-outline"
+            size={42}
+            color="rgba(34,34,34,0.72)"
+            style={styles.playArtIcon}
+          />
+        </>
+      )}
     </View>
   );
 }
@@ -596,6 +610,10 @@ const styles = StyleSheet.create({
     height: 78,
     overflow: "hidden",
     borderRadius: 16,
+  },
+  playArtImage: {
+    width: "100%",
+    height: "100%",
   },
   artBlob: {
     position: "absolute",

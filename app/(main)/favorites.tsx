@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
 import { router, useFocusEffect } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
+import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getFavorites } from "@/db/queries";
 import { usePlaysStore } from "@/store/playsStore";
@@ -65,6 +66,7 @@ export default function FavoritesScreen() {
         <View style={styles.grid}>
           {favorites.map((favorite, index) => {
             const play = playMap.get(favorite.playId);
+            const imageSource = getPlayImageSource(favorite.playId);
 
             return (
               <Pressable
@@ -84,7 +86,15 @@ export default function FavoritesScreen() {
                     index % 2 === 0 ? styles.thumbnailYellow : styles.thumbnailPink,
                   ]}
                 >
-                  <Text style={styles.heart}>♡</Text>
+                  {imageSource ? (
+                    <Image
+                      accessibilityIgnoresInvertColors
+                      resizeMode="cover"
+                      source={imageSource}
+                      style={styles.thumbnailImage}
+                    />
+                  ) : null}
+                  <Text style={styles.heart}>♥</Text>
                 </View>
                 <Text style={styles.cardTitle}>{play?.name ?? favorite.playId}</Text>
                 <Text style={styles.cardMeta}>
@@ -158,9 +168,6 @@ const styles = StyleSheet.create({
   thumbnail: {
     aspectRatio: 1,
     borderRadius: 24,
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-    padding: 12,
     overflow: "hidden",
   },
   thumbnailYellow: {
@@ -169,8 +176,15 @@ const styles = StyleSheet.create({
   thumbnailPink: {
     backgroundColor: "#FFE5E9",
   },
+  thumbnailImage: {
+    width: "100%",
+    height: "100%",
+  },
   heart: {
-    color: APP_COLORS.surface,
+    position: "absolute",
+    right: 12,
+    bottom: 10,
+    color: APP_COLORS.coral,
     fontSize: 34,
     lineHeight: 36,
     textShadowColor: "rgba(0,0,0,0.14)",

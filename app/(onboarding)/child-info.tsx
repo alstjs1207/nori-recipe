@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import {
   ScrollView,
@@ -268,10 +269,16 @@ export default function ChildInfoScreen() {
               <Text style={styles.ageSummaryBody}>
                 또래 평균 발달에 맞는 놀이를 추천해드려요.
               </Text>
-              <View style={styles.chickIllustration}>
-                <View style={styles.chickBody} />
-                <View style={styles.chickWing} />
-                <View style={styles.chickEye} />
+              <View
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                style={styles.ageSummaryIconBubble}
+              >
+                <MaterialCommunityIcons
+                  name="baby-face-outline"
+                  size={30}
+                  color={APP_COLORS.coral}
+                />
               </View>
             </View>
           </View>
@@ -457,40 +464,16 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontFamily: APP_FONTS.body,
   },
-  chickIllustration: {
+  ageSummaryIconBubble: {
     position: "absolute",
     right: 14,
     bottom: 12,
-    width: 42,
-    height: 42,
-  },
-  chickBody: {
-    position: "absolute",
-    right: 0,
-    bottom: 0,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: APP_COLORS.accent,
-  },
-  chickWing: {
-    position: "absolute",
-    right: 20,
-    bottom: 5,
-    width: 16,
-    height: 18,
-    borderRadius: 10,
-    backgroundColor: APP_COLORS.mustard,
-    transform: [{ rotate: "-22deg" }],
-  },
-  chickEye: {
-    position: "absolute",
-    right: 10,
-    bottom: 22,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: APP_COLORS.ink,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: APP_COLORS.coralSoft,
   },
   primaryButton: {
     minHeight: 64,

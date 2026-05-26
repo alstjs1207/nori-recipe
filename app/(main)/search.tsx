@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
+import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
@@ -95,41 +96,54 @@ export default function SearchScreen() {
       </View>
 
       <View style={styles.resultList}>
-        {results.map((play, index) => (
-          <Pressable
-            key={play.id}
-            accessibilityRole="button"
-            onPress={() =>
-              router.push({
-                pathname: "/(main)/play/[id]",
-                params: { id: play.id },
-              })
-            }
-            style={({ pressed }) => [styles.resultCard, pressed && styles.pressed]}
-          >
-            <View
-              style={[
-                styles.thumbnail,
-                index % 3 === 0
-                  ? styles.thumbnailYellow
-                  : index % 3 === 1
-                    ? styles.thumbnailMint
-                    : styles.thumbnailPurple,
-              ]}
+        {results.map((play, index) => {
+          const imageSource = getPlayImageSource(play.id);
+
+          return (
+            <Pressable
+              key={play.id}
+              accessibilityRole="button"
+              onPress={() =>
+                router.push({
+                  pathname: "/(main)/play/[id]",
+                  params: { id: play.id },
+                })
+              }
+              style={({ pressed }) => [styles.resultCard, pressed && styles.pressed]}
             >
-              <View style={styles.thumbnailLayer} />
-            </View>
-            <View style={styles.resultBody}>
-              <Text style={styles.resultTitle}>{play.name}</Text>
-              <Text style={styles.resultMeta}>
-                {play.ageMin}-{play.ageMax}개월 · {formatDuration(play.durationMin, play.durationMax)}
-              </Text>
-              <Text style={styles.resultTag}>
-                #{DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"]}
-              </Text>
-            </View>
-          </Pressable>
-        ))}
+              <View
+                style={[
+                  styles.thumbnail,
+                  index % 3 === 0
+                    ? styles.thumbnailYellow
+                    : index % 3 === 1
+                      ? styles.thumbnailMint
+                      : styles.thumbnailPurple,
+                ]}
+              >
+                {imageSource ? (
+                  <Image
+                    accessibilityIgnoresInvertColors
+                    resizeMode="cover"
+                    source={imageSource}
+                    style={styles.thumbnailImage}
+                  />
+                ) : (
+                  <View style={styles.thumbnailLayer} />
+                )}
+              </View>
+              <View style={styles.resultBody}>
+                <Text style={styles.resultTitle}>{play.name}</Text>
+                <Text style={styles.resultMeta}>
+                  {play.ageMin}-{play.ageMax}개월 · {formatDuration(play.durationMin, play.durationMax)}
+                </Text>
+                <Text style={styles.resultTag}>
+                  #{DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"]}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
     </ScrollView>
   );
@@ -227,6 +241,10 @@ const styles = StyleSheet.create({
   },
   thumbnailPurple: {
     backgroundColor: "#EEE7FF",
+  },
+  thumbnailImage: {
+    width: "100%",
+    height: "100%",
   },
   thumbnailLayer: {
     position: "absolute",

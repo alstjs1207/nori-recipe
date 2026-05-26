@@ -10,8 +10,9 @@ import { MotionPressable } from "@/components/motion/MotionPressable";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { MATERIAL_DISPLAY_NAMES, type MaterialSlug } from "@/constants/materials";
 import { getMaterialVisualSpec } from "@/constants/materialVisuals";
+import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
-import { getPlayLogCount, getPlayLogs } from "@/db/queries";
+import { getFavorites, getPlayLogCount, getPlayLogs } from "@/db/queries";
 import { recommend } from "@/engine/recommend";
 import {
   getAgeMonthsFromBirthMonth,
@@ -33,6 +34,7 @@ const SITUATION_CARDS = [
 
 const visibleCategories = getVisibleMaterialCategories();
 const MATERIAL_TILE_GAP = 8;
+const MATERIAL_TILE_MIN_WIDTH = 76;
 
 function mergeRecommendedPlays(primary: Play[], fallback: Play[], limit: number): Play[] {
   const merged = [...primary];
@@ -233,7 +235,19 @@ function openPlayDetail(play: Play, selectedMaterials: MaterialSlug[], usedFallb
   });
 }
 
-function ImageSlot({ index, large = false }: { index: number; large?: boolean }) {
+function ImageSlot({
+  dimmed = false,
+  index,
+  large = false,
+  playId,
+}: {
+  dimmed?: boolean;
+  index: number;
+  large?: boolean;
+  playId?: string;
+}) {
+  const imageSource = playId ? getPlayImageSource(playId) : null;
+
   return (
     <View
       style={[
@@ -248,9 +262,22 @@ function ImageSlot({ index, large = false }: { index: number; large?: boolean })
               : styles.imageSlotPurple,
       ]}
     >
-      <View style={styles.imageShapeOne} />
-      <View style={styles.imageShapeTwo} />
-      <View style={styles.imageShapeThree} />
+      {imageSource ? (
+        <Image
+          accessibilityIgnoresInvertColors
+          blurRadius={dimmed ? 2 : 0}
+          resizeMode="cover"
+          source={imageSource}
+          style={styles.playImage}
+        />
+      ) : (
+        <>
+          <View style={styles.imageShapeOne} />
+          <View style={styles.imageShapeTwo} />
+          <View style={styles.imageShapeThree} />
+        </>
+      )}
+      {dimmed ? <View pointerEvents="none" style={styles.completedImageOverlay} /> : null}
     </View>
   );
 }
@@ -316,18 +343,21 @@ function MaterialStatusPill({ tone, label }: { label: string; tone: MaterialTone
 
 function PlayCard({
   completedAt,
+  favorite,
   index,
   materialSummary,
   onPress,
   play,
 }: {
   completedAt?: string;
+  favorite: boolean;
   index: number;
   materialSummary: ReturnType<typeof getMaterialSummary>;
   onPress: () => void;
   play: Play;
 }) {
   const completionLabel = getCompletionLabel(completedAt);
+  const isCompleted = completionLabel !== null;
 
   return (
     <MotionPressable
@@ -335,7 +365,7 @@ function PlayCard({
       onPress={onPress}
       style={({ pressed }) => [styles.playCard, pressed && styles.pressed]}
     >
-      <ImageSlot index={index} />
+      <ImageSlot dimmed={isCompleted} index={index} playId={play.id} />
       <View style={styles.playCardBadge}>
         <Text style={styles.playCardBadgeText}>{play.ageMin}-{play.ageMax}개월</Text>
       </View>
@@ -343,7 +373,7 @@ function PlayCard({
       <Text style={styles.playCardMeta}>#{getPrimaryAreaLabel(play)}</Text>
       <View style={styles.playCardFooter}>
         <MaterialStatusPill label={completionLabel ?? materialSummary.label} tone={completionLabel ? "ready" : materialSummary.tone} />
-        <Text style={styles.heartOutline}>♡</Text>
+        <Text style={[styles.heartOutline, favorite && styles.heartFilled]}>{favorite ? "♥" : "♡"}</Text>
       </View>
     </MotionPressable>
   );
@@ -406,6 +436,7 @@ export default function MainScreen() {
   const setPinnedHomeRecommendations = useSessionStore((state) => state.setPinnedHomeRecommendations);
   const [totalPlays, setTotalPlays] = useState(0);
   const [recentLogs, setRecentLogs] = useState<PlayLogRecord[]>([]);
+  const [favoritePlayIds, setFavoritePlayIds] = useState<Set<string>>(() => new Set());
 
   const baseMaterials = useMemo(
     () =>
@@ -414,9 +445,9 @@ export default function MainScreen() {
   );
   const selectedMaterials = todayMaterials ?? baseMaterials;
   const selectedMaterialsSet = new Set<MaterialSlug>(selectedMaterials);
-  const materialTileColumns = width >= 560 ? 4 : width < 370 ? 2 : 3;
+  const materialTileColumns = width >= 560 ? 4 : width < 330 ? 2 : 3;
   const materialTileContentWidth = width - 40 - 36;
-  const materialTileWidth = Math.max(88, Math.floor(
+  const materialTileWidth = Math.max(MATERIAL_TILE_MIN_WIDTH, Math.floor(
     (materialTileContentWidth - MATERIAL_TILE_GAP * (materialTileColumns - 1)) /
       materialTileColumns,
   ));
@@ -440,22 +471,25 @@ export default function MainScreen() {
       if (!guestId) {
         setTotalPlays(0);
         setRecentLogs([]);
+        setFavoritePlayIds(new Set());
         return () => {
           active = false;
         };
       }
 
-      void Promise.all([getPlayLogCount(guestId), getPlayLogs(guestId, 12)])
-        .then(([count, logs]) => {
+      void Promise.all([getPlayLogCount(guestId), getPlayLogs(guestId, 12), getFavorites(guestId, 200)])
+        .then(([count, logs, favorites]) => {
           if (active) {
             setTotalPlays(count);
             setRecentLogs(logs);
+            setFavoritePlayIds(new Set(favorites.map((favorite) => favorite.playId)));
           }
         })
         .catch(() => {
           if (active) {
             setTotalPlays(0);
             setRecentLogs([]);
+            setFavoritePlayIds(new Set());
           }
         });
 
@@ -760,7 +794,7 @@ export default function MainScreen() {
             </View>
           </View>
           <View style={styles.heroImageWrap}>
-            <ImageSlot index={0} large />
+            <ImageSlot index={0} large playId={featuredPlay?.id} />
           </View>
         </MotionPressable>
       </Animated.View>
@@ -805,6 +839,7 @@ export default function MainScreen() {
               <PlayCard
                 key={play.id}
                 completedAt={latestCompletedAtByPlayId.get(play.id)}
+                favorite={favoritePlayIds.has(play.id)}
                 index={index}
                 materialSummary={getMaterialSummary(play, selectedMaterialsSet)}
                 onPress={() => openPlayDetail(play, selectedMaterials, recommendation.usedFallback)}
@@ -841,6 +876,7 @@ export default function MainScreen() {
               <PlayCard
                 key={play.id}
                 completedAt={latestCompletedAtByPlayId.get(play.id)}
+                favorite={favoritePlayIds.has(play.id)}
                 index={index + 3}
                 materialSummary={getMaterialSummary(play, selectedMaterialsSet)}
                 onPress={() => openPlayDetail(play, selectedMaterials, false)}
@@ -1048,14 +1084,14 @@ const styles = StyleSheet.create({
     gap: MATERIAL_TILE_GAP,
   },
   materialChip: {
-    height: 124,
+    height: 112,
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 5,
-    paddingHorizontal: 7,
-    paddingTop: 7,
-    paddingBottom: 8,
-    borderRadius: 16,
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingTop: 6,
+    paddingBottom: 7,
+    borderRadius: 14,
     backgroundColor: APP_COLORS.surface,
     borderWidth: 1,
     borderColor: APP_COLORS.line,
@@ -1097,8 +1133,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 7,
     right: 7,
-    width: 19,
-    height: 19,
+    width: 18,
+    height: 18,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
@@ -1254,6 +1290,18 @@ const styles = StyleSheet.create({
   imageSlotPurple: {
     backgroundColor: "#EEE4FF",
   },
+  playImage: {
+    width: "100%",
+    height: "100%",
+  },
+  completedImageOverlay: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(255,255,255,0.28)",
+  },
   imageShapeOne: {
     position: "absolute",
     right: -30,
@@ -1348,6 +1396,9 @@ const styles = StyleSheet.create({
     color: "#B5B5B5",
     fontSize: 25,
     lineHeight: 27,
+  },
+  heartFilled: {
+    color: APP_COLORS.coral,
   },
   emptyCard: {
     gap: 8,

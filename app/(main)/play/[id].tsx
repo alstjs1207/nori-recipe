@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { type ComponentProps, useEffect, useRef, useState } from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Image,
@@ -19,8 +20,9 @@ import {
   type MaterialSlug,
 } from "@/constants/materials";
 import { getMaterialVisualSpec } from "@/constants/materialVisuals";
+import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
-import { isFavorite, toggleFavorite } from "@/db/queries";
+import { getLatestPlayLog, isFavorite, toggleFavorite } from "@/db/queries";
 import {
   advanceAutoProgress,
   completeStep,
@@ -29,6 +31,8 @@ import {
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { Play } from "@/types";
+
+type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 
 type DetailTab = "overview" | "steps" | "safety";
 
@@ -55,9 +59,10 @@ type MaterialCheckCardProps = {
 type IconCircleButtonProps = {
   accent?: boolean;
   disabled?: boolean;
+  icon: MaterialCommunityIconName;
+  iconColor?: string;
   label: string;
   onPress?: () => void;
-  text: string;
 };
 
 type ArtworkVariant = "bath" | "dough" | "plate" | "paper" | "book" | "blocks";
@@ -102,6 +107,14 @@ function readMaterialParams(value: string | string[] | undefined): MaterialSlug[
   );
 }
 
+function isSameCalendarDay(value: Date, target: Date): boolean {
+  return (
+    value.getFullYear() === target.getFullYear() &&
+    value.getMonth() === target.getMonth() &&
+    value.getDate() === target.getDate()
+  );
+}
+
 function formatDuration(play: Play): string {
   if (play.durationMin === play.durationMax) {
     return `${play.durationMin}분`;
@@ -134,19 +147,21 @@ function getPrimaryActionLabel({
   allStepsCompleted,
   hasStartedPlay,
   isAutoProgressing,
+  isCompletedToday,
   nextIncompleteStepIndex,
 }: {
   allStepsCompleted: boolean;
   hasStartedPlay: boolean;
   isAutoProgressing: boolean;
+  isCompletedToday: boolean;
   nextIncompleteStepIndex: number;
 }): string {
   if (!hasStartedPlay) {
-    return "놀이 시작하기";
+    return isCompletedToday ? "다시 놀이하기" : "놀이 시작하기";
   }
 
   if (allStepsCompleted) {
-    return "놀이 마치고 기록하기";
+    return isCompletedToday ? "한 번 더 기록하기" : "놀이 마치고 기록하기";
   }
 
   if (isAutoProgressing) {
@@ -253,9 +268,10 @@ function getArtworkVariant(play: Play): ArtworkVariant {
 function IconCircleButton({
   accent = false,
   disabled = false,
+  icon,
+  iconColor,
   label,
   onPress,
-  text,
 }: IconCircleButtonProps) {
   return (
     <Pressable
@@ -270,7 +286,11 @@ function IconCircleButton({
         pressed && !disabled && styles.iconButtonPressed,
       ]}
     >
-      <Text style={[styles.iconButtonText, accent && styles.iconButtonTextAccent]}>{text}</Text>
+      <MaterialCommunityIcons
+        name={icon}
+        size={28}
+        color={iconColor ?? (accent ? "#4E3B0F" : APP_COLORS.ink)}
+      />
     </Pressable>
   );
 }
@@ -408,6 +428,7 @@ export default function PlayDetailScreen() {
   const [hasStartedPlay, setHasStartedPlay] = useState(false);
   const [isAutoProgressing, setIsAutoProgressing] = useState(false);
   const [favorite, setFavorite] = useState(false);
+  const [latestCompletedAt, setLatestCompletedAt] = useState<string | null>(null);
 
   function clearAutoProgressTimer() {
     if (!autoProgressTimerRef.current) {
@@ -425,6 +446,7 @@ export default function PlayDetailScreen() {
     setHasStartedPlay(false);
     setIsAutoProgressing(false);
     setFavorite(false);
+    setLatestCompletedAt(null);
   }, [playId]);
 
   useEffect(() => clearAutoProgressTimer, []);
@@ -446,6 +468,31 @@ export default function PlayDetailScreen() {
       .catch(() => {
         if (active) {
           setFavorite(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [guestId, playId]);
+
+  useEffect(() => {
+    if (!guestId || !playId) {
+      setLatestCompletedAt(null);
+      return;
+    }
+
+    let active = true;
+
+    void getLatestPlayLog(guestId, playId)
+      .then((log) => {
+        if (active) {
+          setLatestCompletedAt(log?.completedAt ?? null);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setLatestCompletedAt(null);
         }
       });
 
@@ -554,12 +601,20 @@ export default function PlayDetailScreen() {
   const totalStepCount = play?.steps.length ?? 0;
   const allStepsCompleted = totalStepCount > 0 && completedSteps.length === totalStepCount;
   const nextIncompleteStepIndex = getNextIncompleteStepIndex(totalStepCount, completedSteps);
+  const playImageSource = play ? getPlayImageSource(play.id) : null;
+  const latestCompletedDate = latestCompletedAt ? new Date(latestCompletedAt) : null;
+  const isCompletedToday =
+    latestCompletedDate !== null &&
+    !Number.isNaN(latestCompletedDate.getTime()) &&
+    isSameCalendarDay(latestCompletedDate, new Date());
   const primaryActionLabel = getPrimaryActionLabel({
     allStepsCompleted,
     hasStartedPlay,
     isAutoProgressing,
+    isCompletedToday,
     nextIncompleteStepIndex,
   });
+  const footerHeightOffset = isCompletedToday ? 146 : 110;
 
   useEffect(() => {
     if (!hasStartedPlay || !isAutoProgressing) {
@@ -592,7 +647,7 @@ export default function PlayDetailScreen() {
             styles.container,
             {
               paddingTop: insets.top + 12,
-              paddingBottom: play ? 110 + Math.max(insets.bottom, 16) : 32,
+              paddingBottom: play ? footerHeightOffset + Math.max(insets.bottom, 16) : 32,
             },
           ]}
         >
@@ -600,17 +655,39 @@ export default function PlayDetailScreen() {
             <>
               <View style={styles.heroImageCard}>
                 <View style={styles.heroTopBar}>
-                  <IconCircleButton label="뒤로 가기" onPress={handleBack} text="‹" />
+                  <IconCircleButton icon="chevron-left" label="뒤로 가기" onPress={handleBack} />
                   <IconCircleButton
+                    icon={favorite ? "heart" : "heart-outline"}
+                    iconColor={APP_COLORS.coral}
                     label={favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
                     onPress={handleToggleFavorite}
-                    text={favorite ? "★" : "☆"}
                   />
                 </View>
-                <PlayHeroArtwork play={play} />
-                <View style={styles.heroFallbackLabel}>
-                  <Text style={styles.heroFallbackLabelText}>대표 이미지 준비 중</Text>
-                </View>
+                {playImageSource ? (
+                  <View style={styles.heroImageLayer}>
+                    <Image
+                      accessibilityIgnoresInvertColors
+                      blurRadius={16}
+                      resizeMode="cover"
+                      source={playImageSource}
+                      style={styles.heroImageBackdrop}
+                    />
+                    <View style={styles.heroImageScrim} />
+                    <Image
+                      accessibilityIgnoresInvertColors
+                      resizeMode="contain"
+                      source={playImageSource}
+                      style={styles.heroImageContain}
+                    />
+                  </View>
+                ) : (
+                  <>
+                    <PlayHeroArtwork play={play} />
+                    <View style={styles.heroFallbackLabel}>
+                      <Text style={styles.heroFallbackLabelText}>대표 이미지 준비 중</Text>
+                    </View>
+                  </>
+                )}
               </View>
 
               <View style={styles.summaryPanel}>
@@ -618,6 +695,14 @@ export default function PlayDetailScreen() {
                   <Text style={styles.agePillText}>{formatAgeRange(play)}</Text>
                 </View>
                 <Text style={styles.heroTitle}>{play.name}</Text>
+                {isCompletedToday ? (
+                  <View style={styles.completedTodayBanner}>
+                    <Text style={styles.completedTodayIcon}>✓</Text>
+                    <Text style={styles.completedTodayText}>
+                      오늘 완료한 놀이예요. 다시 해보고 싶다면 새 기록으로 남길 수 있어요.
+                    </Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.heroMetaRow}>
                   <View style={styles.heroMetaItem}>
@@ -744,7 +829,7 @@ export default function PlayDetailScreen() {
                         {play.educationalEffects.slice(0, 3).map((effect, index) => (
                           <View key={`${play.id}-effect-card-${index}`} style={styles.effectCard}>
                             <Text style={styles.effectIcon}>{index === 0 ? "◌" : index === 1 ? "◉" : "✋"}</Text>
-                            <Text numberOfLines={2} style={styles.effectText}>{effect}</Text>
+                            <Text style={styles.effectText}>{effect}</Text>
                           </View>
                         ))}
                       </View>
@@ -837,8 +922,13 @@ export default function PlayDetailScreen() {
 
         {play ? (
           <View style={[styles.footerWrap, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+            {isCompletedToday ? (
+              <View style={styles.footerCompletionNotice}>
+                <Text style={styles.footerCompletionText}>오늘 완료한 놀이예요</Text>
+              </View>
+            ) : null}
             <View style={styles.footerBar}>
-              <IconCircleButton label="공유하기" onPress={handleShare} text="⇧" />
+              <IconCircleButton icon="share-variant-outline" label="공유하기" onPress={handleShare} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ disabled: isAutoProgressing }}
@@ -871,7 +961,7 @@ const styles = StyleSheet.create({
     backgroundColor: APP_COLORS.background,
   },
   heroImageCard: {
-    height: 240,
+    height: 300,
     overflow: "hidden",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
@@ -879,6 +969,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderBottomWidth: 0,
     borderColor: "#EFE1C7",
+  },
+  heroImageLayer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroImageBackdrop: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    opacity: 0.32,
+    transform: [{ scale: 1.08 }],
+  },
+  heroImageScrim: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(255,253,248,0.36)",
+  },
+  heroImageContain: {
+    width: "100%",
+    height: "100%",
   },
   heroTopBar: {
     position: "absolute",
@@ -910,15 +1026,6 @@ const styles = StyleSheet.create({
   },
   iconButtonPressed: {
     opacity: 0.88,
-  },
-  iconButtonText: {
-    color: APP_COLORS.ink,
-    fontSize: 24,
-    lineHeight: 26,
-    fontFamily: APP_FONTS.heading,
-  },
-  iconButtonTextAccent: {
-    color: "#4E3B0F",
   },
   heroFallbackLabel: {
     position: "absolute",
@@ -973,6 +1080,37 @@ const styles = StyleSheet.create({
     lineHeight: 36,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
+  },
+  completedTodayBanner: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: "#FFF7E5",
+  },
+  completedTodayIcon: {
+    width: 24,
+    height: 24,
+    overflow: "hidden",
+    borderRadius: 12,
+    color: APP_COLORS.surface,
+    backgroundColor: APP_COLORS.mustard,
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
+  },
+  completedTodayText: {
+    flex: 1,
+    color: "#514A3E",
+    fontSize: 14,
+    lineHeight: 19,
+    fontFamily: APP_FONTS.body,
   },
   heroMetaRow: {
     flexDirection: "row",
@@ -1234,11 +1372,12 @@ const styles = StyleSheet.create({
   },
   effectCard: {
     flex: 1,
-    minHeight: 88,
+    minHeight: 104,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: 8,
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: APP_COLORS.background,
     borderWidth: 1,
@@ -1251,6 +1390,7 @@ const styles = StyleSheet.create({
     fontFamily: APP_FONTS.heading,
   },
   effectText: {
+    width: "100%",
     color: APP_COLORS.ink,
     fontSize: 12,
     lineHeight: 17,
@@ -1348,6 +1488,23 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     paddingHorizontal: 16,
+  },
+  footerCompletionNotice: {
+    alignSelf: "center",
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.surface,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    ...APP_SHADOWS.control,
+  },
+  footerCompletionText: {
+    color: APP_COLORS.ink,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
   },
   footerBar: {
     flexDirection: "row",

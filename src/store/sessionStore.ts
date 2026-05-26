@@ -129,12 +129,17 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       pinnedHomeRecommendationKey: savedPinnedRecommendationKey,
     });
 
+    const fallbackBirthMonth = savedBirthMonth !== null ? Number(savedBirthMonth) : null;
+
     try {
       const storedContext = await getUserContext(guestId);
-      const userContext = await upsertUserContext(guestId, storedContext);
+      const contextWithStoredProfile =
+        storedContext.childBirthMonth === null && fallbackBirthMonth !== null
+          ? { ...storedContext, childBirthMonth: fallbackBirthMonth }
+          : storedContext;
+      const userContext = await upsertUserContext(guestId, contextWithStoredProfile);
       set({ userContext, status: "ready", error: null });
     } catch (error) {
-      const fallbackBirthMonth = savedBirthMonth !== null ? Number(savedBirthMonth) : null;
       set({
         userContext: { ...DEFAULT_USER_CONTEXT, childBirthMonth: fallbackBirthMonth },
         status: "error",

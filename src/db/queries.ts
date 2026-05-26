@@ -1,4 +1,5 @@
 import { CHILD_REACTION_PARSE_OPTIONS, type ChildReaction } from "@/constants/feedback";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
 import { Platform } from "react-native";
 
@@ -24,6 +25,154 @@ type UserContextRow = {
 };
 
 const playIndex = new Map(loadPlaysBundle().plays.map((play) => [play.id, play]));
+const WEB_PLAY_LOGS_STORAGE_KEY = "nori-recipe/web-db/play-logs";
+const WEB_FAVORITES_STORAGE_KEY = "nori-recipe/web-db/favorites";
+const WEB_USER_CONTEXT_STORAGE_KEY = "nori-recipe/web-db/user-context";
+
+function emptyUserContext(): UserContext {
+  return {
+    childBirthMonth: DEFAULT_USER_CONTEXT.childBirthMonth,
+    ownedMaterials: [...DEFAULT_USER_CONTEXT.ownedMaterials],
+    blockedMaterials: [...DEFAULT_USER_CONTEXT.blockedMaterials],
+    preferredDevAreas: [...DEFAULT_USER_CONTEXT.preferredDevAreas],
+    devGaps: { ...DEFAULT_USER_CONTEXT.devGaps },
+    userFeedback: { ...DEFAULT_USER_CONTEXT.userFeedback },
+  };
+}
+
+async function readJsonFromStorage<T>(key: string, fallback: T): Promise<T> {
+  const value = await AsyncStorage.getItem(key);
+
+  if (!value) {
+    return fallback;
+  }
+
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+async function writeJsonToStorage(key: string, value: unknown): Promise<void> {
+  await AsyncStorage.setItem(key, JSON.stringify(value));
+}
+
+function normalizeWebPlayLog(value: Partial<PlayLogRecord>): PlayLogRecord | null {
+  if (
+    typeof value.id !== "string" ||
+    typeof value.guestId !== "string" ||
+    typeof value.playId !== "string" ||
+    typeof value.completedAt !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    guestId: value.guestId,
+    playId: value.playId,
+    completedAt: value.completedAt,
+    durationActual: typeof value.durationActual === "number" ? value.durationActual : null,
+    starRating: typeof value.starRating === "number" ? value.starRating : null,
+    childReaction: Array.isArray(value.childReaction)
+      ? value.childReaction.filter((reaction): reaction is ChildReaction =>
+          CHILD_REACTION_PARSE_OPTIONS.includes(reaction as ChildReaction),
+        )
+      : [],
+    memo: typeof value.memo === "string" ? value.memo : null,
+  };
+}
+
+async function readWebPlayLogs(): Promise<PlayLogRecord[]> {
+  const records = await readJsonFromStorage<Partial<PlayLogRecord>[]>(
+    WEB_PLAY_LOGS_STORAGE_KEY,
+    [],
+  );
+
+  return records
+    .map(normalizeWebPlayLog)
+    .filter((record): record is PlayLogRecord => Boolean(record));
+}
+
+async function writeWebPlayLogs(records: PlayLogRecord[]): Promise<void> {
+  await writeJsonToStorage(WEB_PLAY_LOGS_STORAGE_KEY, records);
+}
+
+function normalizeWebFavorite(value: Partial<FavoriteRecord>): FavoriteRecord | null {
+  if (
+    typeof value.id !== "string" ||
+    typeof value.guestId !== "string" ||
+    typeof value.playId !== "string" ||
+    typeof value.createdAt !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    guestId: value.guestId,
+    playId: value.playId,
+    createdAt: value.createdAt,
+  };
+}
+
+async function readWebFavorites(): Promise<FavoriteRecord[]> {
+  const records = await readJsonFromStorage<Partial<FavoriteRecord>[]>(
+    WEB_FAVORITES_STORAGE_KEY,
+    [],
+  );
+
+  return records
+    .map(normalizeWebFavorite)
+    .filter((record): record is FavoriteRecord => Boolean(record));
+}
+
+async function writeWebFavorites(records: FavoriteRecord[]): Promise<void> {
+  await writeJsonToStorage(WEB_FAVORITES_STORAGE_KEY, records);
+}
+
+function normalizeWebUserContext(value: Partial<UserContext> | null | undefined): UserContext {
+  if (!value || typeof value !== "object") {
+    return emptyUserContext();
+  }
+
+  return {
+    childBirthMonth:
+      typeof value.childBirthMonth === "number"
+        ? value.childBirthMonth
+        : DEFAULT_USER_CONTEXT.childBirthMonth,
+    ownedMaterials: Array.isArray(value.ownedMaterials) ? value.ownedMaterials : [],
+    blockedMaterials: Array.isArray(value.blockedMaterials) ? value.blockedMaterials : [],
+    preferredDevAreas: Array.isArray(value.preferredDevAreas) ? value.preferredDevAreas : [],
+    devGaps:
+      value.devGaps && typeof value.devGaps === "object"
+        ? parseScoreMap(JSON.stringify(value.devGaps))
+        : {},
+    userFeedback:
+      value.userFeedback && typeof value.userFeedback === "object"
+        ? parseScoreMap(JSON.stringify(value.userFeedback))
+        : {},
+  };
+}
+
+async function readWebUserContexts(): Promise<Record<string, UserContext>> {
+  const records = await readJsonFromStorage<Record<string, Partial<UserContext>>>(
+    WEB_USER_CONTEXT_STORAGE_KEY,
+    {},
+  );
+
+  return Object.fromEntries(
+    Object.entries(records).map(([guestId, context]) => [
+      guestId,
+      normalizeWebUserContext(context),
+    ]),
+  );
+}
+
+async function writeWebUserContexts(records: Record<string, UserContext>): Promise<void> {
+  await writeJsonToStorage(WEB_USER_CONTEXT_STORAGE_KEY, records);
+}
 
 async function runWriteBatch(
   database: Awaited<ReturnType<typeof initializeDatabase>>,
@@ -148,9 +297,29 @@ export async function insertPlayLog(
     throw new Error(`Unknown play id: ${playId}`);
   }
 
-  const database = await initializeDatabase();
   const playLogId = randomUUID();
   const completedAt = new Date().toISOString();
+
+  if (Platform.OS === "web") {
+    const logs = await readWebPlayLogs();
+    await writeWebPlayLogs([
+      {
+        id: playLogId,
+        guestId,
+        playId,
+        completedAt,
+        durationActual,
+        starRating: rating,
+        childReaction: reactions ?? [],
+        memo,
+      },
+      ...logs,
+    ]);
+
+    return playLogId;
+  }
+
+  const database = await initializeDatabase();
 
   await runWriteBatch(database, async () => {
     await database.runAsync(
@@ -184,6 +353,15 @@ export async function insertPlayLog(
 }
 
 export async function getPlayLogs(guestId: string, limit = 20): Promise<PlayLogRecord[]> {
+  if (Platform.OS === "web") {
+    const logs = await readWebPlayLogs();
+
+    return logs
+      .filter((log) => log.guestId === guestId)
+      .sort((left, right) => right.completedAt.localeCompare(left.completedAt))
+      .slice(0, limit);
+  }
+
   const database = await initializeDatabase();
   const rows = await database.getAllAsync<{
     id: string;
@@ -220,6 +398,16 @@ export async function getLatestPlayLog(
   guestId: string,
   playId: string,
 ): Promise<PlayLogRecord | null> {
+  if (Platform.OS === "web") {
+    const logs = await readWebPlayLogs();
+
+    return (
+      logs
+        .filter((log) => log.guestId === guestId && log.playId === playId)
+        .sort((left, right) => right.completedAt.localeCompare(left.completedAt))[0] ?? null
+    );
+  }
+
   const database = await initializeDatabase();
   const row = await database.getFirstAsync<{
     id: string;
@@ -257,6 +445,12 @@ export async function getLatestPlayLog(
 }
 
 export async function getPlayLogCount(guestId: string): Promise<number> {
+  if (Platform.OS === "web") {
+    const logs = await readWebPlayLogs();
+
+    return logs.filter((log) => log.guestId === guestId).length;
+  }
+
   const database = await initializeDatabase();
   const row = await database.getFirstAsync<{ total: number }>(
     "SELECT COUNT(*) AS total FROM play_logs WHERE guest_id = ?",
@@ -267,6 +461,15 @@ export async function getPlayLogCount(guestId: string): Promise<number> {
 }
 
 export async function getFavorites(guestId: string, limit = 8): Promise<FavoriteRecord[]> {
+  if (Platform.OS === "web") {
+    const favorites = await readWebFavorites();
+
+    return favorites
+      .filter((favorite) => favorite.guestId === guestId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+      .slice(0, limit);
+  }
+
   const database = await initializeDatabase();
   const rows = await database.getAllAsync<{
     id: string;
@@ -292,6 +495,30 @@ export async function getFavorites(guestId: string, limit = 8): Promise<Favorite
 }
 
 export async function toggleFavorite(guestId: string, playId: string): Promise<boolean> {
+  if (Platform.OS === "web") {
+    const favorites = await readWebFavorites();
+    const existingFavorite = favorites.find(
+      (favorite) => favorite.guestId === guestId && favorite.playId === playId,
+    );
+
+    if (existingFavorite) {
+      await writeWebFavorites(favorites.filter((favorite) => favorite.id !== existingFavorite.id));
+      return false;
+    }
+
+    await writeWebFavorites([
+      {
+        id: randomUUID(),
+        guestId,
+        playId,
+        createdAt: new Date().toISOString(),
+      },
+      ...favorites,
+    ]);
+
+    return true;
+  }
+
   const database = await initializeDatabase();
   const existingFavorite = await database.getFirstAsync<FavoriteRecord>(
     "SELECT id, guest_id AS guestId, play_id AS playId, created_at AS createdAt FROM favorites WHERE guest_id = ? AND play_id = ?",
@@ -316,6 +543,14 @@ export async function toggleFavorite(guestId: string, playId: string): Promise<b
 }
 
 export async function isFavorite(guestId: string, playId: string): Promise<boolean> {
+  if (Platform.OS === "web") {
+    const favorites = await readWebFavorites();
+
+    return favorites.some(
+      (favorite) => favorite.guestId === guestId && favorite.playId === playId,
+    );
+  }
+
   const database = await initializeDatabase();
   const row = await database.getFirstAsync<{ id: string }>(
     "SELECT id FROM favorites WHERE guest_id = ? AND play_id = ? LIMIT 1",
@@ -326,6 +561,12 @@ export async function isFavorite(guestId: string, playId: string): Promise<boole
 }
 
 export async function getUserContext(guestId: string): Promise<UserContext> {
+  if (Platform.OS === "web") {
+    const contexts = await readWebUserContexts();
+
+    return contexts[guestId] ?? emptyUserContext();
+  }
+
   const database = await initializeDatabase();
   const row = await database.getFirstAsync<UserContextRow>(
     `SELECT
@@ -345,6 +586,14 @@ export async function getUserContext(guestId: string): Promise<UserContext> {
 }
 
 export async function upsertUserContext(guestId: string, context: UserContext): Promise<UserContext> {
+  if (Platform.OS === "web") {
+    const contexts = await readWebUserContexts();
+    contexts[guestId] = normalizeWebUserContext(context);
+    await writeWebUserContexts(contexts);
+
+    return getUserContext(guestId);
+  }
+
   const database = await initializeDatabase();
 
   await database.runAsync(
@@ -427,6 +676,29 @@ export async function applyPlayFeedbackSignals(
 }
 
 export async function resetUserActivity(guestId: string): Promise<UserContext> {
+  if (Platform.OS === "web") {
+    const [logs, favorites, contexts] = await Promise.all([
+      readWebPlayLogs(),
+      readWebFavorites(),
+      readWebUserContexts(),
+    ]);
+    const currentContext = contexts[guestId] ?? emptyUserContext();
+    const nextContext: UserContext = {
+      ...currentContext,
+      devGaps: {},
+      userFeedback: {},
+    };
+
+    contexts[guestId] = nextContext;
+    await Promise.all([
+      writeWebPlayLogs(logs.filter((log) => log.guestId !== guestId)),
+      writeWebFavorites(favorites.filter((favorite) => favorite.guestId !== guestId)),
+      writeWebUserContexts(contexts),
+    ]);
+
+    return getUserContext(guestId);
+  }
+
   const database = await initializeDatabase();
   const currentContext = await getUserContext(guestId);
   const nextContext: UserContext = {
@@ -458,6 +730,34 @@ export async function getDevAreaStats(
   year: number,
   month: number,
 ): Promise<DevAreaStat[]> {
+  if (Platform.OS === "web") {
+    const logs = await readWebPlayLogs();
+    const { start, end } = getMonthBounds(year, month);
+    const countByDevArea = new Map<DevArea, number>();
+
+    for (const log of logs) {
+      if (log.guestId !== guestId || log.completedAt < start || log.completedAt >= end) {
+        continue;
+      }
+
+      const play = playIndex.get(log.playId);
+
+      if (!play) {
+        continue;
+      }
+
+      for (const devArea of play.devAreas) {
+        countByDevArea.set(devArea, (countByDevArea.get(devArea) ?? 0) + 1);
+      }
+    }
+
+    return Array.from(countByDevArea.entries())
+      .map(([devArea, total]) => ({ devArea, total }))
+      .sort(
+        (left, right) => right.total - left.total || left.devArea.localeCompare(right.devArea),
+      );
+  }
+
   const database = await initializeDatabase();
   const { start, end } = getMonthBounds(year, month);
   const rows = await database.getAllAsync<{ dev_area: DevArea; total: number }>(

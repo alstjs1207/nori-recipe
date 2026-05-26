@@ -1,13 +1,14 @@
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 
 import { fadeInUp, layoutTransition } from "@/animations/motion";
 import { MotionPressable } from "@/components/motion/MotionPressable";
 import { DEV_AREA_LABELS, DEV_AREA_SLUGS, DEV_AREA_THEME, type DevArea } from "@/constants/devAreas";
+import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getDevAreaStats, getPlayLogs } from "@/db/queries";
 import { usePlaysStore } from "@/store/playsStore";
@@ -227,17 +228,29 @@ function PlayThumbnailSlot({ index, play }: { index: number; play: Play | undefi
   const accentColor = theme?.accentColor ?? "rgba(255,255,255,0.72)";
   const iconName = devArea ? DEV_AREA_ICONS[devArea] : "clipboard-check-outline";
   const iconColor = theme?.textColor ?? APP_COLORS.accentText;
+  const imageSource = play ? getPlayImageSource(play.id) : null;
 
   return (
     <View style={[styles.thumbnailSlot, { backgroundColor }]}>
-      <View style={[styles.thumbnailShapeLarge, { backgroundColor: accentColor }]} />
-      <View style={styles.thumbnailShapeSmall} />
-      <MaterialCommunityIcons
-        name={iconName}
-        size={32}
-        color={iconColor}
-        style={styles.thumbnailIcon}
-      />
+      {imageSource ? (
+        <Image
+          accessibilityIgnoresInvertColors
+          resizeMode="cover"
+          source={imageSource}
+          style={styles.thumbnailImage}
+        />
+      ) : (
+        <>
+          <View style={[styles.thumbnailShapeLarge, { backgroundColor: accentColor }]} />
+          <View style={styles.thumbnailShapeSmall} />
+          <MaterialCommunityIcons
+            name={iconName}
+            size={32}
+            color={iconColor}
+            style={styles.thumbnailIcon}
+          />
+        </>
+      )}
     </View>
   );
 }
@@ -683,6 +696,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(34,34,34,0.04)",
+  },
+  thumbnailImage: {
+    width: "100%",
+    height: "100%",
   },
   thumbnailShapeLarge: {
     position: "absolute",
