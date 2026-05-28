@@ -195,7 +195,7 @@ export default function ChildInfoScreen() {
             <Text style={styles.fieldLabel}>아이 이름을 알려주세요</Text>
           </View>
           <TextInput
-            placeholder="예) 서아"
+            placeholder="예) 이찬이"
             placeholderTextColor={APP_COLORS.placeholder}
             value={childName}
             onChangeText={setChildName}

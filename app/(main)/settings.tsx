@@ -159,7 +159,7 @@ export default function SettingsScreen() {
           <View style={styles.field}>
             <Text style={styles.label}>이름</Text>
             <TextInput
-              placeholder="하윤이, 우리 딸 ..."
+              placeholder="이찬이, 우리아들 ..."
               placeholderTextColor={APP_COLORS.muted}
               style={styles.textInput}
               value={childName}

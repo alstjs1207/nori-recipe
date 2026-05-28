@@ -633,7 +633,9 @@ export default function MainScreen() {
           .map((material) => MATERIAL_DISPLAY_NAMES[material])
           .join(", ");
 
-  const displayName = childName.trim().length > 0 ? childName.trim() : "오늘도";
+  const childDisplayName = childName.trim();
+  const displayName = childDisplayName.length > 0 ? childDisplayName : "오늘도";
+  const avatarInitial = childDisplayName.length > 0 ? childDisplayName.slice(0, 1) : null;
 
   function toggleMaterial(material: MaterialSlug) {
     const nextMaterials = selectedMaterials.includes(material)
@@ -659,8 +661,20 @@ export default function MainScreen() {
         layout={reduceMotion ? undefined : layoutTransition}
         style={styles.header}
       >
-        <View style={styles.avatar}>
-          <View style={styles.avatarFace} />
+        <View
+          accessibilityLabel={`${displayName} 아이 아바타`}
+          accessibilityRole="image"
+          style={styles.avatar}
+        >
+          {avatarInitial ? (
+            <Text style={styles.avatarInitial}>{avatarInitial}</Text>
+          ) : (
+            <MaterialCommunityIcons
+              name="baby-face-outline"
+              size={32}
+              color={APP_COLORS.accentText}
+            />
+          )}
         </View>
         <View style={styles.headerCopy}>
           <Text style={styles.headerTitle}>
@@ -931,15 +945,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 999,
-    backgroundColor: "#FFF0CD",
+    backgroundColor: APP_COLORS.mustardSoft,
+    borderWidth: 1,
+    borderColor: "#F2DE9C",
+    ...APP_SHADOWS.control,
   },
-  avatarFace: {
-    width: 38,
-    height: 38,
-    borderRadius: 999,
-    backgroundColor: "#F5C3AD",
-    borderWidth: 5,
-    borderColor: APP_COLORS.surface,
+  avatarInitial: {
+    color: APP_COLORS.accentText,
+    fontSize: 24,
+    lineHeight: 30,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
   },
   headerCopy: {
     flex: 1,
