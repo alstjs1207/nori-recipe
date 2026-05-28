@@ -57,6 +57,16 @@ const DEV_AREA_ICONS: Record<DevArea, MaterialCommunityIconName> = {
   sensory: "eye-outline",
 };
 
+const DEV_AREA_RECOMMENDATION_COPY: Record<DevArea, string> = {
+  fine_motor: "손끝으로 조작하는 놀이를 한 번 추가해보세요",
+  gross_motor: "몸을 크게 쓰는 활동을 한 번 추가해보세요",
+  cognitive: "관찰하고 비교하는 놀이를 한 번 추가해보세요",
+  language: "말을 주고받는 놀이를 한 번 추가해보세요",
+  emotional: "감정을 나누는 놀이를 한 번 추가해보세요",
+  social: "차례를 주고받는 놀이를 한 번 추가해보세요",
+  sensory: "만지고 느끼는 놀이를 한 번 추가해보세요",
+};
+
 function formatLogDate(value: string): string {
   const date = new Date(value);
   const year = date.getFullYear();
@@ -92,7 +102,14 @@ function buildCoverageRows(stats: DevAreaStat[]): CoverageRow[] {
 }
 
 function getLackingArea(rows: CoverageRow[]): DevArea | null {
-  const sorted = [...rows].sort((left, right) => left.count - right.count);
+  const sorted = [...rows].sort((left, right) => {
+    if (left.count !== right.count) {
+      return left.count - right.count;
+    }
+
+    return DEV_AREA_SLUGS.indexOf(left.devArea) - DEV_AREA_SLUGS.indexOf(right.devArea);
+  });
+
   return sorted[0]?.devArea ?? null;
 }
 
@@ -185,14 +202,20 @@ function getLogPreview(log: PlayLogRecord): string {
   return "짧은 기록이 없어요.";
 }
 
-function CoverageWheel({ rows, total }: { rows: CoverageRow[]; total: number }) {
+function CoverageWheel({
+  rows,
+  coveredAreaCount,
+}: {
+  rows: CoverageRow[];
+  coveredAreaCount: number;
+}) {
   const step = 360 / rows.length;
 
   return (
     <View style={styles.coverageWheel}>
       {rows.map((row, index) => {
         const theme = DEV_AREA_THEME[row.devArea];
-        const strength = row.count === 0 ? 0.45 : 0.58 + row.strength * 0.42;
+        const strength = row.count === 0 ? 0.34 : 0.58 + row.strength * 0.42;
 
         return (
           <View
@@ -202,7 +225,7 @@ function CoverageWheel({ rows, total }: { rows: CoverageRow[]; total: number }) 
               {
                 backgroundColor: theme.backgroundColor,
                 borderColor: theme.accentColor,
-                opacity: row.count === 0 ? 0.36 : 1,
+                opacity: row.count === 0 ? 0.28 : 0.94,
                 transform: [
                   { rotate: `${index * step}deg` },
                   { translateY: -58 },
@@ -214,8 +237,10 @@ function CoverageWheel({ rows, total }: { rows: CoverageRow[]; total: number }) 
         );
       })}
       <View style={styles.coverageCenter}>
-        <Text style={styles.coverageCenterValue}>{total}</Text>
-        <Text style={styles.coverageCenterLabel}>기록</Text>
+        <Text style={styles.coverageCenterValue}>
+          {coveredAreaCount}/{rows.length}
+        </Text>
+        <Text style={styles.coverageCenterLabel}>영역</Text>
       </View>
     </View>
   );
@@ -279,7 +304,9 @@ export default function HistoryScreen() {
     [historyData.logs, referenceMonthDate],
   );
   const coverageRows = useMemo(() => buildCoverageRows(historyData.stats), [historyData.stats]);
-  const lackingArea = getLackingArea(coverageRows);
+  const coveredAreaCount = coverageRows.filter((row) => row.count > 0).length;
+  const missingAreaCount = Math.max(0, coverageRows.length - coveredAreaCount);
+  const lackingArea = monthLogs.length > 0 ? getLackingArea(coverageRows) : null;
   const filteredLogs = useMemo(
     () =>
       historyData.logs.filter((log) => {
@@ -359,8 +386,8 @@ export default function HistoryScreen() {
           <View style={styles.sectionTitleGroup}>
             <Text style={styles.sectionTitle}>발달 영역 커버리지</Text>
             <Text style={styles.sectionDescription}>
-              {monthLogs.length > 0 && lackingArea
-                ? `${currentMonth}월에는 ${DEV_AREA_LABELS[lackingArea]} 놀이를 조금 더 채워볼 수 있어요.`
+              {monthLogs.length > 0
+                ? `이번 달에는 ${coveredAreaCount}/${coverageRows.length}개 영역이 기록되었어요.`
                 : "기록이 쌓이면 영역별 놀이 균형을 볼 수 있어요."}
             </Text>
           </View>
@@ -369,17 +396,83 @@ export default function HistoryScreen() {
           </View>
         </View>
 
-        <CoverageWheel rows={coverageRows} total={monthLogs.length} />
+        <View style={styles.coverageSummaryRow}>
+          <View style={styles.coverageSummaryPill}>
+            <MaterialCommunityIcons
+              name="clipboard-check-outline"
+              size={16}
+              color={APP_COLORS.accentText}
+            />
+            <Text style={styles.coverageSummaryText}>기록 {monthLogs.length}회</Text>
+          </View>
+          <View style={styles.coverageSummaryPill}>
+            <MaterialCommunityIcons
+              name="chart-donut"
+              size={16}
+              color={APP_COLORS.accentText}
+            />
+            <Text style={styles.coverageSummaryText}>미기록 {missingAreaCount}개 영역</Text>
+          </View>
+        </View>
+
+        <CoverageWheel rows={coverageRows} coveredAreaCount={coveredAreaCount} />
+
+        {lackingArea ? (
+          <View style={styles.recommendationStrip}>
+            <View style={styles.recommendationIcon}>
+              <MaterialCommunityIcons name="target" size={18} color={APP_COLORS.accentText} />
+            </View>
+            <View style={styles.recommendationTextGroup}>
+              <Text style={styles.recommendationTitle}>
+                다음 추천: {DEV_AREA_LABELS[lackingArea]} 놀이
+              </Text>
+              <Text style={styles.recommendationDescription}>
+                {DEV_AREA_RECOMMENDATION_COPY[lackingArea]}
+              </Text>
+            </View>
+          </View>
+        ) : null}
 
         <View style={styles.coverageLegend}>
           {coverageRows.map((row) => {
             const theme = DEV_AREA_THEME[row.devArea];
+            const active = row.count > 0;
+            const recommended = lackingArea === row.devArea;
 
             return (
-              <View key={row.devArea} style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: theme.accentColor }]} />
-                <Text style={styles.legendLabel}>{DEV_AREA_LABELS[row.devArea]}</Text>
-                <Text style={styles.legendValue}>{row.count}회</Text>
+              <View
+                key={row.devArea}
+                style={[
+                  styles.legendItem,
+                  active && {
+                    backgroundColor: theme.backgroundColor,
+                    borderColor: theme.backgroundColor,
+                  },
+                  !active && styles.legendItemMuted,
+                  recommended && styles.legendItemRecommended,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.legendDot,
+                    {
+                      backgroundColor: active ? theme.accentColor : APP_COLORS.placeholder,
+                    },
+                  ]}
+                />
+                <View style={styles.legendTextGroup}>
+                  <Text
+                    style={[
+                      styles.legendLabel,
+                      active && { color: theme.textColor },
+                      !active && styles.legendLabelMuted,
+                    ]}
+                  >
+                    {DEV_AREA_LABELS[row.devArea]}
+                  </Text>
+                  {recommended ? <Text style={styles.legendTag}>추천</Text> : null}
+                </View>
+                <Text style={[styles.legendValue, active && { color: theme.textColor }]}>{row.count}회</Text>
               </View>
             );
           })}
@@ -502,7 +595,7 @@ const styles = StyleSheet.create({
     fontFamily: APP_FONTS.body,
   },
   coverageCard: {
-    gap: 18,
+    gap: 16,
     padding: 20,
     borderRadius: 24,
     backgroundColor: APP_COLORS.surface,
@@ -559,6 +652,30 @@ const styles = StyleSheet.create({
     fontFamily: APP_FONTS.body,
     fontWeight: "700",
   },
+  coverageSummaryRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  coverageSummaryPill: {
+    minHeight: 34,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.mustardSoft,
+    borderWidth: 1,
+    borderColor: "#F6E3A7",
+  },
+  coverageSummaryText: {
+    color: APP_COLORS.accentText,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
   coverageWheel: {
     position: "relative",
     width: 220,
@@ -584,8 +701,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   coverageCenter: {
-    width: 72,
-    height: 72,
+    width: 76,
+    height: 76,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 999,
@@ -596,7 +713,7 @@ const styles = StyleSheet.create({
   },
   coverageCenterValue: {
     color: APP_COLORS.ink,
-    fontSize: 24,
+    fontSize: 23,
     lineHeight: 27,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
@@ -607,40 +724,110 @@ const styles = StyleSheet.create({
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
   },
+  recommendationStrip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    borderRadius: 16,
+    backgroundColor: "#FFFDF3",
+    borderWidth: 1,
+    borderColor: "#EFD67D",
+  },
+  recommendationIcon: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.mustardSoft,
+  },
+  recommendationTextGroup: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  recommendationTitle: {
+    color: APP_COLORS.accentText,
+    fontSize: 14,
+    lineHeight: 19,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "600",
+  },
+  recommendationDescription: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: APP_FONTS.body,
+  },
   coverageLegend: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
   },
   legendItem: {
-    minWidth: "31%",
+    minWidth: "47%",
     flexGrow: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 9,
-    borderRadius: 14,
+    borderRadius: 12,
     backgroundColor: APP_COLORS.background,
     borderWidth: 1,
     borderColor: APP_COLORS.lineSoft,
+  },
+  legendItemMuted: {
+    backgroundColor: "#FFFDF8",
+    borderColor: APP_COLORS.lineSoft,
+  },
+  legendItemRecommended: {
+    borderColor: "#E7BE4F",
+    borderWidth: 1.5,
   },
   legendDot: {
     width: 8,
     height: 8,
     borderRadius: 999,
   },
-  legendLabel: {
+  legendTextGroup: {
     flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  legendLabel: {
     color: APP_COLORS.ink,
     fontSize: 12,
+    lineHeight: 16,
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
+  },
+  legendLabelMuted: {
+    color: APP_COLORS.muted,
+    fontWeight: "500",
+  },
+  legendTag: {
+    overflow: "hidden",
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: APP_COLORS.mustardSoft,
+    color: APP_COLORS.accentText,
+    fontSize: 10,
+    lineHeight: 13,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
   },
   legendValue: {
     color: APP_COLORS.muted,
     fontSize: 12,
+    lineHeight: 16,
     fontFamily: APP_FONTS.body,
+    fontWeight: "600",
   },
   filterRow: {
     flexDirection: "row",

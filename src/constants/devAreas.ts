@@ -30,37 +30,37 @@ export const DEV_AREA_THEME: Record<
 > = {
   fine_motor: {
     accentColor: "#DD8A6A",
-    backgroundColor: "#F2D3C2",
+    backgroundColor: "#F7DFD3",
     textColor: "#6E493B",
   },
   gross_motor: {
-    accentColor: "#E8C15A",
-    backgroundColor: "#F3E3A8",
+    accentColor: "#E7BE4F",
+    backgroundColor: "#FFF0B8",
     textColor: "#6F5715",
   },
   cognitive: {
-    accentColor: "#BCB5E3",
-    backgroundColor: "#E6E2F4",
-    textColor: "#554C7F",
+    accentColor: "#A99AE4",
+    backgroundColor: "#EFEAFB",
+    textColor: "#514978",
   },
   language: {
-    accentColor: "#BCB5E3",
-    backgroundColor: "#EDE8F7",
-    textColor: "#554C7F",
+    accentColor: "#9EA8E9",
+    backgroundColor: "#ECEFFD",
+    textColor: "#46507E",
   },
   emotional: {
-    accentColor: "#DD8A6A",
-    backgroundColor: "#F4DDD1",
-    textColor: "#7A5646",
+    accentColor: "#D88A6F",
+    backgroundColor: "#F6DDD0",
+    textColor: "#744D3D",
   },
   social: {
-    accentColor: "#AFBE94",
-    backgroundColor: "#DDE5CF",
+    accentColor: "#A9B88A",
+    backgroundColor: "#E5ECD8",
     textColor: "#4A5A39",
   },
   sensory: {
-    accentColor: "#E8C15A",
-    backgroundColor: "#F5E8BC",
+    accentColor: "#F0C04F",
+    backgroundColor: "#FFF0C2",
     textColor: "#6F5715",
   },
 };
