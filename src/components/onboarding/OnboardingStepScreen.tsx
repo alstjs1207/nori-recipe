@@ -12,6 +12,7 @@ type OnboardingStepScreenProps = {
   children: ReactNode;
   footer?: ReactNode;
   heroArt?: ReactNode;
+  scrollEnabled?: boolean;
 };
 
 export function OnboardingStepScreen({
@@ -20,6 +21,7 @@ export function OnboardingStepScreen({
   children,
   footer,
   heroArt,
+  scrollEnabled = true,
 }: OnboardingStepScreenProps) {
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
@@ -33,6 +35,8 @@ export function OnboardingStepScreen({
       <View style={styles.screen}>
         <Animated.ScrollView
           style={styles.scroll}
+          scrollEnabled={scrollEnabled}
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
           contentContainerStyle={[
             styles.container,
             footer ? styles.containerWithFooter : null,

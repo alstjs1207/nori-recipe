@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import {
-  ScrollView,
   Image,
+  Keyboard,
+  PanResponder,
   Platform,
   StyleSheet,
   Text,
   TextInput,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -31,10 +30,7 @@ const AGE_ITEM_HEIGHT = 44;
 const AGE_WHEEL_VISIBLE_ROWS = 5;
 const AGE_WHEEL_HEIGHT = AGE_ITEM_HEIGHT * AGE_WHEEL_VISIBLE_ROWS;
 const AGE_WHEEL_PADDING = (AGE_WHEEL_HEIGHT - AGE_ITEM_HEIGHT) / 2;
-const ageMonthOptions = Array.from(
-  { length: MAX_AGE_MONTHS - MIN_AGE_MONTHS + 1 },
-  (_, index) => MIN_AGE_MONTHS + index,
-);
+const AGE_WHEEL_CENTER_ROW = Math.floor(AGE_WHEEL_VISIBLE_ROWS / 2);
 
 function clampAgeMonths(ageMonths: number): number {
   return Math.min(Math.max(ageMonths, MIN_AGE_MONTHS), MAX_AGE_MONTHS);
@@ -81,82 +77,79 @@ export default function ChildInfoScreen() {
   const updateOnboardingProfile = useSessionStore((state) => state.updateOnboardingProfile);
   const reduceMotion = useReducedMotion();
   const shouldAnimate = !reduceMotion && Platform.OS !== "web";
-  const ageScrollRef = useRef<ScrollView | null>(null);
-  const latestScrollYRef = useRef(0);
-  const scrollSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isDraggingRef = useRef(false);
+  const selectedAgeMonthsRef = useRef(getAgeMonthsFromMonthIndex(userContext.childBirthMonth));
+  const gestureStartAgeMonthsRef = useRef(selectedAgeMonthsRef.current);
   const [childName, setChildName] = useState(savedChildName);
-  const [selectedAgeMonths, setSelectedAgeMonths] = useState(() =>
-    getAgeMonthsFromMonthIndex(userContext.childBirthMonth),
-  );
-  const initialAgeMonthsRef = useRef(selectedAgeMonths);
+  const [screenScrollEnabled, setScreenScrollEnabled] = useState(true);
+  const [selectedAgeMonths, setSelectedAgeMonths] = useState(selectedAgeMonthsRef.current);
 
-  const scrollToAgeMonths = useCallback((ageMonths: number, animated: boolean) => {
-    ageScrollRef.current?.scrollTo({
-      y: clampAgeMonths(ageMonths) * AGE_ITEM_HEIGHT,
-      animated,
-    });
+  const updateSelectedAgeMonths = useCallback((ageMonths: number) => {
+    const nextAgeMonths = clampAgeMonths(ageMonths);
+    selectedAgeMonthsRef.current = nextAgeMonths;
+    setSelectedAgeMonths(nextAgeMonths);
   }, []);
 
-  const settleAgeScroll = useCallback(
-    (offsetY = latestScrollYRef.current) => {
-      const nextAgeMonths = clampAgeMonths(Math.round(offsetY / AGE_ITEM_HEIGHT));
-      setSelectedAgeMonths(nextAgeMonths);
-      scrollToAgeMonths(nextAgeMonths, true);
-    },
-    [scrollToAgeMonths],
-  );
+  const handleAgeWheelTouchStart = useCallback(() => {
+    Keyboard.dismiss();
+    setScreenScrollEnabled(false);
+  }, []);
 
-  const handleAgeScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const offsetY = Math.max(0, event.nativeEvent.contentOffset.y);
-      const nextAgeMonths = clampAgeMonths(Math.round(offsetY / AGE_ITEM_HEIGHT));
+  const handleAgeWheelTouchEnd = useCallback(() => {
+    setScreenScrollEnabled(true);
+  }, []);
 
-      latestScrollYRef.current = offsetY;
-      setSelectedAgeMonths((current) => (current === nextAgeMonths ? current : nextAgeMonths));
-
-      if (scrollSettleTimerRef.current) {
-        clearTimeout(scrollSettleTimerRef.current);
-      }
-
-      scrollSettleTimerRef.current = setTimeout(() => {
-        if (!isDraggingRef.current) {
-          settleAgeScroll(offsetY);
-        }
-      }, 180);
-    },
-    [settleAgeScroll],
-  );
-
-  const handleAgeScrollEnd = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      isDraggingRef.current = false;
-      settleAgeScroll(event.nativeEvent.contentOffset.y);
-    },
-    [settleAgeScroll],
-  );
+  const handleAgeWheelTouchCancel = useCallback(() => {
+    setScreenScrollEnabled(true);
+  }, []);
 
   const selectAgeMonths = useCallback(
     (ageMonths: number) => {
-      const nextAgeMonths = clampAgeMonths(ageMonths);
-      setSelectedAgeMonths(nextAgeMonths);
-      scrollToAgeMonths(nextAgeMonths, true);
+      updateSelectedAgeMonths(ageMonths);
     },
-    [scrollToAgeMonths],
+    [updateSelectedAgeMonths],
   );
 
-  useEffect(() => {
-    const initialScrollTimer = setTimeout(() => {
-      scrollToAgeMonths(initialAgeMonthsRef.current, false);
-    }, 0);
+  const ageWheelPanResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => false,
+        onStartShouldSetPanResponderCapture: () => {
+          Keyboard.dismiss();
+          setScreenScrollEnabled(false);
+          return false;
+        },
+        onMoveShouldSetPanResponder: (_event, gestureState) => Math.abs(gestureState.dy) > 4,
+        onMoveShouldSetPanResponderCapture: (_event, gestureState) => Math.abs(gestureState.dy) > 4,
+        onPanResponderGrant: () => {
+          Keyboard.dismiss();
+          setScreenScrollEnabled(false);
+          gestureStartAgeMonthsRef.current = selectedAgeMonthsRef.current;
+        },
+        onPanResponderMove: (_event, gestureState) => {
+          const monthDelta = Math.round(-gestureState.dy / AGE_ITEM_HEIGHT);
+          updateSelectedAgeMonths(gestureStartAgeMonthsRef.current + monthDelta);
+        },
+        onPanResponderRelease: (_event, gestureState) => {
+          const monthDelta = Math.round(-gestureState.dy / AGE_ITEM_HEIGHT);
+          updateSelectedAgeMonths(gestureStartAgeMonthsRef.current + monthDelta);
+          setScreenScrollEnabled(true);
+        },
+        onPanResponderTerminate: () => {
+          setScreenScrollEnabled(true);
+        },
+        onShouldBlockNativeResponder: () => true,
+      }),
+    [updateSelectedAgeMonths],
+  );
 
-    return () => {
-      clearTimeout(initialScrollTimer);
-      if (scrollSettleTimerRef.current) {
-        clearTimeout(scrollSettleTimerRef.current);
-      }
-    };
-  }, [scrollToAgeMonths]);
+  const visibleAgeMonthOptions = useMemo(
+    () =>
+      Array.from({ length: AGE_WHEEL_VISIBLE_ROWS }, (_, index) => {
+        const ageMonths = selectedAgeMonths + index - AGE_WHEEL_CENTER_ROW;
+        return ageMonths >= MIN_AGE_MONTHS && ageMonths <= MAX_AGE_MONTHS ? ageMonths : null;
+      }),
+    [selectedAgeMonths],
+  );
 
   async function handleContinue() {
     const latestUserContext = useSessionStore.getState().userContext;
@@ -178,6 +171,7 @@ export default function ChildInfoScreen() {
       title="아이에 대해 알려주세요"
       description="연령에 맞는 놀이를 추천해드릴게요."
       heroArt={<ChildHeroArt />}
+      scrollEnabled={screenScrollEnabled}
       footer={
         <MotionPressable
           accessibilityRole="button"
@@ -218,27 +212,33 @@ export default function ChildInfoScreen() {
           <Text style={styles.helper}>정확한 놀이 추천을 위해 필요해요.</Text>
 
           <View style={styles.agePickerRow}>
-            <View style={styles.ageWheel} accessibilityRole="adjustable">
+            <View
+              {...ageWheelPanResponder.panHandlers}
+              accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
+              accessibilityRole="adjustable"
+              accessibilityValue={{ text: `${selectedAgeMonths}개월` }}
+              onAccessibilityAction={(event) => {
+                if (event.nativeEvent.actionName === "increment") {
+                  selectAgeMonths(selectedAgeMonths + 1);
+                }
+
+                if (event.nativeEvent.actionName === "decrement") {
+                  selectAgeMonths(selectedAgeMonths - 1);
+                }
+              }}
+              onTouchCancel={handleAgeWheelTouchCancel}
+              onTouchEnd={handleAgeWheelTouchEnd}
+              onTouchStart={handleAgeWheelTouchStart}
+              style={styles.ageWheel}
+              testID="age-month-wheel"
+            >
               <View style={styles.ageWheelSelection} pointerEvents="none" />
-              <ScrollView
-                ref={ageScrollRef}
-                bounces={false}
-                contentContainerStyle={styles.ageWheelContent}
-                decelerationRate="fast"
-                nestedScrollEnabled
-                onMomentumScrollEnd={handleAgeScrollEnd}
-                onScroll={handleAgeScroll}
-                onScrollBeginDrag={() => {
-                  isDraggingRef.current = true;
-                }}
-                onScrollEndDrag={handleAgeScrollEnd}
-                keyboardShouldPersistTaps="handled"
-                scrollEventThrottle={16}
-                showsVerticalScrollIndicator={false}
-                snapToInterval={AGE_ITEM_HEIGHT}
-                testID="age-month-wheel"
-              >
-                {ageMonthOptions.map((ageMonths) => {
+              <View style={styles.ageWheelContent}>
+                {visibleAgeMonthOptions.map((ageMonths, index) => {
+                  if (ageMonths === null) {
+                    return <View key={`empty-${index}`} style={styles.ageRow} />;
+                  }
+
                   const selected = ageMonths === selectedAgeMonths;
 
                   return (
@@ -260,7 +260,7 @@ export default function ChildInfoScreen() {
                     </MotionPressable>
                   );
                 })}
-              </ScrollView>
+              </View>
             </View>
 
             <View style={styles.ageSummaryCard}>
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     ...APP_SHADOWS.control,
   },
   ageWheelContent: {
-    paddingVertical: AGE_WHEEL_PADDING,
+    height: AGE_WHEEL_HEIGHT,
   },
   ageRow: {
     height: AGE_ITEM_HEIGHT,
