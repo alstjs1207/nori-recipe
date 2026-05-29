@@ -11,6 +11,7 @@
     "web": "expo start --web",
     "prepare:play-images": "tsx scripts/prepare-play-images.ts",
     "check:play-images": "tsx scripts/prepare-play-images.ts --verify-only",
+    "material-audit": "tsx scripts/material-audit.ts",
     "test": "tsx --test 'src/**/*.test.ts' 'src/**/*.test.tsx'",
     "typecheck": "tsc --noEmit"
   },
