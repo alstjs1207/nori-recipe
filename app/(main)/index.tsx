@@ -35,6 +35,9 @@ const SITUATION_CARDS = [
 const visibleCategories = getVisibleMaterialCategories();
 const MATERIAL_TILE_GAP = 8;
 const MATERIAL_TILE_MIN_WIDTH = 76;
+const PLAY_CARD_ROW_GAP = 12;
+const PLAY_CARD_MIN_WIDTH = 154;
+const PLAY_CARD_MAX_WIDTH = 184;
 
 function mergeRecommendedPlays(primary: Play[], fallback: Play[], limit: number): Play[] {
   const merged = [...primary];
@@ -82,6 +85,10 @@ function formatDuration(play: Play): string {
   return play.durationMin === play.durationMax
     ? `${play.durationMin}분`
     : `${play.durationMin}-${play.durationMax}분`;
+}
+
+function formatPlayCardTitle(name: string): string {
+  return name.replaceAll("·", "·\u200B");
 }
 
 function formatCompletedAtLabel(completedAt: string): string {
@@ -342,6 +349,7 @@ function MaterialStatusPill({ tone, label }: { label: string; tone: MaterialTone
 }
 
 function PlayCard({
+  cardWidth,
   completedAt,
   favorite,
   index,
@@ -349,6 +357,7 @@ function PlayCard({
   onPress,
   play,
 }: {
+  cardWidth: number;
   completedAt?: string;
   favorite: boolean;
   index: number;
@@ -363,13 +372,13 @@ function PlayCard({
     <MotionPressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.playCard, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.playCard, { width: cardWidth }, pressed && styles.pressed]}
     >
       <ImageSlot dimmed={isCompleted} index={index} playId={play.id} />
       <View style={styles.playCardBadge}>
         <Text style={styles.playCardBadgeText}>{play.ageMin}-{play.ageMax}개월</Text>
       </View>
-      <Text style={styles.playCardTitle}>{play.name}</Text>
+      <Text numberOfLines={2} style={styles.playCardTitle}>{formatPlayCardTitle(play.name)}</Text>
       <Text style={styles.playCardMeta}>#{getPrimaryAreaLabel(play)}</Text>
       <View style={styles.playCardFooter}>
         <MaterialStatusPill label={completionLabel ?? materialSummary.label} tone={completionLabel ? "ready" : materialSummary.tone} />
@@ -445,8 +454,14 @@ export default function MainScreen() {
   );
   const selectedMaterials = todayMaterials ?? baseMaterials;
   const selectedMaterialsSet = new Set<MaterialSlug>(selectedMaterials);
-  const materialTileColumns = width >= 560 ? 4 : width < 330 ? 2 : 3;
-  const materialTileContentWidth = width - 40 - 36;
+  const contentWidth = width - 40;
+  const minPlayCardWidth = width < 360 ? 138 : PLAY_CARD_MIN_WIDTH;
+  const playCardWidth = Math.min(
+    PLAY_CARD_MAX_WIDTH,
+    Math.max(minPlayCardWidth, Math.floor((contentWidth - PLAY_CARD_ROW_GAP) / 2)),
+  );
+  const materialTileColumns = width >= 680 ? 4 : width >= 360 ? 3 : 2;
+  const materialTileContentWidth = contentWidth - 42;
   const materialTileWidth = Math.max(MATERIAL_TILE_MIN_WIDTH, Math.floor(
     (materialTileContentWidth - MATERIAL_TILE_GAP * (materialTileColumns - 1)) /
       materialTileColumns,
@@ -801,10 +816,10 @@ export default function MainScreen() {
           <View style={styles.heroCopy}>
             <Text style={styles.heroEyebrow}>오늘 뭐하지?</Text>
             <Text style={styles.heroTitle}>
-              아이와 함께하는{"\n"}즐거운 <Text style={styles.heroAccent}>놀이 레시피</Text>
+              즐거운{"\n"}<Text style={styles.heroAccent}>노리 레시피</Text>
             </Text>
             <View style={styles.heroButton}>
-              <Text style={styles.heroButtonText}>오늘의 추천 놀이 보기 ›</Text>
+              <Text style={styles.heroButtonText}>추천 놀이 보기 ›</Text>
             </View>
           </View>
           <View style={styles.heroImageWrap}>
@@ -852,6 +867,7 @@ export default function MainScreen() {
             {visibleRecommendations.map((play, index) => (
               <PlayCard
                 key={play.id}
+                cardWidth={playCardWidth}
                 completedAt={latestCompletedAtByPlayId.get(play.id)}
                 favorite={favoritePlayIds.has(play.id)}
                 index={index}
@@ -889,6 +905,7 @@ export default function MainScreen() {
             {ageMatchedOtherPlays.slice(0, 6).map((play, index) => (
               <PlayCard
                 key={play.id}
+                cardWidth={playCardWidth}
                 completedAt={latestCompletedAtByPlayId.get(play.id)}
                 favorite={favoritePlayIds.has(play.id)}
                 index={index + 3}
@@ -1100,7 +1117,7 @@ const styles = StyleSheet.create({
     gap: MATERIAL_TILE_GAP,
   },
   materialChip: {
-    height: 112,
+    height: 104,
     alignItems: "center",
     justifyContent: "space-between",
     gap: 4,
@@ -1133,10 +1150,10 @@ const styles = StyleSheet.create({
   },
   materialChipText: {
     width: "100%",
-    minHeight: 30,
+    minHeight: 28,
     color: APP_COLORS.ink,
-    fontSize: 11,
-    lineHeight: 15,
+    fontSize: 10,
+    lineHeight: 14,
     textAlign: "center",
     fontFamily: APP_FONTS.body,
     fontWeight: "600",
@@ -1178,7 +1195,7 @@ const styles = StyleSheet.create({
     ...APP_SHADOWS.card,
   },
   heroCopy: {
-    flex: 1.1,
+    flex: 0.9,
     gap: 12,
     justifyContent: "center",
     paddingLeft: 24,
@@ -1192,8 +1209,8 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     color: APP_COLORS.ink,
-    fontSize: 31,
-    lineHeight: 42,
+    fontSize: 28,
+    lineHeight: 36,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
@@ -1215,7 +1232,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   heroImageWrap: {
-    flex: 0.95,
+    flex: 1.08,
     justifyContent: "flex-end",
     paddingRight: 14,
     paddingBottom: 12,
@@ -1277,11 +1294,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   playCardRow: {
-    gap: 16,
+    gap: PLAY_CARD_ROW_GAP,
     paddingRight: 2,
   },
   playCard: {
-    width: 190,
     gap: 9,
   },
   imageSlot: {
@@ -1362,9 +1378,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   playCardTitle: {
+    minHeight: 44,
     color: APP_COLORS.ink,
-    fontSize: 17,
-    lineHeight: 24,
+    fontSize: 16,
+    lineHeight: 22,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
