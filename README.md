@@ -164,6 +164,19 @@
 
 놀이 레시피는 서버 의존도를 낮춘 로컬 중심 앱입니다. 놀이 콘텐츠와 사용자 기록은 앱 안에서 빠르게 접근할 수 있도록 구성되어 있으며, 기본 사용 경험은 네트워크 연결보다 기기 내 데이터 흐름을 우선합니다.
 
+## 비공개 놀이 이미지
+
+놀이 상세 이미지는 공개 저장소에 포함하지 않습니다. `images/plays/`는 Git에서 제외하고, 실제 `play_001.jpeg`부터 `play_191.jpeg`까지의 파일은 로컬 또는 private 저장소에서 관리합니다.
+
+빌드 전에 private 이미지 폴더를 프로젝트의 `images/plays/` 위치로 복사합니다.
+
+```bash
+pnpm prepare:play-images /path/to/private/images/plays
+pnpm check:play-images
+```
+
+EAS Build를 사용할 때는 로컬에 이미지가 준비된 상태에서 `eas build`를 실행합니다. `.easignore`는 Git에는 올리지 않는 `images/plays/`를 EAS build archive에는 포함하도록 설정되어 있습니다.
+
 ## 에셋 라이선스
 
 이 저장소의 이미지 에셋은 프로젝트 전용 자산입니다. 자세한 조건은 [ASSET-LICENSE.md](ASSET-LICENSE.md)를 확인하세요.

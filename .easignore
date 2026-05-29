@@ -9,7 +9,6 @@ node_modules/
 .expo/
 dist/
 web-build/
-images/plays/
 expo-env.d.ts
 .kotlin/
 *.orig.*
@@ -28,3 +27,8 @@ yarn-error.*
 *.tsbuildinfo
 /ios
 /android
+
+# Play images are intentionally gitignored, but EAS should upload them
+# when they are present locally during a build.
+!/images/plays/
+!/images/plays/**

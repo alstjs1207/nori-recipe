@@ -9,6 +9,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "prepare:play-images": "tsx scripts/prepare-play-images.ts",
+    "check:play-images": "tsx scripts/prepare-play-images.ts --verify-only",
     "test": "tsx --test 'src/**/*.test.ts' 'src/**/*.test.tsx'",
     "typecheck": "tsc --noEmit"
   },
