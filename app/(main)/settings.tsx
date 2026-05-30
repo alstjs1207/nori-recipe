@@ -1,12 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { router } from "expo-router";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Keyboard,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import packageJson from "../../package.json";
 
+import { MotionPressable } from "@/components/motion/MotionPressable";
 import { MATERIAL_DISPLAY_NAMES, type MaterialSlug } from "@/constants/materials";
-import { APP_COLORS, APP_FONTS } from "@/constants/theme";
+import { getMaterialVisualSpec } from "@/constants/materialVisuals";
+import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import {
   getBirthMonthOptions,
   getVisibleMaterialCategories,
@@ -17,24 +31,87 @@ import { useSessionStore } from "@/store/sessionStore";
 
 const birthMonthOptions = getBirthMonthOptions();
 const visibleCategories = getVisibleMaterialCategories();
+const ALL_CATEGORY = "전체";
+const DEFAULT_AGE_MONTHS = 17;
+const MIN_AGE_MONTHS = 0;
+const MAX_AGE_MONTHS = 48;
+const AGE_ITEM_HEIGHT = 44;
+const AGE_WHEEL_VISIBLE_ROWS = 5;
+const AGE_WHEEL_HEIGHT = AGE_ITEM_HEIGHT * AGE_WHEEL_VISIBLE_ROWS;
+const AGE_WHEEL_PADDING = (AGE_WHEEL_HEIGHT - AGE_ITEM_HEIGHT) / 2;
+const AGE_WHEEL_CENTER_ROW = Math.floor(AGE_WHEEL_VISIBLE_ROWS / 2);
+const MATERIAL_TILE_GAP = 12;
+const MAX_MATERIAL_GRID_WIDTH = 560;
+
+type MaterialEntry = {
+  categoryName: string;
+  material: MaterialSlug;
+};
+
+const materialEntries: MaterialEntry[] = visibleCategories.flatMap((category) =>
+  category.materials.map((material) => ({
+    categoryName: category.name,
+    material,
+  })),
+);
+
+function clampAgeMonths(ageMonths: number): number {
+  return Math.min(Math.max(ageMonths, MIN_AGE_MONTHS), MAX_AGE_MONTHS);
+}
+
+function getAgeMonthsFromMonthIndex(monthIndex: number | null): number {
+  if (monthIndex === null) {
+    return DEFAULT_AGE_MONTHS;
+  }
+
+  return (
+    birthMonthOptions.find((option) => option.monthIndex === monthIndex)?.ageMonths ??
+    DEFAULT_AGE_MONTHS
+  );
+}
+
+function getMonthIndexFromAgeMonths(ageMonths: number): number {
+  return (
+    birthMonthOptions.find((option) => option.ageMonths === ageMonths)?.monthIndex ??
+    birthMonthOptions.find((option) => option.ageMonths === DEFAULT_AGE_MONTHS)?.monthIndex ??
+    birthMonthOptions[0].monthIndex
+  );
+}
+
+function formatAgeSummary(ageMonths: number): string {
+  if (ageMonths < 12) {
+    return `만 ${ageMonths}개월`;
+  }
+
+  const years = Math.floor(ageMonths / 12);
+  const months = ageMonths % 12;
+
+  if (months === 0) {
+    return `만 ${years}세`;
+  }
+
+  return `만 ${years}세 ${months}개월`;
+}
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const guestId = useSessionStore((state) => state.guestId);
   const userContext = useSessionStore((state) => state.userContext);
   const childNameFromStore = useSessionStore((state) => state.childName);
   const upsertUserContext = useSessionStore((state) => state.upsertUserContext);
   const updateOnboardingProfile = useSessionStore((state) => state.updateOnboardingProfile);
   const resetOnboarding = useSessionStore((state) => state.resetOnboarding);
+  const selectedAgeMonthsRef = useRef(getAgeMonthsFromMonthIndex(userContext.childBirthMonth));
+  const gestureStartAgeMonthsRef = useRef(selectedAgeMonthsRef.current);
 
   const [childName, setChildName] = useState(childNameFromStore);
-  const [selectedBirthMonth, setSelectedBirthMonth] = useState<number | null>(
-    userContext.childBirthMonth,
-  );
+  const [screenScrollEnabled, setScreenScrollEnabled] = useState(true);
+  const [selectedAgeMonths, setSelectedAgeMonths] = useState(selectedAgeMonthsRef.current);
   const [selectedMaterials, setSelectedMaterials] = useState<MaterialSlug[]>(
     userContext.ownedMaterials,
   );
-  const [birthMonthExpanded, setBirthMonthExpanded] = useState(false);
+  const [activeMaterialCategory, setActiveMaterialCategory] = useState(ALL_CATEGORY);
   const [materialsExpanded, setMaterialsExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -42,14 +119,102 @@ export default function SettingsScreen() {
   const [resetConfirmVisible, setResetConfirmVisible] = useState(false);
   const [resetNoticeVisible, setResetNoticeVisible] = useState(false);
 
+  const updateSelectedAgeMonths = useCallback((ageMonths: number) => {
+    const nextAgeMonths = clampAgeMonths(ageMonths);
+    selectedAgeMonthsRef.current = nextAgeMonths;
+    setSelectedAgeMonths(nextAgeMonths);
+  }, []);
+
+  const handleAgeWheelTouchStart = useCallback(() => {
+    Keyboard.dismiss();
+    setScreenScrollEnabled(false);
+  }, []);
+
+  const handleAgeWheelTouchEnd = useCallback(() => {
+    setScreenScrollEnabled(true);
+  }, []);
+
+  const handleAgeWheelTouchCancel = useCallback(() => {
+    setScreenScrollEnabled(true);
+  }, []);
+
+  const selectAgeMonths = useCallback(
+    (ageMonths: number) => {
+      updateSelectedAgeMonths(ageMonths);
+    },
+    [updateSelectedAgeMonths],
+  );
+
+  const ageWheelPanResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => false,
+        onStartShouldSetPanResponderCapture: () => {
+          Keyboard.dismiss();
+          setScreenScrollEnabled(false);
+          return false;
+        },
+        onMoveShouldSetPanResponder: (_event, gestureState) => Math.abs(gestureState.dy) > 4,
+        onMoveShouldSetPanResponderCapture: (_event, gestureState) => Math.abs(gestureState.dy) > 4,
+        onPanResponderGrant: () => {
+          Keyboard.dismiss();
+          setScreenScrollEnabled(false);
+          gestureStartAgeMonthsRef.current = selectedAgeMonthsRef.current;
+        },
+        onPanResponderMove: (_event, gestureState) => {
+          const monthDelta = Math.round(-gestureState.dy / AGE_ITEM_HEIGHT);
+          updateSelectedAgeMonths(gestureStartAgeMonthsRef.current + monthDelta);
+        },
+        onPanResponderRelease: (_event, gestureState) => {
+          const monthDelta = Math.round(-gestureState.dy / AGE_ITEM_HEIGHT);
+          updateSelectedAgeMonths(gestureStartAgeMonthsRef.current + monthDelta);
+          setScreenScrollEnabled(true);
+        },
+        onPanResponderTerminate: () => {
+          setScreenScrollEnabled(true);
+        },
+        onShouldBlockNativeResponder: () => true,
+      }),
+    [updateSelectedAgeMonths],
+  );
+
+  const selectedBirthMonth = useMemo(
+    () => getMonthIndexFromAgeMonths(selectedAgeMonths),
+    [selectedAgeMonths],
+  );
+  const selectedBirthMonthLabel = formatBirthMonth(selectedBirthMonth);
+  const visibleAgeMonthOptions = useMemo(
+    () =>
+      Array.from({ length: AGE_WHEEL_VISIBLE_ROWS }, (_, index) => {
+        const ageMonths = selectedAgeMonths + index - AGE_WHEEL_CENTER_ROW;
+        return ageMonths >= MIN_AGE_MONTHS && ageMonths <= MAX_AGE_MONTHS ? ageMonths : null;
+      }),
+    [selectedAgeMonths],
+  );
+  const filteredMaterialEntries = useMemo(
+    () =>
+      activeMaterialCategory === ALL_CATEGORY
+        ? materialEntries
+        : materialEntries.filter((entry) => entry.categoryName === activeMaterialCategory),
+    [activeMaterialCategory],
+  );
+  const materialColumns = width < 380 ? 3 : 4;
+  const materialGridWidth = Math.max(0, Math.min(width - 80, MAX_MATERIAL_GRID_WIDTH));
+  const materialTileWidth = Math.max(
+    68,
+    Math.floor(
+      (materialGridWidth - MATERIAL_TILE_GAP * (materialColumns - 1)) / materialColumns,
+    ),
+  );
+
   useEffect(() => {
     setChildName(childNameFromStore);
   }, [childNameFromStore]);
 
   useEffect(() => {
-    setSelectedBirthMonth(userContext.childBirthMonth);
+    updateSelectedAgeMonths(getAgeMonthsFromMonthIndex(userContext.childBirthMonth));
     setSelectedMaterials(userContext.ownedMaterials);
-  }, [userContext.childBirthMonth, userContext.ownedMaterials]);
+  }, [updateSelectedAgeMonths, userContext.childBirthMonth, userContext.ownedMaterials]);
 
   useEffect(() => {
     if (!saveNoticeVisible) {
@@ -93,7 +258,7 @@ export default function SettingsScreen() {
   }
 
   async function handleSave() {
-    if (selectedBirthMonth === null || saving) return;
+    if (saving) return;
     setSaving(true);
     try {
       const latestUserContext = useSessionStore.getState().userContext;
@@ -136,20 +301,17 @@ export default function SettingsScreen() {
     }
   }
 
-  const selectedBirthLabel = selectedBirthMonth !== null
-    ? `${formatBirthMonth(selectedBirthMonth)} · ${birthMonthOptions.find(o => o.monthIndex === selectedBirthMonth)?.ageLabel ?? ""}`
-    : "선택 안 함";
-
   return (
     <View style={styles.root}>
       <ScrollView
         contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+        scrollEnabled={screenScrollEnabled}
         showsVerticalScrollIndicator={false}
       >
         {/* 헤더 */}
         <View style={styles.pageHeader}>
-          <Text style={styles.pageTitle}>관리</Text>
-          <Text style={styles.pageSubtitle}>재료, 아이 정보, 기록을 한곳에서 관리해요.</Text>
+          <Text style={styles.pageTitle}>마이페이지</Text>
+          <Text style={styles.pageSubtitle}>아이 정보, 재료, 기록을 한곳에서 관리해요.</Text>
         </View>
 
         {/* 아이 정보 */}
@@ -168,47 +330,66 @@ export default function SettingsScreen() {
           </View>
 
           <View style={styles.field}>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setBirthMonthExpanded((v) => !v)}
-              style={styles.collapsibleHeader}
-            >
-              <View>
-                <Text style={styles.label}>생년월</Text>
-                <Text style={styles.collapsibleValue}>{selectedBirthLabel}</Text>
-              </View>
-              <Text style={styles.chevron}>{birthMonthExpanded ? "▲" : "▼"}</Text>
-            </Pressable>
+            <Text style={styles.label}>아이의 개월 수</Text>
+            <Text style={styles.helper}>생년월 {selectedBirthMonthLabel}</Text>
 
-            {birthMonthExpanded && (
-              <View style={styles.chipGrid}>
-                {birthMonthOptions.map((option) => {
-                  const selected = option.monthIndex === selectedBirthMonth;
-                  return (
-                    <Pressable
-                      key={option.monthIndex}
-                      accessibilityRole="button"
-                      onPress={() => {
-                        setSelectedBirthMonth(option.monthIndex);
-                        setBirthMonthExpanded(false);
-                      }}
-                      style={({ pressed }) => [
-                        styles.monthChip,
-                        selected && styles.monthChipSelected,
-                        pressed && styles.chipPressed,
-                      ]}
-                    >
-                      <Text style={[styles.monthChipLabel, selected && styles.monthChipLabelSelected]}>
-                        {option.monthLabel}
-                      </Text>
-                      <Text style={[styles.monthChipMeta, selected && styles.monthChipMetaSelected]}>
-                        {option.ageLabel}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+            <View style={styles.agePickerRow}>
+              <View
+                {...ageWheelPanResponder.panHandlers}
+                accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
+                accessibilityRole="adjustable"
+                accessibilityValue={{ text: `${selectedAgeMonths}개월` }}
+                onAccessibilityAction={(event) => {
+                  if (event.nativeEvent.actionName === "increment") {
+                    selectAgeMonths(selectedAgeMonths + 1);
+                  }
+
+                  if (event.nativeEvent.actionName === "decrement") {
+                    selectAgeMonths(selectedAgeMonths - 1);
+                  }
+                }}
+                onTouchCancel={handleAgeWheelTouchCancel}
+                onTouchEnd={handleAgeWheelTouchEnd}
+                onTouchStart={handleAgeWheelTouchStart}
+                style={styles.ageWheel}
+                testID="settings-age-month-wheel"
+              >
+                <View style={styles.ageWheelSelection} pointerEvents="none" />
+                <View style={styles.ageWheelContent}>
+                  {visibleAgeMonthOptions.map((ageMonths, index) => {
+                    if (ageMonths === null) {
+                      return <View key={`empty-${index}`} style={styles.ageRow} />;
+                    }
+
+                    const selected = ageMonths === selectedAgeMonths;
+
+                    return (
+                      <MotionPressable
+                        key={ageMonths}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${ageMonths}개월 선택`}
+                        onPress={() => selectAgeMonths(ageMonths)}
+                        scaleTo={0.98}
+                        style={({ pressed }) => [
+                          styles.ageRow,
+                          pressed && styles.ageRowPressed,
+                        ]}
+                      >
+                        <Text style={[styles.ageRowText, selected && styles.ageRowTextSelected]}>
+                          {ageMonths}
+                        </Text>
+                        {selected ? <Text style={styles.ageUnit}>개월</Text> : null}
+                      </MotionPressable>
+                    );
+                  })}
+                </View>
               </View>
-            )}
+
+              <View style={styles.ageSummaryCard}>
+                <Text style={styles.ageSummaryTitle}>{formatAgeSummary(selectedAgeMonths)}</Text>
+                <Text style={styles.ageSummaryBody}>{selectedBirthMonthLabel} 출생 기준</Text>
+              </View>
+            </View>
           </View>
         </View>
 
@@ -216,42 +397,91 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Pressable
             accessibilityRole="button"
-            onPress={() => setMaterialsExpanded((v) => !v)}
-            style={styles.collapsibleHeader}
+            accessibilityState={{ expanded: materialsExpanded }}
+            onPress={() => setMaterialsExpanded((current) => !current)}
+            style={({ pressed }) => [
+              styles.collapsibleSectionHeader,
+              pressed && styles.actionRowPressed,
+            ]}
           >
-            <View>
-              <Text style={styles.sectionTitle}>재료 목록</Text>
-              <Text style={styles.collapsibleValue}>선택됨 {selectedMaterials.length}개</Text>
+            <Text style={styles.sectionTitle}>재료 목록</Text>
+            <View style={styles.sectionHeaderActions}>
+              <Text style={styles.sectionMeta}>선택됨 {selectedMaterials.length}개</Text>
+              <Text style={styles.chevron}>{materialsExpanded ? "▲" : "▼"}</Text>
             </View>
-            <Text style={styles.chevron}>{materialsExpanded ? "▲" : "▼"}</Text>
           </Pressable>
 
-          {materialsExpanded && visibleCategories.map((category) => (
-            <View key={category.name} style={styles.field}>
-              <Text style={styles.label}>{category.name}</Text>
-              <View style={styles.chipGrid}>
-                {category.materials.map((material) => {
-                  const selected = selectedMaterials.includes(material);
+          {materialsExpanded ? (
+            <>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.categoryRow}
+                style={styles.categoryBand}
+              >
+                {[ALL_CATEGORY, ...visibleCategories.map((category) => category.name)].map((categoryName) => {
+                  const selected = categoryName === activeMaterialCategory;
+
                   return (
-                    <Pressable
-                      key={material}
+                    <MotionPressable
+                      key={categoryName}
                       accessibilityRole="button"
-                      onPress={() => toggleMaterial(material)}
+                      onPress={() => setActiveMaterialCategory(categoryName)}
+                      scaleTo={0.97}
                       style={({ pressed }) => [
-                        styles.materialChip,
-                        selected && styles.materialChipSelected,
-                        pressed && styles.chipPressed,
+                        styles.categoryChip,
+                        selected && styles.categoryChipSelected,
+                        pressed && styles.categoryChipPressed,
                       ]}
                     >
-                      <Text style={[styles.materialChipText, selected && styles.materialChipTextSelected]}>
+                      <Text style={[styles.categoryChipText, selected && styles.categoryChipTextSelected]}>
+                        {categoryName}
+                      </Text>
+                    </MotionPressable>
+                  );
+                })}
+              </ScrollView>
+
+              <View style={styles.materialGrid}>
+                {filteredMaterialEntries.map(({ categoryName, material }) => {
+                  const selected = selectedMaterials.includes(material);
+                  const visual = getMaterialVisualSpec(material, categoryName);
+
+                  return (
+                    <MotionPressable
+                      key={`${categoryName}-${material}`}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: selected }}
+                      accessibilityLabel={`${MATERIAL_DISPLAY_NAMES[material]} 선택`}
+                      onPress={() => toggleMaterial(material)}
+                      scaleTo={0.98}
+                      style={({ pressed }) => [
+                        styles.materialCard,
+                        { width: materialTileWidth },
+                        selected && styles.materialCardSelected,
+                        pressed && styles.materialCardPressed,
+                      ]}
+                    >
+                      <View style={styles.materialImageSlot}>
+                        <Image
+                          accessibilityIgnoresInvertColors
+                          resizeMode="contain"
+                          source={visual.imageSource}
+                          style={styles.materialImage}
+                        />
+                      </View>
+                      <Text style={styles.materialLabel} numberOfLines={2}>
                         {MATERIAL_DISPLAY_NAMES[material]}
                       </Text>
-                    </Pressable>
+                      <View style={[styles.checkCircle, selected && styles.checkCircleSelected]}>
+                        {selected ? <Text style={styles.checkText}>✓</Text> : null}
+                      </View>
+                    </MotionPressable>
                   );
                 })}
               </View>
-            </View>
-          ))}
+            </>
+          ) : null}
         </View>
 
         {/* 데이터 */}
@@ -364,11 +594,11 @@ export default function SettingsScreen() {
             ) : (
               <Pressable
                 accessibilityRole="button"
-                disabled={selectedBirthMonth === null || saving}
+                disabled={saving}
                 onPress={() => { void handleSave(); }}
                 style={({ pressed }) => [
                   styles.saveButton,
-                  (selectedBirthMonth === null || saving) && styles.saveButtonDisabled,
+                  saving && styles.saveButtonDisabled,
                   pressed && styles.saveButtonPressed,
                 ]}
               >
@@ -423,12 +653,43 @@ const styles = StyleSheet.create({
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
   },
+  collapsibleSectionHeader: {
+    minHeight: 32,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  sectionHeaderActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  sectionMeta: {
+    color: APP_COLORS.muted,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "600",
+  },
+  chevron: {
+    color: APP_COLORS.muted,
+    fontSize: 11,
+    lineHeight: 16,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
   field: {
     gap: 10,
   },
   label: {
     color: APP_COLORS.muted,
     fontSize: 13,
+    fontFamily: APP_FONTS.body,
+  },
+  helper: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    lineHeight: 17,
     fontFamily: APP_FONTS.body,
   },
   body: {
@@ -447,81 +708,196 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: APP_FONTS.body,
   },
-  collapsibleHeader: {
+  agePickerRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 12,
+  },
+  ageWheel: {
+    width: 118,
+    height: AGE_WHEEL_HEIGHT,
+    justifyContent: "center",
+    overflow: "hidden",
+    borderRadius: 18,
+    backgroundColor: APP_COLORS.background,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  ageWheelSelection: {
+    position: "absolute",
+    top: AGE_WHEEL_PADDING,
+    left: 8,
+    right: 8,
+    height: AGE_ITEM_HEIGHT,
+    borderRadius: 14,
+    backgroundColor: APP_COLORS.card,
+    borderWidth: 1,
+    borderColor: APP_COLORS.accent,
+  },
+  ageWheelContent: {
+    zIndex: 1,
+  },
+  ageRow: {
+    height: AGE_ITEM_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: 4,
+  },
+  ageRowPressed: {
+    opacity: 0.72,
+  },
+  ageRowText: {
+    color: APP_COLORS.muted,
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "600",
+  },
+  ageRowTextSelected: {
+    color: APP_COLORS.ink,
+    fontSize: 28,
+    lineHeight: 36,
+  },
+  ageUnit: {
+    color: APP_COLORS.ink,
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
+  ageSummaryCard: {
+    flex: 1,
+    minHeight: AGE_WHEEL_HEIGHT,
+    justifyContent: "center",
+    gap: 8,
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: APP_COLORS.card,
+    borderWidth: 1,
+    borderColor: APP_COLORS.lineSoft,
+  },
+  ageSummaryTitle: {
+    color: APP_COLORS.ink,
+    fontSize: 18,
+    lineHeight: 25,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
+  },
+  ageSummaryBody: {
+    color: APP_COLORS.muted,
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily: APP_FONTS.body,
+  },
+  categoryBand: {
+    marginHorizontal: -4,
+  },
+  categoryRow: {
+    gap: 8,
+    paddingHorizontal: 4,
     paddingVertical: 2,
   },
-  collapsibleValue: {
+  categoryChip: {
+    minHeight: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    backgroundColor: APP_COLORS.surface,
+  },
+  categoryChipSelected: {
+    borderColor: APP_COLORS.accent,
+    backgroundColor: APP_COLORS.accent,
+  },
+  categoryChipPressed: {
+    opacity: 0.82,
+  },
+  categoryChipText: {
     color: APP_COLORS.ink,
-    fontSize: 15,
+    fontSize: 13,
+    lineHeight: 18,
     fontFamily: APP_FONTS.body,
-    marginTop: 2,
+    fontWeight: "700",
   },
-  chevron: {
-    color: APP_COLORS.muted,
-    fontSize: 11,
+  categoryChipTextSelected: {
+    color: APP_COLORS.ink,
   },
-  chipGrid: {
+  materialGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: MATERIAL_TILE_GAP,
   },
-  monthChip: {
-    minWidth: "30%",
-    gap: 2,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+  materialCard: {
+    height: 136,
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 6,
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    backgroundColor: APP_COLORS.surface,
+  },
+  materialCardSelected: {
+    borderColor: APP_COLORS.accent,
+    backgroundColor: APP_COLORS.card,
+    ...APP_SHADOWS.control,
+  },
+  materialCardPressed: {
+    opacity: 0.84,
+  },
+  materialImageSlot: {
+    width: "100%",
+    flex: 1,
+    minHeight: 0,
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 14,
-    backgroundColor: APP_COLORS.background,
-    borderWidth: 1,
-    borderColor: APP_COLORS.line,
+    overflow: "hidden",
+    backgroundColor: APP_COLORS.surface,
   },
-  monthChipSelected: {
-    backgroundColor: APP_COLORS.pill,
-    borderColor: APP_COLORS.accent,
+  materialImage: {
+    width: "100%",
+    height: "100%",
   },
-  monthChipLabel: {
+  materialLabel: {
+    width: "100%",
+    minHeight: 34,
     color: APP_COLORS.ink,
-    fontSize: 14,
-    fontFamily: APP_FONTS.body,
-    fontWeight: "600",
-  },
-  monthChipLabelSelected: {
-    color: APP_COLORS.accent,
-  },
-  monthChipMeta: {
-    color: APP_COLORS.muted,
     fontSize: 12,
+    lineHeight: 17,
+    textAlign: "center",
     fontFamily: APP_FONTS.body,
+    fontWeight: "700",
   },
-  monthChipMetaSelected: {
-    color: APP_COLORS.accent,
-  },
-  materialChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: APP_COLORS.background,
-    borderWidth: 1,
+  checkCircle: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    borderWidth: 2,
     borderColor: APP_COLORS.line,
+    backgroundColor: APP_COLORS.surface,
   },
-  materialChipSelected: {
-    backgroundColor: APP_COLORS.pill,
+  checkCircleSelected: {
     borderColor: APP_COLORS.accent,
+    backgroundColor: APP_COLORS.accent,
   },
-  materialChipText: {
-    color: APP_COLORS.muted,
-    fontSize: 14,
-    fontFamily: APP_FONTS.body,
-  },
-  materialChipTextSelected: {
-    color: APP_COLORS.ink,
-    fontWeight: "600",
-  },
-  chipPressed: {
-    opacity: 0.85,
+  checkText: {
+    color: APP_COLORS.surface,
+    fontSize: 13,
+    lineHeight: 16,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
   },
   divider: {
     height: 1,
