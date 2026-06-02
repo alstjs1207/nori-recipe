@@ -4,6 +4,7 @@ import { router, useFocusEffect } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
+import Svg, { Circle, Path } from "react-native-svg";
 
 import { fadeInUp, layoutTransition } from "@/animations/motion";
 import { MotionPressable } from "@/components/motion/MotionPressable";
@@ -65,6 +66,72 @@ const DEV_AREA_RECOMMENDATION_COPY: Record<DevArea, string> = {
   emotional: "감정을 나누는 놀이를 한 번 추가해보세요",
   social: "차례를 주고받는 놀이를 한 번 추가해보세요",
   sensory: "만지고 느끼는 놀이를 한 번 추가해보세요",
+};
+
+const COVERAGE_WHEEL_SIZE = 280;
+const COVERAGE_WHEEL_CENTER = COVERAGE_WHEEL_SIZE / 2;
+const COVERAGE_DONUT_SIZE = 194;
+const COVERAGE_DONUT_CENTER = COVERAGE_DONUT_SIZE / 2;
+const COVERAGE_DONUT_INNER_RADIUS = 36;
+const COVERAGE_DONUT_MIN_RADIUS = 64;
+const COVERAGE_DONUT_MAX_RADIUS = 86;
+const COVERAGE_SEGMENT_GAP_DEGREES = 5;
+const COVERAGE_LABEL_WIDTH = 62;
+const COVERAGE_LABEL_HEIGHT = 22;
+const COVERAGE_LABEL_RADIUS_X = 119;
+const COVERAGE_LABEL_RADIUS_Y = 124;
+
+const COVERAGE_AREA_VISUALS: Record<
+  DevArea,
+  {
+    fillColor: string;
+    softColor: string;
+    textColor: string;
+    borderColor: string;
+  }
+> = {
+  fine_motor: {
+    fillColor: "#FF8FBC",
+    softColor: "#FFE5F0",
+    textColor: "#7E3A58",
+    borderColor: "#F7C2D8",
+  },
+  gross_motor: {
+    fillColor: "#A6E7C2",
+    softColor: "#E0F7E9",
+    textColor: "#2F6848",
+    borderColor: "#C9EED8",
+  },
+  cognitive: {
+    fillColor: "#FFD84D",
+    softColor: "#FFF1B8",
+    textColor: "#725A0E",
+    borderColor: "#F5D86A",
+  },
+  language: {
+    fillColor: "#9ECFFF",
+    softColor: "#E3F1FF",
+    textColor: "#315A7D",
+    borderColor: "#C4E0FF",
+  },
+  emotional: {
+    fillColor: "#C9AEFF",
+    softColor: "#EFE7FF",
+    textColor: "#594681",
+    borderColor: "#DCCFFF",
+  },
+  social: {
+    fillColor: "#FFDDBE",
+    softColor: "#FFF0E1",
+    textColor: "#744B2D",
+    borderColor: "#F5D7BB",
+  },
+  sensory: {
+    fillColor: "#B7DCFF",
+    softColor: "#E5F3FF",
+    textColor: "#315A7D",
+    borderColor: "#D0E7FF",
+  },
 };
 
 function formatLogDate(value: string): string {
@@ -202,6 +269,41 @@ function getLogPreview(log: PlayLogRecord): string {
   return "짧은 기록이 없어요.";
 }
 
+function svgNumber(value: number): string {
+  return value.toFixed(2);
+}
+
+function polarToCartesian(center: number, radius: number, angleDegrees: number) {
+  const angleRadians = ((angleDegrees - 90) * Math.PI) / 180;
+
+  return {
+    x: center + radius * Math.cos(angleRadians),
+    y: center + radius * Math.sin(angleRadians),
+  };
+}
+
+function describeDonutSegment(
+  center: number,
+  innerRadius: number,
+  outerRadius: number,
+  startAngle: number,
+  endAngle: number,
+): string {
+  const outerStart = polarToCartesian(center, outerRadius, startAngle);
+  const outerEnd = polarToCartesian(center, outerRadius, endAngle);
+  const innerEnd = polarToCartesian(center, innerRadius, endAngle);
+  const innerStart = polarToCartesian(center, innerRadius, startAngle);
+  const largeArcFlag = endAngle - startAngle > 180 ? "1" : "0";
+
+  return [
+    `M ${svgNumber(outerStart.x)} ${svgNumber(outerStart.y)}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${svgNumber(outerEnd.x)} ${svgNumber(outerEnd.y)}`,
+    `L ${svgNumber(innerEnd.x)} ${svgNumber(innerEnd.y)}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${svgNumber(innerStart.x)} ${svgNumber(innerStart.y)}`,
+    "Z",
+  ].join(" ");
+}
+
 function CoverageWheel({
   rows,
   coveredAreaCount,
@@ -209,38 +311,91 @@ function CoverageWheel({
   rows: CoverageRow[];
   coveredAreaCount: number;
 }) {
-  const step = 360 / rows.length;
+  const step = 360 / Math.max(rows.length, 1);
 
   return (
-    <View style={styles.coverageWheel}>
+    <View
+      accessibilityLabel={`발달 영역 커버리지 ${coveredAreaCount}/${rows.length}개 영역`}
+      accessibilityRole="image"
+      style={styles.coverageWheel}
+    >
+      <View style={styles.coverageWheelHalo} />
+      <View style={styles.coverageWheelRing} />
+      <Svg
+        width={COVERAGE_DONUT_SIZE}
+        height={COVERAGE_DONUT_SIZE}
+        viewBox={`0 0 ${COVERAGE_DONUT_SIZE} ${COVERAGE_DONUT_SIZE}`}
+        style={styles.coverageDonutChart}
+      >
+        <Circle
+          cx={COVERAGE_DONUT_CENTER}
+          cy={COVERAGE_DONUT_CENTER}
+          r={COVERAGE_DONUT_MAX_RADIUS + 1}
+          fill="#FFFEFC"
+        />
+        {rows.map((row, index) => {
+          const visual = COVERAGE_AREA_VISUALS[row.devArea];
+          const active = row.count > 0;
+          const startAngle = index * step - step / 2 + COVERAGE_SEGMENT_GAP_DEGREES / 2;
+          const endAngle = index * step + step / 2 - COVERAGE_SEGMENT_GAP_DEGREES / 2;
+          const radius = active
+            ? COVERAGE_DONUT_MIN_RADIUS +
+              row.strength * (COVERAGE_DONUT_MAX_RADIUS - COVERAGE_DONUT_MIN_RADIUS)
+            : COVERAGE_DONUT_MAX_RADIUS - 11;
+
+          return (
+            <Path
+              key={`${row.devArea}-segment`}
+              d={describeDonutSegment(
+                COVERAGE_DONUT_CENTER,
+                COVERAGE_DONUT_INNER_RADIUS,
+                radius,
+                startAngle,
+                endAngle,
+              )}
+              fill={visual.fillColor}
+              opacity={active ? 0.96 : 0.5}
+            />
+          );
+        })}
+        <Circle
+          cx={COVERAGE_DONUT_CENTER}
+          cy={COVERAGE_DONUT_CENTER}
+          r={COVERAGE_DONUT_INNER_RADIUS + 2}
+          fill={APP_COLORS.surface}
+        />
+      </Svg>
       {rows.map((row, index) => {
-        const theme = DEV_AREA_THEME[row.devArea];
-        const strength = row.count === 0 ? 0.34 : 0.58 + row.strength * 0.42;
+        const active = row.count > 0;
+        const labelAngle = ((index * step - 90) * Math.PI) / 180;
+        const left =
+          COVERAGE_WHEEL_CENTER +
+          Math.cos(labelAngle) * COVERAGE_LABEL_RADIUS_X -
+          COVERAGE_LABEL_WIDTH / 2;
+        const top =
+          COVERAGE_WHEEL_CENTER +
+          Math.sin(labelAngle) * COVERAGE_LABEL_RADIUS_Y -
+          COVERAGE_LABEL_HEIGHT / 2;
 
         return (
-          <View
-            key={row.devArea}
+          <Text
+            key={`${row.devArea}-label`}
+            numberOfLines={1}
             style={[
-              styles.coveragePetal,
+              styles.coverageWheelLabel,
+              !active && styles.coverageWheelLabelMuted,
               {
-                backgroundColor: theme.backgroundColor,
-                borderColor: theme.accentColor,
-                opacity: row.count === 0 ? 0.28 : 0.94,
-                transform: [
-                  { rotate: `${index * step}deg` },
-                  { translateY: -58 },
-                  { scaleY: strength },
-                ],
+                left,
+                top,
               },
             ]}
-          />
+          >
+            {DEV_AREA_LABELS[row.devArea]}
+          </Text>
         );
       })}
       <View style={styles.coverageCenter}>
-        <Text style={styles.coverageCenterValue}>
-          {coveredAreaCount}/{rows.length}
-        </Text>
-        <Text style={styles.coverageCenterLabel}>영역</Text>
+        <MaterialCommunityIcons name="star-face" size={43} color={APP_COLORS.mustard} />
       </View>
     </View>
   );
@@ -435,7 +590,7 @@ export default function HistoryScreen() {
 
         <View style={styles.coverageLegend}>
           {coverageRows.map((row) => {
-            const theme = DEV_AREA_THEME[row.devArea];
+            const visual = COVERAGE_AREA_VISUALS[row.devArea];
             const active = row.count > 0;
             const recommended = lackingArea === row.devArea;
 
@@ -445,18 +600,21 @@ export default function HistoryScreen() {
                 style={[
                   styles.legendItem,
                   active && {
-                    backgroundColor: theme.backgroundColor,
-                    borderColor: theme.backgroundColor,
+                    backgroundColor: visual.softColor,
+                    borderColor: visual.softColor,
                   },
                   !active && styles.legendItemMuted,
-                  recommended && styles.legendItemRecommended,
+                  recommended && {
+                    borderColor: visual.fillColor,
+                    borderWidth: 1.5,
+                  },
                 ]}
               >
                 <View
                   style={[
                     styles.legendDot,
                     {
-                      backgroundColor: active ? theme.accentColor : APP_COLORS.placeholder,
+                      backgroundColor: active ? visual.fillColor : APP_COLORS.placeholder,
                     },
                   ]}
                 />
@@ -464,7 +622,7 @@ export default function HistoryScreen() {
                   <Text
                     style={[
                       styles.legendLabel,
-                      active && { color: theme.textColor },
+                      active && { color: visual.textColor },
                       !active && styles.legendLabelMuted,
                     ]}
                   >
@@ -472,7 +630,7 @@ export default function HistoryScreen() {
                   </Text>
                   {recommended ? <Text style={styles.legendTag}>추천</Text> : null}
                 </View>
-                <Text style={[styles.legendValue, active && { color: theme.textColor }]}>{row.count}회</Text>
+                <Text style={[styles.legendValue, active && { color: visual.textColor }]}>{row.count}회</Text>
               </View>
             );
           })}
@@ -678,31 +836,45 @@ const styles = StyleSheet.create({
   },
   coverageWheel: {
     position: "relative",
-    width: 220,
-    height: 220,
+    width: COVERAGE_WHEEL_SIZE,
+    height: COVERAGE_WHEEL_SIZE,
     alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  coverageWheelHalo: {
+    position: "absolute",
+    left: 28,
+    top: 28,
+    width: 224,
+    height: 224,
     borderRadius: 999,
-    backgroundColor: APP_COLORS.background,
+    backgroundColor: "#FFFDFB",
     borderWidth: 1,
     borderColor: APP_COLORS.lineSoft,
+    ...APP_SHADOWS.control,
   },
-  coveragePetal: {
+  coverageWheelRing: {
     position: "absolute",
-    left: 88,
-    top: 66,
-    width: 44,
-    height: 88,
-    borderTopLeftRadius: 999,
-    borderTopRightRadius: 999,
-    borderBottomLeftRadius: 18,
-    borderBottomRightRadius: 18,
+    left: 43,
+    top: 43,
+    width: 194,
+    height: 194,
+    borderRadius: 999,
     borderWidth: 1,
+    borderColor: "#F6EFE8",
+  },
+  coverageDonutChart: {
+    position: "absolute",
+    left: COVERAGE_WHEEL_CENTER - COVERAGE_DONUT_SIZE / 2,
+    top: COVERAGE_WHEEL_CENTER - COVERAGE_DONUT_SIZE / 2,
+    zIndex: 1,
   },
   coverageCenter: {
-    width: 76,
-    height: 76,
+    position: "absolute",
+    left: COVERAGE_WHEEL_CENTER - 35,
+    top: COVERAGE_WHEEL_CENTER - 35,
+    zIndex: 3,
+    width: 70,
+    height: 70,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 999,
@@ -711,17 +883,20 @@ const styles = StyleSheet.create({
     borderColor: APP_COLORS.line,
     ...APP_SHADOWS.control,
   },
-  coverageCenterValue: {
+  coverageWheelLabel: {
+    position: "absolute",
+    zIndex: 4,
+    width: COVERAGE_LABEL_WIDTH,
+    height: COVERAGE_LABEL_HEIGHT,
     color: APP_COLORS.ink,
-    fontSize: 23,
-    lineHeight: 27,
-    fontFamily: APP_FONTS.heading,
-    fontWeight: "600",
-  },
-  coverageCenterLabel: {
-    color: APP_COLORS.muted,
-    fontSize: 12,
+    fontSize: 13,
+    lineHeight: COVERAGE_LABEL_HEIGHT,
     fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  coverageWheelLabelMuted: {
+    color: APP_COLORS.placeholder,
     fontWeight: "600",
   },
   recommendationStrip: {
@@ -782,10 +957,6 @@ const styles = StyleSheet.create({
   legendItemMuted: {
     backgroundColor: "#FFFDF8",
     borderColor: APP_COLORS.lineSoft,
-  },
-  legendItemRecommended: {
-    borderColor: "#E7BE4F",
-    borderWidth: 1.5,
   },
   legendDot: {
     width: 8,
