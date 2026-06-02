@@ -298,7 +298,7 @@ function HeaderIconButton({
   label: string;
   onPress?: () => void;
 }) {
-  const iconElement = <MaterialCommunityIcons name={icon} size={23} color={APP_COLORS.ink} />;
+  const iconElement = <MaterialCommunityIcons name={icon} size={27} color={APP_COLORS.ink} />;
 
   if (!onPress) {
     return (
@@ -382,7 +382,12 @@ function PlayCard({
       <Text style={styles.playCardMeta}>#{getPrimaryAreaLabel(play)}</Text>
       <View style={styles.playCardFooter}>
         <MaterialStatusPill label={completionLabel ?? materialSummary.label} tone={completionLabel ? "ready" : materialSummary.tone} />
-        <Text style={[styles.heartOutline, favorite && styles.heartFilled]}>{favorite ? "♥" : "♡"}</Text>
+        <MaterialCommunityIcons
+          name={favorite ? "heart" : "heart-outline"}
+          size={24}
+          color={favorite ? APP_COLORS.coral : "#B5B5B5"}
+          style={styles.favoriteIcon}
+        />
       </View>
     </MotionPressable>
   );
@@ -698,9 +703,8 @@ export default function MainScreen() {
           <Text style={styles.headerDate}>{formatTodayLabel()}</Text>
         </View>
         <View style={styles.headerActions}>
-          <HeaderIconButton icon="bell-outline" label="알림" />
           <HeaderIconButton
-            icon="heart-outline"
+            icon="bookmark-outline"
             label="찜으로 이동"
             onPress={() => router.push("/(main)/favorites")}
           />
@@ -713,16 +717,17 @@ export default function MainScreen() {
           onPress={() => router.push("/(main)/search")}
           style={({ pressed }) => [styles.searchBox, pressed && styles.pressed]}
         >
-          <Text style={styles.searchIcon}>⌕</Text>
+          <MaterialCommunityIcons name="magnify" size={25} color="#6F6A61" style={styles.searchIcon} />
           <Text style={styles.searchPlaceholder}>놀이, 재료, 상황으로 검색해 보세요</Text>
         </Pressable>
         <MotionPressable
+          accessibilityLabel="오늘 재료 설정"
           accessibilityRole="button"
           accessibilityState={{ expanded: materialsEditorOpen }}
           onPress={() => setMaterialsEditorOpen((current) => !current)}
           style={({ pressed }) => [styles.filterButton, pressed && styles.pressed]}
         >
-          <Text style={styles.filterButtonText}>☷</Text>
+          <MaterialCommunityIcons name="tune-variant" size={26} color={APP_COLORS.ink} style={styles.filterButtonIcon} />
         </MotionPressable>
       </Animated.View>
 
@@ -992,17 +997,13 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: 10,
   },
   headerIconButton: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 999,
-    backgroundColor: APP_COLORS.surface,
-    borderWidth: 1,
-    borderColor: APP_COLORS.line,
   },
   searchRow: {
     flexDirection: "row",
@@ -1023,9 +1024,8 @@ const styles = StyleSheet.create({
     ...APP_SHADOWS.card,
   },
   searchIcon: {
-    color: APP_COLORS.ink,
-    fontSize: 27,
-    lineHeight: 28,
+    width: 26,
+    textAlign: "center",
   },
   searchPlaceholder: {
     flex: 1,
@@ -1045,10 +1045,9 @@ const styles = StyleSheet.create({
     borderColor: APP_COLORS.line,
     ...APP_SHADOWS.card,
   },
-  filterButtonText: {
-    color: APP_COLORS.ink,
-    fontSize: 28,
-    lineHeight: 30,
+  filterButtonIcon: {
+    width: 28,
+    textAlign: "center",
   },
   materialPanel: {
     gap: 16,
@@ -1425,13 +1424,9 @@ const styles = StyleSheet.create({
   statusPillTextMissing: {
     color: "#A64F48",
   },
-  heartOutline: {
-    color: "#B5B5B5",
-    fontSize: 25,
-    lineHeight: 27,
-  },
-  heartFilled: {
-    color: APP_COLORS.coral,
+  favoriteIcon: {
+    width: 25,
+    textAlign: "center",
   },
   emptyCard: {
     gap: 8,

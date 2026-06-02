@@ -17,6 +17,10 @@ import { useSessionStore } from "@/store/sessionStore";
 type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 type TabGlyph = "home" | "search" | "record" | "heart" | "person";
 
+const ACTIVE_TAB_ICON_COLOR = APP_COLORS.accent;
+const ACTIVE_TAB_LABEL_COLOR = "#F2C600";
+const INACTIVE_TAB_COLOR = "#8F8F8F";
+
 const TAB_ICONS: Record<
   TabGlyph,
   { active: MaterialCommunityIconName; inactive: MaterialCommunityIconName; size: number }
@@ -63,7 +67,7 @@ function TabIcon({ focused, glyph }: { focused: boolean; glyph: TabGlyph }) {
 }
 
 function renderGlyph(glyph: TabGlyph, focused: boolean) {
-  const color = focused ? APP_COLORS.accentText : "#8F8F8F";
+  const color = focused ? ACTIVE_TAB_ICON_COLOR : INACTIVE_TAB_COLOR;
   const icon = TAB_ICONS[glyph];
 
   return (
@@ -89,8 +93,8 @@ export default function MainLayout() {
         sceneStyle: {
           backgroundColor: APP_COLORS.background,
         },
-        tabBarActiveTintColor: "#F2C600",
-        tabBarInactiveTintColor: "#8F8F8F",
+        tabBarActiveTintColor: ACTIVE_TAB_LABEL_COLOR,
+        tabBarInactiveTintColor: INACTIVE_TAB_COLOR,
         tabBarStyle: {
           backgroundColor: APP_COLORS.surface,
           borderTopColor: APP_COLORS.line,
