@@ -1,11 +1,10 @@
-import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { type ComponentProps, useEffect, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Image,
   Pressable,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   View,
@@ -23,11 +22,6 @@ import { getMaterialVisualSpec } from "@/constants/materialVisuals";
 import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getLatestPlayLog, isFavorite, toggleFavorite } from "@/db/queries";
-import {
-  advanceAutoProgress,
-  completeStep,
-  getNextIncompleteStepIndex,
-} from "@/play/stepProgress";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { Play } from "@/types";
@@ -43,10 +37,8 @@ type MaterialReadinessSummary = {
 };
 
 type StepRowProps = {
-  active: boolean;
-  completed: boolean;
   index: number;
-  onPress?: () => void;
+  isLast: boolean;
   text: string;
 };
 
@@ -141,36 +133,6 @@ function getMaterialCategoryName(material: MaterialSlug): string {
   );
 
   return category?.[0] ?? "도구";
-}
-
-function getPrimaryActionLabel({
-  allStepsCompleted,
-  hasStartedPlay,
-  isAutoProgressing,
-  isCompletedToday,
-  nextIncompleteStepIndex,
-}: {
-  allStepsCompleted: boolean;
-  hasStartedPlay: boolean;
-  isAutoProgressing: boolean;
-  isCompletedToday: boolean;
-  nextIncompleteStepIndex: number;
-}): string {
-  if (!hasStartedPlay) {
-    return isCompletedToday ? "다시 놀이하기" : "놀이 시작하기";
-  }
-
-  if (allStepsCompleted) {
-    return isCompletedToday ? "한 번 더 기록하기" : "놀이 마치고 기록하기";
-  }
-
-  if (isAutoProgressing) {
-    return "자동 진행 중";
-  }
-
-  return nextIncompleteStepIndex >= 0
-    ? `${nextIncompleteStepIndex + 1}단계 완료하기`
-    : "놀이 기록하기";
 }
 
 function getMaterialReadinessSummary(
@@ -332,28 +294,19 @@ function MaterialCheckCard({ material, missing, requirementLabel }: MaterialChec
   );
 }
 
-function StepRow({ active, completed, index, onPress, text }: StepRowProps) {
+function StepRow({ index, isLast, text }: StepRowProps) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ checked: completed }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.stepRow,
-        active && styles.stepRowActive,
-        completed && styles.stepRowCompleted,
-        pressed && styles.stepRowPressed,
-      ]}
-    >
-      <View style={[styles.stepBadge, active && styles.stepBadgeActive]}>
-        <Text style={[styles.stepBadgeText, active && styles.stepBadgeTextActive]}>
-          {completed ? "✓" : index + 1}
-        </Text>
+    <View style={styles.stepRow}>
+      <View style={styles.stepTimeline}>
+        <View style={styles.stepBadge}>
+          <Text style={styles.stepBadgeText}>{index + 1}</Text>
+        </View>
+        {isLast ? null : <View style={styles.stepConnector} />}
       </View>
       <View style={styles.stepBody}>
-        <Text style={[styles.stepText, completed && styles.stepTextCompleted]}>{text}</Text>
+        <Text style={styles.stepText}>{text}</Text>
       </View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -417,39 +370,20 @@ function PlayHeroArtwork({ play }: { play: Play }) {
 }
 
 export default function PlayDetailScreen() {
-  const autoProgressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ id?: string; fallback?: string; materials?: string | string[] }>();
   const playId = readParam(params.id);
   const guestId = useSessionStore((state) => state.guestId);
   const play = usePlaysStore((state) => state.plays.find((item) => item.id === playId));
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [hasStartedPlay, setHasStartedPlay] = useState(false);
-  const [isAutoProgressing, setIsAutoProgressing] = useState(false);
   const [favorite, setFavorite] = useState(false);
   const [latestCompletedAt, setLatestCompletedAt] = useState<string | null>(null);
 
-  function clearAutoProgressTimer() {
-    if (!autoProgressTimerRef.current) {
-      return;
-    }
-
-    clearTimeout(autoProgressTimerRef.current);
-    autoProgressTimerRef.current = null;
-  }
-
   useEffect(() => {
-    clearAutoProgressTimer();
     setActiveTab("overview");
-    setCompletedSteps([]);
-    setHasStartedPlay(false);
-    setIsAutoProgressing(false);
     setFavorite(false);
     setLatestCompletedAt(null);
   }, [playId]);
-
-  useEffect(() => clearAutoProgressTimer, []);
 
   useEffect(() => {
     if (!guestId || !playId) {
@@ -514,21 +448,6 @@ export default function PlayDetailScreen() {
     }
   }
 
-  async function handleShare() {
-    if (!play) {
-      return;
-    }
-
-    try {
-      await Share.share({
-        title: play.name,
-        message: `${play.name}\n${formatAgeRange(play)} · ${formatDuration(play)} · ${getPrepTimeLabel(play)}`,
-      });
-    } catch {
-      // Native share sheets can fail on unsupported platforms or cancelled flows.
-    }
-  }
-
   function moveToFeedback() {
     if (!play) {
       return;
@@ -549,42 +468,6 @@ export default function PlayDetailScreen() {
     router.replace("/(main)");
   }
 
-  function toggleStep(index: number) {
-    if (!hasStartedPlay) {
-      setHasStartedPlay(true);
-      setActiveTab("steps");
-    }
-
-    setCompletedSteps((current) =>
-      current.includes(index)
-        ? current.filter((item) => item !== index)
-        : completeStep(current, index),
-    );
-  }
-
-  function handlePrimaryAction() {
-    if (isAutoProgressing) {
-      return;
-    }
-
-    if (hasStartedPlay && allStepsCompleted) {
-      moveToFeedback();
-      return;
-    }
-
-    setActiveTab("steps");
-
-    if (!hasStartedPlay) {
-      setHasStartedPlay(true);
-      setIsAutoProgressing(true);
-      return;
-    }
-
-    if (nextIncompleteStepIndex >= 0) {
-      setIsAutoProgressing(true);
-    }
-  }
-
   const selectedMaterials = readMaterialParams(params.materials);
   const selectedMaterialsSet = new Set(selectedMaterials);
   const requiredMaterials = play?.materials.required ?? [];
@@ -598,43 +481,13 @@ export default function PlayDetailScreen() {
   const materialReadiness = play
     ? getMaterialReadinessSummary(play, selectedMaterialsSet)
     : null;
-  const totalStepCount = play?.steps.length ?? 0;
-  const allStepsCompleted = totalStepCount > 0 && completedSteps.length === totalStepCount;
-  const nextIncompleteStepIndex = getNextIncompleteStepIndex(totalStepCount, completedSteps);
   const playImageSource = play ? getPlayImageSource(play.id) : null;
   const latestCompletedDate = latestCompletedAt ? new Date(latestCompletedAt) : null;
   const isCompletedToday =
     latestCompletedDate !== null &&
     !Number.isNaN(latestCompletedDate.getTime()) &&
     isSameCalendarDay(latestCompletedDate, new Date());
-  const primaryActionLabel = getPrimaryActionLabel({
-    allStepsCompleted,
-    hasStartedPlay,
-    isAutoProgressing,
-    isCompletedToday,
-    nextIncompleteStepIndex,
-  });
   const footerHeightOffset = isCompletedToday ? 146 : 110;
-
-  useEffect(() => {
-    if (!hasStartedPlay || !isAutoProgressing) {
-      clearAutoProgressTimer();
-      return;
-    }
-
-    if (allStepsCompleted || nextIncompleteStepIndex < 0) {
-      clearAutoProgressTimer();
-      setIsAutoProgressing(false);
-      return;
-    }
-
-    clearAutoProgressTimer();
-    autoProgressTimerRef.current = setTimeout(() => {
-      setCompletedSteps((current) => advanceAutoProgress(totalStepCount, current).completedSteps);
-    }, 1000);
-
-    return clearAutoProgressTimer;
-  }, [allStepsCompleted, hasStartedPlay, isAutoProgressing, nextIncompleteStepIndex, totalStepCount]);
 
   return (
     <>
@@ -854,11 +707,9 @@ export default function PlayDetailScreen() {
                   <View style={styles.stepList}>
                     {play.steps.map((step, index) => (
                       <StepRow
-                        active={hasStartedPlay && index === nextIncompleteStepIndex}
                         key={`${play.id}-step-${index}`}
-                        completed={completedSteps.includes(index)}
                         index={index}
-                        onPress={isAutoProgressing ? undefined : () => toggleStep(index)}
+                        isLast={index === play.steps.length - 1}
                         text={step}
                       />
                     ))}
@@ -928,20 +779,16 @@ export default function PlayDetailScreen() {
               </View>
             ) : null}
             <View style={styles.footerBar}>
-              <IconCircleButton icon="share-variant-outline" label="공유하기" onPress={handleShare} />
               <Pressable
                 accessibilityRole="button"
-                accessibilityState={{ disabled: isAutoProgressing }}
-                disabled={isAutoProgressing}
-                onPress={handlePrimaryAction}
+                onPress={moveToFeedback}
                 style={({ pressed }) => [
                   styles.footerPrimaryButton,
-                  isAutoProgressing && styles.footerPrimaryButtonDisabled,
-                  pressed && !isAutoProgressing && styles.footerPrimaryButtonPressed,
+                  pressed && styles.footerPrimaryButtonPressed,
                 ]}
               >
-                <Text style={styles.footerPrimaryIcon}>{allStepsCompleted ? "✓" : "▶"}</Text>
-                <Text style={styles.footerPrimaryText}>{primaryActionLabel}</Text>
+                <Text style={styles.footerPrimaryIcon}>✓</Text>
+                <Text style={styles.footerPrimaryText}>놀이 완료</Text>
               </Pressable>
             </View>
           </View>
@@ -1426,61 +1273,51 @@ const styles = StyleSheet.create({
     backgroundColor: APP_COLORS.ink,
   },
   stepList: {
-    gap: 12,
+    paddingTop: 2,
+    paddingBottom: 4,
   },
   stepRow: {
     flexDirection: "row",
+    alignItems: "stretch",
+    minHeight: 70,
+  },
+  stepTimeline: {
+    width: 40,
     alignItems: "center",
-    gap: 14,
-    minHeight: 64,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: APP_COLORS.surface,
-    borderWidth: 1,
-    borderColor: APP_COLORS.line,
-  },
-  stepRowActive: {
-    borderColor: APP_COLORS.accent,
-    backgroundColor: "#FFFBEC",
-  },
-  stepRowCompleted: {
-    backgroundColor: "#F8F6F1",
-  },
-  stepRowPressed: {
-    opacity: 0.92,
+    alignSelf: "stretch",
   },
   stepBadge: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 18,
-    backgroundColor: APP_COLORS.mustard,
-  },
-  stepBadgeActive: {
+    borderRadius: 16,
     backgroundColor: APP_COLORS.mustard,
   },
   stepBadgeText: {
     color: APP_COLORS.accentText,
-    fontSize: 15,
+    fontSize: 14,
+    lineHeight: 18,
     fontFamily: APP_FONTS.body,
     fontWeight: "700",
   },
-  stepBadgeTextActive: {
-    color: "#4E3B0F",
+  stepConnector: {
+    flex: 1,
+    width: 1,
+    marginTop: 8,
+    marginBottom: 8,
+    backgroundColor: APP_COLORS.line,
   },
   stepBody: {
     flex: 1,
+    paddingLeft: 12,
+    paddingBottom: 18,
   },
   stepText: {
     color: APP_COLORS.ink,
     fontSize: 16,
-    lineHeight: 23,
+    lineHeight: 25,
     fontFamily: APP_FONTS.body,
-  },
-  stepTextCompleted: {
-    color: APP_COLORS.muted,
   },
   footerWrap: {
     position: "absolute",
@@ -1526,9 +1363,6 @@ const styles = StyleSheet.create({
     gap: 10,
     borderRadius: 14,
     backgroundColor: APP_COLORS.mustard,
-  },
-  footerPrimaryButtonDisabled: {
-    backgroundColor: "#E0D7BD",
   },
   footerPrimaryButtonPressed: {
     opacity: 0.9,
