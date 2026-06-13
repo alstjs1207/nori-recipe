@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import packageJson from "../../package.json";
 
 import { MotionPressable } from "@/components/motion/MotionPressable";
+import { LEGAL_NOTICE, PRIVACY_NOTICE } from "@/constants/legalNotices";
 import { MATERIAL_DISPLAY_NAMES, type MaterialSlug } from "@/constants/materials";
 import { getMaterialVisualSpec } from "@/constants/materialVisuals";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
@@ -42,6 +43,13 @@ const AGE_WHEEL_PADDING = (AGE_WHEEL_HEIGHT - AGE_ITEM_HEIGHT) / 2;
 const AGE_WHEEL_CENTER_ROW = Math.floor(AGE_WHEEL_VISIBLE_ROWS / 2);
 const MATERIAL_TILE_GAP = 12;
 const MAX_MATERIAL_GRID_WIDTH = 560;
+
+const NOTICE_DISCLOSURES = [
+  { key: "privacy", notice: PRIVACY_NOTICE },
+  { key: "legal", notice: LEGAL_NOTICE },
+] as const;
+
+type NoticeDisclosureKey = (typeof NOTICE_DISCLOSURES)[number]["key"];
 
 type MaterialEntry = {
   categoryName: string;
@@ -102,6 +110,7 @@ export default function SettingsScreen() {
   const upsertUserContext = useSessionStore((state) => state.upsertUserContext);
   const updateOnboardingProfile = useSessionStore((state) => state.updateOnboardingProfile);
   const resetOnboarding = useSessionStore((state) => state.resetOnboarding);
+  const resetLocalData = useSessionStore((state) => state.resetLocalData);
   const selectedAgeMonthsRef = useRef(getAgeMonthsFromMonthIndex(userContext.childBirthMonth));
   const gestureStartAgeMonthsRef = useRef(selectedAgeMonthsRef.current);
 
@@ -118,6 +127,9 @@ export default function SettingsScreen() {
   const [saveNoticeVisible, setSaveNoticeVisible] = useState(false);
   const [resetConfirmVisible, setResetConfirmVisible] = useState(false);
   const [resetNoticeVisible, setResetNoticeVisible] = useState(false);
+  const [fullResetConfirmVisible, setFullResetConfirmVisible] = useState(false);
+  const [fullResetting, setFullResetting] = useState(false);
+  const [openNotice, setOpenNotice] = useState<NoticeDisclosureKey | null>(null);
 
   const updateSelectedAgeMonths = useCallback((ageMonths: number) => {
     const nextAgeMonths = clampAgeMonths(ageMonths);
@@ -289,6 +301,20 @@ export default function SettingsScreen() {
       Alert.alert("초기화하지 못했어요", "잠시 후 다시 시도해 주세요.");
     } finally {
       setResetting(false);
+    }
+  }
+
+  async function handleFullReset() {
+    if (!guestId || fullResetting) return;
+    setFullResetting(true);
+    try {
+      await resetLocalData();
+      setFullResetConfirmVisible(false);
+      router.replace("/(onboarding)/child-info");
+    } catch {
+      Alert.alert("초기화하지 못했어요", "잠시 후 다시 시도해 주세요.");
+    } finally {
+      setFullResetting(false);
     }
   }
 
@@ -572,6 +598,102 @@ export default function SettingsScreen() {
               <Text style={styles.resetNoticeText}>놀이 기록과 즐겨찾기를 비웠습니다.</Text>
             </View>
           ) : null}
+
+          <View style={styles.divider} />
+
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => {
+              setFullResetConfirmVisible((current) => !current);
+              setResetNoticeVisible(false);
+            }}
+            style={({ pressed }) => [styles.actionRow, pressed && styles.actionRowPressed]}
+          >
+            <Text style={[styles.actionTitle, styles.actionTitleDestructive]}>
+              전체 로컬 데이터 초기화
+            </Text>
+            <Text style={styles.actionMeta}>
+              {fullResetting ? "처리 중..." : fullResetConfirmVisible ? "한 번 더 확인" : "앱 데이터 삭제"}
+            </Text>
+          </Pressable>
+
+          {fullResetConfirmVisible ? (
+            <View style={styles.resetPanel}>
+              <Text style={styles.resetPanelBody}>
+                아이 정보, 재료, 놀이 기록, 즐겨찾기, 추천 피드백을 이 기기에서 삭제하고
+                처음 설정 화면으로 돌아갑니다.
+              </Text>
+              <View style={styles.resetActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={fullResetting}
+                  onPress={() => setFullResetConfirmVisible(false)}
+                  style={({ pressed }) => [
+                    styles.resetSecondaryButton,
+                    pressed && styles.actionRowPressed,
+                  ]}
+                >
+                  <Text style={styles.resetSecondaryButtonText}>취소</Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={fullResetting}
+                  onPress={() => {
+                    void handleFullReset();
+                  }}
+                  style={({ pressed }) => [
+                    styles.resetPrimaryButton,
+                    fullResetting && styles.resetPrimaryButtonDisabled,
+                    pressed && !fullResetting && styles.actionRowPressed,
+                  ]}
+                >
+                  <Text style={styles.resetPrimaryButtonText}>
+                    {fullResetting ? "삭제 중..." : "모두 삭제"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          ) : null}
+        </View>
+
+        {/* 개인정보와 고지 */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>개인정보 및 법적 고지</Text>
+          {NOTICE_DISCLOSURES.map(({ key, notice }, index) => {
+            const expanded = openNotice === key;
+
+            return (
+              <View key={key} style={styles.noticeDisclosure}>
+                {index > 0 ? <View style={styles.divider} /> : null}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded }}
+                  onPress={() => setOpenNotice((current) => (current === key ? null : key))}
+                  style={({ pressed }) => [
+                    styles.actionRow,
+                    pressed && styles.actionRowPressed,
+                  ]}
+                >
+                  <View style={styles.noticeRowText}>
+                    <Text style={styles.actionTitle}>{notice.title}</Text>
+                    <Text style={styles.noticeRowSummary}>{notice.summary}</Text>
+                  </View>
+                  <Text style={styles.actionMeta}>{expanded ? "접기" : "보기"}</Text>
+                </Pressable>
+
+                {expanded ? (
+                  <View style={styles.noticeBlock}>
+                    <Text style={styles.noticeTitle}>{notice.title}</Text>
+                    {notice.items.map((item) => (
+                      <Text key={item} style={styles.noticeBody}>
+                        {item}
+                      </Text>
+                    ))}
+                  </View>
+                ) : null}
+              </View>
+            );
+          })}
         </View>
 
         {/* 앱 정보 */}
@@ -695,6 +817,40 @@ const styles = StyleSheet.create({
   body: {
     color: APP_COLORS.muted,
     fontSize: 14,
+    fontFamily: APP_FONTS.body,
+  },
+  noticeDisclosure: {
+    gap: 12,
+  },
+  noticeRowText: {
+    flex: 1,
+    gap: 4,
+  },
+  noticeRowSummary: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: APP_FONTS.body,
+  },
+  noticeBlock: {
+    gap: 8,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: APP_COLORS.background,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+  },
+  noticeTitle: {
+    color: APP_COLORS.ink,
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
+  },
+  noticeBody: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    lineHeight: 18,
     fontFamily: APP_FONTS.body,
   },
   textInput: {

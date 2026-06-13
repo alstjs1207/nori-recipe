@@ -17,6 +17,7 @@ import Animated, { useReducedMotion } from "react-native-reanimated";
 import { fadeInUp, layoutTransition } from "@/animations/motion";
 import { MotionPressable } from "@/components/motion/MotionPressable";
 import { OnboardingStepScreen } from "@/components/onboarding/OnboardingStepScreen";
+import { PRIVACY_NOTICE } from "@/constants/legalNotices";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getBirthMonthOptions } from "@/onboarding/utils";
 import { useSessionStore } from "@/store/sessionStore";
@@ -82,6 +83,7 @@ export default function ChildInfoScreen() {
   const [childName, setChildName] = useState(savedChildName);
   const [screenScrollEnabled, setScreenScrollEnabled] = useState(true);
   const [selectedAgeMonths, setSelectedAgeMonths] = useState(selectedAgeMonthsRef.current);
+  const [privacyNoticeVisible, setPrivacyNoticeVisible] = useState(false);
 
   const updateSelectedAgeMonths = useCallback((ageMonths: number) => {
     const nextAgeMonths = clampAgeMonths(ageMonths);
@@ -189,6 +191,38 @@ export default function ChildInfoScreen() {
         layout={shouldAnimate ? layoutTransition : undefined}
         style={styles.formPanel}
       >
+        <View style={styles.privacyDisclosure}>
+          <Text style={styles.privacyIntro}>
+            아이 정보는 맞춤 놀이 추천과 이 기기 안의 저장에 사용돼요.
+          </Text>
+          <MotionPressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: privacyNoticeVisible }}
+            onPress={() => setPrivacyNoticeVisible((current) => !current)}
+            scaleTo={0.98}
+            style={({ pressed }) => [
+              styles.privacyRow,
+              pressed && styles.privacyRowPressed,
+            ]}
+          >
+            <View style={styles.privacyRowText}>
+              <Text style={styles.privacyTitle}>{PRIVACY_NOTICE.title}</Text>
+              <Text style={styles.privacySummary}>{PRIVACY_NOTICE.summary}</Text>
+            </View>
+            <Text style={styles.privacyMeta}>{privacyNoticeVisible ? "접기" : "보기"}</Text>
+          </MotionPressable>
+
+          {privacyNoticeVisible ? (
+            <View style={styles.privacyPanel}>
+              {PRIVACY_NOTICE.items.map((item) => (
+                <Text key={item} style={styles.privacyBody}>
+                  {item}
+                </Text>
+              ))}
+            </View>
+          ) : null}
+        </View>
+
         <View style={styles.fieldGroup}>
           <View style={styles.fieldLabelRow}>
             <View style={styles.bullet} />
@@ -336,6 +370,69 @@ const styles = StyleSheet.create({
   },
   fieldGroup: {
     gap: 14,
+  },
+  privacyDisclosure: {
+    gap: 10,
+  },
+  privacyIntro: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: APP_FONTS.body,
+  },
+  privacyRow: {
+    minHeight: 52,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    backgroundColor: APP_COLORS.background,
+  },
+  privacyRowPressed: {
+    opacity: 0.82,
+  },
+  privacyRowText: {
+    flex: 1,
+    gap: 3,
+  },
+  privacyTitle: {
+    color: APP_COLORS.ink,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
+  privacySummary: {
+    color: APP_COLORS.muted,
+    fontSize: 11,
+    lineHeight: 16,
+    fontFamily: APP_FONTS.body,
+  },
+  privacyMeta: {
+    color: APP_COLORS.ink,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+  },
+  privacyPanel: {
+    gap: 8,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: APP_COLORS.lineSoft,
+    backgroundColor: APP_COLORS.background,
+  },
+  privacyBody: {
+    color: APP_COLORS.muted,
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: APP_FONTS.body,
   },
   fieldLabelRow: {
     flexDirection: "row",

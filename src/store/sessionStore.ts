@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
-import { getUserContext, upsertUserContext } from "@/db/queries";
+import { getUserContext, resetUserActivity, upsertUserContext } from "@/db/queries";
 import type { MaterialSlug } from "@/constants/materials";
 import type { UserContext } from "@/types";
 import { DEFAULT_USER_CONTEXT } from "@/types";
@@ -42,6 +42,7 @@ type SessionStore = {
   }) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   resetOnboarding: () => Promise<void>;
+  resetLocalData: () => Promise<void>;
 };
 
 async function getOrCreateGuestId(): Promise<string> {
@@ -222,5 +223,34 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   resetOnboarding: async () => {
     await AsyncStorage.removeItem(ONBOARDING_COMPLETE_STORAGE_KEY);
     set({ onboardingCompleted: false });
+  },
+  resetLocalData: async () => {
+    const guestId = get().guestId;
+
+    if (!guestId) {
+      throw new Error("Guest session has not been initialized.");
+    }
+
+    await resetUserActivity(guestId);
+    await upsertUserContext(guestId, DEFAULT_USER_CONTEXT);
+    await Promise.all([
+      AsyncStorage.removeItem(ONBOARDING_COMPLETE_STORAGE_KEY),
+      AsyncStorage.removeItem(ONBOARDING_CHILD_NAME_STORAGE_KEY),
+      AsyncStorage.removeItem(ONBOARDING_FAMILY_TYPE_STORAGE_KEY),
+      AsyncStorage.removeItem(CHILD_BIRTH_MONTH_STORAGE_KEY),
+      AsyncStorage.removeItem(TODAY_MATERIALS_STORAGE_KEY),
+      AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
+      AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+    ]);
+
+    set({
+      userContext: DEFAULT_USER_CONTEXT,
+      todayMaterials: null,
+      pinnedHomeRecommendationIds: [],
+      pinnedHomeRecommendationKey: null,
+      childName: "",
+      familyType: null,
+      onboardingCompleted: false,
+    });
   },
 }));

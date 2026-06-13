@@ -21,13 +21,14 @@
     "@expo-google-fonts/noto-sans-kr": "^0.4.3",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~54.0.34",
+    "expo": "~54.0.35",
     "expo-crypto": "~15.0.9",
-    "expo-font": "^14.0.11",
-    "expo-router": "~6.0.23",
+    "expo-font": "~14.0.12",
+    "expo-linking": "~8.0.12",
+    "expo-router": "~6.0.24",
     "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
-    "expo-updates": "~29.0.17",
+    "expo-updates": "~29.0.18",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
@@ -45,5 +46,15 @@
     "@types/react": "~19.1.0",
     "tsx": "^4.21.0",
     "typescript": "~5.9.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@xmldom/xmldom": "0.8.13",
+      "brace-expansion@>=5.0.0 <5.0.6": "5.0.6",
+      "postcss": "8.5.10",
+      "react-devtools-core>shell-quote": "1.8.4",
+      "ws@>=8.0.0 <8.20.1": "8.20.1",
+      "xcode>uuid": "11.1.1"
+    }
   }
 }
