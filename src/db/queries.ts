@@ -11,9 +11,29 @@ import type {
   DevAreaStat,
   FavoriteRecord,
   PlayLogRecord,
+  SyncState,
   UserContext,
 } from "@/types";
 import { DEFAULT_USER_CONTEXT } from "@/types";
+
+const DEFAULT_SYNC_STATE: SyncState = "pending";
+
+/**
+ * 웹(AsyncStorage) 폴백 저장 형태. 네이티브 SQLite 스키마(v3)와 parity를 맞추기 위해
+ * 동기화 메타데이터(updatedAt/deletedAt/syncState)를 함께 저장한다.
+ * 외부에 반환할 때는 PlayLogRecord/FavoriteRecord 형태로 노출된다(메타데이터는 내부용).
+ */
+type StoredPlayLog = PlayLogRecord & {
+  updatedAt: string;
+  deletedAt: string | null;
+  syncState: SyncState;
+};
+
+type StoredFavorite = FavoriteRecord & {
+  updatedAt: string;
+  deletedAt: string | null;
+  syncState: SyncState;
+};
 
 type UserContextRow = {
   child_birth_month: number | null;
@@ -58,7 +78,11 @@ async function writeJsonToStorage(key: string, value: unknown): Promise<void> {
   await AsyncStorage.setItem(key, JSON.stringify(value));
 }
 
-function normalizeWebPlayLog(value: Partial<PlayLogRecord>): PlayLogRecord | null {
+function parseSyncState(value: unknown): SyncState {
+  return value === "synced" ? "synced" : "pending";
+}
+
+function normalizeWebPlayLog(value: Partial<StoredPlayLog>): StoredPlayLog | null {
   if (
     typeof value.id !== "string" ||
     typeof value.guestId !== "string" ||
@@ -81,25 +105,28 @@ function normalizeWebPlayLog(value: Partial<PlayLogRecord>): PlayLogRecord | nul
         )
       : [],
     memo: typeof value.memo === "string" ? value.memo : null,
+    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : value.completedAt,
+    deletedAt: typeof value.deletedAt === "string" ? value.deletedAt : null,
+    syncState: parseSyncState(value.syncState),
   };
 }
 
-async function readWebPlayLogs(): Promise<PlayLogRecord[]> {
-  const records = await readJsonFromStorage<Partial<PlayLogRecord>[]>(
+async function readWebPlayLogs(): Promise<StoredPlayLog[]> {
+  const records = await readJsonFromStorage<Partial<StoredPlayLog>[]>(
     WEB_PLAY_LOGS_STORAGE_KEY,
     [],
   );
 
   return records
     .map(normalizeWebPlayLog)
-    .filter((record): record is PlayLogRecord => Boolean(record));
+    .filter((record): record is StoredPlayLog => Boolean(record));
 }
 
-async function writeWebPlayLogs(records: PlayLogRecord[]): Promise<void> {
+async function writeWebPlayLogs(records: StoredPlayLog[]): Promise<void> {
   await writeJsonToStorage(WEB_PLAY_LOGS_STORAGE_KEY, records);
 }
 
-function normalizeWebFavorite(value: Partial<FavoriteRecord>): FavoriteRecord | null {
+function normalizeWebFavorite(value: Partial<StoredFavorite>): StoredFavorite | null {
   if (
     typeof value.id !== "string" ||
     typeof value.guestId !== "string" ||
@@ -114,21 +141,24 @@ function normalizeWebFavorite(value: Partial<FavoriteRecord>): FavoriteRecord | 
     guestId: value.guestId,
     playId: value.playId,
     createdAt: value.createdAt,
+    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : value.createdAt,
+    deletedAt: typeof value.deletedAt === "string" ? value.deletedAt : null,
+    syncState: parseSyncState(value.syncState),
   };
 }
 
-async function readWebFavorites(): Promise<FavoriteRecord[]> {
-  const records = await readJsonFromStorage<Partial<FavoriteRecord>[]>(
+async function readWebFavorites(): Promise<StoredFavorite[]> {
+  const records = await readJsonFromStorage<Partial<StoredFavorite>[]>(
     WEB_FAVORITES_STORAGE_KEY,
     [],
   );
 
   return records
     .map(normalizeWebFavorite)
-    .filter((record): record is FavoriteRecord => Boolean(record));
+    .filter((record): record is StoredFavorite => Boolean(record));
 }
 
-async function writeWebFavorites(records: FavoriteRecord[]): Promise<void> {
+async function writeWebFavorites(records: StoredFavorite[]): Promise<void> {
   await writeJsonToStorage(WEB_FAVORITES_STORAGE_KEY, records);
 }
 
@@ -312,6 +342,9 @@ export async function insertPlayLog(
         starRating: rating,
         childReaction: reactions ?? [],
         memo,
+        updatedAt: completedAt,
+        deletedAt: null,
+        syncState: DEFAULT_SYNC_STATE,
       },
       ...logs,
     ]);
@@ -324,8 +357,9 @@ export async function insertPlayLog(
   await runWriteBatch(database, async () => {
     await database.runAsync(
       `INSERT INTO play_logs (
-        id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo,
+        updated_at, sync_state
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       playLogId,
       guestId,
       playId,
@@ -334,17 +368,21 @@ export async function insertPlayLog(
       rating,
       serializeChildReactions(reactions),
       memo,
+      completedAt,
+      DEFAULT_SYNC_STATE,
     );
 
     for (const devArea of play.devAreas) {
       await database.runAsync(
-        `INSERT INTO dev_logs (id, guest_id, dev_area, play_id, logged_at)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO dev_logs (id, guest_id, dev_area, play_id, logged_at, updated_at, sync_state)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         randomUUID(),
         guestId,
         devArea,
         playId,
         completedAt,
+        completedAt,
+        DEFAULT_SYNC_STATE,
       );
     }
   });
@@ -357,7 +395,7 @@ export async function getPlayLogs(guestId: string, limit = 20): Promise<PlayLogR
     const logs = await readWebPlayLogs();
 
     return logs
-      .filter((log) => log.guestId === guestId)
+      .filter((log) => log.guestId === guestId && !log.deletedAt)
       .sort((left, right) => right.completedAt.localeCompare(left.completedAt))
       .slice(0, limit);
   }
@@ -375,7 +413,7 @@ export async function getPlayLogs(guestId: string, limit = 20): Promise<PlayLogR
   }>(
     `SELECT id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo
      FROM play_logs
-     WHERE guest_id = ?
+     WHERE guest_id = ? AND deleted_at IS NULL
      ORDER BY completed_at DESC
      LIMIT ?`,
     guestId,
@@ -403,7 +441,7 @@ export async function getLatestPlayLog(
 
     return (
       logs
-        .filter((log) => log.guestId === guestId && log.playId === playId)
+        .filter((log) => log.guestId === guestId && log.playId === playId && !log.deletedAt)
         .sort((left, right) => right.completedAt.localeCompare(left.completedAt))[0] ?? null
     );
   }
@@ -421,7 +459,7 @@ export async function getLatestPlayLog(
   }>(
     `SELECT id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo
      FROM play_logs
-     WHERE guest_id = ? AND play_id = ?
+     WHERE guest_id = ? AND play_id = ? AND deleted_at IS NULL
      ORDER BY completed_at DESC
      LIMIT 1`,
     guestId,
@@ -448,12 +486,12 @@ export async function getPlayLogCount(guestId: string): Promise<number> {
   if (Platform.OS === "web") {
     const logs = await readWebPlayLogs();
 
-    return logs.filter((log) => log.guestId === guestId).length;
+    return logs.filter((log) => log.guestId === guestId && !log.deletedAt).length;
   }
 
   const database = await initializeDatabase();
   const row = await database.getFirstAsync<{ total: number }>(
-    "SELECT COUNT(*) AS total FROM play_logs WHERE guest_id = ?",
+    "SELECT COUNT(*) AS total FROM play_logs WHERE guest_id = ? AND deleted_at IS NULL",
     guestId,
   );
 
@@ -465,7 +503,7 @@ export async function getFavorites(guestId: string, limit = 8): Promise<Favorite
     const favorites = await readWebFavorites();
 
     return favorites
-      .filter((favorite) => favorite.guestId === guestId)
+      .filter((favorite) => favorite.guestId === guestId && !favorite.deletedAt)
       .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
       .slice(0, limit);
   }
@@ -479,7 +517,7 @@ export async function getFavorites(guestId: string, limit = 8): Promise<Favorite
   }>(
     `SELECT id, guest_id, play_id, created_at
      FROM favorites
-     WHERE guest_id = ?
+     WHERE guest_id = ? AND deleted_at IS NULL
      ORDER BY created_at DESC
      LIMIT ?`,
     guestId,
@@ -495,15 +533,42 @@ export async function getFavorites(guestId: string, limit = 8): Promise<Favorite
 }
 
 export async function toggleFavorite(guestId: string, playId: string): Promise<boolean> {
+  const now = new Date().toISOString();
+
   if (Platform.OS === "web") {
     const favorites = await readWebFavorites();
     const existingFavorite = favorites.find(
       (favorite) => favorite.guestId === guestId && favorite.playId === playId,
     );
 
-    if (existingFavorite) {
-      await writeWebFavorites(favorites.filter((favorite) => favorite.id !== existingFavorite.id));
+    if (existingFavorite && !existingFavorite.deletedAt) {
+      // 활성 찜 해제: tombstone으로 소프트 삭제(이력 보존 → 향후 삭제 동기화 가능).
+      await writeWebFavorites(
+        favorites.map((favorite) =>
+          favorite.id === existingFavorite.id
+            ? { ...favorite, deletedAt: now, updatedAt: now, syncState: DEFAULT_SYNC_STATE }
+            : favorite,
+        ),
+      );
       return false;
+    }
+
+    if (existingFavorite) {
+      // 소프트 삭제된 찜 재활성화 (UNIQUE(guest_id, play_id) 재삽입 충돌 방지).
+      await writeWebFavorites(
+        favorites.map((favorite) =>
+          favorite.id === existingFavorite.id
+            ? {
+                ...favorite,
+                deletedAt: null,
+                createdAt: now,
+                updatedAt: now,
+                syncState: DEFAULT_SYNC_STATE,
+              }
+            : favorite,
+        ),
+      );
+      return true;
     }
 
     await writeWebFavorites([
@@ -511,7 +576,10 @@ export async function toggleFavorite(guestId: string, playId: string): Promise<b
         id: randomUUID(),
         guestId,
         playId,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
+        deletedAt: null,
+        syncState: DEFAULT_SYNC_STATE,
       },
       ...favorites,
     ]);
@@ -520,23 +588,44 @@ export async function toggleFavorite(guestId: string, playId: string): Promise<b
   }
 
   const database = await initializeDatabase();
-  const existingFavorite = await database.getFirstAsync<FavoriteRecord>(
-    "SELECT id, guest_id AS guestId, play_id AS playId, created_at AS createdAt FROM favorites WHERE guest_id = ? AND play_id = ?",
+  const existingFavorite = await database.getFirstAsync<{ id: string; deleted_at: string | null }>(
+    "SELECT id, deleted_at FROM favorites WHERE guest_id = ? AND play_id = ?",
     guestId,
     playId,
   );
 
-  if (existingFavorite) {
-    await database.runAsync("DELETE FROM favorites WHERE id = ?", existingFavorite.id);
+  if (existingFavorite && !existingFavorite.deleted_at) {
+    // 활성 찜 해제: hard delete 대신 tombstone 처리.
+    await database.runAsync(
+      "UPDATE favorites SET deleted_at = ?, updated_at = ?, sync_state = ? WHERE id = ?",
+      now,
+      now,
+      DEFAULT_SYNC_STATE,
+      existingFavorite.id,
+    );
     return false;
   }
 
+  if (existingFavorite) {
+    // 소프트 삭제된 찜 재활성화 (UNIQUE(guest_id, play_id) 재삽입 충돌 방지).
+    await database.runAsync(
+      "UPDATE favorites SET deleted_at = NULL, created_at = ?, updated_at = ?, sync_state = ? WHERE id = ?",
+      now,
+      now,
+      DEFAULT_SYNC_STATE,
+      existingFavorite.id,
+    );
+    return true;
+  }
+
   await database.runAsync(
-    "INSERT INTO favorites (id, guest_id, play_id, created_at) VALUES (?, ?, ?, ?)",
+    "INSERT INTO favorites (id, guest_id, play_id, created_at, updated_at, sync_state) VALUES (?, ?, ?, ?, ?, ?)",
     randomUUID(),
     guestId,
     playId,
-    new Date().toISOString(),
+    now,
+    now,
+    DEFAULT_SYNC_STATE,
   );
 
   return true;
@@ -547,13 +636,13 @@ export async function isFavorite(guestId: string, playId: string): Promise<boole
     const favorites = await readWebFavorites();
 
     return favorites.some(
-      (favorite) => favorite.guestId === guestId && favorite.playId === playId,
+      (favorite) => favorite.guestId === guestId && favorite.playId === playId && !favorite.deletedAt,
     );
   }
 
   const database = await initializeDatabase();
   const row = await database.getFirstAsync<{ id: string }>(
-    "SELECT id FROM favorites WHERE guest_id = ? AND play_id = ? LIMIT 1",
+    "SELECT id FROM favorites WHERE guest_id = ? AND play_id = ? AND deleted_at IS NULL LIMIT 1",
     guestId,
     playId,
   );
@@ -605,8 +694,9 @@ export async function upsertUserContext(guestId: string, context: UserContext): 
       preferred_dev_areas,
       dev_gaps,
       user_feedback,
-      updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      updated_at,
+      sync_state
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(guest_id) DO UPDATE SET
       child_birth_month = excluded.child_birth_month,
       owned_materials = excluded.owned_materials,
@@ -614,7 +704,8 @@ export async function upsertUserContext(guestId: string, context: UserContext): 
       preferred_dev_areas = excluded.preferred_dev_areas,
       dev_gaps = excluded.dev_gaps,
       user_feedback = excluded.user_feedback,
-      updated_at = excluded.updated_at`,
+      updated_at = excluded.updated_at,
+      sync_state = excluded.sync_state`,
     guestId,
     context.childBirthMonth,
     JSON.stringify(context.ownedMaterials),
@@ -623,6 +714,7 @@ export async function upsertUserContext(guestId: string, context: UserContext): 
     JSON.stringify(context.devGaps),
     JSON.stringify(context.userFeedback),
     new Date().toISOString(),
+    DEFAULT_SYNC_STATE,
   );
 
   return getUserContext(guestId);
@@ -676,6 +768,8 @@ export async function applyPlayFeedbackSignals(
 }
 
 export async function resetUserActivity(guestId: string): Promise<UserContext> {
+  const now = new Date().toISOString();
+
   if (Platform.OS === "web") {
     const [logs, favorites, contexts] = await Promise.all([
       readWebPlayLogs(),
@@ -689,10 +783,16 @@ export async function resetUserActivity(guestId: string): Promise<UserContext> {
       userFeedback: {},
     };
 
+    // 활동 초기화도 hard delete 대신 tombstone 처리 (삭제 이력 동기화 가능).
+    const softDelete = <T extends StoredPlayLog | StoredFavorite>(record: T): T =>
+      record.guestId === guestId && !record.deletedAt
+        ? { ...record, deletedAt: now, updatedAt: now, syncState: DEFAULT_SYNC_STATE }
+        : record;
+
     contexts[guestId] = nextContext;
     await Promise.all([
-      writeWebPlayLogs(logs.filter((log) => log.guestId !== guestId)),
-      writeWebFavorites(favorites.filter((favorite) => favorite.guestId !== guestId)),
+      writeWebPlayLogs(logs.map(softDelete)),
+      writeWebFavorites(favorites.map(softDelete)),
       writeWebUserContexts(contexts),
     ]);
 
@@ -708,16 +808,35 @@ export async function resetUserActivity(guestId: string): Promise<UserContext> {
   };
 
   await runWriteBatch(database, async () => {
-    await database.runAsync("DELETE FROM play_logs WHERE guest_id = ?", guestId);
-    await database.runAsync("DELETE FROM dev_logs WHERE guest_id = ?", guestId);
-    await database.runAsync("DELETE FROM favorites WHERE guest_id = ?", guestId);
+    await database.runAsync(
+      "UPDATE play_logs SET deleted_at = ?, updated_at = ?, sync_state = ? WHERE guest_id = ? AND deleted_at IS NULL",
+      now,
+      now,
+      DEFAULT_SYNC_STATE,
+      guestId,
+    );
+    await database.runAsync(
+      "UPDATE dev_logs SET deleted_at = ?, updated_at = ?, sync_state = ? WHERE guest_id = ? AND deleted_at IS NULL",
+      now,
+      now,
+      DEFAULT_SYNC_STATE,
+      guestId,
+    );
+    await database.runAsync(
+      "UPDATE favorites SET deleted_at = ?, updated_at = ?, sync_state = ? WHERE guest_id = ? AND deleted_at IS NULL",
+      now,
+      now,
+      DEFAULT_SYNC_STATE,
+      guestId,
+    );
     await database.runAsync(
       `UPDATE user_context
-       SET dev_gaps = ?, user_feedback = ?, updated_at = ?
+       SET dev_gaps = ?, user_feedback = ?, updated_at = ?, sync_state = ?
        WHERE guest_id = ?`,
       JSON.stringify(nextContext.devGaps),
       JSON.stringify(nextContext.userFeedback),
-      new Date().toISOString(),
+      now,
+      DEFAULT_SYNC_STATE,
       guestId,
     );
   });
@@ -736,7 +855,12 @@ export async function getDevAreaStats(
     const countByDevArea = new Map<DevArea, number>();
 
     for (const log of logs) {
-      if (log.guestId !== guestId || log.completedAt < start || log.completedAt >= end) {
+      if (
+        log.guestId !== guestId ||
+        log.deletedAt ||
+        log.completedAt < start ||
+        log.completedAt >= end
+      ) {
         continue;
       }
 
@@ -763,7 +887,7 @@ export async function getDevAreaStats(
   const rows = await database.getAllAsync<{ dev_area: DevArea; total: number }>(
     `SELECT dev_area, COUNT(*) AS total
      FROM dev_logs
-     WHERE guest_id = ? AND logged_at >= ? AND logged_at < ?
+     WHERE guest_id = ? AND deleted_at IS NULL AND logged_at >= ? AND logged_at < ?
      GROUP BY dev_area
      ORDER BY total DESC, dev_area ASC`,
     guestId,

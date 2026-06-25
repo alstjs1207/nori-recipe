@@ -1,5 +1,5 @@
 export const DATABASE_NAME = "nori-recipe.db";
-export const DATABASE_VERSION = 2;
+export const DATABASE_VERSION = 3;
 
 export const MIGRATIONS = [
   {
@@ -63,6 +63,38 @@ export const MIGRATIONS = [
     sql: `
       ALTER TABLE user_context ADD COLUMN dev_gaps TEXT NOT NULL DEFAULT '{}';
       ALTER TABLE user_context ADD COLUMN user_feedback TEXT NOT NULL DEFAULT '{}';
+    `,
+  },
+  {
+    // v3: 향후 계정 연동/서버 동기화를 위한 메타데이터.
+    //  - updated_at: 충돌 해소(LWW) 기준 시각. 기존 행은 원본 타임스탬프로 백필.
+    //  - deleted_at: tombstone(소프트 삭제). NULL = 미삭제. 삭제 전파를 위해 hard delete 대신 사용.
+    //  - sync_state: 'pending'(로컬 변경, 미동기화) | 'synced'. 서버 도입 전에는 모두 'pending'.
+    version: 3,
+    sql: `
+      ALTER TABLE play_logs ADD COLUMN updated_at TEXT NOT NULL DEFAULT '';
+      ALTER TABLE play_logs ADD COLUMN deleted_at TEXT;
+      ALTER TABLE play_logs ADD COLUMN sync_state TEXT NOT NULL DEFAULT 'pending';
+      UPDATE play_logs SET updated_at = completed_at WHERE updated_at = '';
+
+      ALTER TABLE favorites ADD COLUMN updated_at TEXT NOT NULL DEFAULT '';
+      ALTER TABLE favorites ADD COLUMN deleted_at TEXT;
+      ALTER TABLE favorites ADD COLUMN sync_state TEXT NOT NULL DEFAULT 'pending';
+      UPDATE favorites SET updated_at = created_at WHERE updated_at = '';
+
+      ALTER TABLE dev_logs ADD COLUMN updated_at TEXT NOT NULL DEFAULT '';
+      ALTER TABLE dev_logs ADD COLUMN deleted_at TEXT;
+      ALTER TABLE dev_logs ADD COLUMN sync_state TEXT NOT NULL DEFAULT 'pending';
+      UPDATE dev_logs SET updated_at = logged_at WHERE updated_at = '';
+
+      ALTER TABLE user_context ADD COLUMN sync_state TEXT NOT NULL DEFAULT 'pending';
+
+      CREATE INDEX IF NOT EXISTS idx_play_logs_guest_active
+        ON play_logs (guest_id, completed_at DESC) WHERE deleted_at IS NULL;
+      CREATE INDEX IF NOT EXISTS idx_favorites_guest_active
+        ON favorites (guest_id, created_at DESC) WHERE deleted_at IS NULL;
+      CREATE INDEX IF NOT EXISTS idx_dev_logs_guest_active
+        ON dev_logs (guest_id, logged_at DESC) WHERE deleted_at IS NULL;
     `,
   },
 ] as const;
