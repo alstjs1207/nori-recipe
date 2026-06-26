@@ -1,4 +1,4 @@
-import { type ComponentProps, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Image, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
@@ -23,7 +23,6 @@ import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { Play, PlayLogRecord, PlayPlace } from "@/types";
 
-type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 type MaterialTone = "ready" | "partial" | "missing";
 
 const SITUATION_CARDS = [
@@ -286,37 +285,6 @@ function ImageSlot({
       )}
       {dimmed ? <View pointerEvents="none" style={styles.completedImageOverlay} /> : null}
     </View>
-  );
-}
-
-function HeaderIconButton({
-  icon,
-  label,
-  onPress,
-}: {
-  icon: MaterialCommunityIconName;
-  label: string;
-  onPress?: () => void;
-}) {
-  const iconElement = <MaterialCommunityIcons name={icon} size={27} color={APP_COLORS.ink} />;
-
-  if (!onPress) {
-    return (
-      <View accessibilityLabel={label} style={styles.headerIconButton}>
-        {iconElement}
-      </View>
-    );
-  }
-
-  return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [styles.headerIconButton, pressed && styles.pressed]}
-    >
-      {iconElement}
-    </Pressable>
   );
 }
 
@@ -702,13 +670,6 @@ export default function MainScreen() {
           </Text>
           <Text style={styles.headerDate}>{formatTodayLabel()}</Text>
         </View>
-        <View style={styles.headerActions}>
-          <HeaderIconButton
-            icon="bookmark-outline"
-            label="찜으로 이동"
-            onPress={() => router.push("/(main)/favorites")}
-          />
-        </View>
       </Animated.View>
 
       <Animated.View entering={reduceMotion ? undefined : fadeInUp(50)} style={styles.searchRow}>
@@ -994,16 +955,6 @@ const styles = StyleSheet.create({
     color: APP_COLORS.muted,
     fontSize: 12,
     fontFamily: APP_FONTS.body,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  headerIconButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
   },
   searchRow: {
     flexDirection: "row",

@@ -1106,6 +1106,8 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: APP_COLORS.line,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   tabButton: {
     flex: 1,

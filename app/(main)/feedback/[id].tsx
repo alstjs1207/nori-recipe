@@ -496,7 +496,7 @@ export default function FeedbackScreen() {
                   </View>
                   <TextInput
                     maxLength={MEMO_MAX_LENGTH}
-                    placeholder="오늘 놀이에 대한 짧은 기록을 남겨보세요."
+                    placeholder="짧은 기록을 남겨보세요"
                     placeholderTextColor={APP_COLORS.placeholder}
                     returnKeyType="done"
                     style={styles.memoInput}
@@ -775,6 +775,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reactionCard: {
+    flex: 1,
     minHeight: 132,
     alignItems: "center",
     justifyContent: "center",
