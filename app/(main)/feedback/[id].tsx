@@ -24,7 +24,7 @@ import {
 } from "@/constants/feedback";
 import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
-import { applyPlayFeedbackSignals, insertPlayLog } from "@/db/queries";
+import { recordPlayFeedback } from "@/db/queries";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
@@ -352,18 +352,12 @@ export default function FeedbackScreen() {
     setSaving(true);
 
     try {
-      await insertPlayLog(
+      const nextUserContext = await recordPlayFeedback(
         guestId,
         play.id,
         rating,
         selectedReactions,
         memo.trim().length > 0 ? memo.trim() : null,
-      );
-      const nextUserContext = await applyPlayFeedbackSignals(
-        guestId,
-        play.id,
-        rating,
-        selectedReactions,
       );
 
       useSessionStore.setState({ userContext: nextUserContext });

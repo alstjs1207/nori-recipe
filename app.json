@@ -23,7 +23,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.paperclip.norirecipe"
+      "bundleIdentifier": "com.paperclip.norirecipe",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +32,8 @@
         "backgroundColor": "#f4efe6"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.paperclip.norirecipe"
+      "package": "com.paperclip.norirecipe",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",

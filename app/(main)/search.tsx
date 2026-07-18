@@ -7,6 +7,7 @@ import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
+import { searchPlays } from "@/play/search";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { PlayPlace } from "@/types";
@@ -42,26 +43,11 @@ export default function SearchScreen() {
   const selectedAgeLabel = selectedAgeMonths === null ? "아이" : `${selectedAgeMonths}개월 아이`;
 
   const results = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    const placeFiltered = selectedPlace === null
-      ? plays
-      : plays.filter((play) => play.place === selectedPlace);
-    const ageFiltered = selectedAgeMonths === null
-      ? placeFiltered
-      : placeFiltered.filter(
-          (play) => play.ageMin <= selectedAgeMonths && play.ageMax >= selectedAgeMonths,
-        );
-
-    if (normalizedQuery.length === 0) {
-      return ageFiltered.slice(0, 24);
-    }
-
-    return ageFiltered
-      .filter((play) => {
-        const target = [play.name, ...play.tags, ...play.steps].join(" ").toLowerCase();
-        return target.includes(normalizedQuery);
-      })
-      .slice(0, 30);
+    return searchPlays(plays, {
+      ageMonths: selectedAgeMonths,
+      place: selectedPlace,
+      query,
+    });
   }, [plays, query, selectedAgeMonths, selectedPlace]);
 
   return (

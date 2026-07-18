@@ -22,6 +22,7 @@ import { getMaterialVisualSpec } from "@/constants/materialVisuals";
 import { getPlayImageSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getLatestPlayLog, isFavorite, toggleFavorite } from "@/db/queries";
+import { getPlaySafetyNotes } from "@/play/safety";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { Play } from "@/types";
@@ -481,6 +482,7 @@ export default function PlayDetailScreen() {
   const materialReadiness = play
     ? getMaterialReadinessSummary(play, selectedMaterialsSet)
     : null;
+  const safetyNotes = play ? getPlaySafetyNotes(play) : [];
   const playImageSource = play ? getPlayImageSource(play.id) : null;
   const latestCompletedDate = latestCompletedAt ? new Date(latestCompletedAt) : null;
   const isCompletedToday =
@@ -612,6 +614,24 @@ export default function PlayDetailScreen() {
                     <Text style={styles.readinessText}>{materialReadiness.title}</Text>
                   </View>
                 ) : null}
+
+                <View style={styles.safetyPreview}>
+                  <View style={styles.safetyPreviewHeader}>
+                    <Text style={styles.safetyPreviewIcon}>!</Text>
+                    <Text style={styles.safetyPreviewTitle}>시작 전 안전 확인</Text>
+                  </View>
+                  <Text style={styles.safetyPreviewText}>{safetyNotes[0]}</Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => setActiveTab("safety")}
+                    style={({ pressed }) => [
+                      styles.safetyPreviewLink,
+                      pressed && styles.safetyPreviewLinkPressed,
+                    ]}
+                  >
+                    <Text style={styles.safetyPreviewLinkText}>주의사항 모두 보기</Text>
+                  </Pressable>
+                </View>
               </View>
 
               <View style={styles.tabBar}>
@@ -714,7 +734,7 @@ export default function PlayDetailScreen() {
                       />
                     ))}
                   </View>
-                  {play.safetyNotes.length > 0 ? (
+                  {safetyNotes.length > 0 ? (
                     <>
                       <View style={styles.sectionDivider} />
                       <View style={styles.sectionHeadingRow}>
@@ -723,7 +743,7 @@ export default function PlayDetailScreen() {
                       </View>
                       <View style={styles.infoCard}>
                         <View style={styles.noteList}>
-                          {play.safetyNotes.map((note, index) => (
+                          {safetyNotes.map((note, index) => (
                             <View key={`${play.id}-steps-safety-${index}`} style={styles.noteRow}>
                               <View style={styles.noteBullet} />
                               <Text style={styles.bodyText}>{note}</Text>
@@ -742,10 +762,10 @@ export default function PlayDetailScreen() {
                     <Text style={styles.sectionHeadingIcon}>◆</Text>
                     <Text style={styles.sectionHeading}>주의사항</Text>
                   </View>
-                  {play.safetyNotes.length > 0 ? (
+                  {safetyNotes.length > 0 ? (
                     <View style={styles.infoCard}>
                       <View style={styles.noteList}>
-                        {play.safetyNotes.map((note, index) => (
+                        {safetyNotes.map((note, index) => (
                           <View key={`${play.id}-safety-${index}`} style={styles.noteRow}>
                             <View style={styles.noteBullet} />
                             <Text style={styles.bodyText}>{note}</Text>
@@ -1096,6 +1116,61 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 19,
     fontFamily: APP_FONTS.body,
+  },
+  safetyPreview: {
+    gap: 8,
+    marginTop: 14,
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E8C989",
+    backgroundColor: "#FFF8E8",
+  },
+  safetyPreviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  safetyPreviewIcon: {
+    width: 22,
+    height: 22,
+    overflow: "hidden",
+    borderRadius: 11,
+    color: APP_COLORS.surface,
+    backgroundColor: "#C77A35",
+    fontSize: 14,
+    lineHeight: 22,
+    textAlign: "center",
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
+  },
+  safetyPreviewTitle: {
+    color: "#6B431F",
+    fontSize: 15,
+    lineHeight: 20,
+    fontFamily: APP_FONTS.heading,
+    fontWeight: "700",
+  },
+  safetyPreviewText: {
+    color: "#5F4B37",
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily: APP_FONTS.body,
+  },
+  safetyPreviewLink: {
+    alignSelf: "flex-start",
+    paddingVertical: 2,
+  },
+  safetyPreviewLinkPressed: {
+    opacity: 0.65,
+  },
+  safetyPreviewLinkText: {
+    color: "#8A5527",
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: APP_FONTS.body,
+    fontWeight: "700",
+    textDecorationLine: "underline",
   },
   tabBar: {
     flexDirection: "row",

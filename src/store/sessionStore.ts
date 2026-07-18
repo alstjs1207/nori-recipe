@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
-import { getUserContext, resetUserActivity, upsertUserContext } from "@/db/queries";
+import { deleteAllUserData, getUserContext, upsertUserContext } from "@/db/queries";
 import type { MaterialSlug } from "@/constants/materials";
 import type { UserContext } from "@/types";
 import { DEFAULT_USER_CONTEXT } from "@/types";
@@ -231,9 +231,9 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       throw new Error("Guest session has not been initialized.");
     }
 
-    await resetUserActivity(guestId);
-    await upsertUserContext(guestId, DEFAULT_USER_CONTEXT);
+    await deleteAllUserData(guestId);
     await Promise.all([
+      AsyncStorage.removeItem(GUEST_ID_STORAGE_KEY),
       AsyncStorage.removeItem(ONBOARDING_COMPLETE_STORAGE_KEY),
       AsyncStorage.removeItem(ONBOARDING_CHILD_NAME_STORAGE_KEY),
       AsyncStorage.removeItem(ONBOARDING_FAMILY_TYPE_STORAGE_KEY),
@@ -243,14 +243,20 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
     ]);
 
+    const nextGuestId = await getOrCreateGuestId();
+    const nextUserContext = await upsertUserContext(nextGuestId, DEFAULT_USER_CONTEXT);
+
     set({
-      userContext: DEFAULT_USER_CONTEXT,
+      guestId: nextGuestId,
+      userContext: nextUserContext,
       todayMaterials: null,
       pinnedHomeRecommendationIds: [],
       pinnedHomeRecommendationKey: null,
       childName: "",
       familyType: null,
       onboardingCompleted: false,
+      status: "ready",
+      error: null,
     });
   },
 }));

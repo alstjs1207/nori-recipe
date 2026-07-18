@@ -37,7 +37,6 @@ const materialEntries: MaterialEntry[] = visibleCategories.flatMap((category) =>
 export default function MaterialsScreen() {
   const userContext = useSessionStore((state) => state.userContext);
   const upsertUserContext = useSessionStore((state) => state.upsertUserContext);
-  const completeOnboarding = useSessionStore((state) => state.completeOnboarding);
   const reduceMotion = useReducedMotion();
   const shouldAnimate = !reduceMotion && Platform.OS !== "web";
   const { width } = useWindowDimensions();
@@ -78,8 +77,7 @@ export default function MaterialsScreen() {
 
   async function handleComplete(materials: MaterialSlug[]) {
     await persistSelection(materials);
-    await completeOnboarding();
-    router.replace("/(main)");
+    router.replace("/(onboarding)/first-result");
   }
 
   return (

@@ -6,6 +6,7 @@ import { Platform } from "react-native";
 import type { DevArea } from "@/constants/devAreas";
 import { initializeDatabase } from "@/db";
 import { loadPlaysBundle } from "@/data/content";
+import { applyFeedbackToUserContext } from "@/play/feedbackSignals";
 import type {
   AreaScoreMap,
   DevAreaStat,
@@ -293,101 +294,6 @@ function getMonthBounds(year: number, month: number) {
     start: start.toISOString(),
     end: end.toISOString(),
   };
-}
-
-function adjustAreaScores(
-  currentScores: AreaScoreMap,
-  devAreas: DevArea[],
-  delta: number,
-): AreaScoreMap {
-  if (delta === 0 || devAreas.length === 0) {
-    return currentScores;
-  }
-
-  const nextScores = { ...currentScores };
-
-  for (const devArea of devAreas) {
-    nextScores[devArea] = clampScore((nextScores[devArea] ?? 50) + delta);
-  }
-
-  return nextScores;
-}
-
-export async function insertPlayLog(
-  guestId: string,
-  playId: string,
-  rating: number | null,
-  reactions: ChildReaction[] | null,
-  memo: string | null,
-  durationActual: number | null = null,
-): Promise<string> {
-  const play = playIndex.get(playId);
-
-  if (!play) {
-    throw new Error(`Unknown play id: ${playId}`);
-  }
-
-  const playLogId = randomUUID();
-  const completedAt = new Date().toISOString();
-
-  if (Platform.OS === "web") {
-    const logs = await readWebPlayLogs();
-    await writeWebPlayLogs([
-      {
-        id: playLogId,
-        guestId,
-        playId,
-        completedAt,
-        durationActual,
-        starRating: rating,
-        childReaction: reactions ?? [],
-        memo,
-        updatedAt: completedAt,
-        deletedAt: null,
-        syncState: DEFAULT_SYNC_STATE,
-      },
-      ...logs,
-    ]);
-
-    return playLogId;
-  }
-
-  const database = await initializeDatabase();
-
-  await runWriteBatch(database, async () => {
-    await database.runAsync(
-      `INSERT INTO play_logs (
-        id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo,
-        updated_at, sync_state
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      playLogId,
-      guestId,
-      playId,
-      completedAt,
-      durationActual,
-      rating,
-      serializeChildReactions(reactions),
-      memo,
-      completedAt,
-      DEFAULT_SYNC_STATE,
-    );
-
-    for (const devArea of play.devAreas) {
-      await database.runAsync(
-        `INSERT INTO dev_logs (id, guest_id, dev_area, play_id, logged_at, updated_at, sync_state)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        randomUUID(),
-        guestId,
-        devArea,
-        playId,
-        completedAt,
-        completedAt,
-        DEFAULT_SYNC_STATE,
-      );
-    }
-  });
-
-  return playLogId;
 }
 
 export async function getPlayLogs(guestId: string, limit = 20): Promise<PlayLogRecord[]> {
@@ -720,11 +626,13 @@ export async function upsertUserContext(guestId: string, context: UserContext): 
   return getUserContext(guestId);
 }
 
-export async function applyPlayFeedbackSignals(
+export async function recordPlayFeedback(
   guestId: string,
   playId: string,
-  rating: number | null,
+  rating: number,
   reactions: ChildReaction[],
+  memo: string | null,
+  durationActual: number | null = null,
 ): Promise<UserContext> {
   const play = playIndex.get(playId);
 
@@ -732,38 +640,178 @@ export async function applyPlayFeedbackSignals(
     throw new Error(`Unknown play id: ${playId}`);
   }
 
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    throw new Error("Rating must be an integer between 1 and 5.");
+  }
+
+  if (memo !== null && memo.length > 100) {
+    throw new Error("Memo must be 100 characters or fewer.");
+  }
+
+  if (reactions.some((reaction) => !CHILD_REACTION_PARSE_OPTIONS.includes(reaction))) {
+    throw new Error("Unknown child reaction.");
+  }
+
   const currentContext = await getUserContext(guestId);
-  let userFeedback = currentContext.userFeedback;
-  let devGaps = currentContext.devGaps;
+  const nextContext = applyFeedbackToUserContext(
+    currentContext,
+    play.devAreas,
+    rating,
+    reactions,
+  );
+  const playLogId = randomUUID();
+  const completedAt = new Date().toISOString();
 
-  if (typeof rating === "number") {
-    if (rating >= 4) {
-      userFeedback = adjustAreaScores(userFeedback, play.devAreas, 10);
-    } else if (rating <= 2) {
-      userFeedback = adjustAreaScores(userFeedback, play.devAreas, -15);
+  if (Platform.OS === "web") {
+    const [logs, contexts] = await Promise.all([readWebPlayLogs(), readWebUserContexts()]);
+    const nextLogs: StoredPlayLog[] = [
+      {
+        id: playLogId,
+        guestId,
+        playId,
+        completedAt,
+        durationActual,
+        starRating: rating,
+        childReaction: reactions,
+        memo,
+        updatedAt: completedAt,
+        deletedAt: null,
+        syncState: DEFAULT_SYNC_STATE,
+      },
+      ...logs,
+    ];
+    const nextContexts = {
+      ...contexts,
+      [guestId]: normalizeWebUserContext(nextContext),
+    };
+
+    try {
+      await Promise.all([
+        writeWebPlayLogs(nextLogs),
+        writeWebUserContexts(nextContexts),
+      ]);
+    } catch (error) {
+      await Promise.allSettled([
+        writeWebPlayLogs(logs),
+        writeWebUserContexts(contexts),
+      ]);
+      throw error;
     }
+
+    return nextContext;
   }
 
-  if (
-    reactions.includes("더 하고 싶어했어요") ||
-    reactions.includes("집중했어요") ||
-    reactions.includes("스스로 했어요")
-  ) {
-    devGaps = adjustAreaScores(devGaps, play.devAreas, -10);
+  const database = await initializeDatabase();
+
+  await runWriteBatch(database, async () => {
+    await database.runAsync(
+      `INSERT INTO play_logs (
+        id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo,
+        updated_at, sync_state
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      playLogId,
+      guestId,
+      playId,
+      completedAt,
+      durationActual,
+      rating,
+      serializeChildReactions(reactions),
+      memo,
+      completedAt,
+      DEFAULT_SYNC_STATE,
+    );
+
+    for (const devArea of play.devAreas) {
+      await database.runAsync(
+        `INSERT INTO dev_logs (id, guest_id, dev_area, play_id, logged_at, updated_at, sync_state)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        randomUUID(),
+        guestId,
+        devArea,
+        playId,
+        completedAt,
+        completedAt,
+        DEFAULT_SYNC_STATE,
+      );
+    }
+
+    await database.runAsync(
+      `INSERT INTO user_context (
+        guest_id,
+        child_birth_month,
+        owned_materials,
+        blocked_materials,
+        preferred_dev_areas,
+        dev_gaps,
+        user_feedback,
+        updated_at,
+        sync_state
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(guest_id) DO UPDATE SET
+        child_birth_month = excluded.child_birth_month,
+        owned_materials = excluded.owned_materials,
+        blocked_materials = excluded.blocked_materials,
+        preferred_dev_areas = excluded.preferred_dev_areas,
+        dev_gaps = excluded.dev_gaps,
+        user_feedback = excluded.user_feedback,
+        updated_at = excluded.updated_at,
+        sync_state = excluded.sync_state`,
+      guestId,
+      nextContext.childBirthMonth,
+      JSON.stringify(nextContext.ownedMaterials),
+      JSON.stringify(nextContext.blockedMaterials),
+      JSON.stringify(nextContext.preferredDevAreas),
+      JSON.stringify(nextContext.devGaps),
+      JSON.stringify(nextContext.userFeedback),
+      completedAt,
+      DEFAULT_SYNC_STATE,
+    );
+  });
+
+  return nextContext;
+}
+
+/**
+ * 사용자가 "전체 로컬 데이터 삭제"를 선택했을 때 호출한다.
+ * 동기화용 tombstone을 남기는 활동 초기화와 달리, 해당 guest의 행을 실제로 제거한다.
+ */
+export async function deleteAllUserData(guestId: string): Promise<void> {
+  if (Platform.OS === "web") {
+    const [logs, favorites, contexts] = await Promise.all([
+      readWebPlayLogs(),
+      readWebFavorites(),
+      readWebUserContexts(),
+    ]);
+    const nextContexts = { ...contexts };
+    const nextLogs = logs.filter((record) => record.guestId !== guestId);
+    const nextFavorites = favorites.filter((record) => record.guestId !== guestId);
+
+    delete nextContexts[guestId];
+
+    try {
+      await Promise.all([
+        writeWebPlayLogs(nextLogs),
+        writeWebFavorites(nextFavorites),
+        writeWebUserContexts(nextContexts),
+      ]);
+    } catch (error) {
+      await Promise.allSettled([
+        writeWebPlayLogs(logs),
+        writeWebFavorites(favorites),
+        writeWebUserContexts(contexts),
+      ]);
+      throw error;
+    }
+    return;
   }
 
-  if (reactions.includes("도움이 필요했어요") || reactions.includes("어려워했어요")) {
-    devGaps = adjustAreaScores(devGaps, play.devAreas, 10);
-  }
+  const database = await initializeDatabase();
 
-  if (reactions.includes("흥미가 적었어요") || reactions.includes("별로였어요")) {
-    userFeedback = adjustAreaScores(userFeedback, play.devAreas, -10);
-  }
-
-  return upsertUserContext(guestId, {
-    ...currentContext,
-    devGaps,
-    userFeedback,
+  await runWriteBatch(database, async () => {
+    await database.runAsync("DELETE FROM dev_logs WHERE guest_id = ?", guestId);
+    await database.runAsync("DELETE FROM play_logs WHERE guest_id = ?", guestId);
+    await database.runAsync("DELETE FROM favorites WHERE guest_id = ?", guestId);
+    await database.runAsync("DELETE FROM user_context WHERE guest_id = ?", guestId);
   });
 }
 
