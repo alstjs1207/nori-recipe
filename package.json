@@ -8,12 +8,15 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
+    "web": "node scripts/prepare-web-assets.mjs && expo start --web",
     "prepare:play-images": "tsx scripts/prepare-play-images.ts",
     "check:play-images": "tsx scripts/prepare-play-images.ts --verify-only",
     "material-audit": "tsx scripts/material-audit.ts",
     "test": "tsx --test 'src/**/*.test.ts' 'src/**/*.test.tsx'",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:web": "node scripts/build-web.mjs",
+    "serve:web": "node scripts/serve-web.mjs",
+    "test:web": "node --test tests/web-*.test.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/ibm-plex-sans-kr": "^0.4.1",
@@ -44,6 +47,8 @@
     "@expo/ngrok": "^4.1.0",
     "@types/node": "^25.6.0",
     "@types/react": "~19.1.0",
+    "babel-preset-expo": "~54.0.11",
+    "sharp": "^0.35.5",
     "tsx": "^4.21.0",
     "typescript": "~5.9.2"
   },

@@ -1,8 +1,9 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
+import { PlayShareButton, PlayWebActionsProvider } from "@/components/web/PlayWebActions";
 import { type ComponentProps, useEffect, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -492,7 +493,7 @@ export default function PlayDetailScreen() {
   const footerHeightOffset = isCompletedToday ? 146 : 110;
 
   return (
-    <>
+    <PlayWebActionsProvider key={play?.id ?? "missing"} play={play}>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.screen}>
         <ScrollView
@@ -511,12 +512,15 @@ export default function PlayDetailScreen() {
               <View style={styles.heroImageCard}>
                 <View style={styles.heroTopBar}>
                   <IconCircleButton icon="chevron-left" label="뒤로 가기" onPress={handleBack} />
-                  <IconCircleButton
-                    icon={favorite ? "heart" : "heart-outline"}
-                    iconColor={APP_COLORS.coral}
-                    label={favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
-                    onPress={handleToggleFavorite}
-                  />
+                  <View style={styles.heroTopActions}>
+                    <PlayShareButton />
+                    <IconCircleButton
+                      icon={favorite ? "heart" : "heart-outline"}
+                      iconColor={APP_COLORS.coral}
+                      label={favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+                      onPress={handleToggleFavorite}
+                    />
+                  </View>
                 </View>
                 {playImageSource ? (
                   <View style={styles.heroImageLayer}>
@@ -814,7 +818,7 @@ export default function PlayDetailScreen() {
           </View>
         ) : null}
       </View>
-    </>
+    </PlayWebActionsProvider>
   );
 }
 
@@ -872,6 +876,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  heroTopActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   iconButton: {
     width: 44,

@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 export const APP_COLORS = {
   background: "#FFFDF8",
   surface: "#FFFFFF",
@@ -24,9 +26,9 @@ export const APP_COLORS = {
 } as const;
 
 export const APP_FONTS = {
-  heading: "IBMPlexSansKR_600SemiBold",
-  body: "IBMPlexSansKR_400Regular",
-  mono: "IBMPlexSansKR_400Regular",
+  heading: Platform.OS === "web" ? 'system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif' : "IBMPlexSansKR_600SemiBold",
+  body: Platform.OS === "web" ? 'system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif' : "IBMPlexSansKR_400Regular",
+  mono: Platform.OS === "web" ? 'system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif' : "IBMPlexSansKR_400Regular",
 } as const;
 
 export const APP_SHADOWS = {

@@ -1,9 +1,9 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
 import { type ComponentProps, useEffect, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,

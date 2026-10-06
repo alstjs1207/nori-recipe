@@ -82,7 +82,7 @@ function renderGlyph(glyph: TabGlyph, focused: boolean) {
 export default function MainLayout() {
   const onboardingCompleted = useSessionStore((state) => state.onboardingCompleted);
 
-  if (!onboardingCompleted) {
+  if (!onboardingCompleted && Platform.OS !== "web") {
     return <Redirect href="/(onboarding)" />;
   }
 

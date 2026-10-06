@@ -1,10 +1,11 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useMemo, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
-import { getPlayImageSource } from "@/constants/playImages";
+import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { searchPlays } from "@/play/search";
@@ -83,7 +84,7 @@ export default function SearchScreen() {
 
       <View style={styles.resultList}>
         {results.map((play, index) => {
-          const imageSource = getPlayImageSource(play.id);
+          const imageSource = getPlayThumbnailSource(play.id);
 
           return (
             <Pressable

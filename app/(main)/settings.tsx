@@ -1,8 +1,9 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
+import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { router } from "expo-router";
 import {
   Alert,
-  Image,
   Keyboard,
   PanResponder,
   Pressable,
@@ -10,7 +11,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -103,7 +103,7 @@ function formatAgeSummary(ageMonths: number): string {
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width } = useContentDimensions();
   const guestId = useSessionStore((state) => state.guestId);
   const userContext = useSessionStore((state) => state.userContext);
   const childNameFromStore = useSessionStore((state) => state.childName);

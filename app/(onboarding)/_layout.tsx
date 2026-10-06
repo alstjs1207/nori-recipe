@@ -1,4 +1,5 @@
 import { Redirect, Stack, usePathname } from "expo-router";
+import { Platform } from "react-native";
 
 import { OnboardingProgressHeader } from "@/components/onboarding/OnboardingProgressHeader";
 import { APP_COLORS } from "@/constants/theme";
@@ -8,6 +9,10 @@ export default function OnboardingLayout() {
   const pathname = usePathname();
   const onboardingCompleted = useSessionStore((state) => state.onboardingCompleted);
   const currentStep = getCurrentStep(pathname);
+
+  if (Platform.OS === "web") {
+    return <Redirect href="/start" />;
+  }
 
   if (onboardingCompleted) {
     return <Redirect href="/(main)" />;

@@ -1,6 +1,8 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
+import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useMemo, useState } from "react";
 import { router } from "expo-router";
-import { Image, Platform, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 
 import { fadeInUp, layoutTransition } from "@/animations/motion";
@@ -39,7 +41,7 @@ export default function MaterialsScreen() {
   const upsertUserContext = useSessionStore((state) => state.upsertUserContext);
   const reduceMotion = useReducedMotion();
   const shouldAnimate = !reduceMotion && Platform.OS !== "web";
-  const { width } = useWindowDimensions();
+  const { width } = useContentDimensions();
   const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORY);
   const [selectedMaterials, setSelectedMaterials] = useState<MaterialSlug[]>(
     userContext.ownedMaterials.length > 0 ? userContext.ownedMaterials : ONBOARDING_DEFAULT_MATERIALS,

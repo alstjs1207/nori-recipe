@@ -1,5 +1,6 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
 import { Redirect, router } from "expo-router";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 
 import { fadeInUp, layoutTransition } from "@/animations/motion";
@@ -7,7 +8,7 @@ import { MotionPressable } from "@/components/motion/MotionPressable";
 import { OnboardingStepScreen } from "@/components/onboarding/OnboardingStepScreen";
 import { DEV_AREA_LABELS, DEV_AREA_THEME } from "@/constants/devAreas";
 import type { MaterialSlug } from "@/constants/materials";
-import { getPlayImageSource } from "@/constants/playImages";
+import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS } from "@/constants/theme";
 import { recommend } from "@/engine/recommend";
 import { buildOnboardingFilterInput } from "@/onboarding/utils";
@@ -136,7 +137,7 @@ export default function FirstResultScreen() {
 
       {recommendation.results.map((play, index) => {
         const playEmoji = getPlayRepresentativeEmoji(play);
-        const imageSource = getPlayImageSource(play.id);
+        const imageSource = getPlayThumbnailSource(play.id);
         const materialSummary = getMaterialSummary(play, selectedMaterialsSet);
         const pastelColor = CARD_PASTELS[index % CARD_PASTELS.length];
 

@@ -1,15 +1,15 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
+import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useMemo, useRef, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import {
-  Image,
   Keyboard,
   PanResponder,
   Platform,
   StyleSheet,
   Text,
   TextInput,
-  useWindowDimensions,
   View,
 } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
@@ -324,7 +324,7 @@ export default function ChildInfoScreen() {
 }
 
 function ChildHeroArt() {
-  const { width } = useWindowDimensions();
+  const { width } = useContentDimensions();
   const compact = width < 430;
   const frameWidth = compact ? 148 : 238;
   const frameHeight = compact ? 170 : 240;

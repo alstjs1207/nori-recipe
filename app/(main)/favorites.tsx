@@ -1,10 +1,11 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useCallback, useState } from "react";
 import { router, useFocusEffect } from "expo-router";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
-import { getPlayImageSource } from "@/constants/playImages";
+import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getFavorites } from "@/db/queries";
 import { usePlaysStore } from "@/store/playsStore";
@@ -66,7 +67,7 @@ export default function FavoritesScreen() {
         <View style={styles.grid}>
           {favorites.map((favorite, index) => {
             const play = playMap.get(favorite.playId);
-            const imageSource = getPlayImageSource(favorite.playId);
+            const imageSource = getPlayThumbnailSource(favorite.playId);
 
             return (
               <Pressable

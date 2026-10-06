@@ -1,7 +1,8 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect } from "expo-router";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";

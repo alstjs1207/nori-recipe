@@ -2,7 +2,7 @@
 results/
 .claude/skills/
 .claude/settings.local.json
-data/
+/data/
 docs/
 generated/
 node_modules/
@@ -28,3 +28,5 @@ yarn-error.*
 *.tsbuildinfo
 /ios
 /android
+/public/media/
+/public/icons/

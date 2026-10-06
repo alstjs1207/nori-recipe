@@ -197,3 +197,5 @@ const PLAY_IMAGE_SOURCES: Record<string, ImageSourcePropType> = {
 export function getPlayImageSource(playId: string): ImageSourcePropType | null {
   return PLAY_IMAGE_SOURCES[playId] ?? null;
 }
+
+export const getPlayThumbnailSource = getPlayImageSource;

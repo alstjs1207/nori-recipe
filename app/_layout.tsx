@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IBMPlexSansKR_400Regular } from "@expo-google-fonts/ibm-plex-sans-kr/400Regular";
-import { IBMPlexSansKR_600SemiBold } from "@expo-google-fonts/ibm-plex-sans-kr/600SemiBold";
-import { IBMPlexSansKR_700Bold } from "@expo-google-fonts/ibm-plex-sans-kr/700Bold";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { ReduceMotion, ReducedMotionConfig } from "react-native-reanimated";
 
 import { APP_COLORS, APP_FONTS } from "@/constants/theme";
+import { WebShell } from "@/components/web/WebShell";
+import { useAppFonts } from "@/hooks/useAppFonts";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 
@@ -18,11 +16,7 @@ export default function RootLayout() {
   const hasStarted = useRef(false);
   const initSession = useSessionStore((state) => state.initSession);
   const loadPlays = usePlaysStore((state) => state.loadPlays);
-  const [fontsLoaded] = useFonts({
-    IBMPlexSansKR_400Regular,
-    IBMPlexSansKR_600SemiBold,
-    IBMPlexSansKR_700Bold,
-  });
+  const fontsLoaded = useAppFonts();
 
   const bootstrap = useCallback(async () => {
     setBootstrapped(false);
@@ -84,7 +78,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <WebShell>
       <ReducedMotionConfig mode={ReduceMotion.System} />
       <StatusBar style="dark" />
       <Stack
@@ -97,10 +91,11 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="start" options={{ headerShown: false }} />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(main)" options={{ headerShown: false }} />
       </Stack>
-    </>
+    </WebShell>
   );
 }
 

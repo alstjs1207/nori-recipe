@@ -1,7 +1,10 @@
+import { ContentImage as Image } from "@/components/web/ContentImage";
+import { WebFirstVisit } from "@/components/web/WebFirstVisit";
+import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { Image, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 
@@ -10,7 +13,7 @@ import { MotionPressable } from "@/components/motion/MotionPressable";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { MATERIAL_DISPLAY_NAMES, type MaterialSlug } from "@/constants/materials";
 import { getMaterialVisualSpec } from "@/constants/materialVisuals";
-import { getPlayImageSource } from "@/constants/playImages";
+import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getFavorites, getPlayLogCount, getPlayLogs } from "@/db/queries";
 import { recommend } from "@/engine/recommend";
@@ -252,7 +255,7 @@ function ImageSlot({
   large?: boolean;
   playId?: string;
 }) {
-  const imageSource = playId ? getPlayImageSource(playId) : null;
+  const imageSource = playId ? getPlayThumbnailSource(playId) : null;
 
   return (
     <View
@@ -403,7 +406,8 @@ function SituationCard({
 export default function MainScreen() {
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
-  const { width } = useWindowDimensions();
+  const { width } = useContentDimensions();
+  const compactWebHero = Platform.OS === "web" && width < 400;
   const params = useLocalSearchParams<{ completedPlayId?: string | string[] }>();
   const [returningCompletedPlayId, setReturningCompletedPlayId] = useState<string | null>(null);
   const [materialsEditorOpen, setMaterialsEditorOpen] = useState(false);
@@ -639,6 +643,10 @@ export default function MainScreen() {
     void setTodayMaterials([]);
   }
 
+  if (Platform.OS === "web" && childAgeMonths === null) {
+    return <WebFirstVisit />;
+  }
+
   return (
     <Animated.ScrollView
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 18 }]}
@@ -679,7 +687,9 @@ export default function MainScreen() {
           style={({ pressed }) => [styles.searchBox, pressed && styles.pressed]}
         >
           <MaterialCommunityIcons name="magnify" size={25} color="#6F6A61" style={styles.searchIcon} />
-          <Text style={styles.searchPlaceholder}>놀이, 재료, 상황으로 검색해 보세요</Text>
+          <Text numberOfLines={Platform.OS === "web" ? 1 : undefined} style={styles.searchPlaceholder}>
+            {Platform.OS === "web" ? "놀이·재료 검색" : "놀이, 재료, 상황으로 검색해 보세요"}
+          </Text>
         </Pressable>
         <MotionPressable
           accessibilityLabel="오늘 재료 설정"
@@ -777,18 +787,18 @@ export default function MainScreen() {
               openPlayDetail(featuredPlay, selectedMaterials, recommendation.usedFallback);
             }
           }}
-          style={({ pressed }) => [styles.heroBanner, pressed && featuredPlay && styles.pressed]}
+          style={({ pressed }) => [styles.heroBanner, compactWebHero && styles.heroBannerCompact, pressed && featuredPlay && styles.pressed]}
         >
-          <View style={styles.heroCopy}>
+          <View style={[styles.heroCopy, compactWebHero && styles.heroCopyCompact]}>
             <Text style={styles.heroEyebrow}>오늘 뭐하지?</Text>
-            <Text style={styles.heroTitle}>
+            <Text style={[styles.heroTitle, compactWebHero && styles.heroTitleCompact]}>
               즐거운{"\n"}<Text style={styles.heroAccent}>노리 레시피</Text>
             </Text>
-            <View style={styles.heroButton}>
-              <Text style={styles.heroButtonText}>추천 놀이 보기 ›</Text>
+            <View style={[styles.heroButton, compactWebHero && styles.heroButtonCompact]}>
+              <Text style={[styles.heroButtonText, compactWebHero && styles.heroButtonTextCompact]}>추천 놀이 보기 ›</Text>
             </View>
           </View>
-          <View style={styles.heroImageWrap}>
+          <View style={[styles.heroImageWrap, compactWebHero && styles.heroImageWrapCompact]}>
             <ImageSlot index={0} large playId={featuredPlay?.id} />
           </View>
         </MotionPressable>
@@ -1186,6 +1196,29 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingRight: 14,
     paddingBottom: 12,
+  },
+  heroBannerCompact: {
+    minHeight: 210,
+  },
+  heroCopyCompact: {
+    flex: 1.15,
+    paddingLeft: 18,
+    paddingVertical: 18,
+  },
+  heroTitleCompact: {
+    fontSize: 22,
+    lineHeight: 30,
+  },
+  heroButtonCompact: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+  heroButtonTextCompact: {
+    fontSize: 12,
+  },
+  heroImageWrapCompact: {
+    flex: 1,
+    paddingRight: 10,
   },
   completionCard: {
     gap: 10,
