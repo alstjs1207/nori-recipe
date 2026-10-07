@@ -1,7 +1,7 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   Alert,
   Keyboard,
@@ -552,14 +552,16 @@ export default function SettingsScreen() {
           >
             <Text style={[styles.actionTitle, styles.actionTitleDestructive]}>기록 초기화</Text>
             <Text style={styles.actionMeta}>
-              {resetting ? "처리 중..." : resetConfirmVisible ? "한 번 더 확인" : "놀이 기록 삭제"}
+              {resetting ? "처리 중..." : resetConfirmVisible ? "한 번 더 확인" : "화면의 기록 비우기"}
             </Text>
           </Pressable>
 
           {resetConfirmVisible ? (
             <View style={styles.resetPanel}>
               <Text style={styles.resetPanelBody}>
-                놀이 기록, 즐겨찾기, 추천에 반영된 피드백 신호를 이 기기에서 삭제합니다.
+                화면의 놀이 기록과 즐겨찾기를 비우고 추천에 반영된 피드백을 초기화합니다.
+                기존 기록 내용은 삭제 표시와 함께 기기에 남습니다. 저장된 내용까지 지우려면
+                ‘전체 로컬 데이터 초기화’를 사용해주세요.
               </Text>
               <View style={styles.resetActions}>
                 <Pressable
@@ -684,11 +686,25 @@ export default function SettingsScreen() {
                 {expanded ? (
                   <View style={styles.noticeBlock}>
                     <Text style={styles.noticeTitle}>{notice.title}</Text>
+                    <Text style={styles.noticeBody}>시행일: {notice.effectiveDate}</Text>
                     {notice.items.map((item) => (
                       <Text key={item} style={styles.noticeBody}>
                         {item}
                       </Text>
                     ))}
+                    {"references" in notice
+                      ? notice.references.map((reference) => (
+                          <Link
+                            key={reference.url}
+                            href={reference.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={[styles.noticeBody, { textDecorationLine: "underline" }]}
+                          >
+                            {reference.label}
+                          </Link>
+                        ))
+                      : null}
                   </View>
                 ) : null}
               </View>
@@ -700,6 +716,7 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>앱 정보</Text>
           <Text style={styles.body}>버전 {packageJson.version}</Text>
+          <Text style={styles.body}>모바일 웹·PWA 지원 및 놀이 링크 공유</Text>
         </View>
 
         <View style={{ height: hasChanges || saveNoticeVisible ? insets.bottom + 96 : 0 }} />

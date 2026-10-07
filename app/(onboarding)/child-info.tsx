@@ -2,7 +2,7 @@ import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useMemo, useRef, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   Keyboard,
   PanResponder,
@@ -214,10 +214,22 @@ export default function ChildInfoScreen() {
 
           {privacyNoticeVisible ? (
             <View style={styles.privacyPanel}>
+              <Text style={styles.privacyBody}>시행일: {PRIVACY_NOTICE.effectiveDate}</Text>
               {PRIVACY_NOTICE.items.map((item) => (
                 <Text key={item} style={styles.privacyBody}>
                   {item}
                 </Text>
+              ))}
+              {PRIVACY_NOTICE.references.map((reference) => (
+                <Link
+                  key={reference.url}
+                  href={reference.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={[styles.privacyBody, { textDecorationLine: "underline" }]}
+                >
+                  {reference.label}
+                </Link>
               ))}
             </View>
           ) : null}
