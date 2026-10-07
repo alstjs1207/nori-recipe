@@ -2,14 +2,15 @@
 results/
 .claude/skills/
 .claude/settings.local.json
-/data/
+/data/*
+!/data/plays.json
+!/data/materials.json
 docs/
 generated/
 node_modules/
 .expo/
 dist/
 web-build/
-images/plays/
 expo-env.d.ts
 .kotlin/
 *.orig.*

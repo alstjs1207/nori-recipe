@@ -176,7 +176,7 @@ pnpm serve:web
 
 로컬 주소는 `http://127.0.0.1:4173`입니다. 포트는 `PORT`, 바인딩 주소는 `HOST` 환경 변수로 바꿀 수 있습니다. 배포 도메인이 정해지면 `PUBLIC_ORIGIN=https://example.com`으로 공유 메타데이터의 기준 주소를 지정할 수 있습니다. 서버는 빌드 결과를 제공하며, 계정 서버와 사용량 분석 기능은 포함하지 않습니다.
 
-- 빌드 전에 private `data/plays.json`, `data/materials.json`, `images/plays/`를 준비해야 합니다. 누락되면 빌드가 실패합니다. 자동 배포에서도 같은 파일을 제공해야 합니다.
+- 빌드에 필요한 `data/plays.json`, `data/materials.json`, `images/plays/`는 Git 저장소에 포함합니다. Vercel에서도 저장소를 복제한 뒤 같은 파일로 빌드합니다. `public/media/`, `public/icons/`와 `dist/`는 빌드 과정에서 생성하며 Git에 포함하지 않습니다.
 - `build:web`은 웹용 WebP 상세 이미지·썸네일·재료 이미지와 설치 아이콘을 생성합니다. 원본 앱 이미지는 변경하지 않습니다. 웹에서는 시스템 한글 폰트를 사용하고, 화면 밖 이미지는 지연 로딩합니다.
 - 개발 중에는 `pnpm web`을 사용할 수 있습니다. 설치·오프라인·업데이트 검증에는 위의 웹 빌드와 서버 명령을 사용합니다.
 - 홈 화면 설치, 버전별 서비스 워커 캐시, 오프라인 앱 셸과 방문한 이미지를 지원합니다. 이미지 캐시는 최대 80개이며, 오래된 이미지는 정리됩니다. 새 버전은 안내의 ‘새 버전 열기’를 눌렀을 때 적용됩니다.
@@ -185,18 +185,13 @@ pnpm serve:web
 
 검증 명령은 `pnpm typecheck`, `pnpm test`, `pnpm test:web`입니다. 웹 테스트는 직접 링크·새로고침·응답 압축·경로 접근과 오프라인 캐시·업데이트 동작을 검증합니다.
 
-## 비공개 놀이 이미지
+## 배포용 놀이 이미지와 데이터
 
-놀이 상세 이미지는 공개 저장소에 포함하지 않습니다. `images/plays/`는 Git에서 제외하고, 실제 `play_001.jpeg`부터 `play_191.jpeg`까지의 파일은 로컬 또는 private 저장소에서 관리합니다.
+`images/plays/play_001.jpeg`부터 `play_191.jpeg`까지의 놀이 이미지 191장과 `data/plays.json`, `data/materials.json`을 Git에서 관리합니다. 재료·온보딩 이미지와 앱 아이콘도 저장소에 포함되어 있으므로 웹 빌드에 필요한 콘텐츠를 별도로 복사할 필요가 없습니다.
 
-빌드 전에 private 이미지 폴더를 프로젝트의 `images/plays/` 위치로 복사합니다.
+저장소 복제 후 `pnpm check:play-images`로 이미지 누락을 확인하고 `pnpm build:web`으로 웹용 WebP 이미지·썸네일·아이콘과 PWA 빌드 결과를 생성합니다. 데이터 백업, 수집 결과, 로컬 설정과 생성된 빌드 파일은 기존 제외 규칙으로 관리합니다.
 
-```bash
-pnpm prepare:play-images /path/to/private/images/plays
-pnpm check:play-images
-```
-
-EAS Build를 사용할 때는 로컬에 이미지가 준비된 상태에서 `eas build`를 실행합니다. `.easignore`는 Git에는 올리지 않는 `images/plays/`를 EAS build archive에는 포함하도록 설정되어 있습니다.
+이미지를 교체할 때는 선택적으로 `pnpm prepare:play-images /path/to/source/images/plays`를 사용할 수 있습니다. 변경된 이미지는 소스 파일과 함께 커밋합니다. EAS Build에도 같은 이미지와 두 데이터 파일이 포함됩니다.
 
 ## 에셋 라이선스
 

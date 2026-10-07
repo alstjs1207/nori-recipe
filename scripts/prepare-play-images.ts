@@ -8,8 +8,8 @@ const IMAGE_EXTENSION = ".jpeg";
 function usage(): string {
   return [
     "Usage:",
-    "  pnpm prepare:play-images /path/to/private/images/plays",
-    "  PLAY_IMAGES_SOURCE_DIR=/path/to/private/images/plays pnpm prepare:play-images",
+    "  pnpm prepare:play-images /path/to/source/images/plays",
+    "  PLAY_IMAGES_SOURCE_DIR=/path/to/source/images/plays pnpm prepare:play-images",
     "  pnpm check:play-images",
   ].join("\n");
 }
@@ -87,7 +87,7 @@ if (verifyOnly) {
   const sourceDir = args.find((arg) => !arg.startsWith("-")) ?? process.env.PLAY_IMAGES_SOURCE_DIR;
 
   if (!sourceDir) {
-    throw new Error(`Missing private play image source directory.\n${usage()}`);
+    throw new Error(`Missing play image source directory.\n${usage()}`);
   }
 
   copyPlayImages(path.resolve(sourceDir));

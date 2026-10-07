@@ -9,7 +9,7 @@ sharp.concurrency(2);
 export async function prepareWebAssets() {
   let bundle;
   try { bundle = JSON.parse(await fs.readFile(path.join(root, "data/plays.json"), "utf8")); }
-  catch { throw new Error("data/plays.json이 필요합니다. private 놀이 데이터와 images/plays를 준비해 주세요."); }
+  catch { throw new Error("data/plays.json이 필요합니다. 저장소의 놀이 데이터와 images/plays를 확인해 주세요."); }
   const plays = bundle.plays.filter((play) => play.status === "live");
   const output = path.join(root, "public/media");
   await Promise.all(["plays", "thumbs", "materials"].map((dir) => fs.mkdir(path.join(output, dir), { recursive: true })));
