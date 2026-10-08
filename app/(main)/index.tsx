@@ -1,5 +1,6 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { WebFirstVisit } from "@/components/web/WebFirstVisit";
+import { HomeRedesign } from "@/components/web/HomeRedesign";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -469,7 +470,11 @@ export default function MainScreen() {
         };
       }
 
-      void Promise.all([getPlayLogCount(guestId), getPlayLogs(guestId, 12), getFavorites(guestId, 200)])
+      void Promise.all([
+        getPlayLogCount(guestId),
+        getPlayLogs(guestId, Platform.OS === "web" ? 10000 : 12),
+        getFavorites(guestId, 200),
+      ])
         .then(([count, logs, favorites]) => {
           if (active) {
             setTotalPlays(count);
@@ -492,7 +497,7 @@ export default function MainScreen() {
   );
 
   const latestCompletedAtByPlayId = getLatestCompletedAtByPlayId(recentLogs);
-  const recentCompletedPlayIds = getRecentCompletedPlayIds(recentLogs);
+  const recentCompletedPlayIds = getRecentCompletedPlayIds(recentLogs.slice(0, 12));
 
   const recommendation =
     childAgeMonths === null
@@ -539,7 +544,10 @@ export default function MainScreen() {
   ]);
 
   const pinnedResults = useMemo(() => {
-    if (pinnedRecommendationIds.length === 0) {
+    if (
+      pinnedRecommendationKey !== recommendationPinKey ||
+      pinnedRecommendationIds.length === 0
+    ) {
       return recommendation.results;
     }
 
@@ -553,7 +561,7 @@ export default function MainScreen() {
     }
 
     return mergeRecommendedPlays(pinned, recommendation.results, 3);
-  }, [pinnedRecommendationIds, plays, recommendation.results]);
+  }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results]);
 
   const visibleRecommendations = useMemo(() => {
     if (!returningCompletedPlayId) {
@@ -645,6 +653,29 @@ export default function MainScreen() {
 
   if (Platform.OS === "web" && childAgeMonths === null) {
     return <WebFirstVisit />;
+  }
+
+  if (Platform.OS === "web" && childAgeMonths !== null) {
+    const webFeatured = pickFeaturedPlay(pinnedResults, selectedMaterials);
+    return (
+      <HomeRedesign
+        featured={webFeatured}
+        recommendations={pinnedResults}
+        otherPlays={ageMatchedOtherPlays.filter(
+          (play) => !pinnedResults.some((recommended) => recommended.id === play.id),
+        )}
+        selectedMaterials={selectedMaterials}
+        completedDates={latestCompletedAtByPlayId}
+        allCompleted={pinnedResults.length === 3 && pinnedResults.every(
+          (play) => latestCompletedAtByPlayId.has(play.id),
+        )}
+        age={childAgeMonths}
+        onSaveMaterials={async (materials) => {
+          setReturningCompletedPlayId(null);
+          await setTodayMaterials(materials);
+        }}
+      />
+    );
   }
 
   return (

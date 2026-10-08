@@ -6,7 +6,9 @@ const PRECACHE = ${JSON.stringify(precache)};
 const MEDIA_LIMIT = 80;
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(SHELL).then(cache => cache.addAll(PRECACHE)));
+  event.waitUntil(caches.open(SHELL).then(cache => cache.addAll(
+    PRECACHE.map(path => new Request(new URL(path, self.location.origin), { cache: 'reload' }))
+  )));
 });
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {

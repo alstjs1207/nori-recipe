@@ -36,10 +36,11 @@ export async function prepareWebAssets() {
   await Promise.all(Array.from({ length: 4 }, async () => { while (cursor < tasks.length) { const task = tasks[cursor++]; await task(); } }));
   const icons = path.join(root, "public/icons");
   await fs.mkdir(icons, { recursive: true });
-  const icon = path.join(root, "assets/icon.png");
+  const icon = path.join(root, "public/nori-icon.svg");
+  await sharp(icon).resize(64, 64).png().toFile(path.join(root, "public/nori-favicon.png"));
   await Promise.all([192, 512].map((size) => sharp(icon).resize(size, size).png().toFile(path.join(icons, `icon-${size}.png`))));
   await sharp(icon).resize(180, 180).png().toFile(path.join(icons, "apple-touch-icon.png"));
-  await sharp(icon).resize(384, 384).extend({ top: 64, bottom: 64, left: 64, right: 64, background: "#FFFDF8" }).png().toFile(path.join(icons, "maskable-512.png"));
+  await sharp(icon).resize(384, 384).extend({ top: 64, bottom: 64, left: 64, right: 64, background: "#FAFAFE" }).png().toFile(path.join(icons, "maskable-512.png"));
   const report = { plays: plays.length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +(detailBytes / 1e6).toFixed(2), thumbnailMB: +(thumbnailBytes / 1e6).toFixed(2) };
   console.info("Web images:", JSON.stringify(report));
   return { plays, report };

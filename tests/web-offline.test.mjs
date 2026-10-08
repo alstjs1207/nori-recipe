@@ -6,6 +6,7 @@ import { createServiceWorker } from "../scripts/web/service-worker.mjs";
 function worker(version = "test") {
   const stores = new Map();
   const listeners = new Map();
+  const httpCache = new Map();
   let online = true;
   let status = 200;
   let claimed = false;
@@ -13,7 +14,12 @@ function worker(version = "test") {
   const key = (request) => new URL(typeof request === "string" ? request : request.url, "http://localhost").href;
   class Cache {
     entries = new Map();
-    async addAll(paths) { for (const path of paths) await this.put(path, new Response(`shell:${path}`)); }
+    async addAll(paths) {
+      for (const path of paths) {
+        const cached = path.cache === "reload" ? undefined : httpCache.get(key(path));
+        await this.put(path, new Response(cached ?? `shell:${new URL(key(path)).pathname}`));
+      }
+    }
     async put(request, response) { this.entries.set(key(request), response.clone()); }
     async match(request) { return this.entries.get(key(request))?.clone(); }
     async keys() { return [...this.entries.keys()]; }
@@ -25,9 +31,10 @@ function worker(version = "test") {
     async delete(name) { return stores.delete(name); },
   };
   const self = { location: { origin: "http://localhost" }, addEventListener: (name, callback) => listeners.set(name, callback), clients: { async claim() { claimed = true; } }, skipWaiting: () => { skipped = true; } };
-  vm.runInNewContext(createServiceWorker(version, ["/index.html", "/offline.html", "/entry.js"]), { self, caches, URL, Response, fetch: async (request) => { if (!online) throw new Error("offline"); return new Response(`network:${request.url}`, { status }); } });
+  vm.runInNewContext(createServiceWorker(version, ["/index.html", "/offline.html", "/entry.js", "/web.css"]), { self, caches, URL, Request, Response, fetch: async (request) => { if (!online) throw new Error("offline"); return new Response(`network:${request.url}`, { status }); } });
   return {
     caches, stores, setOnline: (value) => { online = value; }, setStatus: (value) => { status = value; }, claimed: () => claimed, skipped: () => skipped,
+    seedHttpCache: (url, body) => { httpCache.set(key(url), body); },
     async lifecycle(name) { const promises = []; listeners.get(name)({ waitUntil: (promise) => promises.push(promise) }); await Promise.all(promises); },
     message(data) { listeners.get("message")({ data }); },
     async fetch(url, options = {}) {
@@ -37,6 +44,14 @@ function worker(version = "test") {
     },
   };
 }
+
+test("새 버전 설치는 HTTP 캐시에 남은 이전 스타일 대신 새 스타일을 저장한다", async () => {
+  const app = worker("new");
+  app.seedHttpCache("/web.css", "old styles");
+  await app.lifecycle("install");
+  app.setOnline(false);
+  assert.equal(await (await app.fetch("/web.css", { destination: "style" })).text(), "shell:/web.css");
+});
 
 test("오프라인에서 기존 상세 HTML, 처음 여는 놀이의 앱 셸, 방문한 이미지를 제공한다", async () => {
   const app = worker();
