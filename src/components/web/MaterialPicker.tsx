@@ -5,6 +5,7 @@ import {
   type MaterialSlug,
 } from "@/constants/materials";
 import { Icon } from "./NoriUI";
+import { getMaterialImageUrl } from "@/constants/materialImageUrls";
 
 export function MaterialPicker({
   selected,
@@ -94,7 +95,7 @@ export function MaterialPicker({
                     }
                   />
                   <img
-                    src={`/media/materials/${material}.webp`}
+                    src={getMaterialImageUrl(material)}
                     alt=""
                     loading="lazy"
                   />

@@ -1,4 +1,5 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { useCallback, useState } from "react";
 import { router, useFocusEffect } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -98,9 +99,12 @@ export default function FavoritesScreen() {
                   <Text style={styles.heart}>♥</Text>
                 </View>
                 <Text style={styles.cardTitle}>{play?.name ?? favorite.playId}</Text>
-                <Text style={styles.cardMeta}>
-                  #{play ? DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"] : "놀이"}
-                </Text>
+                <View style={styles.cardMetaRow}>
+                  <Text style={styles.cardMeta}>
+                    #{play ? DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"] : "놀이"}
+                  </Text>
+                  <NewPlayBadge createdAt={play?.createdAt} />
+                </View>
               </Pressable>
             );
           })}
@@ -203,5 +207,11 @@ const styles = StyleSheet.create({
     color: APP_COLORS.muted,
     fontSize: 13,
     fontFamily: APP_FONTS.body,
+  },
+  cardMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
   },
 });

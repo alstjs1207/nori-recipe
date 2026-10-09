@@ -1,4 +1,5 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebFirstVisit } from "@/components/web/WebFirstVisit";
 import { HomeRedesign } from "@/components/web/HomeRedesign";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
@@ -351,7 +352,10 @@ function PlayCard({
         <Text style={styles.playCardBadgeText}>{play.ageMin}-{play.ageMax}개월</Text>
       </View>
       <Text numberOfLines={2} style={styles.playCardTitle}>{formatPlayCardTitle(play.name)}</Text>
-      <Text style={styles.playCardMeta}>#{getPrimaryAreaLabel(play)}</Text>
+      <View style={styles.playCardMetaRow}>
+        <Text style={styles.playCardMeta}>#{getPrimaryAreaLabel(play)}</Text>
+        <NewPlayBadge createdAt={play.createdAt} />
+      </View>
       <View style={styles.playCardFooter}>
         <MaterialStatusPill label={completionLabel ?? materialSummary.label} tone={completionLabel ? "ready" : materialSummary.tone} />
         <MaterialCommunityIcons
@@ -1403,6 +1407,12 @@ const styles = StyleSheet.create({
     color: APP_COLORS.muted,
     fontSize: 13,
     fontFamily: APP_FONTS.body,
+  },
+  playCardMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
   },
   playCardFooter: {
     minHeight: 30,

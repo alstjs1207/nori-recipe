@@ -1,4 +1,5 @@
 import { WebPage } from "@/components/web/NoriUI";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebSelect } from "@/components/web/WebSelect";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -343,7 +344,9 @@ export default function SearchWebScreen() {
                     decoding="async"
                   />
                   <div className="search-result-copy">
-                    <h2>{play.name}</h2>
+                    <h2>
+                      {play.name} <NewPlayBadge createdAt={play.createdAt} />
+                    </h2>
                     <span className="preparation-badge">
                       {play.materials.required.length === 0
                         ? "필수 준비물 없이"

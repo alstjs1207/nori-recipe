@@ -35,11 +35,29 @@ test("등록된 주의사항이 없어도 보호자 감독 안내를 제공한�
 });
 
 test("작은 재료에는 삼킴·질식 경고를 추가한다", () => {
-  const notes = getPlaySafetyNotes(
-    createPlay({ materials: { required: ["marble"], optional: [], substitutes: [] } }),
-  );
+  for (const slug of ["marble", "pom_pom"] as const) {
+    const notes = getPlaySafetyNotes(
+      createPlay({ materials: { required: [slug], optional: [], substitutes: [] } }),
+    );
+    assert.ok(notes.some((note) => note.includes("질식")), slug);
+    assert.ok(notes.some((note) => note.includes("3세 미만에게 제공하지")), slug);
+  }
+});
 
-  assert.ok(notes.some((note) => note.includes("질식")));
+test("생가루 금지 안내와 이미 적합한 식재료의 탐색 안내를 구분한다", () => {
+  const flour = getPlaySafetyNotes(createPlay({ materials: { required: ["flour"], optional: [], substitutes: [] } }));
+  const food = getPlaySafetyNotes(createPlay({ materials: { required: ["soft_food"], optional: [], substitutes: [] } }));
+
+  assert.ok(flour.some((note) => note.includes("놀이로 제공하지")));
+  assert.ok(food.some((note) => note.includes("알레르기")));
+  assert.ok(food.every((note) => !note.includes("생밀가루")));
+});
+
+test("무독성 미술 재료에도 사용 연령과 비식용 안내를 제공한다", () => {
+  const notes = getPlaySafetyNotes(createPlay({ materials: { required: ["paint"], optional: [], substitutes: [] } }));
+
+  assert.ok(notes.some((note) => note.includes("사용 연령")));
+  assert.ok(notes.some((note) => note.includes("먹어도 된다는 뜻이 아니")));
 });
 
 test("콘텐츠 주의사항을 유지하면서 재료별 안내를 보완한다", () => {

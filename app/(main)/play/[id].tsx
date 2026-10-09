@@ -1,4 +1,5 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { PlayShareButton, PlayWebActionsProvider } from "@/components/web/PlayWebActions";
 import { type ComponentProps, useEffect, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -550,8 +551,11 @@ export default function PlayDetailScreen() {
               </View>
 
               <View style={styles.summaryPanel}>
-                <View style={styles.agePill}>
-                  <Text style={styles.agePillText}>{formatAgeRange(play)}</Text>
+                <View style={styles.summaryLabels}>
+                  <View style={styles.agePill}>
+                    <Text style={styles.agePillText}>{formatAgeRange(play)}</Text>
+                  </View>
+                  <NewPlayBadge createdAt={play.createdAt} />
                 </View>
                 <Text style={styles.heroTitle}>{play.name}</Text>
                 {isCompletedToday ? (
@@ -942,6 +946,12 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 999,
     backgroundColor: APP_COLORS.mustard,
+  },
+  summaryLabels: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 8,
   },
   agePillText: {
     color: APP_COLORS.accentText,

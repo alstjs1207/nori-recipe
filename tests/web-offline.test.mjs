@@ -100,3 +100,15 @@ test("이미지 캐시는 최대 80개이며 외부 서비스와 쓰기 요청�
   assert.equal(await app.fetch("/anything", { method: "POST" }), undefined);
   assert.equal(await app.fetch("/sw.js", { destination: "script" }), undefined);
 });
+
+test("기존 기본 아이콘 캐시가 있어도 새 주소의 재료 그림을 받고 오프라인에서도 유지한다", async () => {
+  const app = worker("old");
+  await app.lifecycle("install");
+  const cache = await app.caches.open("nori-web-old-media");
+  await cache.put("/media/materials/paper_plate.webp", new Response("old brand icon"));
+  const updatedUrl = "/media/materials/paper_plate.webp?v=new-image";
+  assert.match(await (await app.fetch(updatedUrl, { destination: "image" })).text(), /network:.*v=new-image/);
+  app.setOnline(false);
+  assert.match(await (await app.fetch(updatedUrl, { destination: "image" })).text(), /network:.*v=new-image/);
+  assert.equal(await (await cache.match("/media/materials/paper_plate.webp")).text(), "old brand icon");
+});

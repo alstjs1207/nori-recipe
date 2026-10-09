@@ -1,4 +1,5 @@
 import { WebPage } from "@/components/web/NoriUI";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import {
   Link,
   router,
@@ -13,6 +14,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
+import { getMaterialImageUrl } from "@/constants/materialImageUrls";
 import {
   MATERIAL_DISPLAY_NAMES,
   MATERIAL_SLUGS,
@@ -157,7 +159,10 @@ export default function PlayDetailWebScreen() {
               </div>
             </div>
             <header className="detail-heading">
-              <span className="eyebrow">{getPlayCategoryLabel(play)}</span>
+              <div className="play-card-labels">
+                <span className="eyebrow">{getPlayCategoryLabel(play)}</span>
+                <NewPlayBadge createdAt={play.createdAt} />
+              </div>
               <h1>{play.name}</h1>
               <p className="detail-intro">
                 {play.educationalEffects[0] ??
@@ -233,7 +238,7 @@ export default function PlayDetailWebScreen() {
                     >
                       <div className="detail-material-image">
                         <img
-                          src={`/media/materials/${slug}.webp`}
+                          src={getMaterialImageUrl(slug)}
                           alt=""
                           loading="lazy"
                         />

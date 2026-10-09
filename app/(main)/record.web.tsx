@@ -156,7 +156,7 @@ export default function RecordWebScreen() {
                         className="record-entry-heading"
                       >
                         <img
-                          src={`/media/thumbs/${log.playId}.webp`}
+                          src={play ? `/media/thumbs/${log.playId}.webp` : "/nori-icon.svg"}
                           alt=""
                           loading="lazy"
                         />

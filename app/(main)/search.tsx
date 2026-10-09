@@ -1,4 +1,5 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { useMemo, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
@@ -120,7 +121,10 @@ export default function SearchScreen() {
                 )}
               </View>
               <View style={styles.resultBody}>
-                <Text style={styles.resultTitle}>{play.name}</Text>
+                <View style={styles.resultHeading}>
+                  <Text style={styles.resultTitle}>{play.name}</Text>
+                  <NewPlayBadge createdAt={play.createdAt} />
+                </View>
                 <Text style={styles.resultMeta}>
                   {play.ageMin}-{play.ageMax}개월 · {formatDuration(play.durationMin, play.durationMax)}
                 </Text>
@@ -248,11 +252,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   resultTitle: {
+    flex: 1,
     color: APP_COLORS.ink,
     fontSize: 17,
     lineHeight: 23,
     fontFamily: APP_FONTS.heading,
     fontWeight: "600",
+  },
+  resultHeading: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   resultMeta: {
     color: APP_COLORS.muted,

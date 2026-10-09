@@ -21,6 +21,7 @@ import {
   EmptyState,
 } from "./NoriUI";
 import { MaterialPicker } from "./MaterialPicker";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 
 const situations = [
   { value: "quiet", label: "집에서 조용히", icon: "home", tone: "purple" },
@@ -160,6 +161,7 @@ export function HomeRedesign({
                 />
                 <span className="featured-category">
                   {getPlayCategoryLabel(featured)}
+                  <NewPlayBadge createdAt={featured.createdAt} />
                 </span>
                 {completedDates.has(featured.id) ? (
                   <span className="completed-badge">

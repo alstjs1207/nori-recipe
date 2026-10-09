@@ -45,7 +45,7 @@ test("getVisibleMaterialCategories는 온보딩 노출 카테고리 순서를 �
   );
   assert.deepEqual(categories.at(-1), {
     name: "도구",
-    materials: ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler"],
+    materials: ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler", "brush"],
   });
   assert.ok(categories.every((category) => category.materials.length > 0));
   assert.ok(

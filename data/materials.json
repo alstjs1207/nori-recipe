@@ -1,12 +1,12 @@
 {
   "categories": {
-    "종이류": ["paper", "cardboard", "tissue", "sticker", "cloth", "blanket"],
-    "주방": ["flour", "rice_flour", "water", "bowl", "cup", "spoon", "chopsticks", "bottle", "soft_food"],
-    "공작": ["crayon", "paint", "glue", "tape", "string", "rubber_band", "straw"],
+    "종이류": ["paper", "cardboard", "tissue", "sticker", "cloth", "blanket", "paper_plate", "paper_towel"],
+    "주방": ["flour", "rice_flour", "water", "bowl", "cup", "spoon", "chopsticks", "bottle", "soft_food", "salt"],
+    "공작": ["crayon", "paint", "glue", "tape", "string", "rubber_band", "straw", "pom_pom"],
     "감각": ["sand", "kinetic_sand", "water_bin", "water_beads", "bubble", "balloon", "slime"],
-    "블록/장난감": ["block", "magnetic_tile", "ball", "puzzle", "book", "mirror", "doll", "marble", "bead", "car_toy"],
+    "블록/장난감": ["block", "magnetic_tile", "ball", "puzzle", "book", "mirror", "doll", "marble", "bead", "car_toy", "animal_toy", "hula_hoop"],
     "조형": ["clay", "foam", "play_corn"],
-    "도구": ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler"]
+    "도구": ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler", "brush"]
   },
   "displayNames": {
     "paper": "종이·신문지",
@@ -56,7 +56,14 @@
     "blanket": "이불",
     "bead": "비즈·단추",
     "car_toy": "자동차 장난감",
-    "shape_ruler": "모양자"
+    "shape_ruler": "모양자",
+    "paper_plate": "종이접시",
+    "paper_towel": "키친타월",
+    "salt": "소금",
+    "pom_pom": "폼폼",
+    "animal_toy": "동물 피규어",
+    "hula_hoop": "훌라후프",
+    "brush": "붓"
   },
   "removed": {
     "newspaper": "paper",

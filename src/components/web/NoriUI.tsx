@@ -11,6 +11,7 @@ import { getFavorites, toggleFavorite } from "@/db/queries";
 import { useSessionStore } from "@/store/sessionStore";
 import { ONBOARDING_DEFAULT_MATERIALS } from "@/onboarding/utils";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
+import { NewPlayBadge } from "@/components/NewPlayBadge";
 import type { MaterialSlug } from "@/constants/materials";
 import {
   formatAge,
@@ -313,9 +314,12 @@ export function PlayCard({
           ) : null}
         </div>
         <div className="play-card-copy">
-          <span className="eyebrow">
-            {DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"]} 놀이
-          </span>
+          <div className="play-card-labels">
+            <span className="eyebrow">
+              {DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"]} 놀이
+            </span>
+            <NewPlayBadge createdAt={play.createdAt} />
+          </div>
           <h3>{play.name}</h3>
           <p className="card-meta">
             {formatDuration(play)} · {formatPreparation(play)}

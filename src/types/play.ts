@@ -27,6 +27,8 @@ export type PlaySource = {
 
 export type Play = {
   id: string;
+  /** 최초 등록일 (Asia/Seoul, YYYY-MM-DD). 날짜 없는 기존 놀이는 NEW에서 제외. */
+  createdAt?: string;
   name: string;
   ageMin: number;
   ageMax: number;
@@ -44,6 +46,7 @@ export type Play = {
   tags: string[];
   source: PlaySource;
   status: PlayStatus;
+  imageStatus?: "review";
 };
 
 export type PlaysBundle = {

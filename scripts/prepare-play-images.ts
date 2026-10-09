@@ -1,7 +1,8 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
+import playsBundle from "../data/plays.json";
 
-const EXPECTED_PLAY_IMAGE_COUNT = 191;
+const plays: Array<{ id: string; imageStatus?: string }> = playsBundle.plays;
 const DESTINATION_DIR = path.resolve("images/plays");
 const IMAGE_EXTENSION = ".jpeg";
 
@@ -15,9 +16,9 @@ function usage(): string {
 }
 
 function expectedFileNames(): string[] {
-  return Array.from({ length: EXPECTED_PLAY_IMAGE_COUNT }, (_, index) => {
-    return `play_${String(index + 1).padStart(3, "0")}${IMAGE_EXTENSION}`;
-  });
+  return plays
+    .filter((play) => play.imageStatus !== "review")
+    .map((play) => `${play.id}${IMAGE_EXTENSION}`);
 }
 
 function ensureDirectory(dir: string, label: string): void {
@@ -44,12 +45,14 @@ function verifyPlayImages(dir: string): void {
   }
 
   const imageFiles = readdirSync(dir).filter((fileName) => {
-    return /^play_\d{3}\.jpeg$/.test(fileName);
+    return /^play_\d{3,}\.jpeg$/.test(fileName);
   });
 
-  if (imageFiles.length !== EXPECTED_PLAY_IMAGE_COUNT) {
+  const knownFiles = new Set(plays.map((play) => `${play.id}${IMAGE_EXTENSION}`));
+  const unknown = imageFiles.filter((fileName) => !knownFiles.has(fileName));
+  if (unknown.length > 0) {
     throw new Error(
-      `Expected ${EXPECTED_PLAY_IMAGE_COUNT} play image files in ${dir}, found ${imageFiles.length}.`,
+      `Found images without a play in data/plays.json: ${unknown.slice(0, 10).join(", ")}`,
     );
   }
 }
@@ -74,7 +77,7 @@ function copyPlayImages(sourceDir: string): void {
   }
 
   verifyPlayImages(DESTINATION_DIR);
-  console.log(`Copied ${EXPECTED_PLAY_IMAGE_COUNT} play images to ${DESTINATION_DIR}`);
+  console.info(`Copied ${expectedFileNames().length} reviewed play images to ${DESTINATION_DIR}`);
 }
 
 const args = process.argv.slice(2);
@@ -82,7 +85,7 @@ const verifyOnly = args.includes("--verify-only");
 
 if (verifyOnly) {
   verifyPlayImages(DESTINATION_DIR);
-  console.log(`Found ${EXPECTED_PLAY_IMAGE_COUNT} play images in ${DESTINATION_DIR}`);
+  console.info(`Verified ${expectedFileNames().length} required play images; ${plays.filter((play) => play.imageStatus === "review").length} plays use image review fallbacks.`);
 } else {
   const sourceDir = args.find((arg) => !arg.startsWith("-")) ?? process.env.PLAY_IMAGES_SOURCE_DIR;
 

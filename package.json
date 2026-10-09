@@ -11,6 +11,7 @@
     "web": "node scripts/prepare-web-assets.mjs && expo start --web",
     "prepare:play-images": "tsx scripts/prepare-play-images.ts",
     "check:play-images": "tsx scripts/prepare-play-images.ts --verify-only",
+    "check:play-content": "node scripts/validate-play-content.mjs",
     "material-audit": "tsx scripts/material-audit.ts",
     "test": "tsx --test 'src/**/*.test.ts' 'src/**/*.test.tsx'",
     "typecheck": "tsc --noEmit",

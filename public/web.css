@@ -433,6 +433,9 @@ input[type="radio"] {
   position: absolute;
   top: 18px;
   left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: #ffffffec;
   color: var(--ink);
   border-radius: 30px;
@@ -526,6 +529,27 @@ input[type="radio"] {
 }
 .play-card-copy {
   padding: 15px;
+}
+.play-card-labels {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.new-play-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  border-radius: 6px;
+  padding: 3px 7px;
+  background: var(--violet);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
 }
 .play-card-copy h3 {
   font-size: 17px;
@@ -991,6 +1015,9 @@ fieldset {
   font-size: 12px;
   margin: 8px 0;
   line-height: 1.5;
+}
+.search-result h2 .new-play-badge {
+  margin-left: 6px;
 }
 .preparation-badge {
   display: inline-block;

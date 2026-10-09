@@ -1,4 +1,9 @@
 import type { ImageSourcePropType } from "react-native";
+import { loadLivePlays } from "@/data/content";
+
+const illustratedPlayIds = new Set(
+  loadLivePlays().filter((play) => play.imageStatus !== "review").map((play) => play.id),
+);
 
 const PLAY_IMAGE_SOURCES: Record<string, ImageSourcePropType> = {
   play_001: require("../../images/plays/play_001.jpeg"),
@@ -192,10 +197,22 @@ const PLAY_IMAGE_SOURCES: Record<string, ImageSourcePropType> = {
   play_189: require("../../images/plays/play_189.jpeg"),
   play_190: require("../../images/plays/play_190.jpeg"),
   play_191: require("../../images/plays/play_191.jpeg"),
+  play_192: require("../../images/plays/play_192.jpeg"),
+  play_193: require("../../images/plays/play_193.jpeg"),
+  play_194: require("../../images/plays/play_194.jpeg"),
+  play_195: require("../../images/plays/play_195.jpeg"),
+  play_196: require("../../images/plays/play_196.jpeg"),
+  play_197: require("../../images/plays/play_197.jpeg"),
+  play_198: require("../../images/plays/play_198.jpeg"),
+  play_199: require("../../images/plays/play_199.jpeg"),
+  play_200: require("../../images/plays/play_200.jpeg"),
+  play_201: require("../../images/plays/play_201.jpeg"),
+  play_202: require("../../images/plays/play_202.jpeg"),
+  play_203: require("../../images/plays/play_203.jpeg"),
 };
 
 export function getPlayImageSource(playId: string): ImageSourcePropType | null {
-  return PLAY_IMAGE_SOURCES[playId] ?? null;
+  return illustratedPlayIds.has(playId) ? PLAY_IMAGE_SOURCES[playId] ?? null : null;
 }
 
 export const getPlayThumbnailSource = getPlayImageSource;
