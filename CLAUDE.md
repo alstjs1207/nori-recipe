@@ -89,6 +89,7 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 - 홈 추천 동작은 `HOME_RECOMMENDATION_RULES.md`의 고정 규칙을 기준으로 유지
 
 ### 데이터
+- 보호자에게 보이는 `steps`와 `tip`은 놀이 동작과 실용적인 팁으로 작성. ‘원문’, ‘등록본’ 등 수집·편집 과정 설명은 수집 파일의 검토 기록에 남기고, 출처는 `source`로 보존.
 - `NEW`는 `createdAt`의 한국 자정부터 다음 달 같은 날짜 자정 전까지 표시. 다음 달에 같은 날짜가 없으면 말일을 만료일로 사용. 번들의 `updatedAt`이나 원문 게시일을 생성일로 대신하지 않음.
 - 재료는 반드시 표준 slug 마스터에 있는 것만 사용. 승인된 등록 작업에 필요한 실제 재료 추가는 진행하고 보고하며, 범위가 불명확한 추가·대체는 사용자 확인
 - 태그에 연령대 포함 금지 (ageMin/ageMax로 대체)
