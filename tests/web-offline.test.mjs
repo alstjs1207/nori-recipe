@@ -53,6 +53,20 @@ test("새 버전 설치는 HTTP 캐시에 남은 이전 스타일 대신 새 스
   assert.equal(await (await app.fetch("/web.css", { destination: "style" })).text(), "shell:/web.css");
 });
 
+test("이전 워커가 활성 상태여도 새 HTML의 해시 스타일은 이전 CSS와 섞이지 않는다", async () => {
+  const app = worker("old");
+  await app.lifecycle("install");
+  const cache = await app.caches.open("nori-web-old-shell");
+  await cache.put("/web.css", new Response("old layout styles"));
+  await app.fetch("/", { mode: "navigate" });
+  const stylesheet = "/web.123456abcdef.css";
+  assert.match(await (await app.fetch(stylesheet, { destination: "style" })).text(), /network:.*web\.123456abcdef\.css/);
+  assert.equal(app.skipped(), false);
+  app.setOnline(false);
+  assert.match(await (await app.fetch(stylesheet, { destination: "style" })).text(), /network:.*web\.123456abcdef\.css/);
+  assert.equal(await (await cache.match("/web.css")).text(), "old layout styles");
+});
+
 test("오프라인에서 기존 상세 HTML, 처음 여는 놀이의 앱 셸, 방문한 이미지를 제공한다", async () => {
   const app = worker();
   await app.lifecycle("install");

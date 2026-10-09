@@ -21,7 +21,16 @@ async function build() {
   const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(result.error?.message ?? `${result.stdout}\n${result.stderr}`);
   console.info(result.stdout.split("\n").filter((line) => /Bundled|_expo\/static\/js|Exported:/.test(line)).join("\n"));
-  const html = await fs.readFile(path.join(dist, "index.html"), "utf8");
+  const stylesheet = await fs.readFile(path.join(dist, "web.css"));
+  const styleVersion = crypto.createHash("sha256").update(stylesheet).digest("hex").slice(0, 12);
+  const styleName = `web.${styleVersion}.css`;
+  await fs.writeFile(path.join(dist, styleName), stylesheet);
+  const exportedHtml = await fs.readFile(path.join(dist, "index.html"), "utf8");
+  if (!exportedHtml.includes('href="/web.css"')) throw new Error("Exported HTML is missing the web stylesheet link.");
+  // A waiting update leaves the previous worker active. Its cached /web.css
+  // must not style the new JavaScript served by network-first navigation.
+  const html = exportedHtml.replace('href="/web.css"', `href="/${styleName}"`);
+  await fs.writeFile(path.join(dist, "index.html"), html);
   for (const play of plays) {
     const directory = path.join(dist, "play", play.id);
     await fs.mkdir(directory, { recursive: true });
