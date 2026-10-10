@@ -176,7 +176,7 @@ pnpm build:web
 pnpm serve:web
 ```
 
-로컬 주소는 `http://127.0.0.1:4173`입니다. 포트는 `PORT`, 바인딩 주소는 `HOST` 환경 변수로 바꿀 수 있습니다. 배포 도메인이 정해지면 `PUBLIC_ORIGIN=https://example.com`으로 공유 메타데이터의 기준 주소를 지정할 수 있습니다. 서버는 빌드 결과를 제공하며, 계정 서버와 사용량 분석 기능은 포함하지 않습니다.
+로컬 주소는 `http://127.0.0.1:4173`입니다. 포트는 `PORT`, 바인딩 주소는 `HOST` 환경 변수로 바꿀 수 있습니다. 배포 도메인이 정해지면 `PUBLIC_ORIGIN=https://example.com`으로 공유 메타데이터의 기준 주소를 지정할 수 있습니다. 서버는 빌드 결과를 제공하며 계정 서버는 포함하지 않습니다. 웹 사용량 분석은 아래 GA4 설정과 이용자의 별도 참여 선택에 따라 작동합니다.
 
 - 빌드에 필요한 `data/plays.json`, `data/materials.json`, `images/plays/`는 Git 저장소에 포함합니다. Vercel에서도 저장소를 복제한 뒤 같은 파일로 빌드합니다. `public/media/`, `public/icons/`와 `dist/`는 빌드 과정에서 생성하며 Git에 포함하지 않습니다.
 - `build:web`은 웹용 WebP 상세 이미지·썸네일·재료 이미지와 설치 아이콘을 생성합니다. 원본 앱 이미지는 변경하지 않습니다. 웹에서는 시스템 한글 폰트를 사용하고, 화면 밖 이미지는 지연 로딩합니다.
@@ -189,9 +189,41 @@ pnpm serve:web
 
 검증 명령은 `pnpm typecheck`, `pnpm test`, `pnpm test:web`입니다. 웹 테스트는 직접 링크·새로고침·응답 압축·경로 접근과 오프라인 캐시·업데이트 동작을 검증합니다.
 
+### 선택적 GA4 웹 분석
+
+기본값은 비활성입니다. 웹/PWA에만 Google tag를 사용하며 Firebase 패키지나 계정 서버를 추가하지 않습니다. 아래 공개 환경변수는 **빌드 시** 반영되므로 변경 후 다시 빌드합니다. 운영 연락처·Google의 실제 처리 국가·이전 근거·이벤트 보유기간을 개인정보 처리방침에 확정하고, GA4 속성 설정을 마친 뒤 활성화합니다.
+
+```bash
+EXPO_PUBLIC_GA_ENABLED=true
+EXPO_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+EXPO_PUBLIC_ANALYTICS_ORIGIN=https://your-production-domain.com
+```
+
+- 도메인은 HTTPS의 정확한 origin으로 지정합니다. 설정한 origin 외의 localhost·미리보기·다른 서브도메인에서는 태그를 로드하지 않습니다. `GA_ENABLED`가 꺼져 있거나 설정이 없으면 분석 배너도 표시하지 않습니다. 활성화 값이 잘못되면 웹 빌드가 실패합니다.
+- GA4 웹 스트림의 **향상된 측정을 전체 끕니다**. 페이지뷰는 Expo Router의 실제 화면 전환에서 직접 전송하며 `send_page_view: false`를 사용합니다. 자동 히스토리 페이지뷰·검색·폼·클릭 측정을 함께 켜지 않습니다. Google Signals, 광고 맞춤설정과 Ads 연결도 사용하지 않는 구성을 기준으로 합니다.
+- Basic Consent Mode로 분석 동의 전에는 Google 태그 자체를 로드하지 않습니다. 설정에서 참여를 중단하면 이후 앱 이벤트를 차단하고 로드 대기 중인 이벤트와 서비스 분석 쿠키를 폐기합니다. 같은 운영 origin·측정 ID·동의 방침 버전의 선택만 복원합니다. 수집 목적·항목이 바뀌면 `ANALYTICS_CONSENT_VERSION`도 갱신합니다.
+- 분석 쿠키는 `nori` 접두사와 30일 유효기간을 사용합니다. GA4 콘솔의 이벤트 데이터 보유기간은 초기에는 2개월을 권장하며, 실제 설정한 기간을 공개 고지에 명시합니다. 쿠키 기간과 GA4 서버의 이벤트 보유기간은 다릅니다. 로컬 데이터 초기화로 Google의 기존 데이터가 삭제되지는 않습니다.
+- 전송 항목은 코드의 이벤트별 허용 목록으로 제한합니다. 아이 이름·생년월·월령·가족 유형·재료 목록·평가·반응·메모·검색어 내용·guestId/User-ID를 보내지 않습니다. 페이지 URL의 모든 query/hash와 외부 유입 URL의 경로·query/hash도 제거합니다. 이 구성은 UTM 값을 전달하지 않으므로 초기 유입 분석은 유입 도메인 중심입니다.
+- Google 태그 로드 실패·광고 차단·오프라인 상태는 놀이 동작을 막지 않습니다. 앱 코드가 보내는 오프라인 행동을 별도 저장하거나 연결 복구 후 재전송하지 않습니다. 동의한 브라우저에서 관측한 지표이므로 전체 이용자 수나 실제 놀이 수행 여부를 직접 증명하지 않습니다.
+
+| 이벤트 | 의미 | 허용하는 추가 항목 |
+| --- | --- | --- |
+| `page_view` | 화면 방문, 시작/추천 홈 구분 | `screen_name`, 정리한 화면 주소·제목·이전 화면 |
+| `tutorial_complete` | 첫 월령 선택 저장 성공 | 없음 |
+| `recommendation_impression`, `recommendation_click` | 추천 카드가 50% 이상 보임 / 선택 | `play_id`, `position`, `is_new` |
+| `play_view` | 공개 놀이 상세 방문 | `play_id`, `entry_point`, `is_new` |
+| `favorite_add`, `favorite_remove` | 로컬 저장·취소 성공 | `play_id` |
+| `play_feedback_saved` | 로컬 기록 저장 성공 | `play_id` |
+| `search_results` | 검색·필터 결과, 입력 중에는 600ms 대기 | `result_count`, `has_query`, `category` |
+| `share` | 링크 복사 / 네이티브 공유 API 성공 | `item_id`, `content_type`, `method` |
+
+GA4 맞춤 측정기준에는 `screen_name`, `play_id`, `entry_point`, `position`, `is_new`, `has_query`, `category`를 필요에 따라 등록하고, `result_count`는 맞춤 측정항목으로 등록합니다. `play_feedback_saved`를 핵심 이벤트로 설정하면 기록 전환을 볼 수 있습니다. 홈 유입의 ‘추천 노출 → 클릭 → 상세 → 저장·기록’과 공유 링크의 ‘상세 → 저장·기록’을 따로 분석합니다.
+
+운영 활성화 후에는 DebugView와 네트워크에서 최초 방문·동의·거부·철회·재방문·직접 링크·뒤로 가기를 확인합니다. 동의 전과 거부 후에는 Google 태그·수집 요청이 없어야 하고, 한 화면 전환은 페이지뷰 한 번이어야 합니다. 로컬 개발 검증에서는 모의 전송기를 사용하고 운영 GA4로 테스트 행동을 보내지 않습니다. [SPA 측정](https://developers.google.com/analytics/devguides/collection/ga4/single-page-applications), [동의 모드](https://developers.google.com/tag-platform/security/concepts/consent-mode), [Google 데이터 정책](https://developers.google.com/analytics/devguides/collection/protocol/ga4/policy)을 기준으로 합니다.
+
 ### 고지와 공개 전 확인
 
-마이페이지와 아이 정보 입력 화면은 `src/constants/legalNotices.ts`의 공통 고지를 사용합니다. 1.1.0 고지는 로컬 저장 항목과 목적, 보유·삭제 방식, 웹 접속정보, PWA 캐시, 외부 앱 공유 및 보호자 안전 수칙을 안내합니다. 웹은 **Vercel Hobby, Web Analytics·Speed Insights 사용 안 함**을 배포 기준으로 삼습니다. Vercel 호스팅·CDN의 접속정보 처리와 국외 처리 가능성을 반영한 초안이며, 아래 미확정 항목을 반영해야 공개용 방침이 완성됩니다. ‘기록 초기화’는 삭제 표시를 남기는 동작이며, 저장 내용의 삭제에는 ‘전체 로컬 데이터 초기화’를 사용합니다.
+마이페이지와 아이 정보 입력 화면은 `src/constants/legalNotices.ts`의 공통 고지를 사용합니다. 고지는 로컬 저장 항목과 목적, 보유·삭제 방식, 웹 접속정보, 선택적 GA4 분석, PWA 캐시, 외부 앱 공유 및 보호자 안전 수칙을 안내합니다. 웹은 **Vercel Hobby, Vercel Web Analytics·Speed Insights 사용 안 함**을 배포 기준으로 삼습니다. Vercel 호스팅·CDN과 선택적 Google 분석의 처리 가능성을 반영한 초안이며, 아래 미확정 항목과 GA4의 실제 처리 국가·이전 근거·이벤트 보유기간을 반영해야 공개용 방침이 완성됩니다. ‘기록 초기화’는 삭제 표시를 남기는 동작이며, 저장 내용의 삭제에는 ‘전체 로컬 데이터 초기화’를 사용합니다.
 
 - 공개할 운영자와 개인정보 문의 연락처는 현재 미정입니다. 공개 전에 실제 담당자 또는 처리 부서와 연락처를 고지에 추가해야 합니다. 고지의 `privacy@vercel.com`은 호스팅 업체의 문의 주소이며 서비스 운영자의 연락처를 대신하지 않습니다.
 - 로컬 `serve:web` 서버는 접속 로그를 따로 보관하지 않지만, 이를 Vercel 배포 환경에 그대로 적용할 수는 없습니다. 분석 기능을 꺼도 Vercel은 화면 제공과 보안을 위해 방문자의 IP 등 접속정보를 처리합니다. 운영자는 별도 로그 저장 서버나 Log Drains를 사용하지 않는 구성을 기준으로 합니다.

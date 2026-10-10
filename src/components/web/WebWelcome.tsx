@@ -8,6 +8,7 @@ import {
 } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
+import { trackAnalytics } from "@/analytics/analytics";
 import {
   Icon,
   PageFooter,
@@ -49,6 +50,7 @@ export function WebWelcome() {
         childBirthMonth: option.monthIndex,
       });
       await completeOnboarding();
+      trackAnalytics({ name: "tutorial_complete" });
       router.replace("/(main)");
     } catch {
       setError("저장하지 못했어요. 다시 시도해 주세요.");
@@ -149,6 +151,7 @@ export function WebWelcome() {
           <div className="welcome-previews">
             {previews.map((play) => (
               <PlayCard
+                entryPoint="welcome"
                 key={play.id}
                 play={play}
                 saved={favorites.ids.has(play.id)}

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useFocusEffect } from "expo-router";
 import type { Play } from "@/types";
+import { trackAnalytics } from "@/analytics/analytics";
 
 type PlaySharing = {
   open: () => void;
@@ -46,6 +47,7 @@ export function PlayWebActionsProvider({ play, children }: { play?: Play; childr
   async function copy() {
     try {
       await navigator.clipboard.writeText(url);
+      if (play) trackAnalytics({ name: "share", params: { item_id: play.id, content_type: "play", method: "copy_link" } });
       setMessage("놀이 링크를 복사했어요.");
     } catch {
       setMessage("아래 링크를 길게 누르거나 선택해서 복사해 주세요.");
@@ -57,6 +59,7 @@ export function PlayWebActionsProvider({ play, children }: { play?: Play; childr
     if (!play) return;
     try {
       await navigator.share({ title: `${play.name} · 노리 레시피`, url });
+      trackAnalytics({ name: "share", params: { item_id: play.id, content_type: "play", method: "native_share" } });
       setDialogOpen(false);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;

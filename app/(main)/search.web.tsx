@@ -1,8 +1,10 @@
 import { WebPage } from "@/components/web/NoriUI";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebSelect } from "@/components/web/WebSelect";
-import { Link, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { Link, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
+import { useWebAnalytics } from "@/components/web/WebAnalytics";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { searchPlays } from "@/play/search";
 import {
@@ -59,6 +61,7 @@ export default function SearchWebScreen() {
       : getAgeMonthsFromBirthMonth(context.childBirthMonth);
   const materials = useSelectedMaterials();
   const favorites = useWebFavorites();
+  const { consent } = useWebAnalytics();
   const [age, setAge] = useState<number | null>(profileAge);
   const [query, setQuery] = useState("");
   const [duration, setDuration] = useState<number | null>(null);
@@ -125,6 +128,12 @@ export default function SearchWebScreen() {
   }).length;
   const extraCount =
     Number(readyOnly) + Number(place !== null && place !== "any");
+  useFocusEffect(useCallback(() => {
+    const timer = setTimeout(() => trackAnalytics({ name: "search_results", params: {
+      result_count: results.length, has_query: Number(query.trim().length > 0), category,
+    } }), 600);
+    return () => clearTimeout(timer);
+  }, [query, age, duration, category, situation, place, readyOnly, sort, results.length, consent]));
   function reset() {
     setQuery("");
     setAge(profileAge);
@@ -336,7 +345,7 @@ export default function SearchWebScreen() {
           <div className="search-results">
             {results.map((play) => (
               <article className="search-result" key={play.id}>
-                <Link href={`/play/${play.id}`} className="search-result-link">
+                <Link href={`/play/${play.id}`} className="search-result-link" onPress={() => rememberPlayEntry(play.id, "search")}>
                   <img
                     src={`/media/thumbs/${play.id}.webp`}
                     alt=""

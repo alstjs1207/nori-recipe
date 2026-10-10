@@ -20,6 +20,10 @@ import {
   getMaterialStatus,
 } from "@/play/presentation";
 import type { Play } from "@/types";
+import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
+import type { AnalyticsEntryPoint } from "@/analytics/policy";
+import { isNewPlay } from "@/play/newPlay";
+import { useRecommendationImpression } from "./WebAnalytics";
 
 export type IconName =
   | "flower"
@@ -241,6 +245,7 @@ export function useWebFavorites() {
     setError(null);
     try {
       const saved = await toggleFavorite(guestId, playId);
+      trackAnalytics({ name: saved ? "favorite_add" : "favorite_remove", params: { play_id: playId } });
       setIds((previous) => {
         const next = new Set(previous);
         if (saved) next.add(playId);
@@ -288,6 +293,8 @@ export function PlayCard({
   completedAt,
   materials,
   compact = false,
+  entryPoint = "other",
+  recommendationPosition,
 }: {
   play: Play;
   saved: boolean;
@@ -295,11 +302,17 @@ export function PlayCard({
   completedAt?: string;
   materials: MaterialSlug[];
   compact?: boolean;
+  entryPoint?: AnalyticsEntryPoint;
+  recommendationPosition?: number;
 }) {
   const status = getMaterialStatus(play, materials);
+  const impressionRef = useRecommendationImpression<HTMLElement>(play, recommendationPosition);
   return (
-    <article className={`nori-play-card ${compact ? "card-compact" : ""}`}>
-      <Link href={`/play/${play.id}`} className="play-card-link">
+    <article ref={impressionRef} className={`nori-play-card ${compact ? "card-compact" : ""}`}>
+      <Link href={`/play/${play.id}`} className="play-card-link" onPress={() => {
+        rememberPlayEntry(play.id, entryPoint);
+        if (recommendationPosition !== undefined) trackAnalytics({ name: "recommendation_click", params: { play_id: play.id, position: recommendationPosition, is_new: Number(isNewPlay(play.createdAt)) } });
+      }}>
         <div className="play-card-art">
           <img
             src={`/media/thumbs/${play.id}.webp`}

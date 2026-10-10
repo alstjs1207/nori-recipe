@@ -2830,3 +2830,29 @@ fieldset {
     scroll-behavior: auto !important;
   }
 }
+.analytics-banner {
+  position: fixed;
+  z-index: 90;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100% - 32px));
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 12px 48px #19192f24;
+}
+.analytics-banner h2 { margin: 0 0 10px; font-size: 17px; line-height: 1.5; }
+.analytics-banner p, .analytics-settings p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+.analytics-banner p { margin: 0 0 8px; }
+.analytics-policy-link { color: var(--violet); font-size: 13px; text-decoration: underline; }
+.analytics-choice { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.analytics-choice .secondary-button { flex: 1; min-width: 140px; min-height: 44px; }
+#privacy-policy { scroll-margin-top: 96px; }
+#privacy-policy p { overflow-wrap: anywhere; }
+@media (max-width: 800px) {
+  .analytics-banner { bottom: calc(78px + env(safe-area-inset-bottom)); padding: 18px; max-height: 65vh; overflow: auto; }
+  .analytics-banner h2 { font-size: 16px; }
+  .analytics-choice { gap: 8px; }
+}

@@ -22,6 +22,9 @@ import {
 } from "./NoriUI";
 import { MaterialPicker } from "./MaterialPicker";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
+import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
+import { isNewPlay } from "@/play/newPlay";
+import { useRecommendationImpression } from "./WebAnalytics";
 
 const situations = [
   { value: "quiet", label: "집에서 조용히", icon: "home", tone: "purple" },
@@ -56,6 +59,7 @@ export function HomeRedesign({
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const favorites = useWebFavorites();
+  const featuredImpressionRef = useRecommendationImpression<HTMLElement>(featured ?? undefined, 1);
   const summary = selectedMaterials.length
     ? selectedMaterials
         .slice(0, 3)
@@ -142,10 +146,14 @@ export function HomeRedesign({
           </div>
         ) : null}
         <div className="home-layout">
-          <section className="home-featured" aria-label="오늘의 추천 놀이">
+          <section ref={featuredImpressionRef} className="home-featured" aria-label="오늘의 추천 놀이">
             {featured ? (
               <Link
                 className="featured-card"
+                onPress={() => {
+                  rememberPlayEntry(featured.id, "home_recommendation");
+                  trackAnalytics({ name: "recommendation_click", params: { play_id: featured.id, position: 1, is_new: Number(isNewPlay(featured.createdAt)) } });
+                }}
                 href={{
                   pathname: "/play/[id]",
                   params: {
@@ -226,10 +234,12 @@ export function HomeRedesign({
               </span>
             </div>
             <div className="recommendation-grid">
-              {companions.map((play) => (
+              {companions.map((play, index) => (
                 <PlayCard
                   key={play.id}
                   play={play}
+                  entryPoint="home_recommendation"
+                  recommendationPosition={index + 2}
                   materials={selectedMaterials}
                   saved={favorites.ids.has(play.id)}
                   onToggle={(id) => {
@@ -259,6 +269,7 @@ export function HomeRedesign({
             {otherPlays.slice(0, 4).map((play) => (
               <PlayCard
                 compact
+                entryPoint="home_discover"
                 key={play.id}
                 play={play}
                 saved={favorites.ids.has(play.id)}

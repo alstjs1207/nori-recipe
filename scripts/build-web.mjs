@@ -16,6 +16,16 @@ async function filesIn(directory) {
 }
 
 async function build() {
+  if (process.env.EXPO_PUBLIC_GA_ENABLED === "true") {
+    const id = process.env.EXPO_PUBLIC_GA_MEASUREMENT_ID;
+    const rawOrigin = process.env.EXPO_PUBLIC_ANALYTICS_ORIGIN;
+    const origin = rawOrigin ? new URL(rawOrigin) : null;
+    if (!id || !/^G-[A-Z0-9]{6,20}$/.test(id) || !origin || origin.protocol !== "https:" ||
+      origin.username || origin.password || origin.pathname !== "/" || origin.search || origin.hash ||
+      !origin.hostname.includes(".") || /^[\d.]+$/.test(origin.hostname) || /(?:^|\.)(?:localhost|local|test|invalid)$/.test(origin.hostname)) {
+      throw new Error("GA4 activation requires a valid EXPO_PUBLIC_GA_MEASUREMENT_ID and a production HTTPS EXPO_PUBLIC_ANALYTICS_ORIGIN.");
+    }
+  }
   const { plays, report } = await prepareWebAssets();
   await fs.rm(dist, { recursive: true, force: true });
   const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });

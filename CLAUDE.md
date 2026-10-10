@@ -103,6 +103,12 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 - 엔진 외 코드 (UI, DB, store)는 테스트 불필요
 - plan.md STEP 3의 테스트 케이스 기준 준수
 
+### 웹 분석
+- GA4는 웹/PWA의 정확한 운영 origin에서 이용자의 별도 분석 동의 후에만 활성화. 개발·미리보기·네이티브는 전송하지 않음.
+- 이벤트별 허용 목록을 사용하며 아이 정보·재료·평가·반응·메모·검색어·guestId/User-ID를 분석에 전송하지 않음. URL query/hash와 외부 referrer 경로도 제거.
+- 자동 향상된 측정과 수동 페이지뷰를 함께 켜지 않음. 실패·오프라인·철회는 놀이 사용을 막지 않으며 이벤트를 로컬에 보관하지 않음.
+- 공개 활성화 전 README의 GA4 설정과 개인정보 고지 미확정 항목을 확인. 수집 목적·항목 변경 시 동의 버전을 갱신.
+
 ### 커밋/PR
 - Phase 1 완료 전까지는 자유 커밋 (컨벤션 미적용)
 - Phase 1 완료 후: 기능 단위 커밋, Conventional Commits (`feat:`, `fix:`, `chore:`)

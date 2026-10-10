@@ -1,7 +1,7 @@
 import { WebPage } from "@/components/web/NoriUI";
 import { WebSelect } from "@/components/web/WebSelect";
-import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useRef, useState } from "react";
 import { MATERIAL_DISPLAY_NAMES } from "@/constants/materials";
 import { resetUserActivity } from "@/db/queries";
 import {
@@ -15,8 +15,12 @@ import {
   useSelectedMaterials,
 } from "@/components/web/NoriUI";
 import { MaterialPicker } from "@/components/web/MaterialPicker";
+import { AnalyticsSettings } from "@/components/web/WebAnalytics";
+import { PRIVACY_NOTICE } from "@/constants/legalNotices";
 
 export default function SettingsWebScreen() {
+  const { privacy } = useLocalSearchParams<{ privacy?: string }>();
+  const policyRef = useRef<HTMLDetailsElement>(null);
   const profile = useSessionStore((state) => state.userContext);
   const guestId = useSessionStore((state) => state.guestId);
   const initialName = useSessionStore((state) => state.childName);
@@ -59,6 +63,11 @@ export default function SettingsWebScreen() {
       setNotice(null);
     }, []),
   );
+  useFocusEffect(useCallback(() => {
+    if (privacy !== "1" || !policyRef.current) return;
+    policyRef.current.open = true;
+    policyRef.current.scrollIntoView({ block: "start" });
+  }, [privacy]));
   async function saveProfile() {
     if (saving || age === null) return;
     setSaving(true);
@@ -189,8 +198,15 @@ export default function SettingsWebScreen() {
             <Icon name="sliders" size={18} />
           </button>
         </section>
+        <AnalyticsSettings />
         <section className="settings-panel">
           <h2>이용 안내</h2>
+          <details id="privacy-policy" ref={policyRef}>
+            <summary>{PRIVACY_NOTICE.title}</summary>
+            <p>시행일: {PRIVACY_NOTICE.effectiveDate}</p>
+            {PRIVACY_NOTICE.items.map((item) => <p key={item}>{item}</p>)}
+            {PRIVACY_NOTICE.references.map((reference) => <p key={reference.url}><a href={reference.url} target="_blank" rel="noopener noreferrer">{reference.label}</a></p>)}
+          </details>
           <details>
             <summary>기록은 어디에 저장되나요?</summary>
             <p>

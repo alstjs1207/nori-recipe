@@ -6,6 +6,7 @@ import { deleteAllUserData, getUserContext, upsertUserContext } from "@/db/queri
 import type { MaterialSlug } from "@/constants/materials";
 import type { UserContext } from "@/types";
 import { DEFAULT_USER_CONTEXT } from "@/types";
+import { resetAnalyticsConsent } from "@/analytics/analytics";
 
 const GUEST_ID_STORAGE_KEY = "nori-recipe/guest-id";
 const ONBOARDING_COMPLETE_STORAGE_KEY = "nori-recipe/onboarding-complete";
@@ -232,6 +233,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     }
 
     await deleteAllUserData(guestId);
+    resetAnalyticsConsent();
     await Promise.all([
       AsyncStorage.removeItem(GUEST_ID_STORAGE_KEY),
       AsyncStorage.removeItem(ONBOARDING_COMPLETE_STORAGE_KEY),

@@ -36,6 +36,7 @@ export default function FavoritesWebScreen() {
           <div className="saved-grid">
             {saved.map((play) => (
               <PlayCard
+                entryPoint="favorites"
                 key={play.id}
                 play={play}
                 saved

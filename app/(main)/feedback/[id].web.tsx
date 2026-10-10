@@ -6,6 +6,7 @@ import {
   type ChildReactionOption,
 } from "@/constants/feedback";
 import { recordPlayFeedback } from "@/db/queries";
+import { trackAnalytics } from "@/analytics/analytics";
 import { useSessionStore } from "@/store/sessionStore";
 import { usePlaysStore } from "@/store/playsStore";
 import { EmptyState, Icon, PageFooter } from "@/components/web/NoriUI";
@@ -51,6 +52,7 @@ export default function FeedbackWebScreen() {
         memo.trim() || null,
       );
       useSessionStore.setState({ userContext: context });
+      trackAnalytics({ name: "play_feedback_saved", params: { play_id: play.id } });
       router.replace({
         pathname: "/(main)",
         params: { completedPlayId: play.id },

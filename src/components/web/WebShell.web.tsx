@@ -3,6 +3,7 @@ import { Link, router } from "expo-router";
 import { BrandMark, Icon, WebNavigation } from "./NoriUI";
 import { useSessionStore } from "@/store/sessionStore";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
+import { WebAnalyticsProvider } from "./WebAnalytics";
 
 interface InstallEvent extends Event {
   prompt(): Promise<void>;
@@ -10,6 +11,10 @@ interface InstallEvent extends Event {
 }
 
 export function WebShell({ children }: PropsWithChildren) {
+  return <WebAnalyticsProvider><WebShellContent>{children}</WebShellContent></WebAnalyticsProvider>;
+}
+
+function WebShellContent({ children }: PropsWithChildren) {
   const birthMonth = useSessionStore(
     (state) => state.userContext.childBirthMonth,
   );
