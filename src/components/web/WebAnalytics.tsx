@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type PropsWithChildren } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type PropsWithChildren } from "react";
 import { Link, useFocusEffect, useNavigation, usePathname, useSegments } from "expo-router";
 import { webAnalytics, consumePlayEntry } from "@/analytics/analytics.web";
 import { type AnalyticsClient } from "@/analytics/client";
@@ -8,6 +8,7 @@ import { useSessionStore } from "@/store/sessionStore";
 import { usePlaysStore } from "@/store/playsStore";
 import type { Play } from "@/types";
 import { ANALYTICS_NOTICE } from "@/constants/legalNotices";
+import { ANALYTICS_INVITATION_SESSION_KEY, createAnalyticsReadingProgress } from "@/analytics/invitation";
 
 const AnalyticsContext = createContext<AnalyticsClient>(webAnalytics);
 export function useWebAnalytics() {
@@ -56,16 +57,112 @@ function AnalyticsPageTracking() {
 export function AnalyticsConsentBanner() {
   const { client, consent } = useWebAnalytics();
   const pathname = usePathname();
-  if (!client.enabled || consent !== "unknown" || pathname === "/settings") return null;
+  const segments = useSegments().join("/");
+  const page = getAnalyticsPage(pathname, segments.includes("(main)"));
+  const play = usePlaysStore((state) => state.plays.find((item) => `/play/${item.id}` === page.path));
+  const [readEnough, setReadEnough] = useState(false);
+  const [invitationOpen, setInvitationOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [visible, setVisible] = useState(document.visibilityState === "visible");
+  const prompted = useRef(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  useEffect(() => {
+    try { prompted.current = sessionStorage.getItem(ANALYTICS_INVITATION_SESSION_KEY) === "shown"; } catch { /* Use this page's memory if storage is blocked. */ }
+    const update = () => setVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
+  }, []);
+  useEffect(() => {
+    if (!client.enabled || consent !== "unknown" || page.screen !== "play" || !play || readEnough) return;
+    let detach: (() => void) | undefined;
+    const attach = () => {
+      if (detach) return;
+      const content = document.querySelector<HTMLElement>(`[data-analytics-play-content="${play.id}"]`);
+      const scroller = content?.closest<HTMLElement>(".nori-scroll-page");
+      if (!content || !scroller || content.getBoundingClientRect().height <= 0) return;
+      observer.disconnect();
+      const reading = createAnalyticsReadingProgress(() => performance.now());
+      const initialScroll = scroller.scrollTop;
+      let timer: number | undefined;
+      const qualify = () => {
+        window.clearTimeout(timer);
+        if (document.visibilityState !== "visible") return;
+        if (reading.isReady()) setReadEnough(true);
+        else timer = window.setTimeout(qualify, Math.max(1, Math.ceil(reading.remaining())));
+      };
+      const updateVisibility = () => {
+        window.clearTimeout(timer);
+        if (document.visibilityState !== "visible") { reading.pause(); return; }
+        reading.resume();
+        qualify();
+      };
+      const scroll = () => {
+        if (document.visibilityState !== "visible" || scroller.scrollTop < initialScroll + 16) return;
+        const rect = content.getBoundingClientRect();
+        if (rect.height <= 0) return;
+        const bottom = Math.min(window.innerHeight, scroller.getBoundingClientRect().bottom);
+        reading.scroll((bottom - rect.top) / rect.height);
+        qualify();
+      };
+      updateVisibility();
+      scroller.addEventListener("scroll", scroll, { passive: true });
+      document.addEventListener("visibilitychange", updateVisibility);
+      detach = () => {
+        window.clearTimeout(timer);
+        scroller.removeEventListener("scroll", scroll);
+        document.removeEventListener("visibilitychange", updateVisibility);
+      };
+    };
+    // A previously visited tab restores its focused DOM after the route changes.
+    const observer = new MutationObserver(attach);
+    attach();
+    if (!detach) observer.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      detach?.();
+    };
+  }, [client, consent, page.path, page.screen, play?.id, readEnough]);
+  useEffect(() => {
+    setInvitationOpen(false);
+    setDialogOpen(false);
+  }, [client, consent, page.path, page.screen]);
+  useEffect(() => {
+    if (!client.enabled || consent !== "unknown" || !visible || !readEnough || prompted.current ||
+      !["home", "search", "favorites"].includes(page.screen)) return;
+    // Remember only that the invitation was shown, never the play or reading history.
+    prompted.current = true;
+    try { sessionStorage.setItem(ANALYTICS_INVITATION_SESSION_KEY, "shown"); } catch { /* Memory still prevents repeated prompts. */ }
+    setInvitationOpen(true);
+  }, [client, consent, page.path, page.screen, visible, readEnough]);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (dialogOpen && dialog && !dialog.open) dialog.showModal();
+    else if (!dialogOpen && dialog?.open) dialog.close();
+  }, [dialogOpen]);
+  if (!client.enabled || consent !== "unknown") return null;
   return (
-    <aside className="analytics-banner" aria-label="선택적 사용량 분석">
-      <div>
-        <h2>더 편한 놀이 찾기를 위해, 사용량 분석에 참여할까요?</h2>
-        <p>페이지 방문과 놀이 선택, 저장·기록 기능의 사용을 Google Analytics로 분석해요. 아이 이름·생년월·메모는 보내지 않아요. 참여하지 않아도 모든 기능을 이용할 수 있어요.</p>
+    <>
+      {invitationOpen ? <aside className="analytics-invitation" aria-label="선택적 사용량 분석" aria-live="polite">
+        <h2>놀이를 둘러보셨나요?</h2>
+        <p>많이 쓰이는 놀이와 기능을 파악해 서비스를 개선하려고 해요. 사용량 분석 참여는 선택이에요.</p>
+        <div className="analytics-choice">
+          <button type="button" className="secondary-button" aria-haspopup="dialog" onClick={() => { setInvitationOpen(false); setDialogOpen(true); }}>자세히 보고 참여하기</button>
+          <button type="button" className="secondary-button" onClick={() => setInvitationOpen(false)}>나중에</button>
+        </div>
+      </aside> : null}
+      <dialog ref={dialogRef} className="nori-dialog analytics-consent-dialog" aria-labelledby={titleId}
+        onCancel={(event) => { event.preventDefault(); setDialogOpen(false); }} onClose={() => setDialogOpen(false)}>
+        <div className="dialog-heading">
+          <div><h2 id={titleId}>사용량 분석에 참여할까요?</h2><p>페이지 방문과 놀이 선택, 저장·기록 기능의 사용을 Google Analytics로 분석해요. 아이 이름·생년월·메모는 보내지 않아요. 참여하지 않아도 모든 기능을 이용할 수 있어요.</p></div>
+          <button type="button" className="secondary-button analytics-dialog-close" autoFocus onClick={() => setDialogOpen(false)}>닫기</button>
+        </div>
+        <div className="analytics-dialog-body">
         <Link href={{ pathname: "/settings", params: { privacy: "1" } }} className="analytics-policy-link">개인정보 처리방침 보기</Link>
-      </div>
-      <AnalyticsConsentForm />
-    </aside>
+          {dialogOpen ? <AnalyticsConsentForm /> : null}
+        </div>
+      </dialog>
+    </>
   );
 }
 

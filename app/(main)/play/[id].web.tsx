@@ -218,7 +218,7 @@ export default function PlayDetailWebScreen() {
               ) : null}
             </header>
           </div>
-          <div className="detail-content-layout">
+          <div className="detail-content-layout" data-analytics-play-content={play.id}>
             <aside className="detail-preparation">
               <div className="section-heading">
                 <h2>이것만 준비해요</h2>

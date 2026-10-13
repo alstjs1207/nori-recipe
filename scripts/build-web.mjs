@@ -29,7 +29,8 @@ async function build() {
   }
   const { plays, report, playImageVersions } = await prepareWebAssets();
   await fs.rm(dist, { recursive: true, force: true });
-  const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });
+  // Exported public settings must reflect this build, not a previous environment.
+  const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--clear", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(result.error?.message ?? `${result.stdout}\n${result.stderr}`);
   console.info(result.stdout.split("\n").filter((line) => /Bundled|_expo\/static\/js|Exported:/.test(line)).join("\n"));
   const stylesheet = await fs.readFile(path.join(dist, "web.css"));
