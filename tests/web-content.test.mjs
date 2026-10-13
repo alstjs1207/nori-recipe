@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { validatePlayBundle } from "../scripts/validate-play-content.mjs";
 import { removeUnpublishedImages, writePlayImages, writeMaterialImage } from "../scripts/prepare-web-assets.mjs";
-import { withPlayMetadata } from "../scripts/web/html.mjs";
+import { resolvePublicOrigin, withPlayMetadata, withPublicOrigin } from "../scripts/web/html.mjs";
 
 const bundle = JSON.parse(await fs.readFile(new URL("../data/plays.json", import.meta.url), "utf8"));
 const registry = JSON.parse(await fs.readFile(new URL("../data/materials.json", import.meta.url), "utf8"));
@@ -62,6 +62,28 @@ test("시작 전 준비 조건은 비어 있지 않은 문자열 배열로 검�
 test("공유 이미지에도 교체한 그림의 버전 주소를 사용한다", () => {
   const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
   assert.ok(html.includes('property="og:image" content="__NORI_ORIGIN__/media/plays/play_006.webp?v=123456abcdef"'));
+});
+
+test("Vercel 정적 HTML의 공유 주소는 운영 도메인과 미리보기 배포를 구분한다", () => {
+  const env = { VERCEL: "1", VERCEL_URL: "nori-preview.vercel.app", VERCEL_PROJECT_PRODUCTION_URL: "nori.example.com" };
+  assert.equal(resolvePublicOrigin({ ...env, VERCEL_ENV: "production" }), "https://nori.example.com");
+  assert.equal(resolvePublicOrigin({ ...env, VERCEL_ENV: "preview" }), "https://nori-preview.vercel.app");
+  assert.equal(resolvePublicOrigin({ ...env, PUBLIC_ORIGIN: "https://custom.example.com/" }), "https://custom.example.com");
+  assert.equal(resolvePublicOrigin({ VERCEL: "1", VERCEL_ENV: "production", VERCEL_URL: "nori.vercel.app" }), "https://nori.vercel.app");
+  assert.equal(resolvePublicOrigin({}), null);
+  const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  const deployed = withPublicOrigin(html, resolvePublicOrigin({ ...env, VERCEL_ENV: "production" }));
+  assert.ok(deployed.includes('href="https://nori.example.com/play/play_006"'));
+  assert.ok(deployed.includes('content="https://nori.example.com/media/plays/play_006.webp?v=123456abcdef"'));
+  assert.doesNotMatch(deployed, /__NORI_ORIGIN__|nori-preview/);
+  assert.equal(withPublicOrigin(html, null), html);
+});
+
+test("Vercel에서 도메인이 누락되거나 잘못 설정되면 깨진 공유 HTML을 만들지 않는다", () => {
+  assert.throws(() => resolvePublicOrigin({ VERCEL: "1" }), /System Environment Variables/);
+  for (const PUBLIC_ORIGIN of ["example.com", "http://example.com", "https://user:pass@example.com", "https://example.com/path", "https://example.com?q=1", "https://example.com#test", "ftp://example.com"]) {
+    assert.throws(() => resolvePublicOrigin({ VERCEL: "1", PUBLIC_ORIGIN }));
+  }
 });
 
 test("검토 이미지의 웹 상세·썸네일은 원본 JPEG 없이도 브랜드 기본 이미지로 생성한다", async () => {

@@ -10,6 +10,7 @@ generated/
 node_modules/
 .expo/
 dist/
+.vercel/
 web-build/
 expo-env.d.ts
 .kotlin/

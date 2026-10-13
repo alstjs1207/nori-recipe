@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { prepareWebAssets } from "./prepare-web-assets.mjs";
 import { createServiceWorker } from "./web/service-worker.mjs";
-import { withPlayMetadata } from "./web/html.mjs";
+import { resolvePublicOrigin, withPlayMetadata, withPublicOrigin } from "./web/html.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
@@ -16,6 +16,7 @@ async function filesIn(directory) {
 }
 
 async function build() {
+  const publicOrigin = resolvePublicOrigin();
   if (process.env.EXPO_PUBLIC_GA_ENABLED === "true") {
     const id = process.env.EXPO_PUBLIC_GA_MEASUREMENT_ID;
     const rawOrigin = process.env.EXPO_PUBLIC_ANALYTICS_ORIGIN;
@@ -39,12 +40,12 @@ async function build() {
   if (!exportedHtml.includes('href="/web.css"')) throw new Error("Exported HTML is missing the web stylesheet link.");
   // A waiting update leaves the previous worker active. Its cached /web.css
   // must not style the new JavaScript served by network-first navigation.
-  const html = exportedHtml.replace('href="/web.css"', `href="/${styleName}"`);
+  const html = withPublicOrigin(exportedHtml.replace('href="/web.css"', `href="/${styleName}"`), publicOrigin);
   await fs.writeFile(path.join(dist, "index.html"), html);
   for (const play of plays) {
     const directory = path.join(dist, "play", play.id);
     await fs.mkdir(directory, { recursive: true });
-    await fs.writeFile(path.join(directory, "index.html"), withPlayMetadata(html, play, playImageVersions[play.id]));
+    await fs.writeFile(path.join(directory, "index.html"), withPublicOrigin(withPlayMetadata(html, play, playImageVersions[play.id]), publicOrigin));
   }
   const assets = (await filesIn(dist)).filter((file) => /\.(js|css|ttf|woff2?)$/.test(file)).map((file) => `/${path.relative(dist, file).split(path.sep).join("/")}`);
   const precache = [...new Set(["/", "/index.html", "/offline.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", ...assets])];

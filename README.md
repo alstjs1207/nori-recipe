@@ -193,6 +193,37 @@ pnpm serve:web
 
 검증 명령은 `pnpm typecheck`, `pnpm test`, `pnpm test:web`입니다. 웹 테스트는 직접 링크·새로고침·응답 압축·경로 접근과 오프라인 캐시·업데이트 동작을 검증합니다.
 
+### Vercel 배포
+
+운영 주소는 [https://nori.lestly.io](https://nori.lestly.io)입니다. 배포 흐름은 다음과 같습니다.
+
+| Git 브랜치 | Vercel 환경 | 적용 주소 |
+| --- | --- | --- |
+| `preview` | Preview | Vercel이 부여한 `*.vercel.app` 주소 |
+| `main` | Production | `https://nori.lestly.io` |
+
+변경사항은 `preview`에서 작업하고 푸시해 미리보기에서 확인합니다. 확인한 `preview`를 `main`에 병합하면 운영 환경으로 배포됩니다. Vercel의 Production Branch는 `main`으로, 운영 도메인 `nori.lestly.io`는 Production에 연결합니다.
+
+기존 Vercel 계정에서 **Add New → Project**를 열고 GitHub의 `alstjs1207/nori-recipe` 저장소를 가져옵니다. 로컬 폴더 이름은 `play-recipe`이지만 GitHub 저장소에는 앱이 루트에 있으므로 **Root Directory는 `.`**로 둡니다.
+
+| 설정 | 값 |
+| --- | --- |
+| Framework Preset | Other |
+| Root Directory | `.` |
+| Build Command | `pnpm build:web` |
+| Output Directory | `dist` |
+| Install Command | `npx --yes pnpm@10.33.0 install --frozen-lockfile` |
+| Node.js Version | `24.x` |
+
+`vercel.json`에서 프레임워크·설치·빌드·출력 설정을 적용합니다. 설치 명령은 `package.json`의 `packageManager`와 같은 pnpm 버전을 사용합니다. pnpm 버전을 바꿀 때는 두 파일을 함께 갱신합니다. `serve:web`은 로컬 검증 서버이며 Vercel에서는 실행하지 않습니다.
+
+- **System Environment Variables 접근을 활성화**합니다. `PUBLIC_ORIGIN=https://nori.lestly.io`는 **Production에만** 설정합니다. Preview에서는 `PUBLIC_ORIGIN`을 비워 `VERCEL_URL`로 해당 미리보기의 공유 주소를 생성합니다. Production에서 `PUBLIC_ORIGIN`이 없으면 `VERCEL_PROJECT_PRODUCTION_URL`을 사용합니다. 별도 도메인 추가나 환경변수 변경 후에는 재배포합니다.
+- `vercel.json`의 경로 설정은 검색·설정·피드백 화면을 새로고침해도 앱을 엽니다. 놀이 상세는 빌드가 생성한 개별 HTML을 제공해 공유 제목·이미지를 유지합니다. 존재하지 않는 이미지·JS·놀이 경로는 앱 셸로 대체하지 않고 404로 처리합니다.
+- 서비스 워커와 설치 설정은 재검증할 수 있는 응답 헤더를 사용합니다. 기본 호스팅만 사용하고 Vercel Web Analytics·Speed Insights는 활성화하지 않습니다. GA4는 별도 설정이 없으면 비활성입니다.
+- `preview`에 푸시하면 Preview 배포를 확인하고, `preview`를 `main`에 병합하면 Production 배포를 확인합니다.
+
+첫 배포 후 운영 HTTPS 주소에서 `/`, `/search`, `/play/play_001`을 직접 열고 새로고침, 놀이 이미지, 공유 미리보기, 홈 화면 설치를 확인합니다. 공개 배포 전에 아래 ‘고지와 공개 전 확인’의 운영자·문의 연락처 등 미정 항목도 확정합니다.
+
 ### 선택적 GA4 웹 분석
 
 기본값은 비활성입니다. 웹/PWA에만 Google tag를 사용하며 Firebase 패키지나 계정 서버를 추가하지 않습니다. 아래 공개 환경변수는 **빌드 시** 반영되므로 변경 후 다시 빌드합니다. 운영 연락처·Google의 실제 처리 국가·이전 근거·이벤트 보유기간을 개인정보 처리방침에 확정하고, GA4 속성 설정을 마친 뒤 활성화합니다.
