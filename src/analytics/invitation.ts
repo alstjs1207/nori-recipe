@@ -1,6 +1,7 @@
 import { ANALYTICS_CONSENT_VERSION } from "./policy";
 
 export const ANALYTICS_INVITATION_SESSION_KEY = `nori-recipe/analytics-invitation-v${ANALYTICS_CONSENT_VERSION}`;
+export const ANALYTICS_INVITATION_RESET_EVENT = "nori:reset-analytics-invitation";
 export const ANALYTICS_READING_TIME_MS = 20_000;
 
 /** Only an in-memory eligibility flag; no reading history or analytics events. */

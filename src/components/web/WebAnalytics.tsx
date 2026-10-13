@@ -8,7 +8,7 @@ import { useSessionStore } from "@/store/sessionStore";
 import { usePlaysStore } from "@/store/playsStore";
 import type { Play } from "@/types";
 import { ANALYTICS_NOTICE } from "@/constants/legalNotices";
-import { ANALYTICS_INVITATION_SESSION_KEY, createAnalyticsReadingProgress } from "@/analytics/invitation";
+import { ANALYTICS_INVITATION_RESET_EVENT, ANALYTICS_INVITATION_SESSION_KEY, createAnalyticsReadingProgress } from "@/analytics/invitation";
 
 const AnalyticsContext = createContext<AnalyticsClient>(webAnalytics);
 export function useWebAnalytics() {
@@ -59,6 +59,8 @@ export function AnalyticsConsentBanner() {
   const pathname = usePathname();
   const segments = useSegments().join("/");
   const page = getAnalyticsPage(pathname, segments.includes("(main)"));
+  // Browser Back can return to the root welcome route after browsing a play.
+  const invitationPage = page.path === "/" || page.screen === "search" || page.screen === "favorites";
   const play = usePlaysStore((state) => state.plays.find((item) => `/play/${item.id}` === page.path));
   const [readEnough, setReadEnough] = useState(false);
   const [invitationOpen, setInvitationOpen] = useState(false);
@@ -70,9 +72,20 @@ export function AnalyticsConsentBanner() {
   useEffect(() => {
     try { prompted.current = sessionStorage.getItem(ANALYTICS_INVITATION_SESSION_KEY) === "shown"; } catch { /* Use this page's memory if storage is blocked. */ }
     const update = () => setVisible(document.visibilityState === "visible");
+    const reset = () => {
+      if (!client.preview) return;
+      prompted.current = false;
+      setReadEnough(false);
+      setInvitationOpen(false);
+      setDialogOpen(false);
+    };
     document.addEventListener("visibilitychange", update);
-    return () => document.removeEventListener("visibilitychange", update);
-  }, []);
+    window.addEventListener(ANALYTICS_INVITATION_RESET_EVENT, reset);
+    return () => {
+      document.removeEventListener("visibilitychange", update);
+      window.removeEventListener(ANALYTICS_INVITATION_RESET_EVENT, reset);
+    };
+  }, [client]);
   useEffect(() => {
     if (!client.consentAvailable || consent !== "unknown" || page.screen !== "play" || !play || readEnough) return;
     let detach: (() => void) | undefined;
@@ -126,15 +139,15 @@ export function AnalyticsConsentBanner() {
   useEffect(() => {
     setInvitationOpen(false);
     setDialogOpen(false);
-  }, [client, consent, page.path, page.screen]);
+  }, [client, consent, page.path]);
   useEffect(() => {
     if (!client.consentAvailable || consent !== "unknown" || !visible || !readEnough || prompted.current ||
-      !["home", "search", "favorites"].includes(page.screen)) return;
+      !invitationPage) return;
     // Remember only that the invitation was shown, never the play or reading history.
     prompted.current = true;
     try { sessionStorage.setItem(ANALYTICS_INVITATION_SESSION_KEY, "shown"); } catch { /* Memory still prevents repeated prompts. */ }
     setInvitationOpen(true);
-  }, [client, consent, page.path, page.screen, visible, readEnough]);
+  }, [client, consent, page.path, invitationPage, visible, readEnough]);
   useEffect(() => {
     const dialog = dialogRef.current;
     if (dialogOpen && dialog && !dialog.open) dialog.showModal();
@@ -196,6 +209,14 @@ function AnalyticsConsentForm() {
 
 export function AnalyticsSettings() {
   const { client, consent } = useWebAnalytics();
+  const [previewResetCount, setPreviewResetCount] = useState(0);
+  function resetPreviewInvitation() {
+    if (!client.preview) return;
+    client.setConsent("unknown");
+    try { sessionStorage.removeItem(ANALYTICS_INVITATION_SESSION_KEY); } catch { /* Reset this tab's in-memory state as well. */ }
+    window.dispatchEvent(new Event(ANALYTICS_INVITATION_RESET_EVENT));
+    setPreviewResetCount((count) => count + 1);
+  }
   const status = client.preview ? {
     granted: "미리보기에서 참여를 선택했어요.",
     denied: "미리보기에서 참여하지 않기로 선택했어요.",
@@ -210,7 +231,11 @@ export function AnalyticsSettings() {
       <h2>사용량 분석 참여</h2>
       <p>{status}</p>
       <p>{client.preview ? "이 미리보기에서는 동의 화면과 참여·중단 동작을 확인할 수 있어요. Google 분석 태그를 불러오거나 분석 데이터를 전송하지 않아요." : "선택한 경우 페이지 방문과 놀이 선택, 저장·기록 기능 사용이 Google Analytics로 전송돼요. 아이 이름·생년월·메모는 보내지 않아요. 언제든 참여를 중단할 수 있고, 놀이 기능은 계속 이용할 수 있어요."}</p>
-      {client.consentAvailable ? consent === "granted" ? <div className="analytics-choice"><button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>참여 중단하기</button></div> : <AnalyticsConsentForm key={consent} /> : null}
+      {client.consentAvailable ? consent === "granted" ? <div className="analytics-choice"><button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>참여 중단하기</button></div> : <AnalyticsConsentForm key={`${consent}:${previewResetCount}`} /> : null}
+      {client.preview ? <>
+        <div className="analytics-choice"><button className="secondary-button" type="button" onClick={resetPreviewInvitation}>동의 안내 다시 테스트</button></div>
+        {previewResetCount > 0 && consent === "unknown" ? <p role="status">미리보기의 동의 선택과 안내 표시 상태를 초기화했어요. 놀이 상세를 20초 읽거나 본문 절반까지 스크롤한 뒤 홈·탐색·저장 목록으로 돌아오면 안내가 다시 나와요.</p> : null}
+      </> : null}
     </section>
   );
 }
