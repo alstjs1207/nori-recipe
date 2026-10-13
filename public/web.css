@@ -2021,6 +2021,16 @@ fieldset {
   color: var(--ink);
   box-shadow: 0 24px 90px #25204340;
 }
+.material-picker[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.material-picker > .dialog-heading,
+.material-picker > .picker-summary,
+.material-picker > .dialog-footer {
+  flex-shrink: 0;
+}
 .nori-dialog::backdrop,
 .play-share-dialog::backdrop {
   background: #29263d66;
@@ -2057,8 +2067,10 @@ fieldset {
   color: var(--violet);
 }
 .picker-content {
-  max-height: 52dvh;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0 24px 12px;
 }
 .picker-content fieldset {
@@ -2745,7 +2757,6 @@ fieldset {
   }
   .picker-content {
     padding: 0 18px 12px;
-    max-height: 48dvh;
   }
   .dialog-footer {
     padding: 14px 18px 18px;
