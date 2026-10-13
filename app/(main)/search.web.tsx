@@ -1,4 +1,5 @@
 import { WebPage } from "@/components/web/NoriUI";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebSelect } from "@/components/web/WebSelect";
 import { Link, useLocalSearchParams, useFocusEffect } from "expo-router";
@@ -347,7 +348,7 @@ export default function SearchWebScreen() {
               <article className="search-result" key={play.id}>
                 <Link href={`/play/${play.id}`} className="search-result-link" onPress={() => rememberPlayEntry(play.id, "search")}>
                   <img
-                    src={`/media/thumbs/${play.id}.webp`}
+                    src={getPlayImageUrl(play.id, "thumbnail")}
                     alt=""
                     loading="lazy"
                     decoding="async"

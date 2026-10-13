@@ -4,9 +4,9 @@
     "주방": ["flour", "rice_flour", "water", "bowl", "cup", "spoon", "chopsticks", "bottle", "soft_food", "salt"],
     "공작": ["crayon", "paint", "glue", "tape", "string", "rubber_band", "straw", "pom_pom"],
     "감각": ["sand", "kinetic_sand", "water_bin", "water_beads", "bubble", "balloon", "slime"],
-    "블록/장난감": ["block", "magnetic_tile", "ball", "puzzle", "book", "mirror", "doll", "marble", "bead", "car_toy", "animal_toy", "hula_hoop"],
+    "블록/장난감": ["block", "magnetic_tile", "ball", "puzzle", "book", "mirror", "doll", "marble", "bead", "car_toy", "animal_toy", "hula_hoop", "large_lid_container"],
     "조형": ["clay", "foam", "play_corn"],
-    "도구": ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler", "brush"]
+    "도구": ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler", "brush", "chair"]
   },
   "displayNames": {
     "paper": "종이·신문지",
@@ -63,7 +63,9 @@
     "pom_pom": "폼폼",
     "animal_toy": "동물 피규어",
     "hula_hoop": "훌라후프",
-    "brush": "붓"
+    "brush": "붓",
+    "large_lid_container": "큰 뚜껑 교구 용기",
+    "chair": "안정된 의자"
   },
   "removed": {
     "newspaper": "paper",

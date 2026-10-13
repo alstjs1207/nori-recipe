@@ -12,6 +12,7 @@ import { useSessionStore } from "@/store/sessionStore";
 import { ONBOARDING_DEFAULT_MATERIALS } from "@/onboarding/utils";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import type { MaterialSlug } from "@/constants/materials";
 import {
   formatAge,
@@ -315,7 +316,7 @@ export function PlayCard({
       }}>
         <div className="play-card-art">
           <img
-            src={`/media/thumbs/${play.id}.webp`}
+            src={getPlayImageUrl(play.id, "thumbnail")}
             alt=""
             loading="lazy"
             decoding="async"

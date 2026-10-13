@@ -16,6 +16,7 @@ export const MATERIAL_IMAGES = {
   spoon: require("../../images/material/Wooden_spoon_on_202604282312.jpeg"),
   chopsticks: require("../../images/material/A_3D_rendered_202604282312_3.jpeg"),
   bottle: require("../../images/material/A_3D_rendered_202604282312_4.jpeg"),
+  large_lid_container: require("../../images/material/large_lid_container.jpeg"),
   soft_food: require("../../images/material/soft_food.jpeg"),
   crayon: require("../../images/material/Five_colored_pencils_202604282312.jpeg"),
   paint: require("../../images/material/Paint_palette_with_202604282312.jpeg"),
@@ -57,4 +58,5 @@ export const MATERIAL_IMAGES = {
   animal_toy: require("../../images/material/animal_toy.jpeg"),
   hula_hoop: require("../../images/material/hula_hoop.jpeg"),
   brush: require("../../images/material/brush.jpeg"),
+  chair: require("../../images/material/chair.jpeg"),
 } satisfies Record<MaterialSlug, ImageSourcePropType>;

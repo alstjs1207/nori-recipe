@@ -126,3 +126,19 @@ test("기존 기본 아이콘 캐시가 있어도 새 주소의 재료 그림을
   assert.match(await (await app.fetch(updatedUrl, { destination: "image" })).text(), /network:.*v=new-image/);
   assert.equal(await (await cache.match("/media/materials/paper_plate.webp")).text(), "old brand icon");
 });
+
+test("이전 놀이 그림이 캐시에 있어도 새 버전 상세·썸네일을 받고 오프라인에서 유지한다", async () => {
+  const app = worker("old");
+  await app.lifecycle("install");
+  const cache = await app.caches.open("nori-web-old-media");
+  for (const kind of ["plays", "thumbs"]) {
+    const previous = `/media/${kind}/play_006.webp`;
+    await cache.put(previous, new Response("old small-cap scene"));
+    const updated = `${previous}?v=large-lid-scene`;
+    assert.match(await (await app.fetch(updated, { destination: "image" })).text(), /network:.*v=large-lid-scene/);
+    app.setOnline(false);
+    assert.match(await (await app.fetch(updated, { destination: "image" })).text(), /network:.*v=large-lid-scene/);
+    assert.equal(await (await cache.match(previous)).text(), "old small-cap scene");
+    app.setOnline(true);
+  }
+});

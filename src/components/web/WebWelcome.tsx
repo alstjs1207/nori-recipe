@@ -1,4 +1,5 @@
 import { WebPage } from "./NoriUI";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { WebSelect } from "./WebSelect";
 import { useState } from "react";
 import { Link, router } from "expo-router";
@@ -77,7 +78,7 @@ export function WebWelcome() {
             </p>
             <div className="welcome-art">
               <img
-                src="/media/plays/play_013.webp"
+                src={getPlayImageUrl("play_013")}
                 alt="아이와 함께하는 그림 놀이"
                 fetchPriority="high"
               />

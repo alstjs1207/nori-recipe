@@ -609,6 +609,12 @@ export default function PlayDetailScreen() {
                   </View>
                 )}
 
+                {play.preparationNotes?.map((note) => (
+                  <Text key={note} style={styles.preparationNote}>
+                    {note}
+                  </Text>
+                ))}
+
                 {materialReadiness ? (
                   <View
                     style={[
@@ -1028,6 +1034,13 @@ const styles = StyleSheet.create({
   },
   materialCheckHeader: {
     marginTop: 20,
+  },
+  preparationNote: {
+    marginTop: 12,
+    color: APP_COLORS.ink,
+    fontSize: 14,
+    lineHeight: 22,
+    fontFamily: APP_FONTS.body,
   },
   materialCheckTitle: {
     color: APP_COLORS.ink,

@@ -49,6 +49,7 @@ play-recipe/
 - `difficulty`: 1(쉬움) | 2(보통) | 3(어려움)
 - `devAreas`: 발달영역 enum 배열
 - `materials`: `{ required, optional, substitutes }` — slug 또는 한글(수집 직후); `substitutes`는 항상 빈 배열 `[]` (대체 재료는 재료 설명 텍스트로 처리)
+- `preparationNotes`: string[] (선택 필드) — 준비물의 사용 연령·설치 조건 등 시작 전 확인할 구체적인 조건. 앱과 웹의 준비물 영역에 표시.
 - `steps`: string[] (순서 = 배열 인덱스)
 - `tip`: string (선택 필드) — 놀이 팁/응용 제안
 - `safetyNotes`: string[]
@@ -76,9 +77,9 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 | 주방 | flour, rice_flour, water, bowl, cup, spoon, chopsticks, bottle, soft_food, salt |
 | 공작 | crayon, paint, glue, tape, string, rubber_band, straw, pom_pom |
 | 감각 | sand, kinetic_sand, water_bin, water_beads, bubble, balloon, slime |
-| 블록/장난감 | block, magnetic_tile, ball, puzzle, book, mirror, doll, marble, bead, car_toy, animal_toy, hula_hoop |
+| 블록/장난감 | block, magnetic_tile, ball, puzzle, book, mirror, doll, marble, bead, car_toy, animal_toy, hula_hoop, large_lid_container |
 | 조형 | clay, foam, play_corn |
-| 도구 | scissors, tongs, smartphone, flashlight, mat, shape_ruler, brush |
+| 도구 | scissors, tongs, smartphone, flashlight, mat, shape_ruler, brush, chair |
 
 제거된 slug: newspaper (→ paper), plastic_bag (안전 이슈)
 

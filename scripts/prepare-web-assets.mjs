@@ -19,7 +19,11 @@ export async function writePlayImages(play, { sourceDirectory, detailDirectory, 
   const sourceBytes = (await fs.stat(source)).size;
   const detail = await sharp(source).rotate().resize({ width: 960, height: 960, fit: "inside", withoutEnlargement: !needsReview }).webp({ quality: 72 }).toFile(path.join(detailDirectory, `${play.id}.webp`));
   const thumbnail = await sharp(source).rotate().resize({ width: 320, height: 320, fit: "cover", withoutEnlargement: !needsReview }).webp({ quality: 66 }).toFile(path.join(thumbnailDirectory, `${play.id}.webp`));
-  return { sourceBytes, detailBytes: detail.size, thumbnailBytes: thumbnail.size };
+  const version = crypto.createHash("sha256")
+    .update(await fs.readFile(path.join(detailDirectory, `${play.id}.webp`)))
+    .update(await fs.readFile(path.join(thumbnailDirectory, `${play.id}.webp`)))
+    .digest("hex").slice(0, 12);
+  return { sourceBytes, detailBytes: detail.size, thumbnailBytes: thumbnail.size, version };
 }
 
 export async function writeMaterialImage(slug, { source, directory }) {
@@ -43,11 +47,13 @@ export async function prepareWebAssets() {
   let originalBytes = 0;
   let detailBytes = 0;
   let thumbnailBytes = 0;
+  const playImageVersions = {};
   const tasks = plays.map((play) => async () => {
     const sizes = await writePlayImages(play, { sourceDirectory: path.join(root, "images/plays"), detailDirectory: path.join(output, "plays"), thumbnailDirectory: path.join(output, "thumbs"), icon });
     originalBytes += sizes.sourceBytes;
     detailBytes += sizes.detailBytes;
     thumbnailBytes += sizes.thumbnailBytes;
+    playImageVersions[play.id] = sizes.version;
   });
   const sourceFile = path.join(root, "src/constants/materialImageSources.ts");
   const materialSource = await fs.readFile(sourceFile, "utf8");
@@ -61,6 +67,8 @@ export async function prepareWebAssets() {
   await Promise.all(Array.from({ length: 4 }, async () => { while (cursor < tasks.length) { const task = tasks[cursor++]; await task(); } }));
   const sortedVersions = Object.fromEntries(Object.entries(materialImageVersions).sort(([a], [b]) => a.localeCompare(b)));
   await fs.writeFile(path.join(root, "src/constants/materialImageVersions.json"), JSON.stringify(sortedVersions, null, 2) + "\n");
+  const sortedPlayVersions = Object.fromEntries(Object.entries(playImageVersions).sort(([a], [b]) => a.localeCompare(b)));
+  await fs.writeFile(path.join(root, "src/constants/playImageVersions.json"), JSON.stringify(sortedPlayVersions, null, 2) + "\n");
   const icons = path.join(root, "public/icons");
   await fs.mkdir(icons, { recursive: true });
   await sharp(icon).resize(64, 64).png().toFile(path.join(root, "public/nori-favicon.png"));
@@ -69,7 +77,7 @@ export async function prepareWebAssets() {
   await sharp(icon).resize(384, 384).extend({ top: 64, bottom: 64, left: 64, right: 64, background: "#FAFAFE" }).png().toFile(path.join(icons, "maskable-512.png"));
   const report = { plays: plays.length, reviewImages: plays.filter((play) => play.imageStatus === "review").length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +(detailBytes / 1e6).toFixed(2), thumbnailMB: +(thumbnailBytes / 1e6).toFixed(2) };
   console.info("Web images:", JSON.stringify(report));
-  return { plays, report };
+  return { plays, report, playImageVersions: sortedPlayVersions };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

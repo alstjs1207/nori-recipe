@@ -1,4 +1,5 @@
 import { WebPage } from "./NoriUI";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { Link } from "expo-router";
 import { useState } from "react";
 import {
@@ -163,7 +164,7 @@ export function HomeRedesign({
                 }}
               >
                 <img
-                  src={`/media/plays/${featured.id}.webp`}
+                  src={getPlayImageUrl(featured.id)}
                   alt=""
                   fetchPriority="high"
                 />

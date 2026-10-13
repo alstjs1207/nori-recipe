@@ -39,6 +39,8 @@ export type Play = {
   difficulty: PlayDifficulty;
   devAreas: DevArea[];
   materials: PlayMaterials;
+  /** 준비물의 사용 연령·설치 조건 등 시작 전에 확인할 구체적인 조건. */
+  preparationNotes?: string[];
   steps: string[];
   tip?: string;
   safetyNotes: string[];

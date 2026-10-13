@@ -1,4 +1,5 @@
 import { WebPage } from "@/components/web/NoriUI";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { WebSelect } from "@/components/web/WebSelect";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -156,7 +157,7 @@ export default function RecordWebScreen() {
                         className="record-entry-heading"
                       >
                         <img
-                          src={play ? `/media/thumbs/${log.playId}.webp` : "/nori-icon.svg"}
+                          src={play ? getPlayImageUrl(log.playId, "thumbnail") : "/nori-icon.svg"}
                           alt=""
                           loading="lazy"
                         />

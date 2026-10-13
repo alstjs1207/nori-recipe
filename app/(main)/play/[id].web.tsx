@@ -15,6 +15,7 @@ import {
 } from "react";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { getMaterialImageUrl } from "@/constants/materialImageUrls";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import {
   MATERIAL_DISPLAY_NAMES,
   MATERIAL_SLUGS,
@@ -135,7 +136,7 @@ export default function PlayDetailWebScreen() {
           <div className="detail-overview">
             <div className="detail-art">
               <img
-                src={`/media/plays/${play.id}.webp`}
+                src={getPlayImageUrl(play.id)}
                 alt={`${play.name} 놀이 일러스트`}
                 fetchPriority="high"
               />
@@ -270,6 +271,13 @@ export default function PlayDetailWebScreen() {
                   </div>
                 </div>
               )}
+              {play.preparationNotes?.length ? (
+                <div className="detail-preparation-notes">
+                  {play.preparationNotes.map((note) => (
+                    <p key={note}>{note}</p>
+                  ))}
+                </div>
+              ) : null}
               <div className="essential-safety">
                 <Icon name="spark" size={18} />
                 <div>

@@ -1209,6 +1209,18 @@ fieldset {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
+.detail-preparation-notes {
+  margin-top: 18px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.detail-preparation-notes p {
+  margin: 0;
+}
+.detail-preparation-notes p + p {
+  margin-top: 8px;
+}
 .detail-material {
   min-width: 0;
   text-align: center;

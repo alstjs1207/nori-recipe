@@ -41,6 +41,7 @@ export function validatePlayBundle(bundle, registry) {
     if (!["live", "draft", "archived"].includes(play.status)) fail(id, "status", "잘못된 게시 상태입니다.");
     if (play.imageStatus !== undefined && play.imageStatus !== "review") fail(id, "imageStatus", "이미지 검토 상태는 review만 사용할 수 있습니다.");
     if (play.tip !== undefined && typeof play.tip !== "string") fail(id, "tip", "팁은 문자열이어야 합니다.");
+    if (play.preparationNotes !== undefined && !stringArray(play.preparationNotes)) fail(id, "preparationNotes", "준비 조건은 빈 문자열이 없는 문자열 배열이어야 합니다.");
     for (const field of ["devAreas", "steps", "safetyNotes", "educationalEffects", "tags"]) {
       if (!stringArray(play[field])) fail(id, field, "빈 문자열이 없는 문자열 배열이어야 합니다.");
     }

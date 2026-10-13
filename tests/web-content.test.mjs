@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { validatePlayBundle } from "../scripts/validate-play-content.mjs";
 import { removeUnpublishedImages, writePlayImages, writeMaterialImage } from "../scripts/prepare-web-assets.mjs";
+import { withPlayMetadata } from "../scripts/web/html.mjs";
 
 const bundle = JSON.parse(await fs.readFile(new URL("../data/plays.json", import.meta.url), "utf8"));
 const registry = JSON.parse(await fs.readFile(new URL("../data/materials.json", import.meta.url), "utf8"));
@@ -49,6 +50,18 @@ test("0분 놀이와 필수·선택 중복 재료를 거부한다", () => {
   const result = validatePlayBundle(fixture({ durationMin: 0, durationMax: 0, materials: { required: ["cup"], optional: ["cup"], substitutes: [] } }), registry);
   assert.ok(result.errors.some((error) => error.field === "duration"));
   assert.ok(result.errors.some((error) => error.field === "materials"));
+});
+
+test("시작 전 준비 조건은 비어 있지 않은 문자열 배열로 검증한다", () => {
+  assert.deepEqual(validatePlayBundle(fixture({ preparationNotes: ["제품의 사용 연령을 확인합니다."] }), registry).errors, []);
+  for (const preparationNotes of [null, "조건", [""], ["   "], [42]]) {
+    assert.ok(validatePlayBundle(fixture({ preparationNotes }), registry).errors.some((error) => error.field === "preparationNotes"));
+  }
+});
+
+test("공유 이미지에도 교체한 그림의 버전 주소를 사용한다", () => {
+  const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  assert.ok(html.includes('property="og:image" content="__NORI_ORIGIN__/media/plays/play_006.webp?v=123456abcdef"'));
 });
 
 test("검토 이미지의 웹 상세·썸네일은 원본 JPEG 없이도 브랜드 기본 이미지로 생성한다", async () => {

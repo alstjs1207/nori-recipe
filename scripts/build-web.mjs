@@ -26,7 +26,7 @@ async function build() {
       throw new Error("GA4 activation requires a valid EXPO_PUBLIC_GA_MEASUREMENT_ID and a production HTTPS EXPO_PUBLIC_ANALYTICS_ORIGIN.");
     }
   }
-  const { plays, report } = await prepareWebAssets();
+  const { plays, report, playImageVersions } = await prepareWebAssets();
   await fs.rm(dist, { recursive: true, force: true });
   const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(result.error?.message ?? `${result.stdout}\n${result.stderr}`);
@@ -44,7 +44,7 @@ async function build() {
   for (const play of plays) {
     const directory = path.join(dist, "play", play.id);
     await fs.mkdir(directory, { recursive: true });
-    await fs.writeFile(path.join(directory, "index.html"), withPlayMetadata(html, play));
+    await fs.writeFile(path.join(directory, "index.html"), withPlayMetadata(html, play, playImageVersions[play.id]));
   }
   const assets = (await filesIn(dist)).filter((file) => /\.(js|css|ttf|woff2?)$/.test(file)).map((file) => `/${path.relative(dist, file).split(path.sep).join("/")}`);
   const precache = [...new Set(["/", "/index.html", "/offline.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", ...assets])];

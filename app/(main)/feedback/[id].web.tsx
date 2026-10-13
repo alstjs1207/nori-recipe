@@ -1,4 +1,5 @@
 import { WebPage } from "@/components/web/NoriUI";
+import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -84,7 +85,7 @@ export default function FeedbackWebScreen() {
               <h1>함께한 순간 남기기</h1>
             </header>
             <div className="feedback-play">
-              <img src={`/media/thumbs/${play.id}.webp`} alt="" />
+              <img src={getPlayImageUrl(play.id, "thumbnail")} alt="" />
               <div>
                 <time dateTime={new Date().toISOString()}>
                   {new Date().toLocaleDateString("ko-KR", {
