@@ -74,7 +74,7 @@ export function AnalyticsConsentBanner() {
     return () => document.removeEventListener("visibilitychange", update);
   }, []);
   useEffect(() => {
-    if (!client.enabled || consent !== "unknown" || page.screen !== "play" || !play || readEnough) return;
+    if (!client.consentAvailable || consent !== "unknown" || page.screen !== "play" || !play || readEnough) return;
     let detach: (() => void) | undefined;
     const attach = () => {
       if (detach) return;
@@ -128,7 +128,7 @@ export function AnalyticsConsentBanner() {
     setDialogOpen(false);
   }, [client, consent, page.path, page.screen]);
   useEffect(() => {
-    if (!client.enabled || consent !== "unknown" || !visible || !readEnough || prompted.current ||
+    if (!client.consentAvailable || consent !== "unknown" || !visible || !readEnough || prompted.current ||
       !["home", "search", "favorites"].includes(page.screen)) return;
     // Remember only that the invitation was shown, never the play or reading history.
     prompted.current = true;
@@ -140,12 +140,13 @@ export function AnalyticsConsentBanner() {
     if (dialogOpen && dialog && !dialog.open) dialog.showModal();
     else if (!dialogOpen && dialog?.open) dialog.close();
   }, [dialogOpen]);
-  if (!client.enabled || consent !== "unknown") return null;
+  if (!client.consentAvailable || consent !== "unknown") return null;
   return (
     <>
       {invitationOpen ? <aside className="analytics-invitation" aria-label="선택적 사용량 분석" aria-live="polite">
         <h2>놀이를 둘러보셨나요?</h2>
         <p>많이 쓰이는 놀이와 기능을 파악해 서비스를 개선하려고 해요. 사용량 분석 참여는 선택이에요.</p>
+        {client.preview ? <p>미리보기에서는 동의해도 분석 데이터를 전송하지 않아요.</p> : null}
         <div className="analytics-choice">
           <button type="button" className="secondary-button" aria-haspopup="dialog" onClick={() => { setInvitationOpen(false); setDialogOpen(true); }}>자세히 보고 참여하기</button>
           <button type="button" className="secondary-button" onClick={() => setInvitationOpen(false)}>나중에</button>
@@ -158,6 +159,7 @@ export function AnalyticsConsentBanner() {
           <button type="button" className="secondary-button analytics-dialog-close" autoFocus onClick={() => setDialogOpen(false)}>닫기</button>
         </div>
         <div className="analytics-dialog-body">
+          {client.preview ? <p>미리보기에서는 동의해도 Google 분석 태그를 불러오거나 데이터를 전송하지 않아요.</p> : null}
         <Link href={{ pathname: "/settings", params: { privacy: "1" } }} className="analytics-policy-link">개인정보 처리방침 보기</Link>
           {dialogOpen ? <AnalyticsConsentForm /> : null}
         </div>
@@ -183,7 +185,7 @@ function AnalyticsConsentForm() {
           <p><a className="analytics-policy-link" href="https://datacenters.google/locations/" target="_blank" rel="noopener noreferrer">Google 데이터센터 목록</a>{" · "}<a className="analytics-policy-link" href="https://business.safety.google/adssubprocessors/" target="_blank" rel="noopener noreferrer">Google 하위처리업체 목록</a></p>
         </details>
       </fieldset>
-      <p>두 항목 모두 동의한 경우에만 분석에 참여해요. 동의하지 않아도 모든 놀이 기능을 이용할 수 있어요.</p>
+      <p>{client.preview ? "미리보기에서 선택한 내용은 이 사이트에만 저장되며 운영 사이트의 분석 동의로 사용되지 않아요." : "두 항목 모두 동의한 경우에만 분석에 참여해요. 동의하지 않아도 모든 놀이 기능을 이용할 수 있어요."}</p>
       <div className="analytics-choice">
         <button type="button" className="secondary-button" onClick={() => client.setConsent("denied")}>참여하지 않기</button>
         <button type="button" className="secondary-button" disabled={!collection || !transfer} onClick={() => { if (collection && transfer) client.setConsent("granted"); }}>선택한 내용에 동의하기</button>
@@ -194,12 +196,21 @@ function AnalyticsConsentForm() {
 
 export function AnalyticsSettings() {
   const { client, consent } = useWebAnalytics();
+  const status = client.preview ? {
+    granted: "미리보기에서 참여를 선택했어요.",
+    denied: "미리보기에서 참여하지 않기로 선택했어요.",
+    unknown: "미리보기에서 참여 여부를 선택할 수 있어요.",
+  }[consent] : !client.enabled ? "현재 이 사이트에서는 사용량 분석을 수집하지 않아요." : {
+    granted: "사용량 분석에 참여하고 있어요.",
+    denied: "사용량 분석에 참여하지 않고 있어요.",
+    unknown: "아직 참여 여부를 선택하지 않았어요.",
+  }[consent];
   return (
     <section className="settings-panel analytics-settings">
       <h2>사용량 분석 참여</h2>
-      <p>{!client.enabled ? "현재 이 사이트에서는 사용량 분석을 수집하지 않아요." : consent === "granted" ? "사용량 분석에 참여하고 있어요." : consent === "denied" ? "사용량 분석에 참여하지 않고 있어요." : "아직 참여 여부를 선택하지 않았어요."}</p>
-      <p>선택한 경우 페이지 방문과 놀이 선택, 저장·기록 기능 사용이 Google Analytics로 전송돼요. 아이 이름·생년월·메모는 보내지 않아요. 언제든 참여를 중단할 수 있고, 놀이 기능은 계속 이용할 수 있어요.</p>
-      {client.enabled ? consent === "granted" ? <div className="analytics-choice"><button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>참여 중단하기</button></div> : <AnalyticsConsentForm key={consent} /> : null}
+      <p>{status}</p>
+      <p>{client.preview ? "이 미리보기에서는 동의 화면과 참여·중단 동작을 확인할 수 있어요. Google 분석 태그를 불러오거나 분석 데이터를 전송하지 않아요." : "선택한 경우 페이지 방문과 놀이 선택, 저장·기록 기능 사용이 Google Analytics로 전송돼요. 아이 이름·생년월·메모는 보내지 않아요. 언제든 참여를 중단할 수 있고, 놀이 기능은 계속 이용할 수 있어요."}</p>
+      {client.consentAvailable ? consent === "granted" ? <div className="analytics-choice"><button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>참여 중단하기</button></div> : <AnalyticsConsentForm key={consent} /> : null}
     </section>
   );
 }

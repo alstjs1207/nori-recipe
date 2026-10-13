@@ -43,7 +43,39 @@ test("동의 전·거부·미설정 상태에서는 태그 로드와 모든 이�
   client.trackPage(getAnalyticsPage("/"));
   await flush();
   assert.equal(client.getConsent(), "unknown");
+  assert.equal(client.consentAvailable, false);
   assert.equal(state.loads, 0);
+});
+
+test("Preview는 참여·거부·초기화를 허용하지만 잘못된 운영 설정이 있어도 전송하지 않는다", async () => {
+  for (const previewConfig of [null, config]) {
+    const { client, state, stored } = fixture({ preview: true, config: previewConfig });
+    assert.equal(client.enabled, false);
+    assert.equal(client.consentAvailable, true);
+    client.setConsent("granted");
+    assert.equal(client.getConsent(), "granted");
+    assert.equal(JSON.parse(stored()!).scope, `preview@${config.origin}`);
+    for (const path of ["/", "/play/play_200", "/search", "/settings"]) client.trackPage(getAnalyticsPage(path));
+    assert.equal(await client.track({ name: "favorite_add", params: { play_id: "play_200" } }), false);
+    client.setConsent("denied");
+    assert.equal(client.getConsent(), "denied");
+    client.setConsent("unknown");
+    assert.equal(stored(), null);
+    await flush();
+    assert.equal(state.loads, 0);
+    assert.equal(state.cleared, 0);
+    assert.deepEqual(state.events, []);
+  }
+});
+
+test("Preview 선택은 같은 미리보기 주소에서만 복원되며 운영 동의와 섞이지 않는다", () => {
+  const record = { version: ANALYTICS_CONSENT_VERSION, scope: `preview@${config.origin}`, value: "granted" };
+  const readConsent = () => JSON.stringify(record);
+  assert.equal(fixture({ preview: true, readConsent }).client.getConsent(), "granted");
+  assert.equal(fixture({ preview: true, origin: () => "https://other-preview.vercel.app", readConsent }).client.getConsent(), "unknown");
+  assert.equal(fixture({ readConsent }).client.getConsent(), "unknown");
+  const productionRecord = { ...record, scope: `${config.measurementId}@${config.origin}` };
+  assert.equal(fixture({ preview: true, readConsent: () => JSON.stringify(productionRecord) }).client.getConsent(), "unknown");
 });
 
 test("동의 후 페이지를 한 번씩 측정하고 같은 URL의 시작·추천 화면도 구분한다", async () => {

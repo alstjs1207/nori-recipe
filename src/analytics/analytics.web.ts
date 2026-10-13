@@ -1,12 +1,14 @@
 import { createAnalyticsClient, type AnalyticsTransport } from "./client";
-import { ANALYTICS_CONSENT_KEY, parseAnalyticsConfig, type AnalyticsEntryPoint, type AnalyticsEvent, type AnalyticsParams } from "./policy";
+import { ANALYTICS_CONSENT_KEY, ANALYTICS_PREVIEW_CONSENT_KEY, parseAnalyticsConfig, type AnalyticsEntryPoint, type AnalyticsEvent, type AnalyticsParams } from "./policy";
 
 type GoogleTag = (...args: unknown[]) => void;
 declare global {
   interface Window { dataLayer?: unknown[]; gtag?: GoogleTag }
 }
 
-const config = process.env.EXPO_PUBLIC_GA_ENABLED === "true"
+const preview = process.env.EXPO_PUBLIC_ANALYTICS_PREVIEW === "true";
+const consentKey = preview ? ANALYTICS_PREVIEW_CONSENT_KEY : ANALYTICS_CONSENT_KEY;
+const config = !preview && process.env.EXPO_PUBLIC_GA_ENABLED === "true"
   ? parseAnalyticsConfig(process.env.EXPO_PUBLIC_GA_MEASUREMENT_ID, process.env.EXPO_PUBLIC_ANALYTICS_ORIGIN)
   : null;
 let ready = false;
@@ -89,11 +91,12 @@ async function loadTag(_page: AnalyticsParams): Promise<AnalyticsTransport | nul
 
 export const webAnalytics = createAnalyticsClient({
   config,
+  preview,
   origin: () => typeof window === "undefined" ? "" : window.location.origin,
   online: () => typeof navigator !== "undefined" && navigator.onLine,
   referrer: () => typeof document === "undefined" ? "" : document.referrer,
-  readConsent: () => window.localStorage.getItem(ANALYTICS_CONSENT_KEY),
-  writeConsent: (value) => value === null ? window.localStorage.removeItem(ANALYTICS_CONSENT_KEY) : window.localStorage.setItem(ANALYTICS_CONSENT_KEY, value),
+  readConsent: () => window.localStorage.getItem(consentKey),
+  writeConsent: (value) => value === null ? window.localStorage.removeItem(consentKey) : window.localStorage.setItem(consentKey, value),
   load: loadTag,
   clearCookies,
 });

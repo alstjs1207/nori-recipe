@@ -21,13 +21,14 @@ test("실제 웹 어댑터는 동의 후에만 태그를 로드하고 URL 정리
     set cookie(value: string) { cookies.push(value); },
   };
   const globals = new Map(["window", "document", "navigator"].map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
-  const envKeys = ["EXPO_PUBLIC_GA_ENABLED", "EXPO_PUBLIC_GA_MEASUREMENT_ID", "EXPO_PUBLIC_ANALYTICS_ORIGIN"];
+  const envKeys = ["EXPO_PUBLIC_GA_ENABLED", "EXPO_PUBLIC_GA_MEASUREMENT_ID", "EXPO_PUBLIC_ANALYTICS_ORIGIN", "EXPO_PUBLIC_ANALYTICS_PREVIEW"];
   const env = new Map(envKeys.map((key) => [key, process.env[key]]));
   try {
     Object.defineProperty(globalThis, "window", { value: fakeWindow, configurable: true });
     Object.defineProperty(globalThis, "document", { value: fakeDocument, configurable: true });
     Object.defineProperty(globalThis, "navigator", { value: { onLine: true }, configurable: true });
     process.env.EXPO_PUBLIC_GA_ENABLED = "true";
+    process.env.EXPO_PUBLIC_ANALYTICS_PREVIEW = "false";
     process.env.EXPO_PUBLIC_GA_MEASUREMENT_ID = "G-ABC1234567";
     process.env.EXPO_PUBLIC_ANALYTICS_ORIGIN = origin;
     const { webAnalytics, resetAnalyticsConsent } = await import("./analytics.web");

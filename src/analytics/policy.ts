@@ -3,6 +3,7 @@ import { DEV_AREA_SLUGS } from "@/constants/devAreas";
 export type AnalyticsConsent = "unknown" | "granted" | "denied";
 export const ANALYTICS_CONSENT_VERSION = 2;
 export const ANALYTICS_CONSENT_KEY = "nori-recipe/analytics-consent";
+export const ANALYTICS_PREVIEW_CONSENT_KEY = "nori-recipe/analytics-consent-preview";
 
 export type AnalyticsConfig = { measurementId: string; origin: string };
 export type AnalyticsEntryPoint = "home_recommendation" | "home_discover" | "welcome" | "search" | "favorites" | "direct_link" | "other";

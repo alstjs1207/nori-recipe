@@ -17,7 +17,16 @@ async function filesIn(directory) {
 
 async function build() {
   const publicOrigin = resolvePublicOrigin();
-  if (process.env.EXPO_PUBLIC_GA_ENABLED === "true") {
+  const preview = process.env.VERCEL_ENV === "preview";
+  const analyticsEnv = {
+    EXPO_PUBLIC_ANALYTICS_PREVIEW: String(preview),
+    ...(preview ? {
+      EXPO_PUBLIC_GA_ENABLED: "false",
+      EXPO_PUBLIC_GA_MEASUREMENT_ID: "",
+      EXPO_PUBLIC_ANALYTICS_ORIGIN: "",
+    } : {}),
+  };
+  if (!preview && process.env.EXPO_PUBLIC_GA_ENABLED === "true") {
     const id = process.env.EXPO_PUBLIC_GA_MEASUREMENT_ID;
     const rawOrigin = process.env.EXPO_PUBLIC_ANALYTICS_ORIGIN;
     const origin = rawOrigin ? new URL(rawOrigin) : null;
@@ -30,7 +39,7 @@ async function build() {
   const { plays, report, playImageVersions } = await prepareWebAssets();
   await fs.rm(dist, { recursive: true, force: true });
   // Exported public settings must reflect this build, not a previous environment.
-  const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--clear", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });
+  const result = spawnSync(process.execPath, [path.join(root, "node_modules/expo/bin/cli"), "export", "--clear", "--platform", "web", "--output-dir", dist], { cwd: root, encoding: "utf8", env: { ...process.env, ...analyticsEnv, CI: "1", EXPO_NO_TELEMETRY: "1" }, maxBuffer: 8 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(result.error?.message ?? `${result.stdout}\n${result.stderr}`);
   console.info(result.stdout.split("\n").filter((line) => /Bundled|_expo\/static\/js|Exported:/.test(line)).join("\n"));
   const stylesheet = await fs.readFile(path.join(dist, "web.css"));

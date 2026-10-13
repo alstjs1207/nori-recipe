@@ -9,6 +9,7 @@ export type AnalyticsTransport = {
 };
 export type AnalyticsEnvironment = {
   config: AnalyticsConfig | null;
+  preview?: boolean;
   origin: () => string;
   online: () => boolean;
   readConsent: () => string | null;
@@ -20,12 +21,15 @@ export type AnalyticsEnvironment = {
 
 export function createAnalyticsClient(environment: AnalyticsEnvironment) {
   const { config } = environment;
-  const enabled = Boolean(config && environment.origin() === config.origin);
+  const preview = environment.preview === true;
+  const enabled = Boolean(!preview && config && environment.origin() === config.origin);
+  const consentAvailable = enabled || preview;
+  const scope = preview ? `preview@${environment.origin()}` : enabled ? `${config!.measurementId}@${config!.origin}` : null;
   let consent: AnalyticsConsent = "unknown";
-  if (enabled) {
+  if (consentAvailable) {
     try {
       const record = JSON.parse(environment.readConsent() ?? "null") as { version?: unknown; scope?: unknown; value?: unknown } | null;
-      if (record?.version === ANALYTICS_CONSENT_VERSION && record.scope === `${config!.measurementId}@${config!.origin}` &&
+      if (record?.version === ANALYTICS_CONSENT_VERSION && record.scope === scope &&
         (record.value === "granted" || record.value === "denied")) consent = record.value;
     } catch { /* Unavailable or old storage requires a new choice. */ }
   }
@@ -57,17 +61,17 @@ export function createAnalyticsClient(environment: AnalyticsEnvironment) {
   }
 
   function setConsent(value: AnalyticsConsent): void {
-    if (!enabled) return;
+    if (!consentAvailable) return;
     revision += 1;
     consent = value;
     lastPageKey = null;
-    if (value !== "granted") {
+    if (enabled && value !== "granted") {
       transport?.disable();
       environment.clearCookies();
     }
     try {
       environment.writeConsent(value === "unknown" ? null : JSON.stringify({
-        version: ANALYTICS_CONSENT_VERSION, scope: `${config!.measurementId}@${config!.origin}`, value,
+        version: ANALYTICS_CONSENT_VERSION, scope, value,
       }));
     } catch { /* Apply the choice to this visit even if storage is unavailable. */ }
     publish();
@@ -88,6 +92,8 @@ export function createAnalyticsClient(environment: AnalyticsEnvironment) {
 
   return {
     enabled,
+    consentAvailable,
+    preview,
     getConsent: () => consent,
     subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
     setConsent,
