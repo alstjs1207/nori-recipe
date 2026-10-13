@@ -7,6 +7,7 @@ import { isNewPlay } from "@/play/newPlay";
 import { useSessionStore } from "@/store/sessionStore";
 import { usePlaysStore } from "@/store/playsStore";
 import type { Play } from "@/types";
+import { ANALYTICS_NOTICE } from "@/constants/legalNotices";
 
 const AnalyticsContext = createContext<AnalyticsClient>(webAnalytics);
 export function useWebAnalytics() {
@@ -54,7 +55,8 @@ function AnalyticsPageTracking() {
 
 export function AnalyticsConsentBanner() {
   const { client, consent } = useWebAnalytics();
-  if (!client.enabled || consent !== "unknown") return null;
+  const pathname = usePathname();
+  if (!client.enabled || consent !== "unknown" || pathname === "/settings") return null;
   return (
     <aside className="analytics-banner" aria-label="선택적 사용량 분석">
       <div>
@@ -62,11 +64,34 @@ export function AnalyticsConsentBanner() {
         <p>페이지 방문과 놀이 선택, 저장·기록 기능의 사용을 Google Analytics로 분석해요. 아이 이름·생년월·메모는 보내지 않아요. 참여하지 않아도 모든 기능을 이용할 수 있어요.</p>
         <Link href={{ pathname: "/settings", params: { privacy: "1" } }} className="analytics-policy-link">개인정보 처리방침 보기</Link>
       </div>
+      <AnalyticsConsentForm />
+    </aside>
+  );
+}
+
+function AnalyticsConsentForm() {
+  const { client } = useWebAnalytics();
+  const [collection, setCollection] = useState(false);
+  const [transfer, setTransfer] = useState(false);
+  return (
+    <div>
+      <fieldset className="analytics-consent-fields">
+        <legend>선택 동의</legend>
+        <label><input type="checkbox" checked={collection} onChange={(event) => setCollection(event.target.checked)} /><span>[선택] 사용량 분석을 위한 개인정보 수집·이용에 동의해요.</span></label>
+        <details><summary>수집·이용 내용 보기</summary>{ANALYTICS_NOTICE.collection.map((item) => <p key={item}>{item}</p>)}</details>
+        <label><input type="checkbox" checked={transfer} onChange={(event) => setTransfer(event.target.checked)} /><span>[선택] 분석 정보의 Google 국외 이전에 동의해요.</span></label>
+        <details>
+          <summary>국외 이전 내용 보기</summary>
+          {ANALYTICS_NOTICE.transfer.map((item) => <p key={item}>{item}</p>)}
+          <p><a className="analytics-policy-link" href="https://datacenters.google/locations/" target="_blank" rel="noopener noreferrer">Google 데이터센터 목록</a>{" · "}<a className="analytics-policy-link" href="https://business.safety.google/adssubprocessors/" target="_blank" rel="noopener noreferrer">Google 하위처리업체 목록</a></p>
+        </details>
+      </fieldset>
+      <p>두 항목 모두 동의한 경우에만 분석에 참여해요. 동의하지 않아도 모든 놀이 기능을 이용할 수 있어요.</p>
       <div className="analytics-choice">
         <button type="button" className="secondary-button" onClick={() => client.setConsent("denied")}>참여하지 않기</button>
-        <button type="button" className="secondary-button" onClick={() => client.setConsent("granted")}>분석에 동의하기</button>
+        <button type="button" className="secondary-button" disabled={!collection || !transfer} onClick={() => { if (collection && transfer) client.setConsent("granted"); }}>선택한 내용에 동의하기</button>
       </div>
-    </aside>
+    </div>
   );
 }
 
@@ -77,10 +102,7 @@ export function AnalyticsSettings() {
       <h2>사용량 분석 참여</h2>
       <p>{!client.enabled ? "현재 이 사이트에서는 사용량 분석을 수집하지 않아요." : consent === "granted" ? "사용량 분석에 참여하고 있어요." : consent === "denied" ? "사용량 분석에 참여하지 않고 있어요." : "아직 참여 여부를 선택하지 않았어요."}</p>
       <p>선택한 경우 페이지 방문과 놀이 선택, 저장·기록 기능 사용이 Google Analytics로 전송돼요. 아이 이름·생년월·메모는 보내지 않아요. 언제든 참여를 중단할 수 있고, 놀이 기능은 계속 이용할 수 있어요.</p>
-      {client.enabled ? <div className="analytics-choice">
-        {consent !== "denied" ? <button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>{consent === "granted" ? "참여 중단하기" : "참여하지 않기"}</button> : null}
-        {consent !== "granted" ? <button className="secondary-button" type="button" onClick={() => client.setConsent("granted")}>분석에 동의하기</button> : null}
-      </div> : null}
+      {client.enabled ? consent === "granted" ? <div className="analytics-choice"><button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>참여 중단하기</button></div> : <AnalyticsConsentForm key={consent} /> : null}
     </section>
   );
 }

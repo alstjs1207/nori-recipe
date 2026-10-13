@@ -129,7 +129,7 @@ test("오프라인·태그 차단은 놀이 동작을 막지 않고 과거 행�
 test("같은 운영 도메인·측정 ID·방침 버전의 선택만 복원하고 초기화 시 철회한다", async () => {
   const record = { version: ANALYTICS_CONSENT_VERSION, scope: `${config.measurementId}@${config.origin}`, value: "granted" };
   assert.equal(fixture({ readConsent: () => JSON.stringify(record) }).client.getConsent(), "granted");
-  for (const stored of ["{broken", JSON.stringify({ ...record, version: 0 }), JSON.stringify({ ...record, scope: "other" }), JSON.stringify({ ...record, value: "yes" })]) {
+  for (const stored of ["{broken", JSON.stringify({ ...record, version: ANALYTICS_CONSENT_VERSION - 1 }), JSON.stringify({ ...record, scope: "other" }), JSON.stringify({ ...record, value: "yes" })]) {
     assert.equal(fixture({ readConsent: () => stored }).client.getConsent(), "unknown");
   }
   const { client, state, stored } = fixture();

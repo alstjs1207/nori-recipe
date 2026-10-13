@@ -1,7 +1,7 @@
 import { DEV_AREA_SLUGS } from "@/constants/devAreas";
 
 export type AnalyticsConsent = "unknown" | "granted" | "denied";
-export const ANALYTICS_CONSENT_VERSION = 1;
+export const ANALYTICS_CONSENT_VERSION = 2;
 export const ANALYTICS_CONSENT_KEY = "nori-recipe/analytics-consent";
 
 export type AnalyticsConfig = { measurementId: string; origin: string };
