@@ -2,11 +2,14 @@ import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { MATERIAL_DISPLAY_NAMES } from "@/constants/materials";
 import type { Play, PlayPlace } from "@/types";
 import type { MaterialSlug } from "@/constants/materials";
+import { sortSearchPlays, type SearchSort } from "@/play/searchSort";
 import {
   matchesCategory,
+  matchesPlayType,
   matchesSituation,
   type PlayCategory,
   type PlaySituation,
+  type PlayType,
 } from "@/play/presentation";
 
 type SearchPlaysOptions = {
@@ -16,10 +19,13 @@ type SearchPlaysOptions = {
   query: string;
   durationMax?: number | null;
   category?: PlayCategory;
+  playType?: PlayType;
   situation?: PlaySituation | null;
   availableMaterials?: readonly MaterialSlug[];
   readyOnly?: boolean;
   blockedMaterials?: readonly MaterialSlug[];
+  sort?: SearchSort;
+  now?: Date;
 };
 
 const PLACE_SEARCH_LABELS: Record<PlayPlace, string[]> = {
@@ -71,7 +77,7 @@ export function searchPlays(
   const normalizedQuery = normalizeSearchText(options.query);
   const limit = options.limit ?? (normalizedQuery.length === 0 ? 24 : 30);
 
-  return plays
+  const matches = plays
     .filter((play) => play.status === "live")
     .filter((play) => matchesPlace(play, options.place))
     .filter(
@@ -79,6 +85,7 @@ export function searchPlays(
         options.durationMax == null || play.durationMax <= options.durationMax,
     )
     .filter((play) => matchesCategory(play, options.category ?? "all"))
+    .filter((play) => matchesPlayType(play, options.playType ?? "all"))
     .filter((play) => matchesSituation(play, options.situation))
     .filter(
       (play) =>
@@ -104,6 +111,7 @@ export function searchPlays(
       (play) =>
         normalizedQuery.length === 0 ||
         buildSearchTarget(play).includes(normalizedQuery),
-    )
-    .slice(0, limit);
+    );
+
+  return sortSearchPlays(matches, options).slice(0, limit);
 }

@@ -1,17 +1,20 @@
-import { DEV_AREA_LABELS } from "@/constants/devAreas";
+import { DEV_AREA_LABELS, DEV_AREA_SLUGS, type DevArea } from "@/constants/devAreas";
 import type { MaterialSlug } from "@/constants/materials";
 import type { Play } from "@/types";
 
-export type PlayCategory = "all" | "sensory" | "art" | "physical" | "language";
+export type PlayCategory = "all" | DevArea;
+export type PlayType = "all" | "art";
 export type PlaySituation = "quiet" | "active" | "no-materials" | "bedtime";
 
 export const PLAY_CATEGORIES: { value: PlayCategory; label: string }[] = [
   { value: "all", label: "전체" },
-  { value: "sensory", label: "감각" },
-  { value: "art", label: "미술" },
-  { value: "physical", label: "신체" },
-  { value: "language", label: "언어" },
+  ...DEV_AREA_SLUGS.map((value) => ({ value, label: DEV_AREA_LABELS[value] })),
 ];
+
+export function readPlayCategory(value: string | string[] | undefined): PlayCategory {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return PLAY_CATEGORIES.find((item) => item.value === candidate)?.value ?? "all";
+}
 
 export function formatAge(play: Pick<Play, "ageMin" | "ageMax">): string {
   return play.ageMin === play.ageMax
@@ -33,18 +36,14 @@ export function formatPreparation(play: Pick<Play, "prepTime">): string {
 }
 
 export function matchesCategory(play: Play, category: PlayCategory): boolean {
-  if (category === "all") return true;
-  if (category === "sensory") return play.devAreas.includes("sensory");
-  if (category === "physical") return play.devAreas.includes("gross_motor");
-  if (category === "language") return play.devAreas.includes("language");
-  return (
-    ["crayon", "paint", "clay", "glue", "sticker", "shape_ruler"].some(
-      (material) =>
-        [...play.materials.required, ...play.materials.optional].includes(
-          material as MaterialSlug,
-        ),
-    ) || /그림|그리기|미술|끼적|색칠|꾸미|만들기/.test(play.name)
-  );
+  return category === "all" || play.devAreas.includes(category);
+}
+
+export function matchesPlayType(play: Play, playType: PlayType): boolean {
+  if (playType === "all") return true;
+  // Art describes the activity, rather than the presence of an optional supply.
+  return play.tags.some((tag) => /미술|창작놀이/.test(tag)) ||
+    /그리기|끼적|색칠|꾸미|콜라주|도장|(?:종이|색종이)\s*접기/.test(play.name);
 }
 
 export function matchesSituation(
@@ -67,12 +66,8 @@ export function matchesSituation(
 }
 
 export function getPlayCategoryLabel(play: Play): string {
-  const category = ["art", "physical", "sensory", "language"].find((value) =>
-    matchesCategory(play, value as PlayCategory),
-  );
-  const label = PLAY_CATEGORIES.find((item) => item.value === category)?.label;
-  const area = DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"];
-  return label && label !== area ? `${label} · ${area} 놀이` : `${area} 놀이`;
+  const areas = play.devAreas.map((area) => DEV_AREA_LABELS[area]).join(" · ");
+  return areas ? `${areas} 놀이` : "놀이";
 }
 
 export function getMaterialStatus(

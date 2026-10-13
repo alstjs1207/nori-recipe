@@ -1,6 +1,6 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,6 +10,9 @@ import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { searchPlays } from "@/play/search";
+import { DEFAULT_SEARCH_SORT, SEARCH_SORT_OPTIONS, type SearchSort } from "@/play/searchSort";
+import { useNewPlayTime } from "@/hooks/useNewPlayTime";
+import { PLAY_CATEGORIES, readPlayCategory, type PlayCategory, type PlayType } from "@/play/presentation";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { PlayPlace } from "@/types";
@@ -34,10 +37,29 @@ function readPlaceParam(value: string | string[] | undefined): PlayPlace | null 
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ label?: string | string[]; place?: string | string[] }>();
+  const params = useLocalSearchParams<{ label?: string | string[]; place?: string | string[]; category?: string | string[]; reset?: string }>();
   const plays = usePlaysStore((state) => state.plays);
-  const childBirthMonth = useSessionStore((state) => state.userContext.childBirthMonth);
+  const now = useNewPlayTime(plays);
+  const context = useSessionStore((state) => state.userContext);
+  const childBirthMonth = context.childBirthMonth;
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<PlayCategory>(readPlayCategory(params.category));
+  const [playType, setPlayType] = useState<PlayType>("all");
+  const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT);
+  useEffect(() => {
+    setCategory(readPlayCategory(params.category));
+  }, [params.category]);
+  useEffect(() => {
+    if (params.reset !== "1") return;
+    setQuery("");
+    setPlayType("all");
+    setSort(DEFAULT_SEARCH_SORT);
+    router.setParams({ reset: undefined, place: undefined, label: undefined });
+  }, [params.reset]);
+  function selectCategory(value: PlayCategory) {
+    setCategory(value);
+    router.setParams({ category: value === "all" ? undefined : value });
+  }
   const selectedPlace = readPlaceParam(params.place);
   const selectedPlaceLabel = readParam(params.label);
   const selectedAgeMonths =
@@ -49,8 +71,13 @@ export default function SearchScreen() {
       ageMonths: selectedAgeMonths,
       place: selectedPlace,
       query,
+      category,
+      playType,
+      sort,
+      availableMaterials: context.ownedMaterials,
+      now: new Date(now),
     });
-  }, [plays, query, selectedAgeMonths, selectedPlace]);
+  }, [plays, query, category, playType, sort, now, context.ownedMaterials, selectedAgeMonths, selectedPlace]);
 
   return (
     <ScrollView
@@ -76,6 +103,58 @@ export default function SearchScreen() {
           onChangeText={setQuery}
           returnKeyType="search"
         />
+      </View>
+
+      <View style={styles.filters}>
+        <Text style={styles.filterLabel}>발달 영역</Text>
+        <View style={styles.categoryRow}>
+          {PLAY_CATEGORIES.map((item) => (
+            <Pressable
+              key={item.value}
+              accessibilityRole="button"
+              accessibilityState={{ selected: category === item.value }}
+              onPress={() => selectCategory(item.value)}
+              style={[styles.categoryChip, category === item.value && styles.categoryChipSelected]}
+            >
+              <Text style={[styles.categoryLabel, category === item.value && styles.categoryLabelSelected]}>
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={styles.typeFilterRow}>
+          <Text style={styles.filterLabel}>놀이 유형</Text>
+          {([{ value: "all", label: "전체 유형" }, { value: "art", label: "미술 놀이" }] as const).map((item) => (
+            <Pressable
+              key={item.value}
+              accessibilityRole="button"
+              accessibilityState={{ selected: playType === item.value }}
+              onPress={() => setPlayType(item.value)}
+              style={[styles.typeChip, playType === item.value && styles.categoryChipSelected]}
+            >
+              <Text style={[styles.categoryLabel, playType === item.value && styles.categoryLabelSelected]}>
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.typeFilterRow}>
+        <Text style={styles.filterLabel}>정렬</Text>
+        {SEARCH_SORT_OPTIONS.map((option) => (
+          <Pressable
+            key={option.value}
+            accessibilityRole="button"
+            accessibilityState={{ selected: sort === option.value }}
+            onPress={() => setSort(option.value)}
+            style={[styles.typeChip, sort === option.value && styles.categoryChipSelected]}
+          >
+            <Text style={[styles.categoryLabel, sort === option.value && styles.categoryLabelSelected]}>
+              {option.label}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
       <View style={styles.resultHeader}>
@@ -128,9 +207,13 @@ export default function SearchScreen() {
                 <Text style={styles.resultMeta}>
                   {play.ageMin}-{play.ageMax}개월 · {formatDuration(play.durationMin, play.durationMax)}
                 </Text>
-                <Text style={styles.resultTag}>
-                  #{DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"]}
-                </Text>
+                <View style={styles.resultTags}>
+                  {play.devAreas.map((area) => (
+                    <Text key={area} style={[styles.resultTag, area === category && styles.categoryLabelSelected]}>
+                      #{DEV_AREA_LABELS[area]}
+                    </Text>
+                  ))}
+                </View>
               </View>
             </Pressable>
           );
@@ -185,6 +268,63 @@ const styles = StyleSheet.create({
     color: APP_COLORS.ink,
     fontSize: 16,
     fontFamily: APP_FONTS.body,
+  },
+  filters: {
+    gap: 10,
+  },
+  filterLabel: {
+    color: APP_COLORS.muted,
+    fontSize: 13,
+    fontFamily: APP_FONTS.body,
+  },
+  categoryRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  categoryChip: {
+    flexBasis: "22%",
+    flexGrow: 1,
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    backgroundColor: APP_COLORS.surface,
+  },
+  categoryChipSelected: {
+    borderColor: APP_COLORS.accentText,
+    backgroundColor: APP_COLORS.mustardSoft,
+  },
+  categoryLabel: {
+    fontSize: 13,
+    color: APP_COLORS.muted,
+    fontFamily: APP_FONTS.body,
+  },
+  categoryLabelSelected: {
+    color: APP_COLORS.accentText,
+    fontWeight: "700",
+  },
+  typeFilterRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+  },
+  typeChip: {
+    minHeight: 40,
+    paddingHorizontal: 12,
+    justifyContent: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: APP_COLORS.line,
+    backgroundColor: APP_COLORS.surface,
+  },
+  resultTags: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
   },
   resultHeader: {
     flexDirection: "row",

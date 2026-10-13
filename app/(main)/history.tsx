@@ -2,7 +2,7 @@ import { ContentImage as Image } from "@/components/web/ContentImage";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";
@@ -574,7 +574,12 @@ export default function HistoryScreen() {
         <CoverageWheel rows={coverageRows} coveredAreaCount={coveredAreaCount} />
 
         {lackingArea ? (
-          <View style={styles.recommendationStrip}>
+          <Pressable
+            style={styles.recommendationStrip}
+            accessibilityRole="button"
+            accessibilityLabel={`${DEV_AREA_LABELS[lackingArea]} 놀이 찾기`}
+            onPress={() => router.push({ pathname: "/(main)/search", params: { category: lackingArea, reset: "1" } })}
+          >
             <View style={styles.recommendationIcon}>
               <MaterialCommunityIcons name="target" size={18} color={APP_COLORS.accentText} />
             </View>
@@ -586,7 +591,7 @@ export default function HistoryScreen() {
                 {DEV_AREA_RECOMMENDATION_COPY[lackingArea]}
               </Text>
             </View>
-          </View>
+          </Pressable>
         ) : null}
 
         <View style={styles.coverageLegend}>
@@ -596,8 +601,11 @@ export default function HistoryScreen() {
             const recommended = lackingArea === row.devArea;
 
             return (
-              <View
+              <Pressable
                 key={row.devArea}
+                accessibilityRole="button"
+                accessibilityLabel={`${DEV_AREA_LABELS[row.devArea]} 놀이 찾기, 기록 ${row.count}회`}
+                onPress={() => router.push({ pathname: "/(main)/search", params: { category: row.devArea, reset: "1" } })}
                 style={[
                   styles.legendItem,
                   active && {
@@ -632,7 +640,7 @@ export default function HistoryScreen() {
                   {recommended ? <Text style={styles.legendTag}>추천</Text> : null}
                 </View>
                 <Text style={[styles.legendValue, active && { color: visual.textColor }]}>{row.count}회</Text>
-              </View>
+              </Pressable>
             );
           })}
         </View>

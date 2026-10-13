@@ -2,19 +2,23 @@ import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebSelect } from "@/components/web/WebSelect";
-import { Link, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { Link, router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
 import { useWebAnalytics } from "@/components/web/WebAnalytics";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { searchPlays } from "@/play/search";
+import { DEFAULT_SEARCH_SORT, SEARCH_SORT_OPTIONS, readSearchSort, type SearchSort } from "@/play/searchSort";
+import { useNewPlayTime } from "@/hooks/useNewPlayTime";
 import {
   PLAY_CATEGORIES,
   formatAge,
   formatDuration,
   formatPreparation,
+  readPlayCategory,
   type PlayCategory,
   type PlaySituation,
+  type PlayType,
 } from "@/play/presentation";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
@@ -53,8 +57,9 @@ function readPlace(value: string | string[] | undefined): PlayPlace | null {
 }
 
 export default function SearchWebScreen() {
-  const params = useLocalSearchParams<{ situation?: string; place?: string }>();
+  const params = useLocalSearchParams<{ situation?: string; place?: string; category?: string | string[]; reset?: string }>();
   const plays = usePlaysStore((state) => state.plays);
+  const now = useNewPlayTime(plays);
   const context = useSessionStore((state) => state.userContext);
   const profileAge =
     context.childBirthMonth === null
@@ -66,14 +71,26 @@ export default function SearchWebScreen() {
   const [age, setAge] = useState<number | null>(profileAge);
   const [query, setQuery] = useState("");
   const [duration, setDuration] = useState<number | null>(null);
-  const [category, setCategory] = useState<PlayCategory>("all");
+  const [category, setCategory] = useState<PlayCategory>(readPlayCategory(params.category));
+  const [playType, setPlayType] = useState<PlayType>("all");
   const [situation, setSituation] = useState<PlaySituation | null>(
     readSituation(params.situation),
   );
   const [place, setPlace] = useState<PlayPlace | null>(readPlace(params.place));
   const [readyOnly, setReadyOnly] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [sort, setSort] = useState("recommended");
+  const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT);
+  const resetFilters = useCallback(() => {
+    setQuery("");
+    setAge(profileAge);
+    setDuration(null);
+    setPlayType("all");
+    setSituation(null);
+    setPlace(null);
+    setReadyOnly(false);
+    setMoreOpen(false);
+    setSort(DEFAULT_SEARCH_SORT);
+  }, [profileAge]);
   useEffect(() => {
     setAge(profileAge);
   }, [profileAge]);
@@ -81,69 +98,65 @@ export default function SearchWebScreen() {
     setSituation(readSituation(params.situation));
     setPlace(readPlace(params.place));
   }, [params.situation, params.place]);
+  useEffect(() => {
+    setCategory(readPlayCategory(params.category));
+  }, [params.category]);
+  useEffect(() => {
+    // Tab screens stay mounted, so consume the record entry flag once.
+    if (params.reset !== "1") return;
+    resetFilters();
+    router.setParams({ reset: undefined, situation: undefined, place: undefined });
+  }, [params.reset, resetFilters]);
   const options = {
     ageMonths: age,
     place,
     query,
     durationMax: duration,
     category,
+    playType,
     situation,
     availableMaterials: materials,
     readyOnly,
     blockedMaterials: context.blockedMaterials,
+    sort,
+    now: new Date(now),
     limit: Number.MAX_SAFE_INTEGER,
   };
-  const results = useMemo(() => {
-    const filtered = searchPlays(plays, options);
-    return filtered.sort((left, right) => {
-      if (sort === "shortest")
-        return (
-          left.durationMax - right.durationMax || left.prepTime - right.prepTime
-        );
-      if (sort === "preparation")
-        return (
-          left.prepTime - right.prepTime || left.durationMax - right.durationMax
-        );
-      const missing = (play: typeof left) =>
-        play.materials.required.filter(
-          (material) => !materials.includes(material),
-        ).length;
-      return missing(left) - missing(right) || left.prepTime - right.prepTime;
-    });
-  }, [
+  const results = useMemo(() => searchPlays(plays, options), [
     plays,
     age,
     place,
     query,
     duration,
     category,
+    playType,
     situation,
     materials,
     readyOnly,
     context.blockedMaterials,
     sort,
+    now,
   ]);
   const noMaterialsCount = searchPlays(plays, {
     ...options,
     situation: "no-materials",
   }).length;
   const extraCount =
-    Number(readyOnly) + Number(place !== null && place !== "any");
+    Number(readyOnly) + Number(place !== null && place !== "any") + Number(playType !== "all");
   useFocusEffect(useCallback(() => {
     const timer = setTimeout(() => trackAnalytics({ name: "search_results", params: {
       result_count: results.length, has_query: Number(query.trim().length > 0), category,
     } }), 600);
     return () => clearTimeout(timer);
-  }, [query, age, duration, category, situation, place, readyOnly, sort, results.length, consent]));
+  }, [query, age, duration, category, playType, situation, place, readyOnly, sort, results.length, consent]));
+  function selectCategory(value: PlayCategory) {
+    setCategory(value);
+    router.setParams({ category: value === "all" ? undefined : value });
+  }
   function reset() {
-    setQuery("");
-    setAge(profileAge);
-    setDuration(null);
+    resetFilters();
     setCategory("all");
-    setSituation(null);
-    setPlace(null);
-    setReadyOnly(false);
-    setMoreOpen(false);
+    router.setParams({ category: undefined, situation: undefined, place: undefined });
   }
   return (
     <WebPage>
@@ -230,6 +243,22 @@ export default function SearchWebScreen() {
           {moreOpen ? (
             <div className="additional-filters" id="additional-filters">
               <fieldset>
+                <legend>놀이 유형</legend>
+                <div className="filter-pills">
+                  {([{ value: "all", label: "전체 유형" }, { value: "art", label: "미술 놀이" }] as const).map((item) => (
+                    <label key={item.value}>
+                      <input
+                        type="radio"
+                        name="play-type"
+                        checked={playType === item.value}
+                        onChange={() => setPlayType(item.value)}
+                      />
+                      <span>{item.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset>
                 <legend>놀이 장소</legend>
                 <div className="filter-pills">
                   {[
@@ -269,14 +298,14 @@ export default function SearchWebScreen() {
             </div>
           ) : null}
         </div>
-        <div className="category-tabs" role="group" aria-label="놀이 분류">
+        <div className="category-tabs" role="group" aria-label="발달 영역">
           {PLAY_CATEGORIES.map((item) => (
             <button
               key={item.value}
               type="button"
               aria-pressed={category === item.value}
               className={category === item.value ? "is-active" : ""}
-              onClick={() => setCategory(item.value)}
+              onClick={() => selectCategory(item.value)}
             >
               {item.label}
             </button>
@@ -296,8 +325,14 @@ export default function SearchWebScreen() {
             <Icon name="chevron" size={20} />
           </button>
         ) : null}
-        {situation || readyOnly || (place && place !== "any") ? (
+        {situation || readyOnly || playType !== "all" || (place && place !== "any") ? (
           <div className="active-filters">
+            {playType !== "all" ? (
+              <button type="button" onClick={() => setPlayType("all")}>
+                미술 놀이
+                <Icon name="close" size={14} />
+              </button>
+            ) : null}
             {situation ? (
               <button type="button" onClick={() => setSituation(null)}>
                 {SITUATION_LABELS[situation]}
@@ -329,11 +364,11 @@ export default function SearchWebScreen() {
               variant="quiet"
               aria-label="놀이 정렬"
               value={sort}
-              onChange={(event) => setSort(event.target.value)}
+              onChange={(event) => setSort(readSearchSort(event.target.value))}
             >
-              <option value="recommended">맞춤순</option>
-              <option value="shortest">짧은 놀이순</option>
-              <option value="preparation">준비 시간순</option>
+              {SEARCH_SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </WebSelect>
           </label>
         </div>
@@ -366,9 +401,11 @@ export default function SearchWebScreen() {
                       {formatDuration(play)} · {formatAge(play)}
                     </p>
                     <div className="result-tags">
-                      <span>
-                        {DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"]}
-                      </span>
+                      {play.devAreas.map((area) => (
+                        <span key={area} className={area === category ? "is-selected" : undefined}>
+                          {DEV_AREA_LABELS[area]}
+                        </span>
+                      ))}
                       <span className="prep-tag">
                         {formatPreparation(play)}
                       </span>

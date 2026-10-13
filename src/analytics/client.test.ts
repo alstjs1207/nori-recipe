@@ -80,6 +80,16 @@ test("개인 입력값·임의 식별값·검색어를 전달해도 허용된 �
   assert.equal(getAnalyticsPage("/profile/private-name").path, "/not-found");
 });
 
+test("검색 분석은 7개 발달 영역을 허용하고 이전 혼합 분류와 임의 값을 거부한다", () => {
+  const params = { result_count: 12, has_query: 0 };
+  for (const category of ["all", "fine_motor", "gross_motor", "cognitive", "language", "emotional", "social", "sensory"]) {
+    assert.deepEqual(sanitizeAnalyticsEvent({ name: "search_results", params: { ...params, category } }), { ...params, category });
+  }
+  for (const category of ["art", "physical", "child-name", "toString"]) {
+    assert.equal(sanitizeAnalyticsEvent({ name: "search_results", params: { ...params, category } }), null);
+  }
+});
+
 test("태그 로드 중 철회하면 이전 동의의 페이지·행동 이벤트를 버린다", async () => {
   let resolve!: (transport: AnalyticsTransport) => void;
   const pending = new Promise<AnalyticsTransport>((done) => { resolve = done; });

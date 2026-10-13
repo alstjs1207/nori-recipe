@@ -1,3 +1,5 @@
+import { DEV_AREA_SLUGS } from "@/constants/devAreas";
+
 export type AnalyticsConsent = "unknown" | "granted" | "denied";
 export const ANALYTICS_CONSENT_VERSION = 1;
 export const ANALYTICS_CONSENT_KEY = "nori-recipe/analytics-consent";
@@ -78,7 +80,7 @@ export function sanitizeAnalyticsEvent(event: AnalyticsEvent): AnalyticsParams |
       return params && playId(params.play_id) ? { play_id: params.play_id as string } : null;
     case "search_results":
       return params && integer(params.result_count, 100_000) && integer(params.has_query, 1) &&
-        ["all", "sensory", "art", "physical", "language"].includes(params.category as string)
+        (params.category === "all" || DEV_AREA_SLUGS.some((area) => area === params.category))
         ? { result_count: params.result_count as number, has_query: params.has_query as number, category: params.category as string } : null;
     case "share":
       return params && playId(params.item_id) && ["copy_link", "native_share"].includes(params.method as string) && params.content_type === "play"

@@ -118,7 +118,7 @@ export default function RecordWebScreen() {
                 <Icon name="leaf" />
                 <strong>
                   {areas.filter((item) => item.count > 0).length}
-                  <span>가지</span>
+                  <span> / {DEV_AREA_SLUGS.length}가지</span>
                 </strong>
                 <p>발달 영역을 경험했어요</p>
               </div>
@@ -126,10 +126,15 @@ export default function RecordWebScreen() {
             <div className="record-layout">
               <section className="record-area-panel">
                 <h2>이런 놀이를 함께했어요</h2>
-                <p>놀이에 담긴 발달 영역이에요.</p>
+                <p>놀이에 담긴 {DEV_AREA_SLUGS.length}가지 발달 영역이에요.</p>
                 <div className="area-bars">
                   {areas.map(({ area, count }) => (
-                    <div key={area}>
+                    <Link
+                      key={area}
+                      href={{ pathname: "/search", params: { category: area, reset: "1" } }}
+                      className="area-link"
+                      aria-label={`${DEV_AREA_LABELS[area]} 놀이 찾기, 기록 ${count}회`}
+                    >
                       <span>{DEV_AREA_LABELS[area]}</span>
                       <span className="area-bar">
                         <i
@@ -139,11 +144,12 @@ export default function RecordWebScreen() {
                         />
                       </span>
                       <strong>{count}회</strong>
-                    </div>
+                    </Link>
                   ))}
                 </div>
                 <p className="panel-note">
                   한 놀이에 여러 발달 영역이 담길 수 있어요.
+                  영역을 누르면 관련 놀이를 찾아볼 수 있어요.
                 </p>
               </section>
               <section className="record-list">
