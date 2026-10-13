@@ -228,16 +228,21 @@ pnpm serve:web
 
 기본값은 비활성입니다. 웹/PWA에만 Google tag를 사용하며 Firebase 패키지나 계정 서버를 추가하지 않습니다. 아래 공개 환경변수는 **빌드 시** 반영되므로 변경 후 다시 빌드합니다. 운영 연락처·Google의 실제 처리 국가·이전 근거·이벤트 보유기간을 개인정보 처리방침에 확정하고, GA4 속성 설정을 마친 뒤 활성화합니다.
 
+2026-10-13에 생성한 GA4 계정·속성은 **노리 레시피**입니다. 계정 ID는 `411729499`, 속성 ID는 `558651002`, 웹 스트림 **노리 레시피 웹**의 ID는 `16118203116`이며 측정 ID는 `G-KVHS8WW1X5`입니다. [GA4 속성 열기](https://analytics.google.com/analytics/web/#/a411729499p558651002/reports/intelligenthome). 보고 시간대는 대한민국(UTC+09:00), 통화는 KRW입니다.
+
+Vercel **Production에만** 측정 ID와 `https://nori.lestly.io` origin을 등록했고 `EXPO_PUBLIC_GA_ENABLED=false`로 수집을 비활성화했습니다. Google의 실제 처리 국가·국외 이전 근거와 고지를 확정한 뒤 이 값을 `true`로 변경하고 재배포합니다. 로컬 예제 설정도 같은 측정 ID와 비활성 기본값을 사용합니다.
+
 ```bash
 EXPO_PUBLIC_GA_ENABLED=true
-EXPO_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-EXPO_PUBLIC_ANALYTICS_ORIGIN=https://your-production-domain.com
+EXPO_PUBLIC_GA_MEASUREMENT_ID=G-KVHS8WW1X5
+EXPO_PUBLIC_ANALYTICS_ORIGIN=https://nori.lestly.io
 ```
 
 - 도메인은 HTTPS의 정확한 origin으로 지정합니다. 설정한 origin 외의 localhost·미리보기·다른 서브도메인에서는 태그를 로드하지 않습니다. `GA_ENABLED`가 꺼져 있거나 설정이 없으면 분석 배너도 표시하지 않습니다. 활성화 값이 잘못되면 웹 빌드가 실패합니다.
 - GA4 웹 스트림의 **향상된 측정을 전체 끕니다**. 페이지뷰는 Expo Router의 실제 화면 전환에서 직접 전송하며 `send_page_view: false`를 사용합니다. 자동 히스토리 페이지뷰·검색·폼·클릭 측정을 함께 켜지 않습니다. Google Signals, 광고 맞춤설정과 Ads 연결도 사용하지 않는 구성을 기준으로 합니다.
+- 생성한 계정의 데이터 공유 옵션 4개를 모두 껐고 Google Signals·사용자 제공 데이터 수집을 활성화하지 않습니다. 속성의 광고 개인 최적화는 지역 컨트롤에서 **307개 지역 모두 차단**으로 설정합니다. 지역 컨트롤은 광고 사용 범위를 정하는 설정이며 Google 서버의 처리 국가를 지정하는 기능은 아닙니다.
 - Basic Consent Mode로 분석 동의 전에는 Google 태그 자체를 로드하지 않습니다. 설정에서 참여를 중단하면 이후 앱 이벤트를 차단하고 로드 대기 중인 이벤트와 서비스 분석 쿠키를 폐기합니다. 같은 운영 origin·측정 ID·동의 방침 버전의 선택만 복원합니다. 수집 목적·항목이 바뀌면 `ANALYTICS_CONSENT_VERSION`도 갱신합니다.
-- 분석 쿠키는 `nori` 접두사와 30일 유효기간을 사용합니다. GA4 콘솔의 이벤트 데이터 보유기간은 초기에는 2개월을 권장하며, 실제 설정한 기간을 공개 고지에 명시합니다. 쿠키 기간과 GA4 서버의 이벤트 보유기간은 다릅니다. 로컬 데이터 초기화로 Google의 기존 데이터가 삭제되지는 않습니다.
+- 분석 쿠키는 `nori` 접두사와 30일 유효기간을 사용합니다. GA4 콘솔의 이벤트·사용자 데이터 보관은 각각 2개월이며 ‘새 사용자 활동 발생 시 재설정’을 끕니다. 이 설정은 합산 데이터를 기반으로 하는 표준 보고서에 적용되지 않습니다. 실제 설정과 이 한계를 공개 고지에 반영합니다. 쿠키 기간과 GA4 서버의 데이터 보관 기간은 다르며 로컬 데이터 초기화로 Google의 기존 데이터가 삭제되지는 않습니다.
 - 전송 항목은 코드의 이벤트별 허용 목록으로 제한합니다. 아이 이름·생년월·월령·가족 유형·재료 목록·평가·반응·메모·검색어 내용·guestId/User-ID를 보내지 않습니다. 페이지 URL의 모든 query/hash와 외부 유입 URL의 경로·query/hash도 제거합니다. 이 구성은 UTM 값을 전달하지 않으므로 초기 유입 분석은 유입 도메인 중심입니다.
 - Google 태그 로드 실패·광고 차단·오프라인 상태는 놀이 동작을 막지 않습니다. 앱 코드가 보내는 오프라인 행동을 별도 저장하거나 연결 복구 후 재전송하지 않습니다. 동의한 브라우저에서 관측한 지표이므로 전체 이용자 수나 실제 놀이 수행 여부를 직접 증명하지 않습니다.
 
@@ -252,7 +257,21 @@ EXPO_PUBLIC_ANALYTICS_ORIGIN=https://your-production-domain.com
 | `search_results` | 검색·필터 결과, 입력 중에는 600ms 대기 | `result_count`, `has_query`, `category` |
 | `share` | 링크 복사 / 네이티브 공유 API 성공 | `item_id`, `content_type`, `method` |
 
-GA4 맞춤 측정기준에는 `screen_name`, `play_id`, `entry_point`, `position`, `is_new`, `has_query`, `category`를 필요에 따라 등록하고, `result_count`는 맞춤 측정항목으로 등록합니다. `play_feedback_saved`를 핵심 이벤트로 설정하면 기록 전환을 볼 수 있습니다. 홈 유입의 ‘추천 노출 → 클릭 → 상세 → 저장·기록’과 공유 링크의 ‘상세 → 저장·기록’을 따로 분석합니다.
+GA4에 등록한 맞춤 측정기준은 아래 7개이며 모두 **이벤트 범위**입니다.
+
+| 이벤트 매개변수 | GA4 측정기준 이름 |
+| --- | --- |
+| `screen_name` | 화면 구분 |
+| `play_id` | 놀이 ID |
+| `entry_point` | 놀이 진입 경로 |
+| `position` | 추천 순번 |
+| `is_new` | 신규 놀이 여부 (1: 신규, 0: 일반) |
+| `has_query` | 검색어 입력 여부 (1: 있음, 0: 없음) |
+| `category` | 검색 발달 영역 |
+
+`result_count`는 **검색 결과 수**라는 이벤트 범위 맞춤 측정항목으로 등록하며 측정 단위는 **일반**입니다. 이 값의 합계는 여러 검색의 결과 개수를 더한 값이므로, 평균 결과 수는 `search_results`의 결과 수 합계를 해당 이벤트 수로 나누어 해석합니다.
+
+`play_feedback_saved`는 기존 앱 코드가 전송하는 이름을 그대로 사용해 핵심 이벤트로 등록했습니다. 집계 방법은 **이벤트당 한 번**, 기본 금액은 **설정 안함**이며 별도의 URL 기반 파생 이벤트를 만들지 않습니다. 홈 유입의 ‘추천 노출 → 클릭 → 상세 → 저장·기록’과 직접 링크의 ‘상세 → 저장·기록’을 따로 분석합니다. `direct_link`는 앱 내부 진입 경로가 없는 상세 방문을 뜻하므로 공유 버튼으로 유입된 방문만을 증명하지는 않습니다.
 
 운영 활성화 후에는 DebugView와 네트워크에서 최초 방문·동의·거부·철회·재방문·직접 링크·뒤로 가기를 확인합니다. 동의 전과 거부 후에는 Google 태그·수집 요청이 없어야 하고, 한 화면 전환은 페이지뷰 한 번이어야 합니다. 로컬 개발 검증에서는 모의 전송기를 사용하고 운영 GA4로 테스트 행동을 보내지 않습니다. [SPA 측정](https://developers.google.com/analytics/devguides/collection/ga4/single-page-applications), [동의 모드](https://developers.google.com/tag-platform/security/concepts/consent-mode), [Google 데이터 정책](https://developers.google.com/analytics/devguides/collection/protocol/ga4/policy)을 기준으로 합니다.
 
@@ -260,7 +279,7 @@ GA4 맞춤 측정기준에는 `screen_name`, `play_id`, `entry_point`, `position
 
 마이페이지와 아이 정보 입력 화면은 `src/constants/legalNotices.ts`의 공통 고지를 사용합니다. 고지는 로컬 저장 항목과 목적, 보유·삭제 방식, 웹 접속정보, 선택적 GA4 분석, PWA 캐시, 외부 앱 공유 및 보호자 안전 수칙을 안내합니다. 웹은 **Vercel Hobby, Vercel Web Analytics·Speed Insights 사용 안 함**을 배포 기준으로 삼습니다. Vercel 호스팅·CDN과 선택적 Google 분석의 처리 가능성을 반영한 초안이며, 아래 미확정 항목과 GA4의 실제 처리 국가·이전 근거·이벤트 보유기간을 반영해야 공개용 방침이 완성됩니다. ‘기록 초기화’는 삭제 표시를 남기는 동작이며, 저장 내용의 삭제에는 ‘전체 로컬 데이터 초기화’를 사용합니다.
 
-- 공개할 운영자와 개인정보 문의 연락처는 현재 미정입니다. 공개 전에 실제 담당자 또는 처리 부서와 연락처를 고지에 추가해야 합니다. 고지의 `privacy@vercel.com`은 호스팅 업체의 문의 주소이며 서비스 운영자의 연락처를 대신하지 않습니다.
+- 서비스 운영·개인정보 문의 창구는 **레슬티**, 연락처는 **alstjs1207@naver.com**이며 공통 개인정보 처리방침에 반영합니다. 고지의 `privacy@vercel.com`은 호스팅 업체의 문의 주소입니다.
 - 로컬 `serve:web` 서버는 접속 로그를 따로 보관하지 않지만, 이를 Vercel 배포 환경에 그대로 적용할 수는 없습니다. 분석 기능을 꺼도 Vercel은 화면 제공과 보안을 위해 방문자의 IP 등 접속정보를 처리합니다. 운영자는 별도 로그 저장 서버나 Log Drains를 사용하지 않는 구성을 기준으로 합니다.
 - Vercel의 실제 처리 국가, 접속·보안 로그별 보유·삭제 기간과 처리 계약을 확인해야 합니다. [Runtime Logs 문서](https://vercel.com/docs/logs/runtime)의 Hobby 보유기간 1시간은 Functions 등의 Runtime Logs에 관한 설명으로, 현재 정적 웹의 모든 접속·보안 정보가 1시간 뒤 삭제된다는 뜻이 아닙니다.
 - 고지에는 웹 요청 시 HTTPS를 통한 전송, 접속정보 처리 목적, Vercel이 안내하는 보관·삭제 원칙과 웹 이용 중단에 따른 추가 전송 중단 방법을 반영했습니다. 마이페이지와 아이 정보 입력 화면에서 Vercel의 공식 개인정보 안내를 외부 링크로 확인할 수 있습니다. 이 안내만으로 정확한 국가·로그별 기간이나 법정 권리행사 절차가 확정되는 것은 아닙니다.
