@@ -2889,7 +2889,7 @@ fieldset {
 .analytics-invitation h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.5; }
 .analytics-invitation p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
 .analytics-settings p, .analytics-dialog-body p { color: var(--muted); font-size: 14px; line-height: 1.7; }
-p.analytics-preview-note { display: inline-block; margin: 8px 0; padding: 4px 10px; border-radius: 8px; background: var(--lavender); color: var(--violet); font-size: 13px; line-height: 1.6; }
+p.analytics-preview-note { display: block; width: fit-content; max-width: 100%; margin: 8px 0; padding: 4px 10px; border-radius: 8px; background: var(--lavender); color: var(--violet); font-size: 13px; line-height: 1.6; }
 .analytics-consent-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
 .analytics-consent-dialog .dialog-heading { flex-shrink: 0; }
 .analytics-dialog-body { padding: 0 24px 24px; overflow-y: auto; overscroll-behavior: contain; }
