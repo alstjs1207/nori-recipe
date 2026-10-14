@@ -19,7 +19,7 @@ export function useWebAnalytics() {
 }
 
 export function WebAnalyticsProvider({ children, client = webAnalytics }: PropsWithChildren<{ client?: AnalyticsClient }>) {
-  return <AnalyticsContext.Provider value={client}><AnalyticsPageTracking />{children}<AnalyticsConsentBanner /></AnalyticsContext.Provider>;
+  return <AnalyticsContext.Provider value={client}><AnalyticsPageTracking />{children}<AnalyticsConsentPrompt /></AnalyticsContext.Provider>;
 }
 
 function AnalyticsPageTracking() {
@@ -55,7 +55,7 @@ function AnalyticsPageTracking() {
   return null;
 }
 
-export function AnalyticsConsentBanner() {
+export function AnalyticsConsentPrompt() {
   const { client, consent } = useWebAnalytics();
   const pathname = usePathname();
   const segments = useSegments().join("/");
@@ -64,7 +64,6 @@ export function AnalyticsConsentBanner() {
   const invitationPage = page.path === "/" || page.screen === "search" || page.screen === "favorites";
   const play = usePlaysStore((state) => state.plays.find((item) => `/play/${item.id}` === page.path));
   const [readEnough, setReadEnough] = useState(false);
-  const [invitationOpen, setInvitationOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [visible, setVisible] = useState(document.visibilityState === "visible");
   const prompted = useRef(false);
@@ -77,7 +76,6 @@ export function AnalyticsConsentBanner() {
       if (!client.preview) return;
       prompted.current = false;
       setReadEnough(false);
-      setInvitationOpen(false);
       setDialogOpen(false);
     };
     document.addEventListener("visibilitychange", update);
@@ -138,7 +136,6 @@ export function AnalyticsConsentBanner() {
     };
   }, [client, consent, page.path, page.screen, play?.id, readEnough]);
   useEffect(() => {
-    setInvitationOpen(false);
     setDialogOpen(false);
   }, [client, consent, page.path]);
   useEffect(() => {
@@ -147,7 +144,7 @@ export function AnalyticsConsentBanner() {
     // Remember only that the invitation was shown, never the play or reading history.
     prompted.current = true;
     try { sessionStorage.setItem(ANALYTICS_INVITATION_SESSION_KEY, "shown"); } catch { /* Memory still prevents repeated prompts. */ }
-    setInvitationOpen(true);
+    setDialogOpen(true);
   }, [client, consent, page.path, invitationPage, visible, readEnough]);
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -157,15 +154,6 @@ export function AnalyticsConsentBanner() {
   if (!client.consentAvailable || consent !== "unknown") return null;
   return (
     <>
-      {invitationOpen ? <aside className="analytics-invitation" aria-label="선택적 사용량 분석" aria-live="polite">
-        <h2>놀이를 둘러보셨나요?</h2>
-        <p>많이 쓰이는 놀이와 기능을 파악해 서비스를 개선하려고 해요. 사용량 분석 참여는 선택이에요.</p>
-        {client.preview ? <p className="analytics-preview-note">{ANALYTICS_PREVIEW_NOTE}</p> : null}
-        <div className="analytics-choice">
-          <button type="button" className="secondary-button" aria-haspopup="dialog" onClick={() => { setInvitationOpen(false); setDialogOpen(true); }}>자세히 보고 참여하기</button>
-          <button type="button" className="secondary-button" onClick={() => setInvitationOpen(false)}>나중에</button>
-        </div>
-      </aside> : null}
       <dialog ref={dialogRef} className="nori-dialog analytics-consent-dialog" aria-labelledby={titleId}
         onCancel={(event) => { event.preventDefault(); setDialogOpen(false); }} onClose={() => setDialogOpen(false)}>
         <div className="dialog-heading">
