@@ -11,6 +11,7 @@ import { ANALYTICS_NOTICE } from "@/constants/legalNotices";
 import { ANALYTICS_INVITATION_RESET_EVENT, ANALYTICS_INVITATION_SESSION_KEY, createAnalyticsReadingProgress } from "@/analytics/invitation";
 
 const AnalyticsContext = createContext<AnalyticsClient>(webAnalytics);
+const ANALYTICS_PREVIEW_NOTE = "미리보기 · 분석 정보 전송 안 함";
 export function useWebAnalytics() {
   const client = useContext(AnalyticsContext);
   const consent = useSyncExternalStore(client.subscribe, client.getConsent, () => "unknown" as const);
@@ -159,7 +160,7 @@ export function AnalyticsConsentBanner() {
       {invitationOpen ? <aside className="analytics-invitation" aria-label="선택적 사용량 분석" aria-live="polite">
         <h2>놀이를 둘러보셨나요?</h2>
         <p>많이 쓰이는 놀이와 기능을 파악해 서비스를 개선하려고 해요. 사용량 분석 참여는 선택이에요.</p>
-        {client.preview ? <p>미리보기에서는 동의해도 분석 데이터를 전송하지 않아요.</p> : null}
+        {client.preview ? <p className="analytics-preview-note">{ANALYTICS_PREVIEW_NOTE}</p> : null}
         <div className="analytics-choice">
           <button type="button" className="secondary-button" aria-haspopup="dialog" onClick={() => { setInvitationOpen(false); setDialogOpen(true); }}>자세히 보고 참여하기</button>
           <button type="button" className="secondary-button" onClick={() => setInvitationOpen(false)}>나중에</button>
@@ -168,12 +169,12 @@ export function AnalyticsConsentBanner() {
       <dialog ref={dialogRef} className="nori-dialog analytics-consent-dialog" aria-labelledby={titleId}
         onCancel={(event) => { event.preventDefault(); setDialogOpen(false); }} onClose={() => setDialogOpen(false)}>
         <div className="dialog-heading">
-          <div><h2 id={titleId}>사용량 분석에 참여할까요?</h2><p>페이지 방문과 놀이 선택, 저장·기록 기능의 사용을 Google Analytics로 분석해요. 아이 이름·생년월·메모는 보내지 않아요. 참여하지 않아도 모든 기능을 이용할 수 있어요.</p></div>
+          <div><h2 id={titleId}>서비스 개선에 참여할까요?</h2><p>어떤 놀이와 기능이 자주 쓰이는지 살펴 서비스를 개선해요. 아이 이름·생년월·메모는 보내지 않아요. 참여하지 않아도 모든 기능을 이용할 수 있어요.</p></div>
           <button type="button" className="secondary-button analytics-dialog-close" autoFocus onClick={() => setDialogOpen(false)}>닫기</button>
         </div>
         <div className="analytics-dialog-body">
-          {client.preview ? <p>미리보기에서는 동의해도 Google 분석 태그를 불러오거나 데이터를 전송하지 않아요.</p> : null}
-        <Link href={{ pathname: "/settings", params: { privacy: "1" } }} className="analytics-policy-link">개인정보 처리방침 보기</Link>
+          {client.preview ? <p className="analytics-preview-note">{ANALYTICS_PREVIEW_NOTE}</p> : null}
+          <Link href={{ pathname: "/settings", params: { privacy: "1" } }} className="analytics-policy-link">개인정보 처리방침 보기</Link>
           {dialogOpen ? <AnalyticsConsentForm /> : null}
         </div>
       </dialog>
@@ -189,19 +190,19 @@ function AnalyticsConsentForm() {
     <div>
       <fieldset className="analytics-consent-fields">
         <legend>선택 동의</legend>
-        <label><input type="checkbox" checked={collection} onChange={(event) => setCollection(event.target.checked)} /><span>[선택] 사용량 분석을 위한 개인정보 수집·이용에 동의해요.</span></label>
-        <details><summary>수집·이용 내용 보기</summary>{ANALYTICS_NOTICE.collection.map((item) => <p key={item}>{item}</p>)}</details>
-        <label><input type="checkbox" checked={transfer} onChange={(event) => setTransfer(event.target.checked)} /><span>[선택] 분석 정보의 Google 국외 이전에 동의해요.</span></label>
+        <label><input type="checkbox" checked={collection} onChange={(event) => setCollection(event.target.checked)} /><span>[선택] 서비스 개선을 위한 이용 통계 분석에 동의해요.</span></label>
+        <details><summary>개인정보 수집·이용 내용 보기</summary>{ANALYTICS_NOTICE.collection.map((item) => <p key={item}>{item}</p>)}</details>
+        <label><input type="checkbox" checked={transfer} onChange={(event) => setTransfer(event.target.checked)} /><span>[선택] Google의 해외 분석 처리·보관에 동의해요.</span></label>
         <details>
-          <summary>국외 이전 내용 보기</summary>
+          <summary>개인정보 국외 이전 내용 보기</summary>
           {ANALYTICS_NOTICE.transfer.map((item) => <p key={item}>{item}</p>)}
           <p><a className="analytics-policy-link" href="https://datacenters.google/locations/" target="_blank" rel="noopener noreferrer">Google 데이터센터 목록</a>{" · "}<a className="analytics-policy-link" href="https://business.safety.google/adssubprocessors/" target="_blank" rel="noopener noreferrer">Google 하위처리업체 목록</a></p>
         </details>
       </fieldset>
-      <p>{client.preview ? "미리보기에서 선택한 내용은 이 사이트에만 저장되며 운영 사이트의 분석 동의로 사용되지 않아요." : "두 항목 모두 동의한 경우에만 분석에 참여해요. 동의하지 않아도 모든 놀이 기능을 이용할 수 있어요."}</p>
+      <p>{client.preview ? "선택은 미리보기에만 저장돼요." : "두 항목 모두 동의한 경우에만 분석에 참여해요. 동의하지 않아도 모든 놀이 기능을 이용할 수 있어요."}</p>
       <div className="analytics-choice">
         <button type="button" className="secondary-button" onClick={() => client.setConsent("denied")}>참여하지 않기</button>
-        <button type="button" className="secondary-button" disabled={!collection || !transfer} onClick={() => { if (collection && transfer) client.setConsent("granted"); }}>선택한 내용에 동의하기</button>
+        <button type="button" className="secondary-button" disabled={!collection || !transfer} onClick={() => { if (collection && transfer) client.setConsent("granted"); }}>동의하고 참여하기</button>
       </div>
     </div>
   );
@@ -230,7 +231,7 @@ export function AnalyticsSettings() {
     <section className="settings-panel analytics-settings">
       <h2>사용량 분석 참여</h2>
       <p>{status}</p>
-      <p>{client.preview ? "이 미리보기에서는 동의 화면과 참여·중단 동작을 확인할 수 있어요. Google 분석 태그를 불러오거나 분석 데이터를 전송하지 않아요." : "선택한 경우 페이지 방문과 놀이 선택, 저장·기록 기능 사용이 Google Analytics로 전송돼요. 아이 이름·생년월·메모는 보내지 않아요. 언제든 참여를 중단할 수 있고, 놀이 기능은 계속 이용할 수 있어요."}</p>
+      {client.preview ? <p className="analytics-preview-note">{ANALYTICS_PREVIEW_NOTE}</p> : <p>선택한 경우 페이지 방문과 놀이 선택, 저장·기록 기능 사용이 Google Analytics로 전송돼요. 아이 이름·생년월·메모는 보내지 않아요. 언제든 참여를 중단할 수 있고, 놀이 기능은 계속 이용할 수 있어요.</p>}
       {client.consentAvailable ? consent === "granted" ? <div className="analytics-choice"><button className="secondary-button" type="button" onClick={() => client.setConsent("denied")}>참여 중단하기</button></div> : <AnalyticsConsentForm key={`${consent}:${previewResetCount}`} /> : null}
       {client.preview ? <>
         <div className="analytics-choice"><button className="secondary-button" type="button" onClick={resetPreviewInvitation}>동의 안내 다시 테스트</button></div>
