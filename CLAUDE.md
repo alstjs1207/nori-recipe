@@ -30,11 +30,25 @@ play-recipe/
 ```
 /play-recipe {월령/재료/후보목록}   → results/{대상}_{주제}_{ts}.json (지정 플랫폼 원문, 한글 재료)
 /normalize-materials results/...  → results/normalized/..._normalized.json (slug 재료)
-/import-plays [파일경로]           → data/plays.json (id, status 부여, 중복 제거)
+/import-plays [파일경로]           → data/plays.json (신규 ID, draft, 중복 제거) + 검수 HTML
 /validate-plays                   → data/plays.json 스키마·품질 검증 (읽기 전용)
 /coverage-report                  → 월령×발달영역 커버리지 매트릭스 + 수집 갭 제안 (plays.json 기준)
 /results-coverage                 → 수집 파일(results/) 기준 커버리지 매트릭스 + 갭 제안
 ```
+
+### 콘텐츠 운영 기본 흐름
+
+- 수집 스킬 → 재료 정규화 → 초안 병합·ID 부여 → 놀이 대표 이미지·없는 새 재료 이미지 자동 생성·저장 → 새 검수 배치 등록 → 로컬 서버 링크 전달 → 사용자가 UI에서 승인한 항목만 로컬 반영을 기본으로 함. 이미지 생성은 별도 요청을 기다리지 않고 수집 작업에서 이어서 수행. 조사·정규화·프롬프트만 지정한 요청은 그 범위에서 완료.
+- 대표 이미지 생성과 재개는 [이미지 생성 절차](tools/local-review/IMAGE-WORKFLOW.md)와 `.claude/skills/generate-play-images/SKILL.md`를 따름. `review:images`로 대상·현재 내용 해시를 확인하고 실제 `image_gen` 결과를 `review:image`로 저장. 새 검수 배치는 모든 이미지와 생성 기록이 준비돼야 생성되며 실패 시 초안·완료 이미지를 보존하고 미완료 ID를 보고.
+- 새 재료는 `.claude/skills/generate-material-images/SKILL.md`를 이어서 수행. `review:material-images --ids ...`로 이번 놀이가 쓰는 미승인 재료만 확인하고 실제 기존 이미지는 재사용. 이미지가 없으면 실제 생성 후 `review:material-image`로 JPEG·매핑·생성 기록을 준비. 놀이·새 재료 이미지가 모두 준비돼야 새 배치를 등록하며, 재료 이미지도 사용자 검수 대상 해시에 포함. 이미지 준비만으로 `reviewPending`을 해제하지 않음.
+- `pnpm review:local`로 실행한 서버에서 놀이 목록·내용은 `/catalog`, 재료 라이브러리는 `/materials`, 수집 건별 검수 목록은 `/reviews`, 개별 검수는 `/reviews/<batchId>`에서 확인. 검색·월령·발달영역·상태 필터와 재료별 사용 놀이를 제공. `pnpm catalog:build`의 정적 HTML과 JSON/CLI 방식도 대안으로 유지.
+- 실제 신규 ID와 현재 존재하는 정규화 파일로 `pnpm review:prepare --ids <ID목록> --source <정규화파일> --title <제목>`을 실행. 반환된 배치 파일은 이후 `--batch`로 재사용하며, 전체 현황과 해당 수집 건의 검수 HTML을 함께 갱신. 신규 ID가 없으면 빈 배치를 만들지 않음.
+- 새 재료는 의미가 확인되면 임시 정의와 `reviewPending`으로 준비해 HTML에서 함께 검수. 정규화 완료만으로 신규 놀이를 `live`로 전환하지 않음.
+- 이미 등록된 항목은 등록 완료로 구분해 재승인을 요구하지 않음. 내용·이미지가 바뀐 초안은 다시 검수하며 승인 결과를 임의로 만들지 않음.
+- 스킬의 배치 생성·서버 실행·실제 검수 URL 확인은 [공통 서버 인계 절차](tools/local-review/README.md#수집-스킬에서-검수로-넘기기)를 따름. JSON/CLI 대안은 [README](README.md#놀이-현황과-html-검수-흐름) 참고. 로컬 승인 반영 후 배포는 별도 요청 범위에서 진행.
+- 로컬 관리 화면은 `pnpm review:local`로 실행. 기존 HTML을 localhost에서 제공하고 검수 상태·의견을 `results/local-review/state.json`에 저장. UI의 승인·재료 결정은 선택한 항목만 기존 검증 모듈을 거쳐 로컬 반영하며 JSON 가져오기만으로 게시하지 않음.
+- 개별 화면의 `Codex에 검수 요청`은 의견을 저장한 뒤 현재 수집 건 전체를 새 로컬 Codex 채팅으로 요청하고 해당 링크를 반환. 동일한 내용의 반복 클릭은 이미 만든 채팅을 재사용하며 다른 수집 건·변경된 의견은 새 채팅으로 분리. 요청 파일의 현재 해시·의견을 대조하고 수정 요청 범위만 보완하며, 등록 완료·승인·보류와 사용자 재승인 절차를 유지. 버튼 요청을 자동 승인·등록·커밋·배포 허가로 해석하지 않음.
+- 서버·파일 저장·HTTP API·브라우저 연결 코드는 `tools/local-review/`에 분리. 스킬/CLI가 데이터·이미지·배치를 수정한 뒤 화면을 새로고침하며, 충돌 시 오래된 화면의 승인을 재사용하지 않음. 실행·복구는 `tools/local-review/README.md` 참고.
 
 ## 놀이 스키마
 
@@ -57,7 +71,7 @@ play-recipe/
 - `tags`: string[] (연령 태그 제외)
 - `source`: `{ type, url, instagramAccount }` — type: youtube | instagram | naver_blog | chaisplay | tistory | brunch | manual
 - `status`: live | draft | archived
-- `imageStatus`: 선택 필드. `review`이면 기존 그림을 노출하지 않음 (앱은 기본 표시, 웹은 브랜드 기본 이미지). 본문·재료·동작과 일치하는 이미지 확인 후에만 필드를 제거.
+- `imageStatus`: 선택 필드. `review`이면 기존 그림을 노출하지 않음 (앱은 기본 표시, 웹은 브랜드 기본 이미지). 본문·재료·동작과 일치하는 이미지를 사용자 검수에서 승인한 뒤 승인 반영 도구로 제거.
 
 ## 데이터 컨벤션
 
@@ -92,7 +106,7 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 ### 데이터
 - 보호자에게 보이는 `steps`와 `tip`은 놀이 동작과 실용적인 팁으로 작성. ‘원문’, ‘등록본’ 등 수집·편집 과정 설명은 수집 파일의 검토 기록에 남기고, 출처는 `source`로 보존.
 - `NEW`는 `createdAt`의 한국 자정부터 다음 달 같은 날짜 자정 전까지 표시. 다음 달에 같은 날짜가 없으면 말일을 만료일로 사용. 번들의 `updatedAt`이나 원문 게시일을 생성일로 대신하지 않음.
-- 재료는 반드시 표준 slug 마스터에 있는 것만 사용. 승인된 등록 작업에 필요한 실제 재료 추가는 진행하고 보고하며, 범위가 불명확한 추가·대체는 사용자 확인
+- 재료는 반드시 표준 slug 마스터에 있는 것만 사용. 새 재료는 임시 정의·reviewPending으로 검수 준비하고, 의미가 불명확하거나 활동 자체를 바꾸는 대체는 사용자 확인
 - 태그에 연령대 포함 금지 (ageMin/ageMax로 대체)
 - 원본 재료와 다른 재료를 유사한 slug로 치환하지 않음. 식품↔공작 재료, 가루↔알갱이, 일반 공↔운동공은 별개로 검토
 - 생밀가루·생반죽 직접 놀이는 `live`로 등록하지 않음. 작은 구슬·비즈·폼폼·플레이콘과 일반 슬라임은 사용 연령을 확인하고 3세 미만 추천에서 제외

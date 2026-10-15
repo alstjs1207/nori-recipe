@@ -299,6 +299,167 @@ GA4에 등록한 맞춤 측정기준은 아래 7개이며 모두 **이벤트 범
 
 검토 기준은 [개인정보보호위원회의 2026년 처리방침 안내](https://pipc.go.kr/np/cop/bbs/selectBoardArticle.do?bbsId=BS074&nttId=12021), [개인정보 보호법 제30조](https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1029335711), [Vercel 개인정보 안내](https://vercel.com/legal/privacy-notice)입니다. 이 고지의 수정만으로 실제 배포 환경이나 콘텐츠 이용 권한까지 확인되는 것은 아닙니다.
 
+## 놀이 현황과 HTML 검수 흐름
+
+콘텐츠 운영은 수집 스킬과 로컬 서버에서 여는 기존 HTML을 기본으로 합니다.
+`pnpm review:local`을 실행하고 [전체 놀이·재료 현황](http://127.0.0.1:4317/catalog)에서 확인합니다.
+검색·월령·발달영역·등록 상태로 목록을 좁히고, 놀이를 펼쳐 준비물·방법·주의사항·
+출처·이미지를 읽을 수 있습니다. 재료 탭에서는 이미지와 해당 재료를 쓰는 놀이를 봅니다.
+
+1. `play-recipe` 스킬로 원문을 확인하고 수집 JSON과 검토 근거를 보존합니다.
+2. `normalize-materials`와 `import-plays`로 재료를 정리하고 새 놀이를 `draft`로 병합합니다. 새 재료는 임시 정의와 `reviewPending`으로 준비합니다.
+3. 수집 스킬이 별도 요청 없이 실제 대표 이미지를 놀이별로 생성하고 `review:image`로 저장합니다. 새 재료도 이미지가 없으면 흰 배경의 부드러운 3D 이미지로 생성해 `review:material-image`로 저장·연결하며 기존 그림은 재사용합니다. 놀이·새 재료 이미지가 모두 준비된 뒤 `review:prepare`로 수집 건별 검수 목록·HTML과 전체 현황을 갱신합니다. 생성 실패 시 초안과 완료 이미지를 보존하고 미완료 항목부터 재개합니다.
+4. 스킬이 실제 서버 API에서 해당 배치를 확인하고 수집 건별 검수 링크를 전달합니다. 사용자는 화면에서 신규 재료를 먼저 결정하고 놀이·재료·이미지를 검수합니다. 의견·상태는 서버 파일에 자동 저장됩니다.
+5. 사용자가 승인 버튼을 누르면 해당 항목의 현재 내용·이미지를 검증하고 로컬에 반영합니다. 수정 요청은 내용을 고친 뒤 같은 배치로 갱신·재검수합니다. 이미 등록된 놀이는 “등록 완료”로 구분하며 재승인을 요구하지 않습니다.
+
+새 수집 건 연결, 실제 URL 확인과 수정 후 재검수는
+[스킬 공통 서버 인계 절차](tools/local-review/README.md#수집-스킬에서-검수로-넘기기)를 따릅니다.
+서버 UI 승인 후에는 별도 JSON 내보내기·CLI 반영이 필요하지 않습니다. `file://` HTML과
+JSON/CLI 방식도 유지하며, 서버에 JSON을 가져오는 것만으로 게시하지 않습니다.
+
+실제 생성·JPEG 저장·완료 확인은 [이미지 생성 절차](tools/local-review/IMAGE-WORKFLOW.md)를
+따릅니다. `review:images`는 대상과 해시 확인, `review:image`는 생성 결과 저장 명령이며,
+실제 그림은 스킬을 수행하는 Codex가 `image_gen` 도구로 만듭니다.
+새 재료는 `review:material-images --ids ...`로 대상·정의 해시를 확인하고
+`review:material-image --slug ... --file ... --definition-hash ... --prompt ...`로 저장합니다.
+준비한 재료 그림은 재료 라이브러리와 수집 건의 재료 검수 탭에 표시됩니다. 그림을
+생성한 것만으로 재료가 등록되지 않으며, 이미지가 바뀌면 새 화면에서 다시 검수합니다.
+
+새 수집 건은 **실제로 부여된 ID**와 수집 파일을 지정합니다. 모든 대표 이미지와 현재
+내용에 맞는 생성 기록과 새 재료의 실제 이미지가 있어야 새 배치를 만들 수 있습니다. 아래 ID와 파일명은 예시입니다.
+
+```bash
+pnpm review:images --ids play_218,play_219
+pnpm review:material-images --ids play_218,play_219
+# 생성 도구로 만든 각 결과를 review:image로 저장한 뒤 실행
+pnpm review:prepare --ids play_218,play_219 --source results/normalized/새로운_수집_normalized.json --title "새로운 놀이 수집"
+```
+
+명령은 반환한 `data/review-batches/<배치-ID>.json`과
+`results/reviews/<배치-ID>.html`을 사용합니다. 같은 ID·수집 파일의 재실행은
+기존 배치를 재사용합니다. 초안 병합과 게시를 실행하는 명령은 아닙니다.
+수집 건의 배치 경로를 보존하고 이후 명령에 동일하게 지정합니다.
+
+아래는 `file://`·JSON/CLI 방식으로 반영할 때의 대안 절차입니다.
+
+```bash
+pnpm review:prepare --batch data/review-batches/<배치-ID>.json
+pnpm review:materials /path/to/검수결과.json --batch data/review-batches/<배치-ID>.json
+pnpm review:materials /path/to/검수결과.json --batch data/review-batches/<배치-ID>.json --write
+```
+
+재료 결정으로 내용·상태가 달라졌으면 `review:prepare --batch ...`로 HTML을
+갱신하고 새 결과 JSON을 받습니다. 바뀐 내용에 이전 승인을 재사용하지 않습니다.
+재료가 확정된 현재 결과의 놀이 승인은 다음 순서로 적용합니다.
+
+```bash
+pnpm review:apply /path/to/최신검수결과.json --batch data/review-batches/<배치-ID>.json
+pnpm review:apply /path/to/최신검수결과.json --batch data/review-batches/<배치-ID>.json --write
+pnpm review:prepare --batch data/review-batches/<배치-ID>.json
+```
+
+기본 실행은 변경 없는 미리보기이며 `--write`가 실제 반영입니다. 로컬 승인
+반영까지가 이 흐름의 완료 범위입니다. 배포 요청이 있으면 필요한 검증을 마친 뒤
+기존 preview → main 절차를 따릅니다.
+
+## 놀이 검수 화면과 승인 반영
+
+이번 24~30개월 국내·해외 14개는 `play_204`~`play_217`로 등록되어 있으며, 현재 게시·초안 상태는 `data/plays.json`에서 관리합니다.
+배치 목록은 `data/review-batches/instagram-14-20261014.json`에서 관리합니다.
+
+이 절은 파일로 여는 HTML과 JSON/CLI 방식입니다. 기본 서버 검수에서는 현황의 해당 수집
+건 링크를 사용하며, 아래 기본 14개 배치를 새 수집 건의 배치로 대신하지 않습니다.
+
+`pnpm review:build`로 기존 검수 HTML인 `results/play-image-audit.html`을 최신
+놀이·재료·대표 이미지에서 다시 생성합니다. 파일을 브라우저로 열면 승인,
+수정 요청, 보류, 의견 저장과 결과 JSON 내보내기·가져오기를 사용할 수 있습니다.
+내용·재료·주의사항과 실제 대표 이미지를 모두 확인해야 승인할 수 있으며,
+수정 요청에는 의견이 필요합니다. 대표 이미지가 없는 항목은 생성 대기로 표시합니다.
+새 이미지는 `images/plays/{놀이ID}.jpeg`에 준비한 뒤 화면을 다시 생성하세요.
+검수 화면은 draft도 포함하므로 앱의 live 목록과는 별도로 확인할 수 있습니다.
+
+상태와 의견은 현재 브라우저에 자동 저장됩니다. 저장이 차단되면 화면에 안내하며,
+결과 JSON을 내보내 보관할 수 있습니다. 다른 브라우저나 기기에서 이어갈 때는
+내보낸 JSON을 가져옵니다. 내용·재료 정의·이미지가 바뀌면 기존 승인을 재사용할
+수 없으며, 화면을 다시 만들면 변경된 항목은 미검수로 돌아가고 의견은 유지됩니다.
+
+```bash
+pnpm review:apply /path/to/play-review-results.json
+pnpm review:apply /path/to/play-review-results.json --write
+```
+
+기본 실행은 파일을 변경하지 않는 dry-run입니다. `--write` 실행은 모든 기록의
+배치·ID·내용·이미지를 대조하고 게시 검증을 통과한 승인 항목만 live로 전환합니다.
+확인한 이미지의 `imageStatus: review`를 해제하고 네이티브 이미지 매핑도 연결합니다.
+미검수·수정 요청·보류 항목은 그대로 두며, 보관 상태를 자동 해제하지 않습니다.
+백업과 적용 기록은 `results/review-backups/`에 저장합니다. 같은 결과의 재실행은
+중복 등록하지 않습니다. 스크립트는 커밋·푸시·배포를 실행하지 않습니다.
+
+다른 배치를 검수할 때는 ID 목록이 담긴 배치 JSON을 두 명령의 `--batch`에
+동일하게 지정합니다. 결과 파일의 경로로 배치를 자동 선택하지 않습니다.
+검수 HTML에는 실행 가능한 최신 내용 전체가 표시되며, 의견으로 본문을 직접
+변경하지 않습니다. 수정 요청은 실제 데이터를 고친 다음 화면을 다시 생성해 검수합니다.
+
+검수 HTML의 **재료 검수** 탭에서는 승인된 기존 재료와 이번 배치의 신규 제안을
+함께 비교합니다. 원문 표현, 용도, 유사한 기존 분류와 사용 놀이를 표시하며,
+재료별 신규 추가·대체·보류와 의견을 놀이 검수 결과 JSON에 함께 저장합니다.
+신규 추가·대체에는 비교 확인이 필요하고 대체에는 기존 재료 선택과 이유가 필요합니다.
+
+최초 재료 제안 12종과 검수 의견으로 추가한 종이컵·투명 플라스틱 컵은 배치에서 함께 관리합니다. 미승인 재료만 `data/materials.json`의 `reviewPending`에 남습니다.
+초안의 재료 타입과 원본 매핑을 보존하기 위해 정의는 유지하지만 앱 준비물 선택
+목록에서는 숨기고, 해당 재료를 필수·선택으로 쓰는 놀이의 게시를 차단합니다.
+신규 추가를 실제 반영해야 목록에 표시됩니다.
+
+```bash
+pnpm review:materials /path/to/play-review-results.json
+pnpm review:materials /path/to/play-review-results.json --write
+pnpm review:build
+```
+
+재료 반영은 놀이를 게시하지 않습니다. 신규 추가는 임시 상태를 해제하고,
+대체는 이번 배치의 draft 재료만 바꿉니다. 방법·주의사항·출처를 자동으로
+다른 재료의 설명으로 고치지 않습니다. 대체된 초안은 방법·준비 조건·주의사항을
+수정하고 이미지를 다시 검수해야 승인할 수 있습니다. 보류 재료는 계속 숨기며,
+사용하는 놀이도 초안으로 남습니다. 백업과 결정 기록은 `results/material-review-backups/`에
+저장합니다. 이미 게시한 놀이와 다른 배치에 사용되는 재료를 일괄 대체하지 않습니다.
+
+재료 반영 후 화면을 다시 생성하고 놀이를 검수합니다. 결과 JSON 버전 2에는
+`records`와 `materialRecords`가 함께 포함됩니다. 이전 브라우저 기록의 놀이 의견은
+유지하되, 변경된 내용·재료·상태의 승인은 다시 확인합니다.
+
+반영 후 `pnpm check:play-content`, `pnpm check:play-images`, `pnpm typecheck`,
+`pnpm build:web`을 통과합니다. 배포 요청이 있으면 기존 preview → main 흐름을 사용합니다.
+승인 적용의 변경 범위·변경 감지·재실행 검증은 `pnpm test:play-review`로 실행합니다.
+
+### DB 없는 로컬 관리 서버
+
+```bash
+pnpm review:local
+```
+
+[놀이·재료 현황](http://127.0.0.1:4317/catalog)에서 기존 수집 건별 검수
+화면을 엽니다. 의견·확인란·상태는 `results/local-review/state.json`에 자동 저장되며,
+재시작·다른 브라우저에서도 복원됩니다. 승인 버튼은 해당 놀이만 기존 검증을 거쳐
+로컬 마스터·이미지 매핑에 반영합니다. 재료 추가·대체·보류도 해당 항목만 반영하며,
+JSON 가져오기는 기록만 저장합니다. 스킬/CLI로 파일을 수정한 뒤에는 화면의
+**최신 파일로 새로고침**을 누릅니다. `file://` 검수와 기존 JSON·CLI 방식도 유지합니다.
+
+메뉴별 서버 주소는 놀이 목록 `/catalog`, 재료 라이브러리 `/materials`, 수집 건별 검수
+목록 `/reviews`입니다. 개별 수집 건은 `/reviews/<batchId>`로 엽니다. 각 주소로 직접
+접속·새로고침하거나 브라우저 뒤로·앞으로 가기를 사용할 수 있습니다. 기존 `.html`
+주소와 `#materials`·`#review-batches` 북마크는 해당 메뉴의 새 주소로 이동합니다.
+
+개별 검수 화면에서 **Codex에 검수 요청**을 누르면 의견을 먼저 저장하고 해당 수집 건
+전체를 위한 새 로컬 Codex 채팅을 만들어 요청합니다. 전송 후 **새 채팅 열기** 링크로
+진행 상황을 확인합니다. JSON을 직접 첨부하지 않아도 되며 수정 후에는 같은 화면에서
+다시 검수합니다. 연결 방법과 중복 전송 처리는
+[수집 건별 Codex 요청](tools/local-review/README.md#codex에-수집-건-검수-요청)을 참고하세요.
+
+기본 바인딩은 `127.0.0.1:4317`이며 `--port`로 변경할 수 있습니다. 서버·저장·API·브라우저
+연결 코드는 `tools/local-review/`에 분리했습니다. 시작·조회만으로 데이터를 변경하지 않으며,
+오래된 요청과 외부 파일 수정 충돌을 거부합니다. 백업·복구, API와 테스트 방법은
+[로컬 검수 서버 문서](tools/local-review/README.md)를 참고하세요.
+
 ## 배포용 놀이 이미지와 데이터
 
 `images/plays/play_001.jpeg`부터 `play_191.jpeg`까지의 놀이 이미지 191장과 `data/plays.json`, `data/materials.json`을 Git에서 관리합니다. 재료·온보딩 이미지와 앱 아이콘도 저장소에 포함되어 있으므로 웹 빌드에 필요한 콘텐츠를 별도로 복사할 필요가 없습니다.
