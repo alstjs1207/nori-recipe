@@ -57,6 +57,7 @@ export function validatePlayBundle(bundle, registry) {
       if (new Set(all).size !== all.length) fail(id, "materials", "중복 또는 필수·선택 재료 중첩입니다.");
       if (materials.substitutes.length) fail(id, "materials.substitutes", "대체 재료 배열은 비워 둡니다.");
       if (play.status === "live") {
+        if (all.some((slug) => (registry.reviewPending ?? []).includes(slug))) fail(id, "materials", "미승인 재료는 게시 중인 놀이에 사용할 수 없습니다.");
         if (all.some((slug) => ["flour", "rice_flour"].includes(slug))) fail(id, "materials", "생가루·생반죽 직접 놀이는 게시하지 않습니다.");
         if (play.ageMin < 36 && all.some((slug) => ["marble", "bead", "pom_pom", "water_beads", "play_corn", "slime"].includes(slug))) fail(id, "materials", "작은 구슬·공작 조각과 일반 슬라임은 3세 미만 추천에서 제외합니다.");
       }

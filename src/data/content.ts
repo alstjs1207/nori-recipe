@@ -1,7 +1,7 @@
 import materialsBundle from "../../data/materials.json";
 import playsBundle from "../../data/plays.json";
 
-import { MATERIAL_SLUGS } from "@/constants/materials";
+import { MATERIAL_CATEGORIES, MATERIAL_SLUGS } from "@/constants/materials";
 import type { Play, PlaysBundle } from "@/types";
 
 const typedPlaysBundle = playsBundle as PlaysBundle;
@@ -17,6 +17,7 @@ export function loadLivePlays(): Play[] {
 export function loadMaterialsBundle() {
   return {
     ...materialsBundle,
+    categories: MATERIAL_CATEGORIES,
     materialSlugs: MATERIAL_SLUGS,
   };
 }

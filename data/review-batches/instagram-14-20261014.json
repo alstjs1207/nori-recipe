@@ -1,0 +1,694 @@
+{
+  "schemaVersion": 1,
+  "batchId": "instagram-14-20261014",
+  "title": "24~30개월 국내·해외 놀이 14개 검수",
+  "registeredAt": "2026-10-14",
+  "metricNotes": "조회수 확인 시점: 2026-10-10~11. 모음 영상은 릴스 전체의 조회수.",
+  "sourceCollection": "results/24-30개월_국내외인스타_최종14개_20261011.json",
+  "normalizedCollection": "results/normalized/24-30개월_국내외인스타_최종14개_20261014_normalized.json",
+  "playIds": [
+    "play_204",
+    "play_205",
+    "play_206",
+    "play_207",
+    "play_208",
+    "play_209",
+    "play_210",
+    "play_211",
+    "play_212",
+    "play_213",
+    "play_214",
+    "play_215",
+    "play_216",
+    "play_217"
+  ],
+  "entries": [
+    {
+      "id": "play_204",
+      "candidateKey": "F1",
+      "origin": "해외",
+      "views": "345.4만",
+      "ageBasis": "숫자 연령이 없는 어린이 활동. 24개월용은 보호자가 색 물을 준비하고 두 색만 제시하는 편집 판단.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다."
+      ]
+    },
+    {
+      "id": "play_205",
+      "candidateKey": "F2",
+      "origin": "해외",
+      "views": "225만",
+      "ageBasis": "원문에는 숫자 연령이 없고 작은 얼음 여러 개를 사용합니다. 24~30개월은 편집 월령이며, 입 탐색이 없고 보호자가 얼음을 관리하면서 아이가 붓으로만 칠하는 조건으로 다시 검수합니다.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "2026-10-15 검수 의견 반영: 큐브 얼음으로 본문·준비 조건·주의사항을 수정하고 대표 이미지를 교체했습니다. 입 탐색이 있는 아이에게는 제공하지 않는 조건을 유지합니다."
+      ],
+      "safetyReferences": [
+        {
+          "title": "INSPQ: Choking risk—be extra careful until age 4",
+          "url": "https://www.inspq.qc.ca/en/tiny-tot/child/feeding/foods/choking-risks",
+          "note": "얼음 조각의 섭취 시 질식 위험을 확인한 자료입니다. 이 자료가 큐브 얼음 미술 놀이의 안전성을 보증하는 것은 아닙니다."
+        }
+      ]
+    },
+    {
+      "id": "play_206",
+      "candidateKey": "F3",
+      "origin": "해외",
+      "views": "137만",
+      "ageBasis": "숫자 연령 없음. 24개월용은 글자 읽기를 요구하지 않고 보호자가 이름과 풀칠을 준비해 자연물 놓기만 하도록 조정.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "사용자 재료 검수에 따라 마커 대신 색연필로 이름을 쓰는 준비 조건으로 수정했습니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "marker",
+          "to": "crayon",
+          "reason": "색연필로 가능",
+          "previousMethodHash": "fbddc52679b3e6dfa236b2446542f6556d422cff4bec43f27d2f91ef146840f0"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "사용자 재료 검수에 따라 마커 대신 색연필로 이름을 쓰는 준비 조건으로 수정했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DYA-cPRv9ZF/",
+          "instagramAccount": "busytoddler"
+        },
+        "previousName": "꽃·잎으로 골판지 이름 꾸미기"
+      }
+    },
+    {
+      "id": "play_207",
+      "candidateKey": "K1",
+      "origin": "국내",
+      "views": "110.3만",
+      "ageBasis": "원문 숫자 연령 없음. 보호자가 제작하고 아이가 집게를 조작하는 동작을 기준으로 24~30개월용 조건부 후보로 편집함.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "2026-10-15 검수 의견 반영: 필수 재료 cup을 별도 재료 paper_cup(종이컵)으로 바꿨습니다."
+      ]
+    },
+    {
+      "id": "play_208",
+      "candidateKey": "F4",
+      "origin": "해외",
+      "views": "95.8만",
+      "ageBasis": "캡션의 작성자 경험은 3–12세. 24개월은 보호자가 단순한 길을 그리고 아이는 자동차를 밀도록 조정한 후보이며 원문의 권장 연령을 2세로 바꾸지 않음.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "사용자 재료 검수에 따라 마커 대신 색연필로 도로를 진하게 그리는 방법으로 수정했습니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "marker",
+          "to": "crayon",
+          "reason": "색연필로 가능",
+          "previousMethodHash": "9fe4e625b20c2639b89122590b81edc34b2508247e83fc32f6e02fb3103c4316"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "사용자 재료 검수에 따라 마커 대신 색연필로 도로를 진하게 그리는 방법으로 수정했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DT33hO3Adru/",
+          "instagramAccount": "busytoddler"
+        },
+        "previousName": "펼친 상자 자동차 도로"
+      }
+    },
+    {
+      "id": "play_209",
+      "candidateKey": "F7",
+      "origin": "해외",
+      "views": "78.7만",
+      "ageBasis": "캡션은 Duplo를 넣은 욕조 놀이이며 숫자 연령 없음. 24개월용은 사용 연령이 맞는 큰 블록과 바닥의 얕은 물놀이통으로 규모를 줄이는 편집 판단.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "채반을 제외하고 물놀이통 하나에서 진행하며 보호자가 손으로 블록을 꺼내 정리하도록 수정했습니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "colander",
+          "to": "water_bin",
+          "reason": "채반 대신 놀 수있도록 방법 수정",
+          "previousMethodHash": "429623810eb2bb50ab5a0de0d05ab022c9a5c7da290a81ec85b42407c0f10607"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "채반을 제외하고 물놀이통 하나에서 진행하며 보호자가 손으로 블록을 꺼내 정리하도록 수정했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DVHr5y-gbDE/",
+          "instagramAccount": "busytoddler"
+        },
+        "previousName": "큰 블록 물놀이"
+      }
+    },
+    {
+      "id": "play_210",
+      "candidateKey": "F8",
+      "origin": "해외",
+      "views": "66.3만",
+      "ageBasis": "개별 Instagram 캡션의 2–6세에 24개월이 포함됨. 보호자가 잎을 잡아 주는 기본형으로 작성.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "사용자 추가 확인에 따라 접시 대신 신규 승인한 트레이·쟁반에 물감을 덜어 씁니다. 필수·선택 중복도 제거했습니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "plate",
+          "to": "tray",
+          "reason": "놀이용 트레이나 쟁반이 신규로 추가되어 접시 대신 사용",
+          "previousMethodHash": "292c459645f0ad9d3f01d8bedca9b530f2b8ff77556ff07a17c585bd0522f4ad"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "사용자 추가 확인에 따라 접시 대신 신규 승인한 트레이·쟁반에 물감을 덜어 씁니다. 필수·선택 중복도 제거했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DbhCgljRI--/",
+          "instagramAccount": "happytoddlerplaytime"
+        },
+        "previousName": "스펀지로 나뭇잎 실루엣 찍기"
+      }
+    },
+    {
+      "id": "play_211",
+      "candidateKey": "F10",
+      "origin": "해외",
+      "views": "33.8만",
+      "ageBasis": "개별 Instagram 캡션의 2–5세에 24개월이 포함됨. 액체 재료와 스포이드 진행은 영상 및 작성자 상세 글로 보완 확인.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "연필 대신 색연필로 윤곽을 그리고 식용 색소 대신 연령에 맞는 희석 가능한 수성 물감을 쓰도록 방법과 주의사항을 수정했습니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "food_coloring",
+          "to": "paint",
+          "reason": "물감을 물에 희석하거나 하면 비슷할듯",
+          "previousMethodHash": "921d706dcf1c199e428fd553b0292bbda2ad34a2eedcbb49cdfbb15ad282b076"
+        },
+        {
+          "from": "pencil",
+          "to": "crayon",
+          "reason": "색연필로 충분히 가능",
+          "previousMethodHash": "921d706dcf1c199e428fd553b0292bbda2ad34a2eedcbb49cdfbb15ad282b076"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "연필 대신 색연필로 윤곽을 그리고 식용 색소 대신 연령에 맞는 희석 가능한 수성 물감을 쓰도록 방법과 주의사항을 수정했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DdE19aIxvi0/",
+          "instagramAccount": "happytoddlerplaytime"
+        },
+        "previousName": "화장솜 사과에 색 물 톡톡"
+      }
+    },
+    {
+      "id": "play_212",
+      "candidateKey": "K4",
+      "origin": "국내",
+      "views": "10.7만",
+      "ageBasis": "원문 숫자 연령 없음. 보호자가 그림판을 제작하고 아이는 빛을 비추거나 휴지심을 움직이는 단순 조작으로 24~30개월에 맞춤.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "색연필은 투명 테이프 직접 그리기에 적합하지 않아 종이에 그린 모양을 잘라 붙이는 그림자 놀이로 수동 재작성했습니다. 원문 마커 방식과 구분하며 참고 출처를 보존했습니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "marker",
+          "to": "crayon",
+          "reason": "색연필로 가능",
+          "previousMethodHash": "2848e1ef11ad6d57050a7b1f2b261212a4016e76fb18c16031c2da0b6876edf9"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "색연필은 투명 테이프 직접 그리기에 적합하지 않아 종이에 그린 모양을 잘라 붙이는 그림자 놀이로 수동 재작성했습니다. 원문 마커 방식과 구분하며 참고 출처를 보존했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DOMpLxrEh2Y/",
+          "instagramAccount": "wplpmom"
+        },
+        "previousName": "휴지심 빛그림 극장 만들기"
+      }
+    },
+    {
+      "id": "play_213",
+      "candidateKey": "K5",
+      "origin": "국내",
+      "views": "9.7만",
+      "ageBasis": "원문은 아이·어르신용 도안 소개이며 숫자 연령 없음. 접기 전체는 보호자 역할, 아이는 누르기·꾸미기·짧은 날리기에 참여하는 24~30개월용 응용.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다."
+      ]
+    },
+    {
+      "id": "play_214",
+      "candidateKey": "K6",
+      "origin": "국내",
+      "views": "8.5만",
+      "ageBasis": "개별 캡션에서 두돌 아기 실내놀이로 소개. 영상 다섯 번째 바구니 받기를 24~30개월 대상으로 선택, 낮고 느린 공으로 시작.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "방법 표현 변경: 아이가 서거나 앉아서 바구니 입구를 위로 향하게 잡습니다. 보호자가 아이 가까이에서 공을 바구니 쪽으로 천천히 굴려 떨어뜨리듯 보내 줍니다. → 아이가 서거나 앉아서 바구니 입구를 위로 향하게 잡습니다. 보호자가 아이 가까이에서 공을 바구니 입구를 향해 낮고 천천히 보내 줍니다.",
+        "구매 바구니 대신 보호자가 상자를 열린 바구니 모양으로 제작하는 방법으로 수동 재작성했습니다. 제작 도구·모서리 처리·앉아서 받기를 명시하고 참고 원문을 보존했습니다.",
+        "2026-10-15 검수 의견 반영: 집에 있는 바구니를 쓰는 방식으로 되돌리고 상자 제작·테이프·가위를 제거했습니다. 기존 바구니 대표 이미지가 수정한 본문과 일치합니다."
+      ],
+      "materialReplacementChecks": [
+        {
+          "from": "basket",
+          "to": "cardboard",
+          "reason": "박스로 바구니모양을 만들어 사용",
+          "previousMethodHash": "8424bd9b63414c269cfc74a735c0ba0b764f27967a4d9dc2c3771cab04d773ab"
+        }
+      ],
+      "materialReviewContentUpdate": {
+        "note": "구매 바구니 대신 보호자가 상자를 열린 바구니 모양으로 제작하는 방법으로 수동 재작성했습니다. 제작 도구·모서리 처리·앉아서 받기를 명시하고 참고 원문을 보존했습니다.",
+        "originalSource": {
+          "type": "instagram",
+          "url": "https://www.instagram.com/reel/DcBPUpdJsqu/",
+          "instagramAccount": "ninimom_talk"
+        },
+        "previousName": "바구니로 큰 공 받기"
+      }
+    },
+    {
+      "id": "play_215",
+      "candidateKey": "K7",
+      "origin": "국내",
+      "views": "8만",
+      "ageBasis": "원문 숫자 연령 없음. 면봉 축을 단단히 고정하고 보호자가 제작한 큰 팽이를 함께 돌리는 24~30개월용 조건부 후보. 입 탐색 시 제외.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "방법 표현 변경: 보호자가 평평한 쟁반이나 바닥에서 면봉 축을 잡고 살짝 돌려 팽이가 회전하는 모습을 보여 줍니다. → 보호자가 평평한 바닥에서 면봉 축을 잡고 살짝 돌려 팽이가 회전하는 모습을 보여 줍니다.",
+        "추가 주의사항: 면봉 축을 귀나 코에 넣지 않도록 함께하며 축이나 솜이 분리되면 즉시 회수합니다.",
+        "2026-10-15 검수 의견 반영: 필수 재료 cup을 별도 재료 paper_cup(종이컵)으로 바꾸고 준비 조건에도 종이컵을 명시했습니다."
+      ]
+    },
+    {
+      "id": "play_216",
+      "candidateKey": "K8",
+      "origin": "국내",
+      "views": "6.9만",
+      "ageBasis": "원문 숫자 연령 없음. 큰 그림 한 개와 컵 두 개로 줄여 컵 돌리기만 수행하는 24~30개월용 편집 판단.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
+        "2026-10-15 검수 의견 반영: 필수 재료 cup을 별도 재료 transparent_cup(투명 플라스틱 컵)으로 바꾸고 본문·준비 조건에 컵 종류를 명시했습니다."
+      ]
+    },
+    {
+      "id": "play_217",
+      "candidateKey": "K10",
+      "origin": "국내",
+      "views": "1.2만",
+      "ageBasis": "개별 캡션에서 두돌 전후 놀이로 명시. 영상의 컵으로 굴러오는 공 잡기를 24~30개월용으로 선택.",
+      "normalizationNotes": [
+        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다."
+      ]
+    }
+  ],
+  "materialProposals": [
+    {
+      "slug": "cardboard_tube",
+      "originalNames": [
+        "깨끗한 휴지심"
+      ],
+      "usages": [
+        {
+          "id": "play_212",
+          "name": "휴지심 빛그림 극장 만들기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "cardboard"
+      ],
+      "purpose": "휴지심 원통의 구조로 빛을 통과시키는 장치를 만듭니다.",
+      "reason": "박스·골판지와 같은 소재지만 원통 구조가 핵심입니다. 기존 분류로 통합할 때도 실제 원통 준비 조건을 유지해야 합니다."
+    },
+    {
+      "slug": "tray",
+      "originalNames": [
+        "놀이용 트레이",
+        "트레이"
+      ],
+      "usages": [
+        {
+          "id": "play_205",
+          "name": "큰 얼음 위에 붓으로 색칠하기",
+          "role": "required"
+        },
+        {
+          "id": "play_210",
+          "name": "스펀지로 나뭇잎 실루엣 찍기",
+          "role": "optional"
+        },
+        {
+          "id": "play_211",
+          "name": "화장솜 사과에 색 물 톡톡",
+          "role": "optional"
+        }
+      ],
+      "similar": [
+        "bowl",
+        "paper_plate"
+      ],
+      "purpose": "큰 얼음의 녹은 물을 받거나 미술 작업을 받치는 낮고 넓은 작업면입니다.",
+      "reason": "낮고 넓은 형태가 필요합니다. 큰 그릇 분류를 쓸 수 있는지 준비 조건과 실제 제품을 함께 비교합니다."
+    },
+    {
+      "slug": "plate",
+      "originalNames": [
+        "물감을 담을 접시"
+      ],
+      "usages": [
+        {
+          "id": "play_210",
+          "name": "스펀지로 나뭇잎 실루엣 찍기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "bowl",
+        "cup",
+        "paper_plate"
+      ],
+      "purpose": "스펀지에 묻힐 물감을 담는 접시입니다.",
+      "reason": "접시형 물감 받침입니다. 큰 그릇·컵 분류로 충분할 가능성이 있어 신규 재료 여부를 확인할 항목입니다."
+    },
+    {
+      "slug": "colander",
+      "originalNames": [
+        "보호자가 쓸 채반"
+      ],
+      "usages": [
+        {
+          "id": "play_209",
+          "name": "큰 블록 물놀이",
+          "role": "optional"
+        }
+      ],
+      "similar": [
+        "bowl"
+      ],
+      "purpose": "보호자가 놀이 후 블록의 물기를 빼는 선택 정리 도구입니다.",
+      "reason": "물이 빠지는 구멍이 있는 도구라 일반 그릇과 구조가 다릅니다. 필수 놀이 재료로 유지할 필요가 있는지도 검토합니다."
+    },
+    {
+      "slug": "food_coloring",
+      "originalNames": [
+        "식용 색소"
+      ],
+      "usages": [
+        {
+          "id": "play_211",
+          "name": "화장솜 사과에 색 물 톡톡",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "paint"
+      ],
+      "purpose": "스포이드로 떨어뜨릴 색 물을 준비합니다.",
+      "reason": "원문은 식용 색소를 사용합니다. 물감으로 바꾸면 실제 재료 변경이므로 방법과 주의사항 검토가 필요합니다."
+    },
+    {
+      "slug": "marker",
+      "originalNames": [
+        "이름을 쓸 굵은 펜",
+        "도로를 그릴 굵은 펜",
+        "보호자용 네임펜"
+      ],
+      "usages": [
+        {
+          "id": "play_206",
+          "name": "꽃·잎으로 골판지 이름 꾸미기",
+          "role": "required"
+        },
+        {
+          "id": "play_208",
+          "name": "펼친 상자 자동차 도로",
+          "role": "required"
+        },
+        {
+          "id": "play_212",
+          "name": "휴지심 빛그림 극장 만들기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "crayon"
+      ],
+      "purpose": "보호자가 이름·도로·투명 테이프 위 그림을 준비합니다.",
+      "reason": "골판지 그림은 색연필로 준비할 수도 있지만 투명 테이프 위 그림은 도구 기능이 다릅니다. 사용되는 놀이 모두를 확인합니다."
+    },
+    {
+      "slug": "pencil",
+      "originalNames": [
+        "사과를 그릴 연필"
+      ],
+      "usages": [
+        {
+          "id": "play_211",
+          "name": "화장솜 사과에 색 물 톡톡",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "crayon"
+      ],
+      "purpose": "보호자가 골판지에 사과 윤곽을 그립니다.",
+      "reason": "크레용·색연필 분류로 윤곽 준비가 가능한지 비교할 수 있습니다. 실물을 바꾼다면 연필이라는 본문 표현도 수정합니다."
+    },
+    {
+      "slug": "cotton_pad",
+      "originalNames": [
+        "큰 원형 화장솜"
+      ],
+      "usages": [
+        {
+          "id": "play_211",
+          "name": "화장솜 사과에 색 물 톡톡",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "cloth",
+        "tissue",
+        "paper_towel"
+      ],
+      "purpose": "큰 화장솜에 색 물을 떨어뜨려 흡수와 번짐을 관찰합니다.",
+      "reason": "천·휴지와 흡수 용도는 비슷하지만 두께·부착·조작이 다릅니다. 실물 대체를 자동 매핑하지 않습니다."
+    },
+    {
+      "slug": "plant_material",
+      "originalNames": [
+        "보호자가 고른 큰 잎과 꽃",
+        "큰 잎"
+      ],
+      "usages": [
+        {
+          "id": "play_206",
+          "name": "꽃·잎으로 골판지 이름 꾸미기",
+          "role": "required"
+        },
+        {
+          "id": "play_210",
+          "name": "스펀지로 나뭇잎 실루엣 찍기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "paper"
+      ],
+      "purpose": "큰 잎·꽃으로 이름을 꾸미거나 잎으로 실루엣을 가립니다.",
+      "reason": "실제 자연물의 촉감·형태가 활동에 포함됩니다. 종이로 바꾸면 놀이 목표와 이름도 다시 검토합니다."
+    },
+    {
+      "slug": "dropper",
+      "originalNames": [
+        "유아용 일체형 스포이드"
+      ],
+      "usages": [
+        {
+          "id": "play_211",
+          "name": "화장솜 사과에 색 물 톡톡",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "spoon"
+      ],
+      "purpose": "보호자와 함께 스포이드를 눌러 색 물을 한두 방울 떨어뜨립니다.",
+      "reason": "숟가락과 물 옮기기 용도는 겹치지만 누르는 핵심 동작과 양 조절이 다릅니다."
+    },
+    {
+      "slug": "basket",
+      "originalNames": [
+        "가볍고 모서리가 둥근 작은 바구니"
+      ],
+      "usages": [
+        {
+          "id": "play_214",
+          "name": "바구니로 큰 공 받기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "bowl"
+      ],
+      "purpose": "아이가 양손으로 바구니를 옮겨 큰 공을 받습니다.",
+      "reason": "큰 그릇으로 같은 받기 활동이 가능한지 비교할 수 있습니다. 무게·모서리·공이 들어가는 크기를 유지해야 합니다."
+    },
+    {
+      "slug": "cotton_swab",
+      "originalNames": [
+        "면봉"
+      ],
+      "usages": [
+        {
+          "id": "play_215",
+          "name": "종이컵 팽이 만들고 돌리기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "straw"
+      ],
+      "purpose": "보호자가 팽이를 만들 때 단단히 고정하는 회전 중심축입니다.",
+      "reason": "빨대 등 다른 축을 쓰면 제작 구조·고정 방법이 달라집니다. 면봉을 느슨한 놀이 재료로 제공하지 않습니다."
+    },
+    {
+      "slug": "paper_cup",
+      "originalNames": [
+        "종이컵"
+      ],
+      "usages": [
+        {
+          "id": "play_207",
+          "name": "종이컵 뽑기 집게 만들기",
+          "role": "required"
+        },
+        {
+          "id": "play_215",
+          "name": "종이컵 팽이 만들고 돌리기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "cup"
+      ],
+      "purpose": "종이컵을 자르고 접어 집게와 팽이를 만듭니다.",
+      "reason": "일반 컵·그릇과 달리 자르고 접을 수 있는 종이컵의 구조와 소재가 핵심입니다. 사용자의 검수 의견에 따라 별도 재료로 추가했습니다."
+    },
+    {
+      "slug": "transparent_cup",
+      "originalNames": [
+        "투명 플라스틱 컵"
+      ],
+      "usages": [
+        {
+          "id": "play_216",
+          "name": "투명컵 그림 맞추기 만들기",
+          "role": "required"
+        }
+      ],
+      "similar": [
+        "cup"
+      ],
+      "purpose": "겹친 컵의 반쪽 그림을 보면서 한 컵을 돌려 맞춥니다.",
+      "reason": "그림을 겹쳐 볼 수 있는 투명성이 필요하므로 일반 컵·그릇과 구분합니다. 사용자의 검수 의견에 따라 별도 재료로 추가했습니다."
+    }
+  ],
+  "appliedMaterialDecisions": {
+    "cardboard_tube": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "",
+      "confirmed": true
+    },
+    "tray": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "",
+      "confirmed": true
+    },
+    "cotton_pad": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "",
+      "confirmed": true
+    },
+    "plant_material": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "",
+      "confirmed": true
+    },
+    "dropper": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "",
+      "confirmed": true
+    },
+    "cotton_swab": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "",
+      "confirmed": true
+    },
+    "plate": {
+      "decision": "replace",
+      "replacementSlug": "tray",
+      "comment": "놀이용 트레이나 쟁반이 신규로 추가되어 접시 대신 사용",
+      "confirmed": true
+    },
+    "colander": {
+      "decision": "replace",
+      "replacementSlug": "water_bin",
+      "comment": "채반 대신 놀 수있도록 방법 수정",
+      "confirmed": true
+    },
+    "food_coloring": {
+      "decision": "replace",
+      "replacementSlug": "paint",
+      "comment": "물감을 물에 희석하거나 하면 비슷할듯",
+      "confirmed": true
+    },
+    "marker": {
+      "decision": "replace",
+      "replacementSlug": "crayon",
+      "comment": "색연필로 가능",
+      "confirmed": true
+    },
+    "pencil": {
+      "decision": "replace",
+      "replacementSlug": "crayon",
+      "comment": "색연필로 충분히 가능",
+      "confirmed": true
+    },
+    "basket": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "2026-10-15 최신 놀이 검수 의견에 따라 집에 있는 바구니를 사용하도록 복원했습니다.",
+      "confirmed": true
+    },
+    "paper_cup": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "2026-10-15 놀이 검수 의견에 따른 별도 재료 추가",
+      "confirmed": true
+    },
+    "transparent_cup": {
+      "decision": "add",
+      "replacementSlug": null,
+      "comment": "2026-10-15 놀이 검수 의견에 따른 별도 재료 추가",
+      "confirmed": true
+    }
+  },
+  "reviewOutput": "results/play-image-audit.html"
+}

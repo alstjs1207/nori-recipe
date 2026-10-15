@@ -45,9 +45,13 @@ test("getVisibleMaterialCategories는 온보딩 노출 카테고리 순서를 �
   );
   assert.deepEqual(categories.at(-1), {
     name: "도구",
-    materials: ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler", "brush", "chair"],
+    materials: ["scissors", "tongs", "smartphone", "flashlight", "mat", "shape_ruler", "brush", "chair", "dropper", "basket", "cotton_swab"],
   });
   assert.ok(categories.every((category) => category.materials.length > 0));
+  const visible = new Set<string>(categories.flatMap((category) => category.materials));
+  for (const slug of ["colander", "food_coloring", "marker", "pencil", "plate"]) {
+    assert.equal(visible.has(slug), false, "미승인 재료는 선택 목록에 표시하지 않습니다: " + slug);
+  }
   assert.ok(
     categories.every((category) =>
       category.materials.every((material) => material in MATERIAL_DISPLAY_NAMES),

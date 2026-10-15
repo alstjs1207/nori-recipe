@@ -73,13 +73,13 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 
 | 카테고리 | slug |
 |---------|------|
-| 종이류 | paper, cardboard, tissue, sticker, cloth, blanket, paper_plate, paper_towel |
-| 주방 | flour, rice_flour, water, bowl, cup, spoon, chopsticks, bottle, soft_food, salt |
-| 공작 | crayon, paint, glue, tape, string, rubber_band, straw, pom_pom |
-| 감각 | sand, kinetic_sand, water_bin, water_beads, bubble, balloon, slime |
+| 종이류 | paper, cardboard, tissue, sticker, cloth, blanket, paper_plate, paper_towel, cardboard_tube, paper_cup |
+| 주방 | flour, rice_flour, water, bowl, cup, spoon, chopsticks, bottle, soft_food, salt, tray, plate, colander, food_coloring, transparent_cup |
+| 공작 | crayon, paint, glue, tape, string, rubber_band, straw, pom_pom, marker, pencil, cotton_pad |
+| 감각 | sand, kinetic_sand, water_bin, water_beads, bubble, balloon, slime, plant_material |
 | 블록/장난감 | block, magnetic_tile, ball, puzzle, book, mirror, doll, marble, bead, car_toy, animal_toy, hula_hoop, large_lid_container |
 | 조형 | clay, foam, play_corn |
-| 도구 | scissors, tongs, smartphone, flashlight, mat, shape_ruler, brush, chair |
+| 도구 | scissors, tongs, smartphone, flashlight, mat, shape_ruler, brush, chair, dropper, basket, cotton_swab |
 
 제거된 slug: newspaper (→ paper), plastic_bag (안전 이슈)
 

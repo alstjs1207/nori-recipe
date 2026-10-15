@@ -10,6 +10,8 @@ generated/
 node_modules/
 .expo/
 dist/
+!/data/review-batches/
+!/data/review-batches/*.json
 .vercel/
 web-build/
 expo-env.d.ts
