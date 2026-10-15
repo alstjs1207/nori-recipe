@@ -634,6 +634,19 @@ export async function recordPlayFeedback(
   memo: string | null,
   durationActual: number | null = null,
 ): Promise<UserContext> {
+  const result = await recordPlayFeedbackWithRecord(guestId, playId, rating, reactions, memo, durationActual);
+  return result.userContext;
+}
+
+/** The record ID stays local, allowing analytics to avoid collecting a record twice. */
+export async function recordPlayFeedbackWithRecord(
+  guestId: string,
+  playId: string,
+  rating: number,
+  reactions: ChildReaction[],
+  memo: string | null,
+  durationActual: number | null = null,
+): Promise<{ userContext: UserContext; record: PlayLogRecord }> {
   const play = playIndex.get(playId);
 
   if (!play) {
@@ -661,6 +674,10 @@ export async function recordPlayFeedback(
   );
   const playLogId = randomUUID();
   const completedAt = new Date().toISOString();
+  const result = { userContext: nextContext, record: {
+    id: playLogId, guestId, playId, completedAt, durationActual,
+    starRating: rating, childReaction: reactions, memo,
+  } };
 
   if (Platform.OS === "web") {
     const [logs, contexts] = await Promise.all([readWebPlayLogs(), readWebUserContexts()]);
@@ -698,7 +715,7 @@ export async function recordPlayFeedback(
       throw error;
     }
 
-    return nextContext;
+    return result;
   }
 
   const database = await initializeDatabase();
@@ -768,7 +785,7 @@ export async function recordPlayFeedback(
     );
   });
 
-  return nextContext;
+  return result;
 }
 
 /**

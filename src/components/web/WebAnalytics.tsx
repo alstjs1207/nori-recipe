@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useId, useRef, useSt
 import { Link, useFocusEffect, useNavigation, usePathname, useSegments } from "expo-router";
 import { webAnalytics, consumePlayEntry } from "@/analytics/analytics.web";
 import { type AnalyticsClient } from "@/analytics/client";
+import { importFeedbackAnalytics } from "@/analytics/feedback.web";
 import { getAnalyticsPage, type AnalyticsEntryPoint } from "@/analytics/policy";
 import { isNewPlay } from "@/play/newPlay";
 import { useSessionStore } from "@/store/sessionStore";
@@ -28,6 +29,8 @@ function AnalyticsPageTracking() {
   const segments = useSegments().join("/");
   const profileReady = useSessionStore((state) => state.onboardingCompleted && state.userContext.childBirthMonth !== null);
   const plays = usePlaysStore((state) => state.plays);
+  const guestId = useSessionStore((state) => state.guestId);
+  const sessionReady = useSessionStore((state) => state.status === "ready");
   const [online, setOnline] = useState(navigator.onLine);
   const playView = useRef<string | null>(null);
   const entry = useRef<{ key: string; source: AnalyticsEntryPoint } | null>(null);
@@ -52,6 +55,11 @@ function AnalyticsPageTracking() {
     void client.track({ name: "play_view", params: { play_id: play.id, entry_point: entry.current.source, is_new: Number(isNewPlay(play.createdAt)) } })
       .then((sent) => { if (!sent && playView.current === page.path) playView.current = null; });
   }, [client, consent, pathname, segments, profileReady, plays, online]);
+  useEffect(() => {
+    if (client === webAnalytics && sessionReady && guestId && consent === "granted" && online) {
+      void importFeedbackAnalytics(guestId);
+    }
+  }, [client, sessionReady, guestId, consent, online, pathname, segments]);
   return null;
 }
 

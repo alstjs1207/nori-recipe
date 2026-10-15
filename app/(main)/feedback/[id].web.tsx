@@ -6,8 +6,8 @@ import {
   CHILD_REACTION_OPTIONS,
   type ChildReactionOption,
 } from "@/constants/feedback";
-import { recordPlayFeedback } from "@/db/queries";
-import { trackAnalytics } from "@/analytics/analytics";
+import { recordPlayFeedbackWithRecord } from "@/db/queries";
+import { trackSavedFeedback } from "@/analytics/feedback.web";
 import { useSessionStore } from "@/store/sessionStore";
 import { usePlaysStore } from "@/store/playsStore";
 import { EmptyState, Icon, PageFooter } from "@/components/web/NoriUI";
@@ -45,15 +45,15 @@ export default function FeedbackWebScreen() {
     setSaving(true);
     setError(null);
     try {
-      const context = await recordPlayFeedback(
+      const { userContext, record } = await recordPlayFeedbackWithRecord(
         guestId,
         play.id,
         rating,
         reactions,
         memo.trim() || null,
       );
-      useSessionStore.setState({ userContext: context });
-      trackAnalytics({ name: "play_feedback_saved", params: { play_id: play.id } });
+      useSessionStore.setState({ userContext });
+      trackSavedFeedback(guestId, record);
       router.replace({
         pathname: "/(main)",
         params: { completedPlayId: play.id },

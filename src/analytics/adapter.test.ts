@@ -69,6 +69,9 @@ test("실제 웹 어댑터는 동의 후에만 태그를 로드하고 URL 정리
     await new Promise<void>((resolve) => setImmediate(resolve));
     assert.equal(scripts.length, 1);
     assert.equal(Reflect.get(fakeWindow, "ga-disable-G-ABC1234567"), false);
+    const receiptKey = "nori-recipe/feedback-analytics/local-receipt";
+    storage.set(receiptKey, "dispatched");
+    Object.defineProperty(fakeWindow.localStorage, receiptKey, { value: "dispatched", enumerable: true });
     resetAnalyticsConsent();
     assert.equal(storage.size, 0);
   } finally {

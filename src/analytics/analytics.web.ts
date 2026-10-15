@@ -1,4 +1,5 @@
 import { createAnalyticsClient, type AnalyticsTransport } from "./client";
+import { FEEDBACK_ANALYTICS_RECEIPT_PREFIX } from "./feedback";
 import { ANALYTICS_CONSENT_KEY, ANALYTICS_PREVIEW_CONSENT_KEY, parseAnalyticsConfig, type AnalyticsEntryPoint, type AnalyticsEvent, type AnalyticsParams } from "./policy";
 
 type GoogleTag = (...args: unknown[]) => void;
@@ -102,7 +103,14 @@ export const webAnalytics = createAnalyticsClient({
 });
 
 export function trackAnalytics(event: AnalyticsEvent): void { void webAnalytics.track(event); }
-export function resetAnalyticsConsent(): void { webAnalytics.setConsent("unknown"); }
+export function resetAnalyticsConsent(): void {
+  webAnalytics.setConsent("unknown");
+  try {
+    for (const key of Object.keys(window.localStorage)) {
+      if (key.startsWith(FEEDBACK_ANALYTICS_RECEIPT_PREFIX)) window.localStorage.removeItem(key);
+    }
+  } catch { /* Consent is revoked even if storage is unavailable. */ }
+}
 
 let pendingEntry: { playId: string; entryPoint: AnalyticsEntryPoint; at: number } | null = null;
 export function rememberPlayEntry(playId: string, entryPoint: AnalyticsEntryPoint): void { pendingEntry = { playId, entryPoint, at: Date.now() }; }

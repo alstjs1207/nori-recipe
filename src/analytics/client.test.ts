@@ -99,10 +99,12 @@ test("개인 입력값·임의 식별값·검색어를 전달해도 허용된 �
   const { client, state } = fixture();
   client.setConsent("granted");
   client.trackPage({ path: "/settings?name=private", screen: "settings", title: "private child name" });
-  const event = { name: "play_feedback_saved", params: { play_id: "play_200", memo: "private memo", childName: "private name", birthMonth: 24000, guestId: "private-id", user_id: "private-id" } } as AnalyticsEvent;
+  const event = { name: "play_feedback_saved", params: { play_id: "play_200", rating: 4, reactions: ["집중했어요"], memo: "private memo", childName: "private name", birthMonth: 24000, guestId: "private-id", user_id: "private-id" } } as AnalyticsEvent;
   assert.equal(await client.track(event), true);
   assert.deepEqual(state.events.at(-1)?.params, {
     page_location: `${config.origin}/settings`, page_referrer: "https://search.example.com/", page_title: "설정 · 노리 레시피", screen_name: "settings", play_id: "play_200",
+    rating: 4, rating_value: 4, reaction_count: 1, reaction_focused: 1, reaction_independent: 0, reaction_needs_help: 0, reaction_low_interest: 0,
+    reaction_legacy_liked: 0, reaction_legacy_disliked: 0, reaction_legacy_difficult: 0, reaction_legacy_wants_more: 0,
   });
   assert.deepEqual(sanitizeAnalyticsEvent({ name: "search_results", params: { result_count: 0, has_query: 1, category: "all", search_term: "private" } } as AnalyticsEvent), { result_count: 0, has_query: 1, category: "all" });
   assert.equal(sanitizeAnalyticsEvent({ name: "favorite_add", params: { play_id: "private" } }), null);
@@ -146,7 +148,7 @@ test("오프라인·태그 차단은 놀이 동작을 막지 않고 과거 행�
   client.setConsent("granted");
   state.online = false;
   client.trackPage(getAnalyticsPage("/play/play_200"));
-  assert.equal(await client.track({ name: "play_feedback_saved", params: { play_id: "play_200" } }), false);
+  assert.equal(await client.track({ name: "play_feedback_saved", params: { play_id: "play_200", rating: 4, reactions: [] } }), false);
   assert.equal(state.loads, 0);
   state.online = true;
   client.trackPage(getAnalyticsPage("/search"));
