@@ -4,7 +4,8 @@ import { create } from "zustand";
 
 import { deleteAllUserData, getUserContext, upsertUserContext } from "@/db/queries";
 import type { MaterialSlug } from "@/constants/materials";
-import type { UserContext } from "@/types";
+import type { HomeIntentConfirmation, UserContext } from "@/types";
+import { parseIntentConfirmation } from "@/engine/intentRecommendation";
 import { DEFAULT_USER_CONTEXT } from "@/types";
 import { resetAnalyticsConsent } from "@/analytics/analytics";
 
@@ -16,6 +17,7 @@ const CHILD_BIRTH_MONTH_STORAGE_KEY = "nori-recipe/child-birth-month";
 const TODAY_MATERIALS_STORAGE_KEY = "nori-recipe/today-materials";
 const HOME_RECOMMENDATION_IDS_STORAGE_KEY = "nori-recipe/home-recommendation-ids";
 const HOME_RECOMMENDATION_KEY_STORAGE_KEY = "nori-recipe/home-recommendation-key";
+const HOME_INTENT_CONFIRMATION_STORAGE_KEY = "nori-recipe/home-intent-confirmation";
 
 type SessionStatus = "idle" | "loading" | "ready" | "error";
 export type FamilyType = "single" | "multiple";
@@ -26,6 +28,7 @@ type SessionStore = {
   todayMaterials: MaterialSlug[] | null;
   pinnedHomeRecommendationIds: string[];
   pinnedHomeRecommendationKey: string | null;
+  homeIntentConfirmation: HomeIntentConfirmation | null;
   childName: string;
   familyType: FamilyType | null;
   onboardingCompleted: boolean;
@@ -37,6 +40,7 @@ type SessionStore = {
   setTodayMaterials: (materials: MaterialSlug[] | null) => Promise<void>;
   setPinnedHomeRecommendations: (payload: { ids: string[]; key: string }) => Promise<void>;
   clearPinnedHomeRecommendations: () => Promise<void>;
+  setHomeIntentConfirmation: (confirmation: HomeIntentConfirmation | null) => Promise<void>;
   updateOnboardingProfile: (profile: {
     childName?: string;
     familyType?: FamilyType | null;
@@ -90,6 +94,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   todayMaterials: null,
   pinnedHomeRecommendationIds: [],
   pinnedHomeRecommendationKey: null,
+  homeIntentConfirmation: null,
   childName: "",
   familyType: null,
   onboardingCompleted: false,
@@ -111,6 +116,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       savedTodayMaterials,
       savedPinnedRecommendationIds,
       savedPinnedRecommendationKey,
+      savedIntentConfirmation,
     ] = await Promise.all([
       AsyncStorage.getItem(ONBOARDING_CHILD_NAME_STORAGE_KEY),
       AsyncStorage.getItem(ONBOARDING_FAMILY_TYPE_STORAGE_KEY),
@@ -119,6 +125,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       AsyncStorage.getItem(TODAY_MATERIALS_STORAGE_KEY),
       AsyncStorage.getItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
       AsyncStorage.getItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+      AsyncStorage.getItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
     ]);
 
     set({
@@ -129,6 +136,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       todayMaterials: parseStoredMaterials(savedTodayMaterials),
       pinnedHomeRecommendationIds: parseStoredStringArray(savedPinnedRecommendationIds),
       pinnedHomeRecommendationKey: savedPinnedRecommendationKey,
+      homeIntentConfirmation: parseIntentConfirmation(savedIntentConfirmation),
     });
 
     const fallbackBirthMonth = savedBirthMonth !== null ? Number(savedBirthMonth) : null;
@@ -161,7 +169,13 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     }
 
     const savedContext = await upsertUserContext(guestId, context);
-    set({ userContext: savedContext });
+    const previous = get().userContext;
+    if (previous.childBirthMonth !== savedContext.childBirthMonth || JSON.stringify(previous.ownedMaterials) !== JSON.stringify(savedContext.ownedMaterials) || JSON.stringify(previous.blockedMaterials) !== JSON.stringify(savedContext.blockedMaterials)) {
+      await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
+      set({ userContext: savedContext, homeIntentConfirmation: null });
+    } else {
+      set({ userContext: savedContext });
+    }
   },
   setUserContext: async (context) => {
     await get().upsertUserContext(context);
@@ -173,7 +187,20 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       await AsyncStorage.setItem(TODAY_MATERIALS_STORAGE_KEY, JSON.stringify(materials));
     }
 
-    set({ todayMaterials: materials });
+    await Promise.all([
+      AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
+      AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
+      AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+    ]);
+    set({ todayMaterials: materials, homeIntentConfirmation: null, pinnedHomeRecommendationIds: [], pinnedHomeRecommendationKey: null });
+  },
+  setHomeIntentConfirmation: async (confirmation) => {
+    if (confirmation) {
+      await AsyncStorage.setItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY, JSON.stringify(confirmation));
+    } else {
+      await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
+    }
+    set({ homeIntentConfirmation: confirmation });
   },
   setPinnedHomeRecommendations: async ({ ids, key }) => {
     await Promise.all([
@@ -190,11 +217,13 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     await Promise.all([
       AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
       AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+      AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
     ]);
 
     set({
       pinnedHomeRecommendationIds: [],
       pinnedHomeRecommendationKey: null,
+      homeIntentConfirmation: null,
     });
   },
   updateOnboardingProfile: async ({ childName, familyType }) => {
@@ -243,6 +272,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       AsyncStorage.removeItem(TODAY_MATERIALS_STORAGE_KEY),
       AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
       AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+      AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
     ]);
 
     const nextGuestId = await getOrCreateGuestId();
@@ -251,6 +281,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     set({
       guestId: nextGuestId,
       userContext: nextUserContext,
+      homeIntentConfirmation: null,
       todayMaterials: null,
       pinnedHomeRecommendationIds: [],
       pinnedHomeRecommendationKey: null,

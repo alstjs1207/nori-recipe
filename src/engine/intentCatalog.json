@@ -1,0 +1,144 @@
+{
+  "version": "2026-10-18-v1",
+  "reviewBasis": [
+    "https://www.gatesheadhealth.nhs.uk/resources/scissor-skills/",
+    "https://www.zerotothree.org/resource/at-home-activity-guide/",
+    "https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Toys"
+  ],
+  "items": [
+    {
+      "id": "play_014",
+      "intents": [
+        "cutting"
+      ],
+      "signature": "{\"id\":\"play_014\",\"name\":\"안전 가위로 클레이 자르기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":15,\"durationMax\":20,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"scissors\",\"clay\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"제품의 사용 연령이 맞는 점토와 끝이 둥근 안전 가위를 준비합니다. 보호자가 점토를 길고 얇게 만들어 놓습니다.\",\"앉은 자세에서 보호자가 가위를 여닫고 점토를 한 번 자르는 모습을 보여줍니다.\",\"아이가 관심을 보이면 손의 위치를 확인하며 짧게 한 번씩 잘라 봅니다.\",\"자른 점토를 다시 합쳐 모양을 만들고 가위를 보호자가 회수합니다.\"],\"tip\":\"생밀가루나 생반죽으로 대체하지 않습니다. 가위 사용이 어렵거나 재료를 입에 넣으면 손으로 누르는 활동만 합니다.\",\"safetyNotes\":[\"제품에 표시된 사용 연령을 지킵니다. 무독성 표시는 먹어도 된다는 뜻이 아니며 눈과 입에 닿지 않게 합니다.\",\"가위를 든 채 이동하지 않습니다. 보호자가 손·얼굴에서 떨어진 자르는 위치를 확인합니다.\",\"보호자가 바로 곁에서 함께하고 아이가 피하거나 불편해하면 멈춥니다.\"],\"educationalEffects\":[\"안전 가위를 여닫고 점토를 짧게 자르는 경험\",\"손의 움직임과 잘리는 위치를 함께 살펴보기\"],\"tags\":[\"소근육\",\"가위놀이\",\"클레이놀이\",\"집콕놀이\"],\"source\":{\"type\":\"chaisplay\",\"url\":\"https://www.chaisplay.com/stories/198\",\"instagramAccount\":null},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_113",
+      "intents": [
+        "cutting"
+      ],
+      "signature": "{\"id\":\"play_113\",\"name\":\"안전 가위질 연습\",\"ageMin\":39,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":10,\"durationMax\":15,\"prepTime\":3,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"scissors\",\"paper\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"아동용 안전 가위를 올바르게 잡는 법을 시범 보인다.\",\"먼저 종이 끝을 한 번에 자르는 '자르기'를 연습한다.\",\"직선을 따라 길게 자르기를 시도한다.\",\"좁은 띠 모양 종이를 연속으로 잘라본다.\",\"자른 종이 조각으로 콜라주를 만들어 마무리한다.\"],\"tip\":\"처음에는 단단한 두꺼운 종이가 자르기 더 쉬워요. 아이가 틀려도 야단치지 않는 것이 중요합니다.\",\"safetyNotes\":[\"반드시 아동용 안전 가위를 사용하고 보호자가 옆에 있어야 합니다.\",\"가위를 들고 뛰거나 다른 사람 쪽으로 향하지 않도록 지도하세요.\",\"가위 사용 후에는 반드시 제자리에 보관합니다.\"],\"educationalEffects\":[\"가위 조작을 통한 손 근육과 협응 능력 발달\",\"집중력과 도구 사용 규칙 이해 능력 향상\",\"자르기 성취감을 통한 자신감 발달\"],\"tags\":[\"소근육\",\"집콕놀이\",\"가위질\",\"엄마표놀이\",\"협응력\"],\"source\":{\"type\":\"manual\",\"url\":\"https://baby.tali.kr/fine-motor-skill-activities-kids\",\"instagramAccount\":null},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_126",
+      "intents": [
+        "cutting",
+        "gluing"
+      ],
+      "signature": "{\"id\":\"play_126\",\"name\":\"색종이 콜라주 말하며 만들기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":20,\"durationMax\":30,\"prepTime\":5,\"difficulty\":2,\"devAreas\":[\"language\",\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"paper\",\"glue\"],\"optional\":[\"scissors\",\"crayon\"],\"substitutes\":[]},\"steps\":[\"색종이를 여러 색으로 준비하고 아이와 색 이름을 말해봅니다.\",\"'빨간 색종이를 찾아볼까요?' '파란 건 어디 있지?' 하며 색 이름을 반복합니다.\",\"아이가 색종이를 손으로 찢거나 가위로 자릅니다.\",\"스케치북에 붙이며 '붙이다', '자르다', '찢다' 등 동작 어휘를 함께 말합니다.\",\"완성된 작품에 대해 '무엇을 만들었어?' '왜 이 색을 골랐어?' 이야기를 나눕니다.\"],\"tip\":\"가위를 사용하는 경우 안전가위를 사용하고 보호자가 옆에서 함께합니다.\",\"safetyNotes\":[\"가위 사용 시 안전가위를 사용하고 반드시 보호자가 함께합니다.\",\"풀을 입에 넣지 않도록 주의합니다.\"],\"educationalEffects\":[\"색상 이름과 형태 어휘 습득\",\"미술 활동 관련 동사(자르다, 붙이다, 찢다) 표현 발달\",\"작품에 대해 이야기하며 설명적 언어 능력 발달\"],\"tags\":[\"언어놀이\",\"미술놀이\",\"소근육\",\"집콕놀이\",\"색깔놀이\"],\"source\":{\"type\":\"youtube\",\"url\":\"https://www.youtube.com/watch?v=4m7iXd2O3GU\",\"instagramAccount\":null},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_192",
+      "intents": [
+        "cutting"
+      ],
+      "signature": "{\"id\":\"play_192\",\"createdAt\":\"2026-10-09\",\"name\":\"괴물 미용실: 종이 머리카락 자르기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":15,\"prepTime\":5,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"language\",\"emotional\"],\"materials\":{\"required\":[\"paper\",\"scissors\",\"glue\"],\"optional\":[\"crayon\"],\"substitutes\":[]},\"steps\":[\"보호자가 종이에 큰 괴물 얼굴을 그리고, 색종이를 넓은 머리카락 띠로 자릅니다. 띠의 윗부분만 얼굴 위에 풀로 붙여 아래쪽은 자유롭게 움직이게 준비합니다.\",\"아이와 괴물에게 이름을 붙이고 “어떤 머리로 바꿔 줄까?” 하며 미용실 놀이를 시작합니다. 색연필이 있으면 얼굴을 함께 꾸밉니다.\",\"앉은 상태에서 안전 가위를 잡고 종이 머리카락의 끝을 조금씩 자릅니다. 보호자는 가위가 지나는 곳에서 손을 떼고 필요할 때 종이판을 안정시켜 줍니다.\",\"짧은 머리, 길이가 다른 머리처럼 아이가 원하는 모양을 만들고 바뀐 모습을 함께 봅니다. 잘린 종이는 바로 모읍니다.\"],\"tip\":\"처음에는 넓은 종이 끝을 한 번 자르는 것으로 시작합니다. 아이가 원하는 얼굴과 머리 모양을 만들도록 두고, 모양을 똑같이 만들도록 요구하지 않습니다.\",\"safetyNotes\":[\"제품 연령에 맞는 안전 가위를 사용하고 보호자가 바로 곁에서 함께합니다. 가위를 들고 이동하지 않습니다.\",\"준비한 종이만 자르고 실제 머리카락·옷·손을 향해 가위를 대지 않습니다. 풀과 종이 조각을 입에 넣지 않습니다.\"],\"educationalEffects\":[\"종이를 잡는 손과 자르는 손을 함께 사용해 보기\",\"원하는 헤어스타일을 말하고 결과의 변화를 살펴보기\"],\"tags\":[\"가위놀이\",\"종이놀이\",\"역할놀이\",\"미용실\",\"소근육\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/CT7KxTWpseG/\",\"instagramAccount\":\"happytoddlerplaytime\"},\"status\":\"live\"}",
+      "minSupportedMonths": 33
+    },
+    {
+      "id": "play_193",
+      "intents": [
+        "cutting"
+      ],
+      "signature": "{\"id\":\"play_193\",\"createdAt\":\"2026-10-09\",\"name\":\"문어 다리 싹둑 자르기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":15,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"cognitive\",\"language\"],\"materials\":{\"required\":[\"cardboard\",\"paper\",\"scissors\",\"glue\",\"crayon\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 골판지에 문어 얼굴을 그리고 색종이로 넓고 긴 다리 8개를 만듭니다. 각 다리의 윗부분을 몸통 뒤에 풀로 붙입니다.\",\"색연필로 다리 끝에 간단한 표시를 그리고 문어와 인사합니다. 아이가 원하면 문어의 다리를 함께 세어 봅니다.\",\"안전 가위로 다리 끝을 한 번씩 싹둑 자릅니다. 보호자는 아이 손 가까이에 몸통을 놓고, 종이를 잡는 손이 가위 앞에 오지 않도록 돕습니다.\",\"다리 하나를 골라 조금 더 짧게 자르고 다른 다리와 길이를 비교합니다. “어느 다리가 길까?” 하고 문어가 헤엄치는 이야기를 함께 만듭니다.\"],\"tip\":\"색연필로 문어를 자유롭게 꾸민 뒤 다리 길이를 함께 비교해 보세요. 다리를 같은 길이로 맞추거나 숫자를 모두 알도록 요구하지 않습니다.\",\"safetyNotes\":[\"골판지 몸통과 다리 준비는 보호자가 합니다. 아이는 제품 연령에 맞는 안전 가위로 얇은 종이 다리만 자릅니다.\",\"앉아서 가위를 사용하고 손가락·몸·얼굴 쪽을 향하지 않게 합니다. 작은 종이 조각은 바로 수거합니다.\"],\"educationalEffects\":[\"긴 종이 띠의 끝을 잡고 가위로 잘라 보기\",\"다리의 길이를 비교하고 바닷속 캐릭터를 이야기하기\"],\"tags\":[\"가위놀이\",\"문어\",\"바다놀이\",\"길이비교\",\"소근육\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/p/CR6-9eLtw4w/\",\"instagramAccount\":\"happytoddlerplaytime\"},\"status\":\"live\"}",
+      "minSupportedMonths": 33
+    },
+    {
+      "id": "play_194",
+      "intents": [
+        "gluing"
+      ],
+      "signature": "{\"id\":\"play_194\",\"createdAt\":\"2026-10-09\",\"name\":\"풀 한 방울로 색깔 점 맞추기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":15,\"prepTime\":5,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"paper\",\"glue\",\"crayon\",\"scissors\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 안전 가위로 색종이를 넓은 사각형으로 자르고 바탕 종이에 같은 색의 점을 색연필로 여러 개 그립니다. 풀 용기는 아이가 적은 힘으로 짤 수 있는 것으로 준비합니다.\",\"색종이 조각 하나를 고르고 종이에서 같은 색 점을 찾습니다. 처음에는 두 가지 색과 적은 수의 점으로 시작합니다.\",\"보호자가 “점 하나만큼” 풀을 짜는 모습을 보여주고, 아이가 점 위에 풀을 조금 짠 뒤 같은 색 종이를 눌러 붙여 봅니다.\",\"다른 점도 차례로 찾아 붙입니다. 풀이 많이 나왔으면 양을 함께 조절하고 아이가 원하면 새로운 색 점을 더합니다.\"],\"tip\":\"안전 가위는 보호자가 종이 조각을 미리 준비할 때 사용합니다. 아이의 가위 사용이 익숙하면 넓은 종이 띠를 함께 잘라 준비할 수 있습니다.\",\"safetyNotes\":[\"아동용 액체풀의 사용 연령을 확인하고 뚜껑·종이 조각을 입에 넣지 않게 합니다. 풀은 눈과 입에 닿지 않도록 곁에서 돕습니다.\",\"기본형의 종이 자르기는 보호자가 합니다. 아이가 자르는 응용에서는 안전 가위를 사용하고 앉아서 함께합니다.\"],\"educationalEffects\":[\"풀 용기를 조금씩 누르며 나오는 양을 살펴보기\",\"같은 색의 점과 종이 조각을 찾아 붙여 보기\"],\"tags\":[\"풀놀이\",\"색맞추기\",\"양조절\",\"종이붙이기\",\"소근육\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DcO0_qNJwla/\",\"instagramAccount\":\"ohheyletsplay\"},\"status\":\"live\"}",
+      "minSupportedMonths": 33
+    },
+    {
+      "id": "play_195",
+      "intents": [
+        "gluing",
+        "painting"
+      ],
+      "signature": "{\"id\":\"play_195\",\"createdAt\":\"2026-10-09\",\"name\":\"풀·소금 불꽃 그림\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":10,\"durationMax\":20,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"sensory\",\"cognitive\"],\"materials\":{\"required\":[\"paper\",\"glue\",\"salt\",\"paint\",\"brush\",\"water\",\"cup\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 안정된 작업면에 두꺼운 종이를 놓고 컵에 물을 조금 담습니다. 아동용 수채 물감과 붓, 액체풀, 소금 소량을 손이 닿는 곳에 준비합니다.\",\"아이와 액체풀을 조금씩 짜서 종이에 중심에서 바깥으로 퍼지는 불꽃 선을 그립니다. 용기를 누르기 어려우면 보호자가 함께 잡습니다.\",\"보호자와 소금을 풀 선 위에 조금씩 뿌립니다. 보호자가 종이를 가볍게 기울여 붙지 않은 소금을 치웁니다.\",\"물을 묻힌 붓으로 수채 물감을 묽게 만들고 소금 선 위에 살짝 대어 색이 퍼지는 모습을 봅니다. 선을 세게 문지르지 않고 다른 곳에도 톡톡 찍습니다.\",\"어떤 색이 어디로 퍼졌는지 함께 이야기합니다. 놀이가 끝나면 손과 작업면을 씻고 그림은 아이 손이 닿지 않는 곳에서 말립니다.\"],\"tip\":\"검은색 두꺼운 종이를 쓰면 색이 잘 보입니다. 불꽃 모양이 어렵다면 점이나 짧은 선으로 시작하세요. 물감이 마를 때까지 기다리는 시간은 별도로 여유 있게 잡아 주세요.\",\"safetyNotes\":[\"제품 연령에 맞는 아동용 액체풀과 물감을 사용하고 보호자가 곁에서 함께합니다. 뜨거운 글루건은 사용하지 않습니다.\",\"소금·풀·물감을 먹거나 눈에 비비지 않게 하고 소금을 얼굴 쪽으로 뿌리지 않습니다. 물은 소량만 쓰고 흘린 물을 바로 닦습니다.\"],\"educationalEffects\":[\"붓을 살짝 대어 색이 퍼지는 변화를 관찰하기\",\"풀 선을 그리고 색을 선택하며 손의 힘을 조절해 보기\"],\"tags\":[\"소금그림\",\"풀놀이\",\"수채화\",\"색번짐\",\"불꽃미술\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DQKibw8DGeX/\",\"instagramAccount\":\"inspiremyplay\"},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_206",
+      "intents": [
+        "gluing"
+      ],
+      "signature": "{\"name\":\"꽃·잎으로 골판지 이름 꾸미기\",\"ageMin\":24,\"ageMax\":30,\"place\":\"any\",\"durationMin\":5,\"durationMax\":10,\"prepTime\":7,\"difficulty\":1,\"devAreas\":[\"fine_motor\",\"sensory\",\"language\"],\"materials\":{\"required\":[\"cardboard\",\"crayon\",\"glue\",\"plant_material\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 가시나 자극성 수액이 없는 식물에서 큰 잎과 꽃을 골라 깨끗이 준비합니다. 작은 열매나 씨앗은 제외합니다.\",\"골판지의 모서리를 정리한 뒤 보호자가 색연필로 아이 이름을 크게 씁니다. 글자를 읽거나 따라 쓰게 하지 않습니다.\",\"보호자가 글자 위에 아동용 액체풀을 조금 바르고 아이가 고른 잎과 꽃을 놓아 가볍게 누르게 합니다.\",\"아이 이름을 말해 주고 붙인 자연물의 색과 모양을 함께 살펴봅니다. 풀통과 남은 재료는 즉시 치웁니다.\"],\"tip\":\"이름이 길면 첫 글자 하나만 꾸며도 좋아요. 꽃과 잎을 놓는 자리는 아이가 고르게 해 주세요.\",\"safetyNotes\":[\"식물 선택과 손질은 보호자가 합니다. 알 수 없는 식물, 가시, 씨앗과 작은 열매는 쓰지 않습니다.\",\"풀과 자연물을 입에 넣지 않도록 함께하며, 입 탐색을 하면 다른 놀이를 고릅니다.\"],\"educationalEffects\":[\"잎과 꽃의 모양을 살펴보고 손으로 골라 붙입니다.\",\"자기 이름을 듣고 완성한 작품의 색과 모양을 함께 말해 봅니다.\"],\"tags\":[\"자연물\",\"이름 꾸미기\",\"콜라주\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DYA-cPRv9ZF/\",\"instagramAccount\":\"busytoddler\"},\"status\":\"live\",\"preparationNotes\":[\"보호자가 색연필로 이름을 쓰고 풀칠을 준비합니다. 가시·자극성 수액·씨앗·작은 열매가 없는 큰 잎과 꽃을 고릅니다.\"],\"id\":\"play_206\",\"createdAt\":\"2026-10-14\"}"
+    },
+    {
+      "id": "play_211",
+      "intents": [
+        "gluing"
+      ],
+      "signature": "{\"name\":\"화장솜 사과에 색 물 톡톡\",\"ageMin\":24,\"ageMax\":30,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":10,\"prepTime\":8,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"sensory\",\"cognitive\"],\"materials\":{\"required\":[\"cardboard\",\"crayon\",\"cotton_pad\",\"glue\",\"dropper\",\"bowl\",\"water\",\"paint\"],\"optional\":[\"tray\"],\"substitutes\":[]},\"steps\":[\"보호자가 색연필로 골판지에 사과 윤곽을 크게 그리고 아동용 풀을 얇게 바릅니다. 아이와 큰 화장솜을 놓고 눌러 붙입니다.\",\"보호자가 낮은 그릇에 적은 물과 사용 연령이 맞는 세척 가능한 수성 물감을 희석해 두 가지 색 물을 준비합니다. 제품의 희석 안내를 따르고 물감 용기는 아이의 손이 닿지 않는 곳에 둡니다.\",\"사용 연령이 맞고 분리되는 작은 부품이 없는 일체형 스포이드를 보호자가 함께 눌러 색 물을 빨아들입니다.\",\"아이가 화장솜 위에 한두 방울씩 떨어뜨리게 돕고 색이 퍼지는 모습을 함께 관찰합니다. 마친 작품은 트레이에 놓고 충분히 말립니다.\"],\"tip\":\"스포이드를 아직 누르기 어려우면 보호자가 함께 눌러 한 방울을 떨어뜨리세요. 색을 정확한 자리에 맞히게 할 필요는 없습니다.\",\"safetyNotes\":[\"화장솜·풀·스포이드를 입에 넣지 않도록 함께하고 떨어진 솜 조각을 회수합니다.\",\"물감과 색 물은 먹거나 마시지 않습니다. 입에 넣으려 하면 마무리합니다. 스포이드 제품의 사용 연령을 확인하고 사용한 도구는 음식용과 구분합니다.\"],\"educationalEffects\":[\"스포이드를 눌렀다 놓으며 물을 빨아들이고 떨어뜨리는 동작을 경험합니다.\",\"화장솜이 색 물을 흡수하고 서로 다른 색이 번져 만나는 모습을 살펴봅니다.\"],\"tags\":[\"화장솜\",\"사과\",\"스포이드\",\"흡수\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DdE19aIxvi0/\",\"instagramAccount\":\"happytoddlerplaytime\"},\"status\":\"live\",\"preparationNotes\":[\"보호자가 색연필로 사과 윤곽과 풀칠을 준비합니다. 화장솜은 큰 원형으로 고릅니다.\",\"스포이드는 제품 사용 연령이 맞고 작은 부품이 분리되지 않는 일체형으로 고릅니다.\",\"물에 희석할 수 있고 사용 연령이 맞는 수성 물감을 고릅니다. 보호자가 제품 안내에 따라 희석하고 스포이드로 한 방울씩 떨어지는지 먼저 확인합니다.\"],\"id\":\"play_211\",\"createdAt\":\"2026-10-14\"}"
+    },
+    {
+      "id": "play_224",
+      "intents": [
+        "gluing"
+      ],
+      "signature": "{\"id\":\"play_224\",\"createdAt\":\"2026-10-17\",\"name\":\"색종이 찢어 큰 조각 콜라주 만들기\",\"ageMin\":25,\"ageMax\":35,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":12,\"prepTime\":2,\"difficulty\":1,\"devAreas\":[\"fine_motor\",\"sensory\",\"cognitive\"],\"materials\":{\"required\":[\"paper\",\"glue\"],\"optional\":[\"cloth\"],\"substitutes\":[]},\"steps\":[\"보호자가 두세 색의 종이와 바탕 종이, 사용 연령에 맞는 고체풀을 준비합니다. 풀 뚜껑은 보호자가 보관합니다.\",\"큰 색종이를 양손으로 잡아 천천히 찢는 모습을 보여주고, 아이가 원하면 충분히 큰 조각으로 찢어 봅니다.\",\"바탕 종이의 작은 영역에 풀을 조금 바르고 아이가 고른 종이 조각을 올려 손바닥으로 가볍게 눌러 붙입니다.\",\"붙일 자리와 색을 자유롭게 고르며 반복합니다. 떨어진 조각과 풀 뚜껑을 모두 정리하고 손을 씻습니다.\"],\"tip\":\"그림 윤곽을 미리 채우는 과제 없이 색과 자리를 자유롭게 골라요. 종이가 잘 안 찢어지면 보호자가 시작 부분만 살짝 도와주세요.\",\"safetyNotes\":[\"풀의 사용 연령을 확인하고 먹거나 눈·피부에 바르지 않게 합니다. 뚜껑과 작은 종이 조각은 보호자가 즉시 수거합니다.\",\"작은 조각을 입에 넣는 동안에는 제공하지 않습니다. 보호자가 곁에서 지켜보고 원하지 않으면 멈춥니다.\"],\"educationalEffects\":[\"양손을 서로 다르게 움직여 종이 찢어 보기\",\"붙일 위치를 고르고 풀로 고정되는 변화 경험하기\"],\"tags\":[\"종이놀이\",\"풀놀이\",\"콜라주\",\"찢어붙이기\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/C-4lPylP0sE/\",\"instagramAccount\":\"usandthelittleone\"},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_196",
+      "intents": [
+        "tape"
+      ],
+      "signature": "{\"id\":\"play_196\",\"createdAt\":\"2026-10-09\",\"name\":\"테이프에 갇힌 장난감 구조대\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":15,\"prepTime\":5,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"cognitive\",\"language\"],\"materials\":{\"required\":[\"tape\",\"animal_toy\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 테이프를 붙여도 되는 안정된 낮은 테이블을 고르고 큰 동물 피규어 3개를 놓습니다. 짧은 종이테이프를 가로질러 붙여 장난감을 고정하고 끝은 조금 접어 손잡이를 만듭니다.\",\"“동물 친구를 구해 줄까?” 하며 구조할 동물을 고릅니다. 아이가 접힌 끝을 잡고 테이프를 천천히 떼어 장난감을 꺼냅니다.\",\"익숙해지면 보호자가 테이프 두 장을 겹쳐 붙이고 위에 있는 것부터 떼는 방법을 아이가 찾아보게 합니다.\",\"구한 동물을 다른 자리로 옮기고 이름이나 특징을 말해 봅니다. 떼어 낸 테이프는 보호자가 바로 모아 버립니다.\"],\"tip\":\"테이프가 잘 떼어지는 낮은 테이블에서 놀이하세요. 겹친 테이프는 어떤 것부터 떼면 좋을지 함께 살펴보고, 동물 울음소리나 생김새로 구조할 장난감의 힌트를 주세요.\",\"safetyNotes\":[\"작은 부품이 떨어지지 않는 큰 장난감을 사용하고 입에 넣는 아이에게는 제공하지 않습니다. 보호자가 계속 곁에서 함께합니다.\",\"테이프를 피부·머리카락·입에 붙이지 않습니다. 약한 점착 제품으로 표면 손상 여부를 먼저 확인하고 장난감과 테이블이 흔들리지 않게 합니다.\"],\"educationalEffects\":[\"테이프 끝을 잡고 떼어 장난감을 꺼내 보기\",\"겹친 테이프의 순서를 살펴보고 구조할 동물을 설명하기\"],\"tags\":[\"테이프놀이\",\"장난감구조\",\"문제해결\",\"동물놀이\",\"소근육\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DE6A6UYSQ3d/\",\"instagramAccount\":\"busytoddler\"},\"status\":\"live\"}",
+      "minSupportedMonths": 33
+    },
+    {
+      "id": "play_197",
+      "intents": [
+        "tape"
+      ],
+      "signature": "{\"id\":\"play_197\",\"createdAt\":\"2026-10-09\",\"name\":\"테이프 거미줄에 색깔 폼폼 붙이기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":15,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"hula_hoop\",\"tape\",\"pom_pom\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 훌라후프에 종이테이프를 여러 방향으로 가로질러 붙여 거미줄을 만듭니다. 아이 쪽에 점착 면이 오도록 하고 폼폼 하나가 잘 붙는지 먼저 확인합니다.\",\"보호자가 훌라후프를 낮은 위치에서 안정적으로 잡습니다. 아이에게 제품 연령에 맞는 큰 폼폼을 하나씩 건네 거미줄에 손으로 눌러 붙여 보게 합니다.\",\"붙이고 싶은 색을 골라 다른 칸에 놓습니다. 익숙해지면 “파랑 옆에 빨강”처럼 간단한 색 배치를 제안합니다.\",\"손으로 폼폼을 천천히 떼고 다른 곳에 다시 붙입니다. 끝나면 보호자가 폼폼 수를 확인해 모두 보관하고 테이프를 정리합니다.\"],\"tip\":\"손으로 폼폼을 붙이는 것부터 시작하고, 던져 맞히도록 요구하지 않습니다. 폼폼 크기와 테이프 종류에 따라 잘 붙는지 보호자가 먼저 확인합니다.\",\"safetyNotes\":[\"폼폼은 삼킴·질식 위험이 있습니다. 3세 미만이나 재료를 입에 넣는 아이에게 제공하지 않으며 제품 사용 연령을 확인하고 보호자가 바로 옆에서 감독합니다.\",\"훌라후프가 쓰러지지 않도록 보호자가 잡고 테이프가 얼굴·목에 닿지 않게 합니다. 놀이 후 폼폼과 테이프를 모두 수거합니다.\"],\"educationalEffects\":[\"폼폼을 잡고 원하는 위치에 눌러 붙였다 떼어 보기\",\"색을 비교하고 간단한 배치 순서를 만들어 보기\"],\"tags\":[\"테이프거미줄\",\"폼폼놀이\",\"색배치\",\"붙였다떼기\",\"소근육\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DPePJoKDlsR/\",\"instagramAccount\":\"kristinatoddlerapproved\"},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_198",
+      "intents": [
+        "tape",
+        "painting"
+      ],
+      "signature": "{\"id\":\"play_198\",\"createdAt\":\"2026-10-09\",\"name\":\"테이프를 떼면 나타나는 거미줄 그림\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":10,\"durationMax\":20,\"prepTime\":5,\"difficulty\":2,\"devAreas\":[\"fine_motor\",\"sensory\",\"cognitive\"],\"materials\":{\"required\":[\"paper_plate\",\"tape\",\"paint\",\"brush\",\"water\",\"cup\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 흰 종이접시에 약한 점착의 종이테이프를 교차해 붙여 거미줄 모양을 만듭니다. 접시 가장자리에 작은 조각을 붙였다 떼어 종이가 찢어지지 않는지 확인합니다.\",\"컵에 물을 조금 담고 아동용 수채 물감과 붓을 준비합니다. 아이가 테이프 사이의 빈칸을 여러 색으로 칠해 봅니다.\",\"그림은 아이 손이 닿지 않는 곳에서 충분히 말립니다. 기다리는 동안 어떤 거미줄이 나타날지 이야기합니다.\",\"마른 뒤 보호자가 접시를 잡고 테이프 끝을 들어 줍니다. 아이와 천천히 떼어 칠해지지 않은 흰 선이 나타나는 모습을 봅니다.\",\"완성된 거미줄에서 큰 칸·작은 칸이나 좋아하는 색을 찾아 이야기합니다.\"],\"tip\":\"물감에 물을 너무 많이 섞으면 종이접시가 찢어질 수 있어 적은 물로 시작합니다. 물감이 충분히 마르면 보호자가 테이프 끝을 들어 주고 아이와 천천히 떼어 보세요. 마르는 시간은 별도로 여유 있게 잡아 주세요.\",\"safetyNotes\":[\"아동용 물감과 제품 연령에 맞는 붓을 사용하고 붓을 들고 이동하지 않습니다. 물감·테이프를 입에 넣지 않도록 함께합니다.\",\"테이프는 약한 점착 제품으로 먼저 시험하고 피부·머리카락에 붙이지 않습니다. 흘린 물은 바로 닦습니다.\"],\"educationalEffects\":[\"색을 칠하고 테이프를 떼며 가려진 부분의 변화를 관찰하기\",\"종이접시를 잡고 테이프 끝을 천천히 당겨 보기\"],\"tags\":[\"테이프미술\",\"거미줄그림\",\"종이접시\",\"색칠놀이\",\"깜짝그림\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/CxdiT0-u9jv/\",\"instagramAccount\":\"happytoddlerplaytime\"},\"status\":\"live\"}",
+      "minSupportedMonths": 33
+    },
+    {
+      "id": "play_058",
+      "intents": [
+        "painting"
+      ],
+      "signature": "{\"id\":\"play_058\",\"name\":\"손끝으로 물감 자국 만들기\",\"ageMin\":36,\"ageMax\":48,\"place\":\"indoor\",\"durationMin\":10,\"durationMax\":20,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"sensory\",\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"paint\",\"paper\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"제품의 사용 연령이 맞는 손가락용 미술 물감과 큰 종이를 준비하고 바닥이 미끄럽지 않게 정리합니다.\",\"보호자가 손끝에 소량 묻혀 종이에 자국을 남기는 모습을 보여줍니다.\",\"아이가 원하면 손으로 자국을 만들고, 싫으면 보기만 하거나 다른 활동으로 바꿉니다.\",\"물감은 보호자가 바로 회수하고 손과 바닥을 씻어 마무리합니다.\"],\"tip\":\"식용 물감과 일반 무독성 물감을 같은 것으로 안내하지 않습니다. 입으로 탐색하는 아이에게는 제공하지 않습니다.\",\"safetyNotes\":[\"제품에 표시된 사용 연령을 지킵니다. 무독성 표시는 먹어도 된다는 뜻이 아니며 눈과 입에 닿지 않게 합니다.\",\"물감이 묻은 발로 이동하지 않습니다. 발도장을 위해 억지로 물감을 바르지 않습니다.\",\"보호자가 바로 곁에서 함께하고 아이가 피하거나 불편해하면 멈춥니다.\"],\"educationalEffects\":[\"손의 움직임과 종이에 남는 자국을 함께 보기\",\"원하는 색과 움직임으로 표현해 보기\"],\"tags\":[\"감각놀이\",\"미술놀이\",\"손자국놀이\",\"집콕놀이\"],\"source\":{\"type\":\"manual\",\"url\":null,\"instagramAccount\":null},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_146",
+      "intents": [
+        "painting"
+      ],
+      "signature": "{\"id\":\"play_146\",\"name\":\"물감 손발도장 오감 놀이\",\"ageMin\":24,\"ageMax\":36,\"place\":\"indoor\",\"durationMin\":20,\"durationMax\":40,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"sensory\",\"fine_motor\",\"emotional\"],\"materials\":{\"required\":[\"paint\",\"paper\"],\"optional\":[\"water\"],\"substitutes\":[]},\"steps\":[\"욕실이나 넓은 공간에 전지를 깔고 물감을 준비합니다.\",\"물감을 손바닥에 바르고 도화지에 손도장을 찍습니다.\",\"발바닥에도 물감을 바르고 발도장을 찍어봅니다.\",\"물감의 차갑고 끈적한 촉감을 느끼며 색이 섞이는 것을 관찰합니다.\",\"끝나면 욕실에서 함께 손발을 씻으며 놀이를 마무리합니다.\"],\"tip\":\"전지 대신 포장지나 쇼핑백을 펼쳐서 사용해도 됩니다. 욕실에서 진행하면 뒷정리가 훨씬 편합니다.\",\"safetyNotes\":[\"아동용 무독성 물감을 사용합니다.\",\"물감이 눈에 들어가지 않도록 주의합니다.\",\"바닥이 미끄러울 수 있으니 아이가 넘어지지 않도록 손을 잡아줍니다.\"],\"educationalEffects\":[\"물감의 끈적하고 차갑고 미끄러운 촉감 탐색으로 감각 통합 발달\",\"손발을 사용한 대형 표현 활동으로 신체 인식 발달\",\"색의 혼합과 변화 관찰로 기초 시각 탐구 능력 발달\"],\"tags\":[\"감각놀이\",\"미술놀이\",\"촉감놀이\",\"오감발달\",\"집콕놀이\"],\"source\":{\"type\":\"chaisplay\",\"url\":\"https://www.chaisplay.com/stories/196\",\"instagramAccount\":null},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_147",
+      "intents": [
+        "painting"
+      ],
+      "signature": "{\"id\":\"play_147\",\"name\":\"채소 도형 도장 찍기\",\"ageMin\":24,\"ageMax\":36,\"place\":\"indoor\",\"durationMin\":20,\"durationMax\":30,\"prepTime\":10,\"difficulty\":2,\"devAreas\":[\"sensory\",\"fine_motor\",\"cognitive\"],\"materials\":{\"required\":[\"soft_food\",\"paint\",\"paper\"],\"optional\":[\"bowl\"],\"substitutes\":[]},\"steps\":[\"연근, 파프리카, 버섯 등 다양한 채소를 반으로 잘라 준비합니다.\",\"일회용 접시에 물감을 담아 도장 받침대로 사용합니다.\",\"채소를 물감에 찍은 후 도화지에 꾹 눌러 도장을 찍습니다.\",\"연근의 구멍 모양, 파프리카의 별 모양 등 채소마다 다른 모양을 비교합니다.\",\"'이건 동그라미야', '저건 별 모양이야' 하며 도형 이름을 이야기합니다.\"],\"safetyNotes\":[\"칼로 채소를 자르는 작업은 반드시 어른이 미리 준비합니다.\",\"아동용 무독성 물감을 사용합니다.\",\"채소를 입에 넣으려 할 수 있으니 물감 묻은 채소는 먹지 않도록 안내합니다.\"],\"educationalEffects\":[\"채소마다 다른 질감(부드럽다/까슬까슬하다)과 냄새 탐색으로 오감 발달\",\"도형 모양 인식과 이름 어휘 학습\",\"누르고 찍는 동작으로 손 힘과 소근육 조절 능력 향상\"],\"tags\":[\"채소놀이\",\"도장놀이\",\"감각놀이\",\"미술놀이\",\"집콕놀이\"],\"source\":{\"type\":\"manual\",\"url\":\"https://enfant.designhouse.co.kr/magazine/type2view.php?num=64341\",\"instagramAccount\":null},\"status\":\"live\"}"
+    },
+    {
+      "id": "play_205",
+      "intents": [
+        "painting"
+      ],
+      "signature": "{\"name\":\"큐브 얼음에 붓으로 색칠하기\",\"ageMin\":24,\"ageMax\":30,\"place\":\"any\",\"durationMin\":5,\"durationMax\":10,\"prepTime\":5,\"difficulty\":1,\"devAreas\":[\"fine_motor\",\"cognitive\",\"sensory\"],\"materials\":{\"required\":[\"water\",\"tray\",\"paint\",\"brush\",\"cup\"],\"optional\":[\"cloth\"],\"substitutes\":[]},\"steps\":[\"보호자가 일반 얼음틀로 얼린 큐브 얼음 몇 개를 안정된 트레이 안에 놓습니다. 얼음은 보호자가 관리하고 아이는 붓으로만 칠하게 합니다.\",\"사용 연령이 맞는 세척 가능한 수채 물감과 굵은 붓, 적은 물을 담은 낮은 컵을 준비합니다.\",\"보호자가 붓에 물감을 묻혀 큐브 얼음 표면에 칠하는 모습을 보여 준 뒤 아이가 붓으로 색을 얹게 합니다. 아이가 얼음을 손으로 집으려 하면 바로 멈춥니다.\",\"얼음이 녹으며 색 물이 모이는 모습을 함께 살펴봅니다. 보호자가 작게 부서진 조각을 바로 치우고 놀이가 끝나면 얼음과 물을 정리합니다.\"],\"tip\":\"처음에는 얼음 몇 개와 두 가지 색으로 짧게 시작하세요. 붓으로 만든 색 자국과 얼음이 녹는 변화를 함께 살펴보고, 아이가 얼음을 집으려 하면 마무리합니다.\",\"safetyNotes\":[\"얼음은 입에 넣으면 질식할 수 있습니다. 입 탐색을 하는 아이에게는 이 놀이를 제공하지 않고, 보호자가 팔을 뻗으면 닿는 거리에서 계속 함께합니다.\",\"아이가 얼음을 직접 집거나 먹게 하지 않습니다. 작게 부서진 조각은 즉시 치우며, 입에 넣으려 하거나 붓 대신 얼음을 집으려 하면 놀이를 마칩니다.\",\"물감과 색 물을 먹지 않도록 함께하고, 녹은 물과 젖은 바닥을 곧바로 정리합니다.\"],\"educationalEffects\":[\"얼음 표면에 붓을 움직여 색 자국을 만들어 봅니다.\",\"얼음이 녹고 서로 다른 색 물이 만나는 변화를 관찰합니다.\"],\"tags\":[\"얼음\",\"색칠\",\"색 섞기\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/C-D4nQ4MLPX/\",\"instagramAccount\":\"inspiremyplay\"},\"status\":\"live\",\"preparationNotes\":[\"일반 얼음틀로 큐브 얼음을 미리 얼려 준비합니다. 냉동 대기시간은 준비 시간에 포함하지 않습니다.\",\"입 탐색을 하는 아이에게는 제공하지 않습니다. 보호자가 계속 바로 옆에서 트레이와 얼음을 관리하고 아이는 붓으로만 칠합니다.\"],\"id\":\"play_205\",\"createdAt\":\"2026-10-14\"}"
+    },
+    {
+      "id": "play_210",
+      "intents": [
+        "painting"
+      ],
+      "signature": "{\"name\":\"스펀지로 나뭇잎 실루엣 찍기\",\"ageMin\":24,\"ageMax\":30,\"place\":\"indoor\",\"durationMin\":5,\"durationMax\":10,\"prepTime\":5,\"difficulty\":1,\"devAreas\":[\"fine_motor\",\"sensory\",\"cognitive\"],\"materials\":{\"required\":[\"paper\",\"plant_material\",\"foam\",\"paint\",\"tray\"],\"optional\":[],\"substitutes\":[]},\"steps\":[\"보호자가 깨끗한 큰 잎과 종이, 사용 연령이 맞는 물감, 쉽게 찢어지지 않는 놀이용 스펀지를 준비합니다. 놀이용 트레이 한쪽에 물감을 조금 덜어 둡니다.\",\"종이 위에 잎 하나를 놓고 보호자가 잎을 가볍게 잡아 줍니다.\",\"아이가 트레이에 덜어 둔 물감을 스펀지에 조금 묻혀 잎 주변을 톡톡 두드려 보게 합니다.\",\"잎을 함께 들어 올려 색칠되지 않은 윤곽을 살펴봅니다. 다른 잎으로 원하면 다시 해 봅니다.\"],\"tip\":\"한 번에 큰 잎 하나만 놓으면 누르기 쉽습니다. 잎이 움직여도 그대로 만들어진 모양을 함께 즐겨 보세요.\",\"safetyNotes\":[\"큰 스펀지도 입에 넣지 않도록 함께하고, 찢어진 조각은 즉시 회수합니다.\",\"가시나 자극성 수액이 없는 잎과 사용 연령이 맞는 물감을 고르고 놀이 후 손을 씻습니다.\"],\"educationalEffects\":[\"스펀지를 눌러 종이에 물감 자국을 만들고 손의 힘을 조절해 봅니다.\",\"잎이 있던 자리에 남는 윤곽과 다른 잎의 모양을 비교합니다.\"],\"tags\":[\"나뭇잎\",\"스펀지\",\"실루엣\",\"과정 미술\"],\"source\":{\"type\":\"instagram\",\"url\":\"https://www.instagram.com/reel/DbhCgljRI--/\",\"instagramAccount\":\"happytoddlerplaytime\"},\"status\":\"live\",\"preparationNotes\":[\"깨끗한 큰 잎 하나, 찢어지지 않는 큰 놀이용 스펀지와 세척 가능한 놀이용 트레이·쟁반을 준비합니다. 트레이 한쪽에 물감을 조금 덜어 둡니다.\"],\"id\":\"play_210\",\"createdAt\":\"2026-10-14\"}"
+    }
+  ]
+}

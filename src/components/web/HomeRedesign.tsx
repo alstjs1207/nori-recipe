@@ -1,7 +1,7 @@
 import { WebPage } from "./NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   MATERIAL_DISPLAY_NAMES,
   type MaterialSlug,
@@ -26,6 +26,8 @@ import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
 import { isNewPlay } from "@/play/newPlay";
 import { useRecommendationImpression } from "./WebAnalytics";
+import { getMaterialRecommendationNotice } from "@/engine/materialFit";
+import { getConditionalRecommendationNotice } from "@/engine/intentRecommendation";
 
 const situations = [
   { value: "quiet", label: "집에서 조용히", icon: "home", tone: "purple" },
@@ -48,6 +50,7 @@ export function HomeRedesign({
   allCompleted,
   age,
   onSaveMaterials,
+  intentOptions,
 }: {
   featured: Play | null;
   recommendations: Play[];
@@ -57,6 +60,7 @@ export function HomeRedesign({
   allCompleted: boolean;
   age: number;
   onSaveMaterials: (materials: MaterialSlug[]) => Promise<void>;
+  intentOptions?: ReactNode;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const favorites = useWebFavorites();
@@ -71,6 +75,8 @@ export function HomeRedesign({
   const status = featured
     ? getMaterialStatus(featured, selectedMaterials)
     : null;
+  const materialNotice = getMaterialRecommendationNotice(recommendations, selectedMaterials);
+  const conditionalNotice = getConditionalRecommendationNotice(recommendations, selectedMaterials, age);
   return (
     <WebPage>
       <div className="nori-page home-page">
@@ -108,6 +114,11 @@ export function HomeRedesign({
             <Icon name="chevron" size={16} />
           </span>
         </button>
+        {materialNotice ? (
+          <p className="recommendation-material-note" role="status">{materialNotice}</p>
+        ) : null}
+        {intentOptions}
+        {conditionalNotice ? <p className="recommendation-material-note" role="status">{conditionalNotice}</p> : null}
         {favorites.error ? (
           <p className="error-text" role="alert">
             {favorites.error}

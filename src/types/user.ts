@@ -1,5 +1,6 @@
 import type { DevArea } from "@/constants/devAreas";
 import type { MaterialSlug } from "@/constants/materials";
+import type { IntentReadiness } from "./recommendation";
 
 export type AreaScoreMap = Partial<Record<DevArea, number>>;
 
@@ -29,4 +30,5 @@ export type FilterInput = {
   place: "indoor" | "outdoor" | "any";
   devGaps?: AreaScoreMap;
   userFeedback?: AreaScoreMap;
+  intentReadiness?: IntentReadiness;
 };

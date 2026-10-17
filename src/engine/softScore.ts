@@ -17,7 +17,7 @@ function averageAreaScore(devAreas: Play["devAreas"], scoreMap: AreaScoreMap | u
 
 function getMaterialScore(play: Play, availableMaterials: Set<string>): number {
   const requiredMaterials = play.materials.required;
-  const hasMaterialIntent = availableMaterials.size >= 3;
+  const hasMaterialIntent = availableMaterials.size > 0;
 
   if (requiredMaterials.length === 0) {
     return hasMaterialIntent ? 20 : 100;

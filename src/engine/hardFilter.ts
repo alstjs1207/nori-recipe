@@ -27,13 +27,13 @@ export function hardFilter(play: Play, ctx: FilterInput): HardFilterResult {
     return { pass: false, reason: "place" };
   }
 
-  if (play.durationMin > ctx.availableMinutes * 1.3) {
-    return { pass: false, reason: "time" };
-  }
-
   const blockedMaterials = new Set(ctx.blockedMaterials);
   if (getAllMaterials(play).some((material) => blockedMaterials.has(material))) {
     return { pass: false, reason: "blocked_material" };
+  }
+
+  if (play.durationMin > ctx.availableMinutes * 1.3) {
+    return { pass: false, reason: "time" };
   }
 
   return { pass: true };

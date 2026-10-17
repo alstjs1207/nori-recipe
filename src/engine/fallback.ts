@@ -1,66 +1,23 @@
+import { createMaterialComparator } from "@/engine/materialFit";
 import type { Play, FilterInput } from "@/types";
 
-type FallbackResult = {
-  plays: Play[];
-  usedFallback: boolean;
-};
-
-function hasAllRequiredMaterials(play: Play, availableMaterials: Set<string>): boolean {
-  return play.materials.required.every((material) => availableMaterials.has(material));
-}
-
-function hasAnyRequiredMaterials(play: Play, availableMaterials: Set<string>): boolean {
-  return play.materials.required.some((material) => availableMaterials.has(material));
-}
-
-function withinTime(play: Play, availableMinutes: number, multiplier: number): boolean {
-  return play.durationMin <= availableMinutes * multiplier;
-}
+type FallbackResult = { plays: Play[]; usedFallback: boolean };
 
 export function applyFallback(ctx: FilterInput, pool: Play[]): FallbackResult {
-  const availableMaterials = new Set(ctx.availableMaterials);
-  const strictTimePool = pool.filter((play) => withinTime(play, ctx.availableMinutes, 1.3));
-  const fullyOwnedPool = strictTimePool.filter((play) =>
-    hasAllRequiredMaterials(play, availableMaterials),
+  const available = new Set(ctx.availableMaterials);
+  const strictTimePool = pool.filter((play) => play.durationMin <= ctx.availableMinutes * 1.3);
+  const readyMatches = strictTimePool.filter((play) =>
+    (available.size === 0 || play.materials.required.length > 0) &&
+    play.materials.required.every((material) => available.has(material)),
   );
-  const partiallyOwnedPool = strictTimePool.filter((play) =>
-    !hasAllRequiredMaterials(play, availableMaterials) &&
-    hasAnyRequiredMaterials(play, availableMaterials),
-  );
-  const unmatchedPool = strictTimePool.filter((play) =>
-    !hasAllRequiredMaterials(play, availableMaterials) &&
-    !hasAnyRequiredMaterials(play, availableMaterials),
-  );
+  if (readyMatches.length >= 3) return { plays: readyMatches, usedFallback: false };
 
-  if (fullyOwnedPool.length >= 3) {
-    return {
-      plays: fullyOwnedPool,
-      usedFallback: false,
-    };
-  }
-
-  if (strictTimePool.length >= 3) {
-    return {
-      plays: [...fullyOwnedPool, ...partiallyOwnedPool, ...unmatchedPool],
-      usedFallback: true,
-    };
-  }
-
-  const extendedTimePool = pool.filter((play) => withinTime(play, ctx.availableMinutes, 1.5));
-  const extendedFullMatches = extendedTimePool.filter((play) =>
-    hasAllRequiredMaterials(play, availableMaterials),
-  );
-  const extendedPartialMatches = extendedTimePool.filter((play) =>
-    !hasAllRequiredMaterials(play, availableMaterials) &&
-    hasAnyRequiredMaterials(play, availableMaterials),
-  );
-  const extendedUnmatched = extendedTimePool.filter((play) =>
-    !hasAllRequiredMaterials(play, availableMaterials) &&
-    !hasAnyRequiredMaterials(play, availableMaterials),
-  );
-
+  const candidates = strictTimePool.length >= 3
+    ? strictTimePool
+    : pool.filter((play) => play.durationMin <= ctx.availableMinutes * 1.5);
+  // Keep partial material matches even when three material-free plays are ready.
   return {
-    plays: [...extendedFullMatches, ...extendedPartialMatches, ...extendedUnmatched],
+    plays: [...candidates].sort(createMaterialComparator(ctx.availableMaterials)),
     usedFallback: true,
   };
 }

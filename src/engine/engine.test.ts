@@ -155,7 +155,7 @@ test("pickTop3는 발달 영역 다양성을 우선한다", () => {
   );
 });
 
-test("재료를 3개 이상 고르면 무재료 놀이는 최대 1개까지만 포함한다", () => {
+test("재료 관련 후보 2개를 먼저 고르고 남은 한 자리에 무재료 놀이를 보충한다", () => {
   const candidates: ScoredPlay[] = [
     { play: createPlay({ id: "play-1", name: "정확 일치 놀이", materials: { required: ["paper"], optional: [], substitutes: [] }, devAreas: ["fine_motor"] }), total: 95, breakdown: { material: 35, dev: 25, popular: 0, time: 10, feedback: 25 } },
     { play: createPlay({ id: "play-2", name: "무재료 A", materials: { required: [], optional: [], substitutes: [] }, devAreas: ["social"] }), total: 90, breakdown: { material: 35, dev: 20, popular: 0, time: 10, feedback: 25 } },

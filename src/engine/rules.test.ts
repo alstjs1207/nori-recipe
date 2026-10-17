@@ -101,7 +101,7 @@ test("hardFilter는 시간 제한 1.3배까지는 허용하고 초과하면 제�
   assert.deepEqual(hardFilter(overtimePlay, ctx), { pass: false, reason: "time" });
 });
 
-test("softScore는 재료 선택 의도가 약하면 무재료 놀이를 불이익 없이 본다", () => {
+test("softScore는 선택한 재료가 없으면 무재료 놀이를 불이익 없이 본다", () => {
   const play = createPlay({
     id: "material-free",
     name: "무재료 놀이",
@@ -115,7 +115,7 @@ test("softScore는 재료 선택 의도가 약하면 무재료 놀이를 불이�
   const result = softScore(
     play,
     createFilterInput({
-      availableMaterials: ["paper", "bowl"],
+      availableMaterials: [],
     }),
     DEFAULT_WEIGHTS,
   );
@@ -178,7 +178,7 @@ test("softScore는 강한 재료 의도에서 부분 일치를 0점보다 높게
   assert.ok(partialResult.total > noMatchResult.total);
 });
 
-test("applyFallback는 완전 일치가 3개 이상이면 fallback 없이 그 풀만 유지한다", () => {
+test("applyFallback는 무재료 후보로 3개를 채울 수 있어도 부분 일치 후보를 유지한다", () => {
   const plays = [
     createPlay({ id: "full-1", name: "완전 일치 1", materials: { required: ["paper"], optional: [], substitutes: [] } }),
     createPlay({ id: "full-2", name: "완전 일치 2", materials: { required: ["bowl"], optional: [], substitutes: [] }, devAreas: ["cognitive"] }),
@@ -193,8 +193,8 @@ test("applyFallback는 완전 일치가 3개 이상이면 fallback 없이 그 �
     plays,
   );
 
-  assert.equal(result.usedFallback, false);
-  assert.deepEqual(result.plays.map((play) => play.id), ["full-1", "full-2", "full-3"]);
+  assert.equal(result.usedFallback, true);
+  assert.deepEqual(result.plays.map((play) => play.id), ["full-1", "full-2", "partial", "full-3"]);
 });
 
 test("applyFallback는 strict 후보가 3개 이상이면 완전 일치 후 부분 일치, 불일치 순으로 확장한다", () => {

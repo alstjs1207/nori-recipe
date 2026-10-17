@@ -2,6 +2,7 @@ import { ContentImage as Image } from "@/components/web/ContentImage";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebFirstVisit } from "@/components/web/WebFirstVisit";
 import { HomeRedesign } from "@/components/web/HomeRedesign";
+import { IntentReadinessPanel } from "@/components/IntentReadinessPanel";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -19,6 +20,9 @@ import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
 import { getFavorites, getPlayLogCount, getPlayLogs } from "@/db/queries";
 import { recommend } from "@/engine/recommend";
+import { createMaterialComparator, getMaterialRecommendationNotice, pickFeaturedPlay } from "@/engine/materialFit";
+import { getConditionalIntentCandidates, getConditionalRecommendationNotice, getIntentConfirmationKey, isEligibleHomeRecommendation, readinessAllowsPlay } from "@/engine/intentRecommendation";
+import { isReadyIntentMatch } from "@/engine/intentSignals";
 import {
   getAgeMonthsFromBirthMonth,
   getVisibleMaterialCategories,
@@ -26,7 +30,7 @@ import {
 } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
-import type { Play, PlayLogRecord, PlayPlace } from "@/types";
+import type { FilterInput, IntentReadiness, Play, PlayLogRecord, PlayPlace } from "@/types";
 
 type MaterialTone = "ready" | "partial" | "missing";
 
@@ -125,14 +129,6 @@ function getPrimaryAreaLabel(play: Play): string {
   return DEV_AREA_LABELS[play.devAreas[0] ?? "cognitive"];
 }
 
-function getMaterialFitScore(play: Play, selectedMaterials: MaterialSlug[]): number {
-  const selectedMaterialsSet = new Set(selectedMaterials);
-  const matchedRequired = play.materials.required.filter((material) => selectedMaterialsSet.has(material)).length;
-  const matchedOptional = play.materials.optional.filter((material) => selectedMaterialsSet.has(material)).length;
-
-  return matchedRequired * 100 + matchedOptional * 10 - play.prepTime;
-}
-
 function playMatchesAgeMonths(play: Play, childAgeMonths: number): boolean {
   return play.ageMin <= childAgeMonths && play.ageMax >= childAgeMonths;
 }
@@ -143,26 +139,6 @@ function hasBlockedMaterial(play: Play, blockedMaterialsSet: Set<MaterialSlug>):
     ...play.materials.optional,
     ...play.materials.substitutes,
   ].some((material) => blockedMaterialsSet.has(material));
-}
-
-function pickFeaturedPlay(plays: Play[], selectedMaterials: MaterialSlug[]): Play | null {
-  if (plays.length === 0) {
-    return null;
-  }
-
-  let bestPlay = plays[0];
-  let bestScore = getMaterialFitScore(bestPlay, selectedMaterials);
-
-  for (const candidate of plays.slice(1)) {
-    const nextScore = getMaterialFitScore(candidate, selectedMaterials);
-
-    if (nextScore > bestScore) {
-      bestPlay = candidate;
-      bestScore = nextScore;
-    }
-  }
-
-  return bestPlay;
 }
 
 function getMaterialSummary(
@@ -425,6 +401,8 @@ export default function MainScreen() {
   const pinnedRecommendationIds = useSessionStore((state) => state.pinnedHomeRecommendationIds);
   const pinnedRecommendationKey = useSessionStore((state) => state.pinnedHomeRecommendationKey);
   const setPinnedHomeRecommendations = useSessionStore((state) => state.setPinnedHomeRecommendations);
+  const homeIntentConfirmation = useSessionStore((state) => state.homeIntentConfirmation);
+  const setHomeIntentConfirmation = useSessionStore((state) => state.setHomeIntentConfirmation);
   const [totalPlays, setTotalPlays] = useState(0);
   const [recentLogs, setRecentLogs] = useState<PlayLogRecord[]>([]);
   const [favoritePlayIds, setFavoritePlayIds] = useState<Set<string>>(() => new Set());
@@ -503,22 +481,33 @@ export default function MainScreen() {
   const latestCompletedAtByPlayId = getLatestCompletedAtByPlayId(recentLogs);
   const recentCompletedPlayIds = getRecentCompletedPlayIds(recentLogs.slice(0, 12));
 
+  const confirmationKey = childAgeMonths === null ? null : getIntentConfirmationKey({ childAgeMonths, availableMaterials: selectedMaterials, blockedMaterials: userContext.blockedMaterials });
+  const intentReadiness = homeIntentConfirmation?.key === confirmationKey ? homeIntentConfirmation?.readiness : undefined;
+  const filterInput: FilterInput = {
+    childAgeMonths: childAgeMonths ?? 0,
+    availableMaterials: selectedMaterials,
+    blockedMaterials: userContext.blockedMaterials,
+    availableMinutes: 999,
+    place: "any",
+    devGaps: userContext.devGaps,
+    userFeedback: userContext.userFeedback,
+    intentReadiness,
+  };
+  const potentialConditionalCandidate = childAgeMonths === null ? undefined : getConditionalIntentCandidates(plays, filterInput)[0];
+  const onConfirmIntent = async (readiness: IntentReadiness | null) => {
+    setReturningCompletedPlayId(null);
+    await setHomeIntentConfirmation(readiness && confirmationKey ? { key: confirmationKey, readiness } : null);
+  };
   const recommendation =
     childAgeMonths === null
       ? { results: [], usedFallback: false, appliedWeights: null }
       : recommend(
           plays,
-          {
-            childAgeMonths,
-            availableMaterials: selectedMaterials,
-            blockedMaterials: userContext.blockedMaterials,
-            availableMinutes: 999,
-            place: "any",
-            devGaps: userContext.devGaps,
-            userFeedback: userContext.userFeedback,
-          },
+          filterInput,
           { totalPlays, recentCompletedPlayIds },
         );
+  const conditionalCandidate = intentReadiness || recommendation.results.filter((p) => p.ageMin <= (childAgeMonths ?? 0) && isReadyIntentMatch(p, selectedMaterials)).length < 3
+    ? potentialConditionalCandidate : undefined;
 
   const recommendationPinKey = useMemo(
     () =>
@@ -527,8 +516,9 @@ export default function MainScreen() {
         selectedMaterials,
         blockedMaterials: userContext.blockedMaterials,
         playCount: plays.length,
+        ...(intentReadiness ? { intentConfirmation: confirmationKey } : {}),
       }),
-    [childAgeMonths, plays.length, selectedMaterials, userContext.blockedMaterials],
+    [childAgeMonths, plays.length, selectedMaterials, userContext.blockedMaterials, intentReadiness, confirmationKey],
   );
 
   useEffect(() => {
@@ -558,14 +548,21 @@ export default function MainScreen() {
     const playMap = new Map(plays.map((play) => [play.id, play]));
     const pinned = pinnedRecommendationIds
       .map((playId) => playMap.get(playId))
-      .filter((play): play is Play => Boolean(play));
+      .filter((play): play is Play => Boolean(play && isEligibleHomeRecommendation(play, filterInput)));
 
     if (pinned.length === 0) {
       return recommendation.results;
     }
 
     return mergeRecommendedPlays(pinned, recommendation.results, 3);
-  }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results]);
+  }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results, childAgeMonths, selectedMaterials, userContext.blockedMaterials, intentReadiness]);
+
+  useEffect(() => {
+    // Repair only removed/ineligible pinned content; ordinary ranking changes keep the set.
+    if (pinnedRecommendationKey === recommendationPinKey && pinnedResults.length > 0 && pinnedResults.map((p) => p.id).join(",") !== pinnedRecommendationIds.join(",")) {
+      void setPinnedHomeRecommendations({ ids: pinnedResults.map((p) => p.id), key: recommendationPinKey });
+    }
+  }, [pinnedRecommendationIds, pinnedRecommendationKey, pinnedResults, recommendationPinKey, setPinnedHomeRecommendations]);
 
   const visibleRecommendations = useMemo(() => {
     if (!returningCompletedPlayId) {
@@ -582,8 +579,8 @@ export default function MainScreen() {
   }, [pinnedResults, plays, returningCompletedPlayId]);
 
   const featuredPlay = useMemo(
-    () => pickFeaturedPlay(visibleRecommendations, selectedMaterials),
-    [visibleRecommendations, selectedMaterials],
+    () => pickFeaturedPlay(visibleRecommendations, selectedMaterials, childAgeMonths ?? undefined),
+    [visibleRecommendations, selectedMaterials, childAgeMonths],
   );
 
   const ageMatchedOtherPlays = useMemo(() => {
@@ -593,6 +590,7 @@ export default function MainScreen() {
 
     const recommendedIds = new Set(visibleRecommendations.map((play) => play.id));
     const blockedMaterialsSet = new Set(userContext.blockedMaterials);
+    const compareMaterials = createMaterialComparator(selectedMaterials);
 
     return plays
       .filter((play) =>
@@ -602,9 +600,7 @@ export default function MainScreen() {
         !hasBlockedMaterial(play, blockedMaterialsSet),
       )
       .sort((left, right) => {
-        const materialFitDiff =
-          getMaterialFitScore(right, selectedMaterials) -
-          getMaterialFitScore(left, selectedMaterials);
+        const materialFitDiff = compareMaterials(left, right);
 
         if (materialFitDiff !== 0) {
           return materialFitDiff;
@@ -660,7 +656,7 @@ export default function MainScreen() {
   }
 
   if (Platform.OS === "web" && childAgeMonths !== null) {
-    const webFeatured = pickFeaturedPlay(pinnedResults, selectedMaterials);
+    const webFeatured = pickFeaturedPlay(pinnedResults, selectedMaterials, childAgeMonths);
     return (
       <HomeRedesign
         featured={webFeatured}
@@ -674,6 +670,10 @@ export default function MainScreen() {
           (play) => latestCompletedAtByPlayId.has(play.id),
         )}
         age={childAgeMonths}
+        intentOptions={conditionalCandidate ? (
+          <IntentReadinessPanel key={confirmationKey} candidate={conditionalCandidate} materials={selectedMaterials}
+            confirmed={readinessAllowsPlay(conditionalCandidate, filterInput)} onChange={onConfirmIntent} />
+        ) : null}
         onSaveMaterials={async (materials) => {
           setReturningCompletedPlayId(null);
           await setTodayMaterials(materials);
@@ -864,11 +864,23 @@ export default function MainScreen() {
         style={styles.section}
       >
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>오늘 바로 가능한 놀이</Text>
+          <Text style={styles.sectionTitle}>오늘 추천하는 놀이</Text>
           <Pressable accessibilityRole="button" onPress={() => router.push("/(main)/search")}>
             <Text style={styles.sectionLink}>전체보기 ›</Text>
           </Pressable>
         </View>
+        {conditionalCandidate ? (
+          <IntentReadinessPanel key={confirmationKey} candidate={conditionalCandidate} materials={selectedMaterials}
+            confirmed={readinessAllowsPlay(conditionalCandidate, filterInput)} onChange={onConfirmIntent} />
+        ) : null}
+        {childAgeMonths !== null && getConditionalRecommendationNotice(visibleRecommendations, selectedMaterials, childAgeMonths) ? (
+          <Text style={styles.panelBody}>{getConditionalRecommendationNotice(visibleRecommendations, selectedMaterials, childAgeMonths)}</Text>
+        ) : null}
+        {getMaterialRecommendationNotice(visibleRecommendations, selectedMaterials) ? (
+          <Text style={styles.panelBody} accessibilityLiveRegion="polite">
+            {getMaterialRecommendationNotice(visibleRecommendations, selectedMaterials)}
+          </Text>
+        ) : null}
         {visibleRecommendations.length > 0 ? (
           <ScrollView
             horizontal

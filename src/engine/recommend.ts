@@ -1,28 +1,11 @@
 import { pickTop3 } from "@/engine/diversity";
 import { applyFallback } from "@/engine/fallback";
 import { hardFilter } from "@/engine/hardFilter";
+import { applyIntentRecommendation } from "@/engine/intentRecommendation";
 import { softScore } from "@/engine/softScore";
 import type { RecommendResult, ScoredPlay, UserStats } from "@/engine/types";
 import { COLD_START_WEIGHTS, DEFAULT_WEIGHTS } from "@/engine/weights";
 import type { Play, FilterInput } from "@/types";
-
-function mergePreferredResults(preferred: Play[], fallback: Play[]): Play[] {
-  const merged = [...preferred];
-
-  for (const play of fallback) {
-    if (merged.some((candidate) => candidate.id === play.id)) {
-      continue;
-    }
-
-    merged.push(play);
-
-    if (merged.length === 3) {
-      break;
-    }
-  }
-
-  return merged;
-}
 
 export function recommend(
   plays: Play[],
@@ -51,19 +34,12 @@ export function recommend(
     };
   });
   const recentCompletedPlayIds = new Set(userStats.recentCompletedPlayIds ?? []);
-  const preferredCandidates =
-    recentCompletedPlayIds.size === 0
-      ? scoredCandidates
-      : scoredCandidates.filter(({ play }) => !recentCompletedPlayIds.has(play.id));
-  const preferredResults = pickTop3(preferredCandidates, ctx);
-  const results =
-    recentCompletedPlayIds.size === 0 || preferredResults.length === 3
-      ? preferredResults
-      : mergePreferredResults(preferredResults, pickTop3(scoredCandidates, ctx));
+  const baseline = pickTop3(scoredCandidates, ctx, recentCompletedPlayIds);
+  const results = applyIntentRecommendation(plays, ctx, userStats, baseline);
 
   return {
     results,
-    usedFallback,
+    usedFallback: usedFallback || results.some((play) => play.ageMin > ctx.childAgeMonths),
     appliedWeights,
   };
 }
