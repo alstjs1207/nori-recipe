@@ -222,6 +222,13 @@ const PLAY_IMAGE_SOURCES: Record<string, ImageSourcePropType> = {
   play_214: require("../../images/plays/play_214.jpeg"),
   play_215: require("../../images/plays/play_215.jpeg"),
   play_216: require("../../images/plays/play_216.jpeg"),
+  play_218: require("../../images/plays/play_218.jpeg"),
+  play_224: require("../../images/plays/play_224.jpeg"),
+  play_219: require("../../images/plays/play_219.jpeg"),
+  play_220: require("../../images/plays/play_220.jpeg"),
+  play_225: require("../../images/plays/play_225.jpeg"),
+  play_221: require("../../images/plays/play_221.jpeg"),
+  play_223: require("../../images/plays/play_223.jpeg"),
 };
 
 export function getPlayImageSource(playId: string): ImageSourcePropType | null {
