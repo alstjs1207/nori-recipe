@@ -186,14 +186,12 @@ input[type="radio"] {
   flex-shrink: 0;
 }
 .install-guide {
-  padding: 16px max(20px, calc((100vw - 1120px) / 2));
+  margin-top: 16px;
+  padding: 16px;
   background: var(--lavender);
-  border-bottom: 1px solid var(--line);
+  border-radius: 12px;
   font-size: 13px;
   line-height: 1.7;
-  max-height: 40dvh;
-  overflow-y: auto;
-  flex-shrink: 0;
 }
 .install-guide p {
   margin: 7px 0;
@@ -2303,8 +2301,6 @@ fieldset {
 }
 @media (max-width: 800px) {
   .web-toolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
     padding: max(13px, env(safe-area-inset-top)) 20px 13px;
     gap: 12px;
   }
@@ -2314,20 +2310,6 @@ fieldset {
   .web-brand > svg {
     width: 32px;
     height: 32px;
-  }
-  .web-toolbar-actions {
-    display: contents;
-  }
-  .web-toolbar .profile-button {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  .web-toolbar .install-button {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    min-height: 44px;
-    background: var(--lavender);
-    color: var(--violet);
   }
   .nori-nav-header {
     display: none;

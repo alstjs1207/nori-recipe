@@ -16,6 +16,7 @@ import {
 } from "@/components/web/NoriUI";
 import { MaterialPicker } from "@/components/web/MaterialPicker";
 import { AnalyticsSettings } from "@/components/web/WebAnalytics";
+import { InstallSettings } from "@/components/web/WebInstall";
 import { PRIVACY_NOTICE } from "@/constants/legalNotices";
 
 export default function SettingsWebScreen() {
@@ -198,6 +199,7 @@ export default function SettingsWebScreen() {
             <Icon name="sliders" size={18} />
           </button>
         </section>
+        <InstallSettings />
         <AnalyticsSettings />
         <section className="settings-panel">
           <h2>이용 안내</h2>
@@ -213,14 +215,6 @@ export default function SettingsWebScreen() {
               설정, 저장한 놀이, 놀이 기록은 현재 브라우저에 보관돼요. 다른
               기기나 브라우저와 자동으로 공유되지 않으며, 브라우저 데이터를
               지우면 함께 삭제될 수 있어요.
-            </p>
-          </details>
-          <details>
-            <summary>홈 화면에서 바로 열고 싶어요</summary>
-            <p>
-              iPhone은 Safari의 공유 메뉴에서 ‘홈 화면에 추가’를, Android는
-              브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택해 주세요.
-              한 번 본 놀이와 이미지는 오프라인에서도 볼 수 있어요.
             </p>
           </details>
           <details>
