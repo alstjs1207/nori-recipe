@@ -74,6 +74,7 @@ export function atomicWrite(root, relative, bytes) {
 }
 
 const allowedTarget = (p) => [STATE, "data/plays.json", "data/materials.json", "src/constants/playImages.ts"].includes(p) ||
+  /^images\/plays\/play_\d{3,}\.jpeg$/.test(p) ||
   p.startsWith("data/review-batches/") && p.endsWith(".json") ||
   /^results\/(?:material-review-backups|review-backups)\/[\w-]+\/[\w.-]+$/.test(p);
 
@@ -91,11 +92,11 @@ export function prepareTransaction(root, updates, expectedFiles) {
   for (const [relative, after] of updates) {
     if (!allowedTarget(relative)) throw new Error("거래 대상 경로 오류: " + relative);
     const before = bytesAt(root, relative);
-    if (before !== null && before.equals(after)) continue;
+    if (before === null && after === null || before !== null && after !== null && before.equals(after)) continue;
     const index = entries.length;
     if (before !== null) atomicWrite(root, directory + "/" + index + ".before", before);
-    atomicWrite(root, directory + "/" + index + ".after", after);
-    entries.push({ relative, beforeHash: before === null ? null : hash(before), afterHash: hash(after), index });
+    if (after !== null) atomicWrite(root, directory + "/" + index + ".after", after);
+    entries.push({ relative, beforeHash: before === null ? null : hash(before), afterHash: after === null ? null : hash(after), index });
   }
   const plan = { schemaVersion: 1, id, status: "prepared", createdAt: new Date().toISOString(), entries };
   atomicWrite(root, directory + "/plan.json", json(plan));
@@ -141,7 +142,10 @@ export function commitTransaction(root, updates, expectedFiles) {
       const before = bytesAt(root, entry.relative);
       if ((before === null ? null : hash(before)) !== entry.beforeHash) throw new ReviewError(409, "반영 중 파일이 변경되었습니다: " + entry.relative);
       started = true;
-      atomicWrite(root, entry.relative, bytesAt(root, directory + "/" + entry.index + ".after"));
+      if (entry.afterHash === null) {
+        fs.rmSync(fileAt(root, entry.relative), { force: true });
+        syncDirectory(path.dirname(fileAt(root, entry.relative)));
+      } else atomicWrite(root, entry.relative, bytesAt(root, directory + "/" + entry.index + ".after"));
     }
     const expectedAfter = { ...expectedFiles };
     for (const entry of plan.entries) expectedAfter[entry.relative] = entry.afterHash;
@@ -150,7 +154,7 @@ export function commitTransaction(root, updates, expectedFiles) {
     const changed = new Set(plan.entries.map((e) => e.relative));
     for (const p of new Set([...Object.keys(expectedFiles), ...Object.keys(actual)])) {
       if (!changed.has(p) && actual[p] !== expectedFiles[p]) throw new ReviewError(409, "반영 중 외부 파일이 변경되었습니다: " + p);
-      if (changed.has(p) && actual[p] !== expectedAfter[p]) throw new ReviewError(409, "저장된 파일이 변경되었습니다: " + p);
+      if (changed.has(p) && (actual[p] ?? null) !== expectedAfter[p]) throw new ReviewError(409, "저장된 파일이 변경되었습니다: " + p);
     }
     atomicWrite(root, directory + "/plan.json", json({ ...plan, status: "committed", committedAt: new Date().toISOString() }));
     return plan.id;

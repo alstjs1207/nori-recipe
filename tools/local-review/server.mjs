@@ -8,6 +8,7 @@ import { buildCatalog } from "../../scripts/build-play-catalog.mjs";
 import { buildReview } from "../../scripts/build-play-review.mjs";
 import { createService } from "./service.mjs";
 import { createCodexRequests } from "./codex-requests.mjs";
+import { buildRecommendations } from "./recommendations.mjs";
 import { ReviewError, bytesAt, fingerprint, revisionOf, recoverTransaction, hash } from "./files.mjs";
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -89,7 +90,7 @@ export async function startServer({ root = project, port = 4317, codex: codexOpt
       if (req.method === "POST") {
         if (req.headers.origin !== "http://" + req.headers.host || req.headers["x-nori-review-token"] !== token ||
             req.headers["sec-fetch-site"] && !["same-origin", "none"].includes(req.headers["sec-fetch-site"])) throw new ReviewError(403, "이 검수 화면에서 보낸 저장 요청만 허용합니다. 서버 재시작 후에는 새로고침하세요.");
-        const match = pathname.match(/^\/api\/local-review\/batches\/([a-z0-9-]+)\/(save|approve|materials|codex-request)$/);
+        const match = pathname.match(/^\/api\/local-review\/batches\/([a-z0-9-]+)\/(save|approve|unused|materials|codex-request)$/);
         if (!match) throw new ReviewError(404, "저장 API를 찾을 수 없습니다.");
         const body = await bodyOf(req);
         if (match[2] === "codex-request") {
@@ -98,12 +99,12 @@ export async function startServer({ root = project, port = 4317, codex: codexOpt
         }
         if (match[2] !== "save" && (typeof body.id !== "string" || !/^[a-z0-9_]+$/.test(body.id))) throw new ReviewError(400, "반영할 항목 ID가 필요합니다.");
         let result;
-        try { result = await service.mutate(match[1], body, match[2] === "save" ? null : { type: match[2] === "approve" ? "play" : "material", id: body.id }); }
+        try { result = await service.mutate(match[1], body, match[2] === "save" ? null : { type: match[2] === "approve" ? "play" : match[2] === "unused" ? "unused" : "material", id: body.id }); }
         catch (error) { if (!error.status && !error.code) error.status = 400; throw error; }
         return send(200, result);
       }
       if (["/", catalogUrl + "/", "/results/play-catalog.html"].includes(pathname)) return redirect(catalogUrl);
-      if (["/materials/", "/reviews/"].includes(pathname)) return redirect(pathname.slice(0, -1));
+      if (["/materials/", "/reviews/", "/recommendations/"].includes(pathname)) return redirect(pathname.slice(0, -1));
       if (pathname === "/local-review/browser.js") return send(200, browserScript, "text/javascript; charset=utf-8");
       const api = pathname.match(/^\/api\/local-review\/(batches|version)(?:\/([a-z0-9-]+))?$/);
       if (api) {
@@ -117,6 +118,11 @@ export async function startServer({ root = project, port = 4317, codex: codexOpt
         return send(200, bytes, ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg");
       }
       const list = service.read();
+      if (pathname === "/recommendations") {
+        const html = buildRecommendations(root, list);
+        if (revisionOf(fingerprint(root)) !== list.revision) throw new ReviewError(409, "화면을 만드는 중 파일이 변경되었습니다. 새로고침해 주세요.");
+        return send(200, html, "text/html; charset=utf-8");
+      }
       const batch = list.batches.find((b) => [reviewUrl(b.batch.batchId), reviewUrl(b.batch.batchId) + "/", "/" + b.output].includes(pathname));
       if (batch && pathname !== reviewUrl(batch.batch.batchId)) return redirect(reviewUrl(batch.batch.batchId));
       const initialView = Object.hasOwn(catalogViews, pathname) ? catalogViews[pathname] : null;

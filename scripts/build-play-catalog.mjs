@@ -17,7 +17,26 @@ export function buildCatalog(root = project, outputPath = "results/play-catalog.
   const output = path.resolve(root, outputPath);
   const relative = (file) => (serverUrls ? "/" : "") + path.relative(serverUrls ? root : path.dirname(output), file).split(path.sep).join("/");
   const asset = (file) => fs.existsSync(file) ? relative(file) + "?v=" + sha256(fs.readFileSync(file)).slice(0, 12) : null;
-  const pending = new Set(registry.reviewPending ?? []);
+  const batchDir = path.join(root, "data/review-batches");
+  const warnings = [], batches = [], sourceBatches = [];
+  if (fs.existsSync(batchDir)) for (const file of fs.readdirSync(batchDir).filter((f) => f.endsWith(".json"))) {
+    try {
+      const batch = readJson(path.join(batchDir, file));
+      if (!Array.isArray(batch.playIds) || !/^[a-z0-9-]+$/.test(batch.batchId ?? "")) throw new Error("배치 형식 확인 필요");
+      sourceBatches.push(batch);
+      const reviewFile = batch.reviewOutput ?? (path.join(batchDir, file) === path.join(root, DEFAULT_BATCH) ? "results/play-image-audit.html" : `results/reviews/${batch.batchId}.html`);
+      const registered = batch.playIds.filter((id) => bundle.plays.some((p) => p.id === id && p.status === "live" && p.imageStatus !== "review")).length;
+      batches.push({ title: batch.title, count: batch.playIds.length, registered, file: serverUrls ? "/reviews/" + encodeURIComponent(batch.batchId) : relative(path.resolve(root, reviewFile)), ready: !write || fs.existsSync(path.resolve(root, reviewFile)) });
+    } catch (error) { warnings.push(file + ": " + error.message); }
+  }
+  const unapproved = new Set(registry.reviewPending ?? []);
+  const usedMaterials = new Set(bundle.plays.flatMap((p) => [...p.materials.required, ...p.materials.optional]));
+  const replaced = new Map();
+  for (const batch of sourceBatches) for (const [slug, decision] of Object.entries(batch.appliedMaterialDecisions ?? {})) {
+    if (unapproved.has(slug) && !usedMaterials.has(slug) && decision.decision === "replace" && decision.confirmed &&
+        registry.displayNames[decision.replacementSlug] && !unapproved.has(decision.replacementSlug)) replaced.set(slug, decision.replacementSlug);
+  }
+  const pending = new Set([...unapproved].filter((slug) => !replaced.has(slug)));
   const materialNames = (slugs) => slugs.map((s) => registry.displayNames[s] ?? s).join(" · ") || "없음";
   const materialImages = {};
   for (const slug of Object.keys(registry.displayNames)) {
@@ -37,19 +56,10 @@ export function buildCatalog(root = project, outputPath = "results/play-catalog.
   const materialCards = Object.entries(registry.displayNames).map(([slug, name]) => {
     const category = Object.keys(registry.categories).find((c) => registry.categories[c].includes(slug));
     const uses = bundle.plays.filter((p) => [...p.materials.required, ...p.materials.optional].includes(slug));
-    return `<article class="material" id="material-${esc(slug)}" data-state="${pending.has(slug) ? "pending" : "registered"}" data-search="${esc([name, slug, category].join(" ").toLocaleLowerCase())}">${picture(materialImages[slug], name, "material-image")}<small>${esc(category)} · ${esc(slug)}</small><h3>${esc(name)}</h3><span class="badge ${pending.has(slug) ? "draft" : "live"}">${pending.has(slug) ? "검수 대기" : "등록"}</span><details><summary>사용 놀이 ${uses.length}개</summary>${uses.map((p) => `<a class="play-link" href="${serverUrls ? "/catalog" : ""}#${esc(p.id)}" data-id="${esc(p.id)}">${esc(p.name)} <small>${states[p.status]}</small></a>`).join("") || '<p class="muted">사용 중인 놀이가 없습니다.</p>'}</details></article>`;
+    const state = replaced.has(slug) ? "replaced" : pending.has(slug) ? "pending" : "registered";
+    const label = { replaced: "대체 완료", pending: "검수 대기", registered: "등록" }[state];
+    return `<article class="material" id="material-${esc(slug)}" data-state="${state}" data-search="${esc([name, slug, category].join(" ").toLocaleLowerCase())}">${picture(materialImages[slug], name, "material-image")}<small>${esc(category)} · ${esc(slug)}</small><h3>${esc(name)}</h3><span class="badge ${state === "pending" ? "draft" : state === "replaced" ? "archived" : "live"}">${label}</span>${state === "replaced" ? `<p class="muted">대체 재료: ${esc(registry.displayNames[replaced.get(slug)])}</p>` : ""}<details><summary>사용 놀이 ${uses.length}개</summary>${uses.map((p) => `<a class="play-link" href="${serverUrls ? "/catalog" : ""}#${esc(p.id)}" data-id="${esc(p.id)}">${esc(p.name)} <small>${states[p.status]}</small></a>`).join("") || '<p class="muted">사용 중인 놀이가 없습니다.</p>'}</details></article>`;
   }).join("\n");
-  const batchDir = path.join(root, "data/review-batches");
-  const warnings = [], batches = [];
-  if (fs.existsSync(batchDir)) for (const file of fs.readdirSync(batchDir).filter((f) => f.endsWith(".json"))) {
-    try {
-      const batch = readJson(path.join(batchDir, file));
-      if (!Array.isArray(batch.playIds) || !/^[a-z0-9-]+$/.test(batch.batchId ?? "")) throw new Error("배치 형식 확인 필요");
-      const reviewFile = batch.reviewOutput ?? (path.join(batchDir, file) === path.join(root, DEFAULT_BATCH) ? "results/play-image-audit.html" : `results/reviews/${batch.batchId}.html`);
-      const registered = batch.playIds.filter((id) => bundle.plays.some((p) => p.id === id && p.status === "live" && p.imageStatus !== "review")).length;
-      batches.push({ title: batch.title, count: batch.playIds.length, registered, file: serverUrls ? "/reviews/" + encodeURIComponent(batch.batchId) : relative(path.resolve(root, reviewFile)), ready: !write || fs.existsSync(path.resolve(root, reviewFile)) });
-    } catch (error) { warnings.push(file + ": " + error.message); }
-  }
   const counts = Object.fromEntries(Object.keys(states).map((status) => [status, bundle.plays.filter((p) => p.status === status).length]));
   const css = backofficeCss() + fs.readFileSync(new URL("./review/catalog.css", import.meta.url), "utf8");
   const client = fs.readFileSync(new URL("./review/catalog-client.js", import.meta.url), "utf8");
@@ -62,7 +72,7 @@ export function buildCatalog(root = project, outputPath = "results/play-catalog.
     <header class="page-header"><div class="page-title-row"><div><p class="eyebrow">CONTENT LIBRARY</p><h1 id="page-title">놀이·재료 현황</h1><p class="subtitle" id="page-description">좋은 놀이를 모으고, 살펴보고, 차곡차곡 관리하세요.</p></div><div class="page-actions" data-refresh-slot><div class="page-meta"><span class="updated-label">데이터 기준 ${esc(bundle.updatedAt)}</span><span class="save-status" id="save-status" role="status">로컬 콘텐츠</span></div></div></div>
     <section class="stat-grid" aria-label="콘텐츠 현황">${stat("전체 놀이", bundle.plays.length, "개의 콘텐츠", "library", "", 'data-catalog-status="all"')}${stat("등록된 놀이", counts.live, "개 등록 완료", "check", "green", 'data-catalog-status="live"')}${stat("초안·검수 대기", counts.draft, "개 검수 중", "review", "amber", 'data-catalog-status="draft"')}${stat("재료 검수 대기", pending.size, "개 / 전체 " + materialCount + "개", "materials", "violet", 'data-catalog-material="pending"')}</section><div id="notice" class="notice" role="status" aria-live="polite"></div></header>
     <main class="page-main">${collections}<section class="library-panel" id="library-panel"><div class="library-heading"><div><h2 id="library-title">놀이 라이브러리</h2><p id="count" role="status"></p></div><span class="library-tip">항목을 눌러 자세히 살펴보세요</span></div>
-    <div class="toolbar catalog-toolbar"><label class="search-field">${icon("search")}<input id="q" type="search" aria-label="목록 검색" placeholder="놀이명, 준비물, ID로 검색"></label><select id="status" aria-label="놀이 등록 상태"><option value="live">등록 ${counts.live}</option><option value="draft">초안 ${counts.draft}</option><option value="archived">보관 ${counts.archived}</option><option value="all">전체 ${bundle.plays.length}</option></select><select id="age" aria-label="월령"><option value="">전체 월령</option>${Array.from({ length: 49 }, (_, i) => `<option value="${i}">${i}개월</option>`).join("")}</select><select id="area" aria-label="발달영역"><option value="">전체 발달영역</option>${Object.entries(areas).map(([v, label]) => `<option value="${v}">${label}</option>`).join("")}</select><select id="material-state" aria-label="재료 등록 상태" hidden><option value="registered">등록 재료</option><option value="pending">검수 대기 재료</option><option value="all">전체 재료</option></select><button class="reset-button" id="reset">초기화</button></div>
+    <div class="toolbar catalog-toolbar"><label class="search-field">${icon("search")}<input id="q" type="search" aria-label="목록 검색" placeholder="놀이명, 준비물, ID로 검색"></label><select id="status" aria-label="놀이 등록 상태"><option value="live">등록 ${counts.live}</option><option value="draft">초안 ${counts.draft}</option><option value="archived">보관 ${counts.archived}</option><option value="all">전체 ${bundle.plays.length}</option></select><select id="age" aria-label="월령"><option value="">전체 월령</option>${Array.from({ length: 49 }, (_, i) => `<option value="${i}">${i}개월</option>`).join("")}</select><select id="area" aria-label="발달영역"><option value="">전체 발달영역</option>${Object.entries(areas).map(([v, label]) => `<option value="${v}">${label}</option>`).join("")}</select><select id="material-state" aria-label="재료 등록 상태" hidden><option value="registered">등록 재료</option><option value="pending">검수 대기 재료</option><option value="replaced">대체 완료 재료</option><option value="all">전체 재료</option></select><button class="reset-button" id="reset">초기화</button></div>
     <section id="plays-panel"><div class="list-columns" aria-hidden="true"><span>놀이 정보</span><span>대상 월령</span><span class="area-column">발달 영역</span><span class="time-column">놀이 시간</span><span>상태</span><span></span></div><section id="play-list" class="plays" aria-label="현재 놀이 목록">${cards}</section></section><section id="materials-panel" hidden><section id="material-list" class="materials" aria-label="현재 재료 목록">${materialCards}</section></section><p id="empty" hidden>조건에 맞는 항목이 없습니다. 검색어나 필터를 바꿔 보세요.</p></section><footer>놀이 레시피 콘텐츠 스튜디오 · 새로 수집한 놀이는 수집 건별 검수에서 확인하세요.</footer></main></div><script>${client}</script></body></html>`;
   if (write) {
     fs.mkdirSync(path.dirname(output), { recursive: true });

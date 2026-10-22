@@ -12,6 +12,7 @@
   const fresh = (entry) => ({ ...entry, decision: "pending", comment: "",
     contentReviewed: false, imageReviewed: false, updatedAt: null, ...initial.get(entry.id) });
   let records = new Map(manifest.entries.map((entry) => [entry.id, fresh(entry)]));
+  const justApproved = new Set();
   let storageError = false;
   const notice = document.getElementById("notice");
   const setNotice = (message, error = false) => {
@@ -66,9 +67,13 @@
     const card = document.getElementById(id);
     const record = records.get(id);
     const complete = registered(entries.get(id));
+    card.dataset.registered = String(complete);
     card.dataset.decision = record.decision;
     card.querySelector(".decision-label").textContent = complete ? "등록 완료" : labels[record.decision];
     card.querySelector("textarea").value = record.comment;
+    card.querySelector("textarea").readOnly = complete;
+    card.querySelector('[data-field="contentReviewed"]').disabled = complete;
+    if (complete) card.querySelector('[data-field="imageReviewed"]').disabled = true;
     card.querySelector('[data-field="contentReviewed"]').checked = record.contentReviewed;
     card.querySelector('[data-field="imageReviewed"]').checked = record.imageReviewed;
     const entry = entries.get(id);
@@ -91,13 +96,20 @@
     for (const decision of validDecisions) {
       document.querySelector('[data-count="' + decision + '"]').textContent = counts[decision];
     }
+    const progress = document.querySelector(".sidebar-progress");
+    if (progress) {
+      progress.querySelector("strong").textContent = completed;
+      progress.querySelector("small").textContent = " / " + entries.size + "개 등록";
+      progress.querySelector(".progress-track span").style.width = (entries.size ? completed / entries.size * 100 : 0) + "%";
+      progress.querySelector("p").textContent = entries.size - completed ? (entries.size - completed) + "개 항목을 검수하고 있어요." : "검수할 항목이 없습니다.";
+    }
     const query = document.getElementById("q").value.trim().toLocaleLowerCase();
     const filter = document.getElementById("filter").value;
     let visible = 0;
     for (const card of document.querySelectorAll(".card")) {
       const record = records.get(card.id);
       const complete = registered(entries.get(card.id));
-      const matchesFilter = filter === "all" || (filter === "registered" ? complete : !complete && record.decision === filter);
+      const matchesFilter = filter === "all" || justApproved.has(card.id) || (filter === "registered" ? complete : !complete && record.decision === filter);
       card.hidden = !(card.dataset.search.includes(query) && matchesFilter);
       if (!card.hidden) visible++;
     }
@@ -196,9 +208,10 @@
     if (!persistence && !storageError) setNotice("재료 검수 선택과 의견을 저장했습니다. 재료 결과는 별도로 먼저 반영합니다.");
   });
 
-  document.getElementById("q").addEventListener("input", updateView);
-  document.getElementById("filter").addEventListener("change", updateView);
+  document.getElementById("q").addEventListener("input", () => { justApproved.clear(); updateView(); });
+  document.getElementById("filter").addEventListener("change", () => { justApproved.clear(); updateView(); });
   document.getElementById("clear-search").addEventListener("click", () => {
+    justApproved.clear();
     document.getElementById("q").value = "";
     document.getElementById("filter").value = "all";
     updateView();
@@ -231,6 +244,32 @@
     if (!persistence && !storageError) setNotice(button.dataset.decision === "changes_requested" && !record.comment.trim()
       ? id + ": 수정할 내용을 의견에 남겨 주세요." : id + " · " + labels[button.dataset.decision] + " 저장");
   });
+  document.getElementById("grid").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-unused]");
+    if (!button || !persistence) return;
+    persistence.save(payload(), { type: "unused", id: button.closest(".card").id });
+  });
+  window.noriPlayReview = {
+    apply(snapshot, intent) {
+      const y = scrollY;
+      if (intent.type === "play") justApproved.add(intent.id);
+      const remaining = new Set(snapshot.manifest.entries.map((entry) => entry.id));
+      for (const id of entries.keys()) if (!remaining.has(id)) document.getElementById(id)?.remove();
+      Object.assign(manifest, snapshot.manifest);
+      entries.clear();
+      for (const entry of manifest.entries) entries.set(entry.id, entry);
+      records = new Map(snapshot.results.records.map((record) => [record.id, record]));
+      window.noriMaterialReview.apply(snapshot);
+      for (const entry of manifest.entries) updateCard(entry.id);
+      document.querySelector("#plays-tab span").textContent = entries.size;
+      if (intent.type === "unused") {
+        justApproved.delete(intent.id);
+        for (const link of document.querySelectorAll(".usage-link")) if (link.dataset.playId === intent.id) link.remove();
+      }
+      updateView();
+      requestAnimationFrame(() => scrollTo(0, y));
+    },
+  };
   for (const image of document.querySelectorAll(".representative-image")) {
     const markFailure = () => {
       const id = image.closest(".card").id;

@@ -20,7 +20,7 @@
     "review:material-image": "node scripts/prepare-material-images.mjs save",
     "catalog:build": "node scripts/build-play-catalog.mjs",
     "review:local": "node tools/local-review/server.mjs",
-    "test:local-review": "node --test tools/local-review/tests/*.test.mjs",
+    "test:local-review": "node --import tsx --test tools/local-review/tests/*.test.mjs tools/local-review/tests/*.test.cts",
     "review:apply": "node scripts/apply-play-review.mjs",
     "review:materials": "node scripts/apply-material-review.mjs",
     "test:play-review": "node --test tests/play-review.test.mjs tests/material-review.test.mjs tests/review-workflow.test.mjs tests/material-images.test.mjs",

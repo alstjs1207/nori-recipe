@@ -54,6 +54,14 @@
     document.dispatchEvent(new CustomEvent("nori-material-change", { detail: intent }));
   }
   window.noriMaterialReview = {
+    apply(snapshot) {
+      Object.assign(manifest, snapshot.manifest);
+      entries.clear();
+      for (const entry of manifest.materialEntries) entries.set(entry.slug, entry);
+      records = new Map(snapshot.results.materialRecords.map((record) => [record.slug, record]));
+      for (const entry of manifest.materialEntries) render(entry.slug);
+      updateView();
+    },
     records: () => manifest.materialEntries.map((entry) => records.get(entry.slug)),
     blocksPlay: (entry) => [...records.values()].some((record) => ["held", "replace"].includes(record.decision) && entry.materialSlugs.includes(record.slug)),
     validate,

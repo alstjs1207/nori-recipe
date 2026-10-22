@@ -12,7 +12,6 @@
     "play_206",
     "play_207",
     "play_208",
-    "play_209",
     "play_210",
     "play_211",
     "play_212",
@@ -116,34 +115,6 @@
           "instagramAccount": "busytoddler"
         },
         "previousName": "펼친 상자 자동차 도로"
-      }
-    },
-    {
-      "id": "play_209",
-      "candidateKey": "F7",
-      "origin": "해외",
-      "views": "78.7만",
-      "ageBasis": "캡션은 Duplo를 넣은 욕조 놀이이며 숫자 연령 없음. 24개월용은 사용 연령이 맞는 큰 블록과 바닥의 얕은 물놀이통으로 규모를 줄이는 편집 판단.",
-      "normalizationNotes": [
-        "본문·주의사항의 수량·형태·보호자 역할을 유지하며 재료를 표준 slug로 매핑했습니다.",
-        "채반을 제외하고 물놀이통 하나에서 진행하며 보호자가 손으로 블록을 꺼내 정리하도록 수정했습니다."
-      ],
-      "materialReplacementChecks": [
-        {
-          "from": "colander",
-          "to": "water_bin",
-          "reason": "채반 대신 놀 수있도록 방법 수정",
-          "previousMethodHash": "429623810eb2bb50ab5a0de0d05ab022c9a5c7da290a81ec85b42407c0f10607"
-        }
-      ],
-      "materialReviewContentUpdate": {
-        "note": "채반을 제외하고 물놀이통 하나에서 진행하며 보호자가 손으로 블록을 꺼내 정리하도록 수정했습니다.",
-        "originalSource": {
-          "type": "instagram",
-          "url": "https://www.instagram.com/reel/DVHr5y-gbDE/",
-          "instagramAccount": "busytoddler"
-        },
-        "previousName": "큰 블록 물놀이"
       }
     },
     {
@@ -385,13 +356,7 @@
       "originalNames": [
         "보호자가 쓸 채반"
       ],
-      "usages": [
-        {
-          "id": "play_209",
-          "name": "큰 블록 물놀이",
-          "role": "optional"
-        }
-      ],
+      "usages": [],
       "similar": [
         "bowl"
       ],

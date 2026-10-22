@@ -65,14 +65,14 @@ export function buildReview(root, batchPath = DEFAULT_BATCH, outputPath = "resul
       "</details><details><summary>팁·효과·검토 근거</summary>" + (p.tip ? "<p>" + esc(p.tip) + "</p>" : "") +
       list(p.educationalEffects) + (extra.ageBasis ? "<p><b>대상 월령 근거</b> " + esc(extra.ageBasis) + "</p>" : "") +
       (extra.normalizationNotes?.length ? list(extra.normalizationNotes) : "") + "</details></div></div>" +
-      (registered ? '<p class="registered-note">' + icon("check") + '<span>등록이 완료된 놀이입니다.<br>다시 승인하지 않아도 됩니다.</span></p>' : "") +
+      (registered ? '<p class="registered-note">' + icon("check") + '<span>등록이 완료된 놀이입니다.<br>다시 승인하지 않아도 됩니다.</span>' + (serverUrls ? '<button type="button" class="unused-play" data-unused>사용안함</button>' : '') + '</p>' : "") +
       '<div class="review-controls"' + (registered ? " hidden" : "") + '><p class="control-title">검수 체크리스트</p><div class="checks"><label><input type="checkbox" data-field="contentReviewed">본문·재료·주의사항 확인</label>' +
       '<label><input type="checkbox" data-field="imageReviewed"' + (!image.hash ? " disabled" : "") + ">대표 이미지 확인" +
       (!image.hash ? " (생성 대기)" : "") + '</label></div><label class="opinion-label" for="opinion-' + id +
       '">검수 의견</label><textarea id="opinion-' + id + '" maxlength="10000" placeholder="수정할 부분이나 보류 이유를 남겨 주세요."></textarea>' +
       '<div class="actions"><button type="button" data-decision="approved"' + (!image.hash || blocked ? " disabled" : "") +
       '>승인</button><button type="button" data-decision="changes_requested">수정 요청</button><button type="button" data-decision="held">보류</button>' +
-      '<button type="button" class="reset" data-decision="pending">미검수로 되돌리기</button></div><p class="control-note">내용과 실제 이미지를 모두 확인한 뒤 승인해 주세요. 보류한 항목은 초안으로 유지됩니다.</p></div></article>';
+      '<button type="button" class="unused-play" data-unused' + (!serverUrls ? ' disabled title="로컬 스튜디오에서 사용할 수 있습니다"' : '') + '>사용안함</button><button type="button" class="reset" data-decision="pending">미검수로 되돌리기</button></div><p class="control-note">내용과 실제 이미지를 모두 확인한 뒤 승인해 주세요. 보류한 항목은 초안으로 유지됩니다. 사용안함은 목록에서 제외하고 놀이 정보·이미지를 제거합니다.</p></div></article>';
   }).join("\n");
   const css = backofficeCss() + fs.readFileSync(path.join(root, "scripts/review/review.css"), "utf8");
   const client = fs.readFileSync(path.join(root, "scripts/review/review-client.js"), "utf8");

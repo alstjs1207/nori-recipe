@@ -102,7 +102,7 @@
   if (serverUrls) {
     const params = new URLSearchParams(location.search);
     if (["live", "draft", "archived", "all"].includes(params.get("status"))) status.value = params.get("status");
-    if (["registered", "pending", "all"].includes(params.get("state"))) materialState.value = params.get("state");
+    if (["registered", "pending", "replaced", "all"].includes(params.get("state"))) materialState.value = params.get("state");
   }
   window.addEventListener("hashchange", showLinkedItem);
   show(initialView);

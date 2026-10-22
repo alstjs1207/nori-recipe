@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { createManifest, validateResults, applyApproval, DEFAULT_BATCH, canonical } from "../../scripts/review/review-core.mjs";
+import { createManifest, validateResults, applyApproval, DEFAULT_BATCH, canonical, koreanDate } from "../../scripts/review/review-core.mjs";
 import { reviewDefaults } from "../../scripts/review/review-history.mjs";
 import { applyMaterialReview } from "../../scripts/apply-material-review.mjs";
 import { materialImageInfo, materialSourcesPath } from "../../scripts/review/material-images.mjs";
@@ -132,6 +132,28 @@ function stageApplication(root, snapshot, results, intent) {
   } finally { fs.rmSync(staged, { recursive: true, force: true }); }
 }
 
+// Remove active content everywhere it is linked; the transaction keeps recoverable originals.
+function removePlay(root, snapshot, id) {
+  const bundle = structuredClone(snapshot.bundle);
+  bundle.plays = bundle.plays.filter((p) => p.id !== id);
+  bundle.updatedAt = koreanDate();
+  const updates = new Map([["data/plays.json", json(bundle)]]);
+  const native = bytesAt(root, "src/constants/playImages.ts").toString();
+  updates.set("src/constants/playImages.ts", Buffer.from(native.replace(new RegExp("^ *" + id + ":.*\\n?", "m"), "")));
+  updates.set("images/plays/" + id + ".jpeg", null);
+  for (const { batch, batchPath } of snapshot.batches) {
+    if (!batch.playIds.includes(id)) continue;
+    const next = structuredClone(batch);
+    next.playIds = next.playIds.filter((value) => value !== id);
+    if (next.entries) next.entries = next.entries.filter((entry) => entry.id !== id);
+    for (const proposal of next.materialProposals ?? []) {
+      if (proposal.usages) proposal.usages = proposal.usages.filter((usage) => usage.id !== id);
+    }
+    updates.set(batchPath, json(next));
+  }
+  return { updates, summary: { removedIds: [id] } };
+}
+
 export function createService(root) {
   let queue = Promise.resolve();
   function mutate(batchId, body, intent) {
@@ -142,15 +164,24 @@ export function createService(root) {
       const results = cleanResults(body.results, snapshot.manifest);
       let updates = new Map(), summary = null;
       if (intent) {
-        if (intent.type === "play") {
+        if (intent.type === "unused") {
+          if (!snapshot.manifest.entries.some((e) => e.id === intent.id)) throw new ReviewError(400, "이 검수 배치의 놀이만 사용안함으로 처리할 수 있습니다.");
+          ({ updates, summary } = removePlay(root, snapshot, intent.id));
+        } else if (intent.type === "play") {
           const record = results.records.find((r) => r.id === intent.id);
           const entry = snapshot.manifest.entries.find((e) => e.id === intent.id);
           if (!record || record.decision !== "approved" || isRegistered(entry)) throw new ReviewError(400, "이번 화면에서 승인한 미등록 놀이 한 개를 지정하세요.");
         } else if (!results.materialRecords.some((m) => m.slug === intent.id && m.decision !== "pending")) throw new ReviewError(400, "반영할 재료 결정을 지정하세요.");
-        ({ updates, summary } = stageApplication(root, snapshot, results, intent));
+        if (intent.type !== "unused") ({ updates, summary } = stageApplication(root, snapshot, results, intent));
       }
       const stored = { savedAt: new Date().toISOString(), manifest: snapshot.manifest, results, materialImages: materialImages(root) };
-      const state = { ...snapshot.state, batches: { ...snapshot.state.batches, [batchId]: stored } };
+      const state = structuredClone({ ...snapshot.state, batches: { ...snapshot.state.batches, [batchId]: stored } });
+      if (intent?.type === "unused") {
+        for (const saved of Object.values(state.batches)) {
+          saved.results.records = saved.results.records.filter((r) => r.id !== intent.id);
+          saved.manifest.entries = saved.manifest.entries.filter((e) => e.id !== intent.id);
+        }
+      }
       updates.set(STATE, json(state));
       const transactionId = commitTransaction(root, updates, snapshot.files);
       const current = readSnapshot(root, batchId);

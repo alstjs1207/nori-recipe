@@ -327,3 +327,68 @@ test("an external image edit during commit is detected; own changes roll back an
   assert.deepEqual(bytesAt(root, image), external);
   assert.deepEqual(pendingTransactions(root), []);
 });
+
+test("unused removes only the selected play, its image and every batch link, then allows continued review", async (t) => {
+  const { root, instance, api } = await setup(t);
+  const batch = read(root, "data/review-batches/fixture.json");
+  write(root, "data/review-batches/overlap.json", { ...batch, batchId: "overlap", reviewOutput: "results/reviews/overlap.html", playIds: ["play_302"] });
+  let snapshot = await api.get();
+  snapshot.results.records.find((r) => r.id === "play_306").comment = "다음 검수 의견";
+  assert.equal((await api.post("unused", snapshot, "play_999")).status, 400);
+  const response = await api.post("unused", snapshot, "play_302");
+  assert.equal(response.status, 200, JSON.stringify(response.body));
+  assert.deepEqual(response.body.summary.removedIds, ["play_302"]);
+  assert.equal(read(root, "data/plays.json").plays.length, 5);
+  assert.equal(fs.existsSync(path.join(root, "images/plays/play_302.jpeg")), false);
+  assert.equal(read(root, "data/review-batches/fixture.json").materialProposals[0].usages.length, 0);
+  assert.deepEqual(read(root, "data/review-batches/overlap.json").playIds, []);
+  assert.equal((await fetch(instance.url + "/reviews/overlap")).status, 200);
+  const catalog = await (await fetch(instance.url + "/catalog")).text();
+  assert.doesNotMatch(catalog, /id="play_302"/);
+  assert.equal(response.body.results.records.find((r) => r.id === "play_306").comment, "다음 검수 의견");
+  assert.equal((await api.post("save", snapshot)).status, 409);
+  const transaction = read(root, "results/local-review/transactions/" + response.body.transactionId + "/plan.json");
+  const image = transaction.entries.find((e) => e.relative === "images/plays/play_302.jpeg");
+  assert.equal(image.afterHash, null);
+  assert.ok(fs.existsSync(path.join(root, "results/local-review/transactions", transaction.id, image.index + ".before")));
+  snapshot = await api.get();
+  approve(snapshot.results, "play_301");
+  const approved = await api.post("approve", snapshot, "play_301");
+  assert.equal(approved.status, 200, JSON.stringify(approved.body));
+  assert.equal(approved.body.manifest.entries.find((e) => e.id === "play_301").status, "live");
+});
+
+test("unused can remove registered plays and native mappings; deletion journals recover removed images", async (t) => {
+  const { root, api } = await setup(t);
+  const native = path.join(root, "src/constants/playImages.ts");
+  fs.writeFileSync(native, 'const PLAY_IMAGE_SOURCES: Record<string, ImageSourcePropType> = {\n  play_304: require("../../images/plays/play_304.jpeg"),\n};\n');
+  const snapshot = await api.get();
+  assert.equal((await api.post("unused", snapshot, "play_304")).status, 200);
+  assert.doesNotMatch(fs.readFileSync(native, "utf8"), /play_304/);
+  const original = bytesAt(root, "images/plays/play_301.jpeg");
+  const { plan } = prepareTransaction(root, new Map([["images/plays/play_301.jpeg", null]]), fingerprint(root));
+  fs.rmSync(path.join(root, "images/plays/play_301.jpeg"));
+  recoverTransaction(root, plan.id);
+  assert.deepEqual(bytesAt(root, "images/plays/play_301.jpeg"), original);
+});
+
+test("catalog excludes applied unused replacements from pending without registering them, and reopens reused materials", async (t) => {
+  const root = fixture(t), service = createService(root);
+  let snapshot = service.read("fixture");
+  Object.assign(snapshot.results.materialRecords.find((r) => r.slug === "basket"), {
+    decision: "replace", replacementSlug: "cup", confirmed: true, comment: "컵으로 대체",
+  });
+  await service.mutate("fixture", snapshot, { type: "material", id: "basket" });
+  let catalog = buildCatalog(root, undefined, { write: false, serverUrls: true });
+  assert.equal(catalog.pendingMaterials, 1);
+  assert.match(catalog.html, /id="material-basket" data-state="replaced"/);
+  assert.match(catalog.html, /대체 재료: 컵/);
+  assert.match(catalog.html, /id="material-dropper" data-state="pending"/);
+  assert.ok(read(root, "data/materials.json").reviewPending.includes("basket"));
+  const bundle = read(root, "data/plays.json");
+  bundle.plays.find((p) => p.id === "play_306").materials.optional.push("basket");
+  write(root, "data/plays.json", bundle);
+  catalog = buildCatalog(root, undefined, { write: false });
+  assert.equal(catalog.pendingMaterials, 2);
+  assert.match(catalog.html, /id="material-basket" data-state="pending"/);
+});

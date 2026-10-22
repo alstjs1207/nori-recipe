@@ -39,7 +39,7 @@ export function imageInfo(root, id) {
 
 export function createManifest(root, batch, bundle, registry) {
   if (!batch || batch.schemaVersion !== 1 || !/^[a-z0-9-]+$/.test(batch.batchId ?? "") ||
-      !Array.isArray(batch.playIds) || !batch.playIds.length ||
+      !Array.isArray(batch.playIds) ||
       new Set(batch.playIds).size !== batch.playIds.length) throw new Error("잘못된 검수 배치입니다.");
   const entries = batch.playIds.map((id) => {
     const play = bundle.plays.find((item) => item.id === id);

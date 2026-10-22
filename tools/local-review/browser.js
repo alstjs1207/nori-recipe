@@ -64,7 +64,7 @@
     saving++;
     chain = chain.then(async () => {
       if (blocked) return;
-      const action = intent?.type === "play" ? "approve" : intent?.type === "material" ? "materials" : "save";
+      const action = intent?.type === "unused" ? "unused" : intent?.type === "play" ? "approve" : intent?.type === "material" ? "materials" : "save";
       const response = await fetch("/api/local-review/batches/" + config.batchId + "/" + action, {
         method: "POST", headers: { "content-type": "application/json", "x-nori-review-token": config.token },
         body: JSON.stringify({ revision, results: value, ...(intent ? { id: intent.id } : {}) }),
@@ -75,14 +75,16 @@
       revision = result.revision;
       if (seq === sequence) dirty = false;
       if (intent) {
-        if (intent.type === "play") {
-          history.replaceState(null, "", "#" + intent.id);
-          document.getElementById("filter").value = "all";
-          document.getElementById("q").value = intent.id;
+        if (intent.type === "play" || intent.type === "unused") {
+          window.noriPlayReview.apply(result, intent);
+          applying = false;
+          lock(blocked);
+          status(intent.type === "unused" ? "사용안함 처리 완료 · 놀이 정보와 이미지를 제거했습니다." : "승인 완료 · 다음 놀이를 계속 검수하세요.");
+        } else {
+          rememberView();
+          status("로컬 반영 완료 · 최신 목록을 불러옵니다.");
+          location.reload();
         }
-        rememberView();
-        status("로컬 반영 완료 · 최신 목록을 불러옵니다.");
-        location.reload();
       } else status(seq === sequence ? "서버에 저장됨 · " + new Date().toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul" }) : "서버에 저장 중…");
     }).catch(fail).finally(() => { saving--; });
   }
