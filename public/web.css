@@ -2303,6 +2303,8 @@ fieldset {
 }
 @media (max-width: 800px) {
   .web-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     padding: max(13px, env(safe-area-inset-top)) 20px 13px;
     gap: 12px;
   }
@@ -2313,7 +2315,20 @@ fieldset {
     width: 32px;
     height: 32px;
   }
-  .web-toolbar .install-button,
+  .web-toolbar-actions {
+    display: contents;
+  }
+  .web-toolbar .profile-button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .web-toolbar .install-button {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 44px;
+    background: var(--lavender);
+    color: var(--violet);
+  }
   .nori-nav-header {
     display: none;
   }
