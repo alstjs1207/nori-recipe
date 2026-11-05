@@ -1,0 +1,17 @@
+Generation mode: built-in image_gen edit.
+Source: assets/nori-share-cover-20261105.png
+Master: assets/nori-share-cover-20261105-v2.png
+Web export: public/og/nori-recipe-20261105-v2.jpg (1200x630)
+Changes: boy with short hair; new two-line slogan; bottom age/material descriptor removed.
+Integration: Main website Open Graph and Twitter metadata use the web export. Play detail links retain their own play-specific images.
+
+Final edit prompt:
+Edit the supplied existing Nori Recipe Korean social share cover. Input image is the edit target, not merely inspiration. Preserve its beautiful watercolor/colored-pencil illustration, warm off-white background, landscape aspect ratio about 1.905:1, existing top-left flower and exact brand title "노리 레시피", mother, mint cardigan, lavender child clothing, play table, paper drawing, crayons and paper cup, restrained accent marks, overall composition and family warmth.
+Make ONLY these requested changes:
+1. Change the child into a clearly recognizable approximately 2.5-year-old Korean BOY, with a neat short dark boy haircut, short sides and a soft boyish fringe. Keep his happy facial expression, position, drawing action, natural hands, lavender top, and connection with his mother. No accessories needed.
+2. Replace the entire current large main slogan with exactly these TWO lines of Korean text:
+"우리 집 재료가,"
+"오늘의 놀이로."
+Use the existing large heavy rounded Korean sans-serif style, first line dark ink, second line vivid brand violet. Both lines must fit comfortably into the left text column without overlapping the boy. Make all glyphs crisp and accurately spelled. Text should be prominent and legible in a small link preview. Slightly rebalance the typography spacing only as needed for this new slogan.
+3. Completely REMOVE the small bottom-left text "0–48개월 · 집에 있는 재료로". Leave beautiful clean warm-white negative space there; do not add any replacement caption or URL.
+Final image should contain ONLY the unchanged brand name and the exact new slogan. No old slogan, no age text, no extra labels, no watermark. Preserve the original illustration and placement of all other elements as closely as possible. Finished wide Open Graph artwork, not a photo of a printed card.

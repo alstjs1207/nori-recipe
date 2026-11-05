@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { validatePlayBundle } from "../scripts/validate-play-content.mjs";
 import { removeUnpublishedImages, writePlayImages, writeMaterialImage } from "../scripts/prepare-web-assets.mjs";
-import { resolvePublicOrigin, withPlayMetadata, withPublicOrigin } from "../scripts/web/html.mjs";
+import { resolvePublicOrigin, withSiteMetadata, withPlayMetadata, withPublicOrigin } from "../scripts/web/html.mjs";
 
 const bundle = JSON.parse(await fs.readFile(new URL("../data/plays.json", import.meta.url), "utf8"));
 const registry = JSON.parse(await fs.readFile(new URL("../data/materials.json", import.meta.url), "utf8"));
@@ -62,6 +62,32 @@ test("시작 전 준비 조건은 비어 있지 않은 문자열 배열로 검�
 test("공유 이미지에도 교체한 그림의 버전 주소를 사용한다", () => {
   const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
   assert.ok(html.includes('property="og:image" content="__NORI_ORIGIN__/media/plays/play_006.webp?v=123456abcdef"'));
+});
+
+test("메인 공유 이미지는 공개된 1200×630 JPEG이며 운영·미리보기 주소를 따른다", async () => {
+  const html = withSiteMetadata('<head><title>노리</title></head>');
+  const relativeImage = "/og/nori-recipe-20261105-v2.jpg";
+  const metadata = await sharp(fileURLToPath(new URL(`../public${relativeImage}`, import.meta.url))).metadata();
+  assert.equal(metadata.format, "jpeg");
+  assert.equal(metadata.width, 1200);
+  assert.equal(metadata.height, 630);
+  for (const origin of ["https://nori.lestly.io", "https://nori-preview.vercel.app"]) {
+    const deployed = withPublicOrigin(html, origin);
+    assert.ok(deployed.includes(`property="og:image" content="${origin}${relativeImage}"`));
+    assert.ok(deployed.includes(`name="twitter:image" content="${origin}${relativeImage}"`));
+    assert.ok(deployed.includes(`property="og:url" content="${origin}/"`));
+    assert.doesNotMatch(deployed, /__NORI_ORIGIN__/);
+  }
+});
+
+test("놀이 상세는 메인 공유 정보를 중복 없이 해당 놀이 이미지로 대체한다", () => {
+  const html = withPlayMetadata(withPublicOrigin(withSiteMetadata('<head><title>노리</title></head>'), "https://nori.lestly.io"), bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  assert.equal((html.match(/property="og:image"/g) ?? []).length, 1);
+  assert.equal((html.match(/name="twitter:image"/g) ?? []).length, 1);
+  assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1);
+  assert.ok(html.includes('property="og:type" content="article"'));
+  assert.ok(html.includes('/media/plays/play_006.webp?v=123456abcdef'));
+  assert.doesNotMatch(html, /nori-recipe-20261105-v2.jpg|og:image:width|og:image:height|og:image:type|og:image:alt/);
 });
 
 test("Vercel 정적 HTML의 공유 주소는 운영 도메인과 미리보기 배포를 구분한다", () => {
