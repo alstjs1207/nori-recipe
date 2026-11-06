@@ -71,7 +71,7 @@ test("메인 공유 이미지는 공개된 1200×630 JPEG이며 운영·미리�
   assert.equal(metadata.format, "jpeg");
   assert.equal(metadata.width, 1200);
   assert.equal(metadata.height, 630);
-  for (const origin of ["https://nori.lestly.io", "https://nori-preview.vercel.app"]) {
+  for (const origin of ["https://nori-recipe.com", "https://nori-preview.vercel.app"]) {
     const deployed = withPublicOrigin(html, origin);
     assert.ok(deployed.includes(`property="og:image" content="${origin}${relativeImage}"`));
     assert.ok(deployed.includes(`name="twitter:image" content="${origin}${relativeImage}"`));
@@ -81,7 +81,7 @@ test("메인 공유 이미지는 공개된 1200×630 JPEG이며 운영·미리�
 });
 
 test("놀이 상세는 메인 공유 정보를 중복 없이 해당 놀이 이미지로 대체한다", () => {
-  const html = withPlayMetadata(withPublicOrigin(withSiteMetadata('<head><title>노리</title></head>'), "https://nori.lestly.io"), bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  const html = withPlayMetadata(withPublicOrigin(withSiteMetadata('<head><title>노리</title></head>'), "https://nori-recipe.com"), bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
   assert.equal((html.match(/property="og:image"/g) ?? []).length, 1);
   assert.equal((html.match(/name="twitter:image"/g) ?? []).length, 1);
   assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1);

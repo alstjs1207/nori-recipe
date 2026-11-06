@@ -3,7 +3,7 @@ import test from "node:test";
 import { createAnalyticsClient, type AnalyticsEnvironment, type AnalyticsTransport } from "./client";
 import { ANALYTICS_CONSENT_VERSION, getAnalyticsPage, parseAnalyticsConfig, sanitizeAnalyticsEvent, sanitizeReferrer, type AnalyticsEvent, type AnalyticsParams } from "./policy";
 
-const config = { measurementId: "G-ABC1234567", origin: "https://nori.example.com" };
+const config = { measurementId: "G-ABC1234567", origin: "https://nori-recipe.com" };
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 function fixture(overrides: Partial<AnalyticsEnvironment> = {}) {
   let stored: string | null = null;
@@ -25,7 +25,7 @@ test("운영 HTTPS 도메인과 올바른 측정 ID가 있을 때만 설정을 �
     assert.equal(parseAnalyticsConfig(config.measurementId, origin), null);
   }
   for (const id of [undefined, "", "UA-12345-1", "G-<script>", "G-short"]) assert.equal(parseAnalyticsConfig(id, config.origin), null);
-  for (const origin of ["http://127.0.0.1:4173", "https://preview.example.com"]) assert.equal(fixture({ origin: () => origin }).client.enabled, false);
+  for (const origin of ["http://127.0.0.1:4173", "https://preview.example.com", "https://nori.lestly.io"]) assert.equal(fixture({ origin: () => origin }).client.enabled, false);
 });
 
 test("동의 전·거부·미설정 상태에서는 태그 로드와 모든 이벤트 전송이 없다", async () => {
