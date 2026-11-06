@@ -1,0 +1,24 @@
+Generation mode: built-in image_gen generation.
+Use case: illustration-story
+Asset type: brand-new wide welcome hero image for the Nori Recipe parenting-play website
+Style reference: user-provided codex-clipboard-413614f5-a530-4588-971d-437773603ec9.png
+
+Create a completely new representative hero illustration in the exact visual style and finish of the supplied reference image. Use the reference only for art direction; do not copy its composition, poses, furniture arrangement, or exact activity.
+
+Match the reference's warm watercolor-and-colored-pencil texture, finely drawn dark-brown contours, softly modeled semi-realistic Korean picture-book faces, detailed paper grain, bright creamy sunlight, cozy layered interior, pastel palette, and polished yet handmade finish.
+
+Scene: In a sunlit cozy Korean living room, a mother and her toddler son sit together on a soft floor mat around a low round wooden table. They are happily building a colorful paper-cup tower on top of a large sheet of paper covered with simple crayon roads and shapes. Two large wooden blocks and three chunky crayons sit nearby, suggesting several easy home-play possibilities. A small bookcase, teddy bear, leafy plants, warm curtains, and pastel cushions make the room rich and welcoming without clutter.
+
+Boy: One cheerful Korean toddler boy, around two to three years old, with short softly tousled black hair, round rosy cheeks, expressive dark eyes, and a delighted smile. He wears a cream knit top with muted sage stripes and is carefully placing a cup in the tower.
+
+Mother: One beautiful Korean mother in her early 30s with an elegant, celebrity-like presence but no resemblance to any specific person. Refined warm features, soft almond eyes, graceful nose, natural rose lips, and an affectionate smile toward her son. Modern dark-brown collarbone-length layered hair with a soft side part, airy face-framing bangs, and loose C-curl waves. She wears a soft lavender knit cardigan and gently steadies the tower with one hand.
+
+Style: Closely reproduce the reference's premium watercolor and colored-pencil storybook look: translucent peach-and-cream washes, delicate pencil hatching, gentle facial shading, realistic but charming hands, visible watercolor paper texture, soft luminous highlights, and warm slightly faded colors. Adult and child share the same coherent illustration style.
+
+Composition: Wide landscape around 2.1:1 for a website hero. Use a fresh composition with the mother on the left and boy on the right, both leaning toward the tower at center. Keep faces, hands, and play activity inside the central crop-safe area. Fill the complete frame naturally; no intentional blank area for text or a badge.
+
+Lighting and color: Abundant warm morning sunlight; affectionate, joyful, safe, cozy, and optimistic. Warm cream, peach, dusty lavender, muted sage, butter yellow, pale coral, and natural honey wood.
+
+Constraints: No text. Exactly one mother and one boy. Boy is clearly male. Mother appears early 30s and visibly beautiful. Use large age-safe household play materials. Balanced realistic anatomy. Fresh scene and poses. No blank placeholder space.
+
+Avoid: copying the reference composition, previous generated welcome compositions, photorealism, 3D rendering, flat cartoon or vector styling, anime, an overly sparse background, dramatic shadows, cold colors, heavy makeup, resemblance to a real celebrity, text, letters, logos, watermarks, extra people, extra hands, malformed fingers, and unsafe small parts.

@@ -1,5 +1,5 @@
 import { WebPage } from "./NoriUI";
-import { getPlayImageUrl } from "@/constants/playImageUrls";
+import { getWelcomeImageUrl } from "@/constants/welcomeImageUrl";
 import { WebSelect } from "./WebSelect";
 import { useState } from "react";
 import { Link, router } from "expo-router";
@@ -78,8 +78,8 @@ export function WebWelcome() {
             </p>
             <div className="welcome-art">
               <img
-                src={getPlayImageUrl("play_013")}
-                alt="아이와 함께하는 그림 놀이"
+                src={getWelcomeImageUrl()}
+                alt="엄마와 남자아이가 종이컵과 크레용으로 함께 노는 모습"
                 fetchPriority="high"
               />
               <span>

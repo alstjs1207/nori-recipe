@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { validatePlayBundle } from "../scripts/validate-play-content.mjs";
-import { removeUnpublishedImages, writePlayImages, writeMaterialImage } from "../scripts/prepare-web-assets.mjs";
+import { removeUnpublishedImages, writePlayImages, writeMaterialImage, writeWelcomeImage } from "../scripts/prepare-web-assets.mjs";
 import { resolvePublicOrigin, withSiteMetadata, withPlayMetadata, withPublicOrigin } from "../scripts/web/html.mjs";
 
 const bundle = JSON.parse(await fs.readFile(new URL("../data/plays.json", import.meta.url), "utf8"));
@@ -145,5 +145,20 @@ test("기본 아이콘을 실제 재료 이미지로 교체하면 주소 버전�
     assert.notEqual(newVersion, oldVersion);
     assert.equal(await writeMaterialImage("paper_plate", { source: plate, directory }), newVersion);
     assert.match(newVersion, /^[a-f0-9]{12}$/);
+  } finally { await fs.rm(directory, { recursive: true, force: true }); }
+});
+
+test("웰컴 대표 이미지는 가벼운 가로형 WebP와 캐시 버전으로 생성한다", async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "nori-welcome-image-"));
+  try {
+    const source = fileURLToPath(new URL("../assets/nori-welcome-hero-boy-20261106-v6.png", import.meta.url));
+    const output = path.join(directory, "hero.webp");
+    const version = await writeWelcomeImage({ source, output });
+    const metadata = await sharp(output).metadata();
+    assert.equal(metadata.format, "webp");
+    assert.equal(metadata.width, 1440);
+    assert.equal(metadata.height, 686);
+    assert.match(version, /^[a-f0-9]{12}$/);
+    assert.equal(await writeWelcomeImage({ source, output }), version);
   } finally { await fs.rm(directory, { recursive: true, force: true }); }
 });

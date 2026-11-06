@@ -32,13 +32,22 @@ export async function writeMaterialImage(slug, { source, directory }) {
   return crypto.createHash("sha256").update(await fs.readFile(output)).digest("hex").slice(0, 12);
 }
 
+export async function writeWelcomeImage({ source, output }) {
+  await sharp(source)
+    .rotate()
+    .resize({ width: 1440, height: 686, fit: "cover", position: "centre", withoutEnlargement: true })
+    .webp({ quality: 78 })
+    .toFile(output);
+  return crypto.createHash("sha256").update(await fs.readFile(output)).digest("hex").slice(0, 12);
+}
+
 export async function prepareWebAssets() {
   let bundle;
   try { bundle = JSON.parse(await fs.readFile(path.join(root, "data/plays.json"), "utf8")); }
   catch { throw new Error("data/plays.json이 필요합니다. 저장소의 놀이 데이터와 images/plays를 확인해 주세요."); }
   const plays = bundle.plays.filter((play) => play.status === "live");
   const output = path.join(root, "public/media");
-  await Promise.all(["plays", "thumbs", "materials"].map((dir) => fs.mkdir(path.join(output, dir), { recursive: true })));
+  await Promise.all(["plays", "thumbs", "materials", "welcome"].map((dir) => fs.mkdir(path.join(output, dir), { recursive: true })));
   const publishedImages = new Set(plays.map((play) => `${play.id}.webp`));
   for (const dir of ["plays", "thumbs"]) {
     await removeUnpublishedImages(path.join(output, dir), publishedImages);
@@ -69,6 +78,11 @@ export async function prepareWebAssets() {
   await fs.writeFile(path.join(root, "src/constants/materialImageVersions.json"), JSON.stringify(sortedVersions, null, 2) + "\n");
   const sortedPlayVersions = Object.fromEntries(Object.entries(playImageVersions).sort(([a], [b]) => a.localeCompare(b)));
   await fs.writeFile(path.join(root, "src/constants/playImageVersions.json"), JSON.stringify(sortedPlayVersions, null, 2) + "\n");
+  const welcomeImageVersion = await writeWelcomeImage({
+    source: path.join(root, "assets/nori-welcome-hero-boy-20261106-v6.png"),
+    output: path.join(output, "welcome/hero.webp"),
+  });
+  await fs.writeFile(path.join(root, "src/constants/welcomeImageVersion.json"), JSON.stringify(welcomeImageVersion) + "\n");
   const icons = path.join(root, "public/icons");
   await fs.mkdir(icons, { recursive: true });
   await sharp(icon).resize(64, 64).png().toFile(path.join(root, "public/nori-favicon.png"));
@@ -77,7 +91,7 @@ export async function prepareWebAssets() {
   await sharp(icon).resize(384, 384).extend({ top: 64, bottom: 64, left: 64, right: 64, background: "#FAFAFE" }).png().toFile(path.join(icons, "maskable-512.png"));
   const report = { plays: plays.length, reviewImages: plays.filter((play) => play.imageStatus === "review").length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +(detailBytes / 1e6).toFixed(2), thumbnailMB: +(thumbnailBytes / 1e6).toFixed(2) };
   console.info("Web images:", JSON.stringify(report));
-  return { plays, report, playImageVersions: sortedPlayVersions };
+  return { plays, report, playImageVersions: sortedPlayVersions, welcomeImageVersion };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
