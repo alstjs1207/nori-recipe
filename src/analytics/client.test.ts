@@ -3,7 +3,7 @@ import test from "node:test";
 import { createAnalyticsClient, type AnalyticsEnvironment, type AnalyticsTransport } from "./client";
 import { ANALYTICS_CONSENT_VERSION, getAnalyticsPage, parseAnalyticsConfig, sanitizeAnalyticsEvent, sanitizeReferrer, type AnalyticsEvent, type AnalyticsParams } from "./policy";
 
-const config = { measurementId: "G-ABC1234567", origin: "https://nori-recipe.com" };
+const config = { measurementId: "G-ABC1234567", origin: "https://www.nori-recipe.com" };
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 function fixture(overrides: Partial<AnalyticsEnvironment> = {}) {
   let stored: string | null = null;

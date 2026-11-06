@@ -128,9 +128,9 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 - Phase 1 완료 전까지는 자유 커밋 (컨벤션 미적용)
 - Phase 1 완료 후: 기능 단위 커밋, Conventional Commits (`feat:`, `fix:`, `chore:`)
 - 개발 변경사항은 `preview` 브랜치에 반영하고 Vercel Preview의 `*.vercel.app` 주소에서 확인
-- 확인한 `preview`를 `main`에 병합하면 Vercel Production의 `https://nori-recipe.com`에 배포
+- 확인한 `preview`를 `main`에 병합하면 Vercel Production의 `https://www.nori-recipe.com`에 배포
 - Vercel의 Production Branch는 `main`, 운영 도메인 `nori-recipe.com`는 Production에 연결
-- `PUBLIC_ORIGIN=https://nori-recipe.com`는 Production에만 설정하고 Preview는 `VERCEL_URL` 사용
+- `PUBLIC_ORIGIN=https://www.nori-recipe.com`는 Production에만 설정하고 Preview는 `VERCEL_URL` 사용
 
 ### 금지
 - `.env`, 크레덴셜 파일 커밋 금지

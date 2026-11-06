@@ -3,13 +3,13 @@ import test from "node:test";
 import { getAnalyticsPage } from "./policy";
 
 test("실제 웹 어댑터는 동의 후에만 태그를 로드하고 URL 정리·광고 제한·철회를 적용한다", async () => {
-  const origin = "https://nori-recipe.com";
+  const origin = "https://www.nori-recipe.com";
   const storage = new Map<string, string>();
   const cookies: string[] = [];
   type Script = { id: string; src: string; async: boolean; referrerPolicy: string; onload: (() => void) | null; onerror: (() => void) | null; remove: () => void };
   const scripts: Script[] = [];
   const fakeWindow = {
-    location: { origin, hostname: "nori-recipe.com" },
+    location: { origin, hostname: "www.nori-recipe.com" },
     localStorage: { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value), removeItem: (key: string) => storage.delete(key) },
     setTimeout, clearTimeout, dataLayer: [] as unknown[],
   };

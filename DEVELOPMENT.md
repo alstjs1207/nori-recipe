@@ -30,12 +30,12 @@ pnpm serve:web
 
 ### Vercel 배포
 
-운영 주소는 [https://nori-recipe.com](https://nori-recipe.com)입니다. 배포 흐름은 다음과 같습니다.
+운영 주소는 [https://www.nori-recipe.com](https://www.nori-recipe.com)입니다. 배포 흐름은 다음과 같습니다.
 
 | Git 브랜치 | Vercel 환경 | 적용 주소 |
 | --- | --- | --- |
 | `preview` | Preview | Vercel이 부여한 `*.vercel.app` 주소 |
-| `main` | Production | `https://nori-recipe.com` |
+| `main` | Production | `https://www.nori-recipe.com` |
 
 변경사항은 `preview`에서 작업하고 푸시해 미리보기에서 확인합니다. 확인한 `preview`를 `main`에 병합하면 운영 환경으로 배포됩니다. Vercel의 Production Branch는 `main`으로, 운영 도메인 `nori-recipe.com`는 Production에 연결합니다.
 
@@ -52,7 +52,7 @@ pnpm serve:web
 
 `vercel.json`에서 프레임워크·설치·빌드·출력 설정을 적용합니다. 설치 명령은 `package.json`의 `packageManager`와 같은 pnpm 버전을 사용합니다. pnpm 버전을 바꿀 때는 두 파일을 함께 갱신합니다. `serve:web`은 로컬 검증 서버이며 Vercel에서는 실행하지 않습니다.
 
-- **System Environment Variables 접근을 활성화**합니다. `PUBLIC_ORIGIN=https://nori-recipe.com`는 **Production에만** 설정합니다. Preview에서는 `PUBLIC_ORIGIN`을 비워 `VERCEL_URL`로 해당 미리보기의 공유 주소를 생성합니다. Production에서 `PUBLIC_ORIGIN`이 없으면 `VERCEL_PROJECT_PRODUCTION_URL`을 사용합니다. 별도 도메인 추가나 환경변수 변경 후에는 재배포합니다.
+- **System Environment Variables 접근을 활성화**합니다. `PUBLIC_ORIGIN=https://www.nori-recipe.com`는 **Production에만** 설정합니다. Preview에서는 `PUBLIC_ORIGIN`을 비워 `VERCEL_URL`로 해당 미리보기의 공유 주소를 생성합니다. Production에서 `PUBLIC_ORIGIN`이 없으면 `VERCEL_PROJECT_PRODUCTION_URL`을 사용합니다. 별도 도메인 추가나 환경변수 변경 후에는 재배포합니다.
 - `vercel.json`의 경로 설정은 검색·설정·피드백 화면을 새로고침해도 앱을 엽니다. 놀이 상세는 빌드가 생성한 개별 HTML을 제공해 공유 제목·이미지를 유지합니다. 존재하지 않는 이미지·JS·놀이 경로는 앱 셸로 대체하지 않고 404로 처리합니다.
 - 서비스 워커와 설치 설정은 재검증할 수 있는 응답 헤더를 사용합니다. 기본 호스팅만 사용하고 Vercel Web Analytics·Speed Insights는 활성화하지 않습니다. GA4는 별도 설정이 없으면 비활성입니다.
 - `preview`에 푸시하면 Preview 배포를 확인하고, `preview`를 `main`에 병합하면 Production 배포를 확인합니다.
@@ -76,7 +76,7 @@ Vercel **Production에만** 아래 설정으로 수집을 활성화합니다. �
 ```bash
 EXPO_PUBLIC_GA_ENABLED=true
 EXPO_PUBLIC_GA_MEASUREMENT_ID=G-KVHS8WW1X5
-EXPO_PUBLIC_ANALYTICS_ORIGIN=https://nori-recipe.com
+EXPO_PUBLIC_ANALYTICS_ORIGIN=https://www.nori-recipe.com
 ```
 
 - 도메인은 HTTPS의 정확한 origin으로 지정합니다. 설정한 origin 외의 localhost·미리보기·다른 서브도메인에서는 태그를 로드하지 않습니다. 운영·로컬 빌드에서 `GA_ENABLED`가 꺼져 있거나 설정이 없으면 분석 안내도 표시하지 않습니다. Preview는 빌드가 자동으로 지정하는 `EXPO_PUBLIC_ANALYTICS_PREVIEW=true`로 안내를 표시하며 수집은 항상 차단합니다. 운영 활성화 값이 잘못되면 웹 빌드가 실패합니다.
