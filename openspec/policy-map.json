@@ -1,0 +1,686 @@
+{
+  "version": 1,
+  "domains": [
+    {
+      "id": "onboarding",
+      "title": "게스트 시작·아이 월령·재료 설정",
+      "commands": [
+        "pnpm test",
+        "pnpm typecheck"
+      ],
+      "requirements": [
+        {
+          "id": "ONB-001",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/store/sessionStore.ts",
+            "src/components/web/WebFirstVisit.web.tsx",
+            "src/components/web/WebWelcome.tsx"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/store/sessionStore.ts",
+              "contains": "getOrCreateGuestId"
+            }
+          ]
+        },
+        {
+          "id": "ONB-002",
+          "verification": "automated",
+          "sources": [
+            "src/onboarding/utils.ts"
+          ],
+          "tests": [
+            "src/onboarding/utils.test.ts",
+            "src/onboarding/dateUtils.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/onboarding/utils.ts",
+              "contains": "buildOnboardingFilterInput"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recommendations",
+      "title": "추천 순위·의도·고정 홈 세트",
+      "commands": [
+        "pnpm test"
+      ],
+      "requirements": [
+        {
+          "id": "REC-001",
+          "verification": "automated",
+          "sources": [
+            "src/engine/hardFilter.ts",
+            "src/engine/fallback.ts",
+            "src/engine/recommend.ts"
+          ],
+          "tests": [
+            "src/engine/rules.test.ts",
+            "src/engine/engine.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/engine/hardFilter.ts",
+              "contains": "hardFilter"
+            }
+          ]
+        },
+        {
+          "id": "REC-002",
+          "verification": "automated",
+          "sources": [
+            "src/engine/materialFit.ts",
+            "src/engine/diversity.ts",
+            "src/engine/softScore.ts"
+          ],
+          "tests": [
+            "src/engine/materialIntent.test.ts",
+            "src/engine/engine.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/engine/materialFit.ts",
+              "contains": "getMaterialFit"
+            }
+          ]
+        },
+        {
+          "id": "REC-003",
+          "verification": "automated",
+          "sources": [
+            "src/engine/intentRecommendation.ts",
+            "src/engine/intentSignals.ts",
+            "src/engine/intentCatalog.json"
+          ],
+          "tests": [
+            "src/engine/activityIntent.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/engine/intentRecommendation.ts",
+              "contains": "getConditionalIntentCandidates"
+            }
+          ]
+        },
+        {
+          "id": "REC-004",
+          "verification": "source-reviewed",
+          "sources": [
+            "app/(main)/index.tsx",
+            "src/store/sessionStore.ts",
+            "src/components/web/HomeRedesign.tsx",
+            "HOME_RECOMMENDATION_RULES.md"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "app/(main)/index.tsx",
+              "contains": "pinnedRecommendationIds"
+            }
+          ]
+        },
+        {
+          "id": "REC-005",
+          "verification": "automated",
+          "sources": [
+            "src/engine/weights.ts",
+            "src/engine/recommend.ts"
+          ],
+          "tests": [
+            "src/engine/engine.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/engine/weights.ts",
+              "contains": "COLD_START_WEIGHTS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "catalog",
+      "title": "공개 놀이·검색·상세·NEW",
+      "commands": [
+        "pnpm test",
+        "pnpm check:play-content"
+      ],
+      "requirements": [
+        {
+          "id": "CAT-001",
+          "verification": "automated",
+          "sources": [
+            "src/data/content.ts",
+            "src/play/search.ts",
+            "scripts/build-web.mjs"
+          ],
+          "tests": [
+            "tests/web-content.test.mjs",
+            "src/play/search.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/data/content.ts",
+              "contains": "loadLivePlays"
+            }
+          ]
+        },
+        {
+          "id": "CAT-002",
+          "verification": "automated",
+          "sources": [
+            "src/play/search.ts",
+            "src/play/searchSort.ts",
+            "src/play/presentation.ts"
+          ],
+          "tests": [
+            "src/play/search.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/play/search.ts",
+              "contains": "searchPlays"
+            }
+          ]
+        },
+        {
+          "id": "CAT-003",
+          "verification": "automated",
+          "sources": [
+            "src/play/newPlay.ts"
+          ],
+          "tests": [
+            "src/play/newPlay.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/play/newPlay.ts",
+              "contains": "getNewPlayWindow"
+            }
+          ]
+        },
+        {
+          "id": "CAT-004",
+          "verification": "automated",
+          "sources": [
+            "src/play/safety.ts",
+            "src/constants/playImages.ts",
+            "src/constants/playImages.web.ts",
+            "app/(main)/play/[id].tsx",
+            "app/(main)/play/[id].web.tsx"
+          ],
+          "tests": [
+            "src/play/safety.test.ts",
+            "src/constants/playImages.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/play/safety.ts",
+              "contains": "getPlaySafetyNotes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "play-records",
+      "title": "찜·놀이 완료·피드백·기록",
+      "commands": [
+        "pnpm test",
+        "pnpm typecheck"
+      ],
+      "requirements": [
+        {
+          "id": "LOG-001",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/db/queries.ts",
+            "src/constants/feedback.ts"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/db/queries.ts",
+              "contains": "recordPlayFeedbackWithRecord"
+            }
+          ]
+        },
+        {
+          "id": "LOG-002",
+          "verification": "automated",
+          "sources": [
+            "src/play/feedbackSignals.ts"
+          ],
+          "tests": [
+            "src/play/feedbackSignals.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/play/feedbackSignals.ts",
+              "contains": "applyFeedbackToUserContext"
+            }
+          ]
+        },
+        {
+          "id": "LOG-003",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/db/queries.ts",
+            "app/(main)/record.tsx",
+            "app/(main)/record.web.tsx",
+            "app/(main)/favorites.tsx"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/db/queries.ts",
+              "contains": "getDevAreaStats"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "local-data",
+      "title": "로컬 저장·마이그레이션·초기화",
+      "commands": [
+        "pnpm typecheck",
+        "pnpm test"
+      ],
+      "requirements": [
+        {
+          "id": "LOC-001",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/db/schema.ts",
+            "src/db/index.ts",
+            "src/db/index.web.ts",
+            "src/db/queries.ts"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/db/schema.ts",
+              "contains": "DATABASE_VERSION"
+            }
+          ]
+        },
+        {
+          "id": "LOC-002",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/db/queries.ts",
+            "src/store/sessionStore.ts"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/db/queries.ts",
+              "contains": "resetUserActivity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content-review",
+      "title": "콘텐츠·재료·이미지·사용자 검수",
+      "commands": [
+        "pnpm check:play-content",
+        "pnpm test:play-review",
+        "pnpm check:play-images"
+      ],
+      "requirements": [
+        {
+          "id": "CON-001",
+          "verification": "automated",
+          "sources": [
+            "scripts/validate-play-content.mjs",
+            "data/materials.json"
+          ],
+          "tests": [
+            "tests/web-content.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/validate-play-content.mjs",
+              "contains": "validatePlayBundle"
+            }
+          ]
+        },
+        {
+          "id": "CON-002",
+          "verification": "automated",
+          "sources": [
+            "scripts/prepare-play-review.mjs",
+            "scripts/prepare-review-images.mjs",
+            "scripts/prepare-material-images.mjs",
+            "tools/local-review/IMAGE-WORKFLOW.md"
+          ],
+          "tests": [
+            "tests/review-workflow.test.mjs",
+            "tests/material-images.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/prepare-play-review.mjs",
+              "contains": "export function prepareReview"
+            }
+          ]
+        },
+        {
+          "id": "CON-003",
+          "verification": "automated",
+          "sources": [
+            "scripts/review/review-core.mjs",
+            "scripts/review/material-review-core.mjs",
+            "scripts/apply-play-review.mjs",
+            "scripts/apply-material-review.mjs"
+          ],
+          "tests": [
+            "tests/play-review.test.mjs",
+            "tests/material-review.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/review/review-core.mjs",
+              "contains": "export function applyApproval"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "local-studio",
+      "title": "로컬 스튜디오·복구·추천 실험실",
+      "commands": [
+        "pnpm test:local-review",
+        "pnpm test:play-review"
+      ],
+      "requirements": [
+        {
+          "id": "STU-001",
+          "verification": "automated",
+          "sources": [
+            "tools/local-review/server.mjs",
+            "tools/local-review/files.mjs",
+            "tools/local-review/service.mjs"
+          ],
+          "tests": [
+            "tools/local-review/tests/server.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "tools/local-review/server.mjs",
+              "contains": "export async function startServer"
+            }
+          ]
+        },
+        {
+          "id": "STU-002",
+          "verification": "automated",
+          "sources": [
+            "tools/local-review/service.mjs",
+            "tools/local-review/files.mjs"
+          ],
+          "tests": [
+            "tools/local-review/tests/server.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "tools/local-review/service.mjs",
+              "contains": "function removePlay"
+            }
+          ]
+        },
+        {
+          "id": "STU-003",
+          "verification": "automated",
+          "sources": [
+            "tools/local-review/codex-requests.mjs",
+            "tools/local-review/codex-worker.mjs"
+          ],
+          "tests": [
+            "tools/local-review/tests/codex-requests.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "tools/local-review/codex-requests.mjs",
+              "contains": "export function createCodexRequests"
+            }
+          ]
+        },
+        {
+          "id": "STU-004",
+          "verification": "automated",
+          "sources": [
+            "tools/local-review/recommendation-model.ts",
+            "tools/local-review/recommendations.mjs"
+          ],
+          "tests": [
+            "tools/local-review/tests/recommendation-model.test.cts",
+            "tools/local-review/tests/recommendations.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "tools/local-review/recommendation-model.ts",
+              "contains": "recommend"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privacy",
+      "title": "웹 분석 동의·허용 항목·소급 피드백",
+      "commands": [
+        "pnpm test"
+      ],
+      "requirements": [
+        {
+          "id": "PRI-001",
+          "verification": "automated",
+          "sources": [
+            "src/analytics/client.ts",
+            "src/analytics/analytics.web.ts",
+            "src/analytics/policy.ts"
+          ],
+          "tests": [
+            "src/analytics/client.test.ts",
+            "src/analytics/adapter.test.ts",
+            "src/analytics/adapter-preview.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/analytics/client.ts",
+              "contains": "createAnalyticsClient"
+            }
+          ]
+        },
+        {
+          "id": "PRI-002",
+          "verification": "automated",
+          "sources": [
+            "src/analytics/policy.ts",
+            "src/analytics/client.ts",
+            "src/analytics/analytics.web.ts"
+          ],
+          "tests": [
+            "src/analytics/client.test.ts",
+            "src/analytics/adapter.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/analytics/policy.ts",
+              "contains": "sanitizeAnalyticsEvent"
+            }
+          ]
+        },
+        {
+          "id": "PRI-003",
+          "verification": "automated",
+          "sources": [
+            "src/analytics/feedback.ts",
+            "src/analytics/feedback.web.ts"
+          ],
+          "tests": [
+            "src/analytics/feedback.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/analytics/feedback.ts",
+              "contains": "createFeedbackCollector"
+            }
+          ]
+        },
+        {
+          "id": "PRI-004",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/constants/legalNotices.ts",
+            "DEVELOPMENT.md"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/constants/legalNotices.ts",
+              "contains": "PRIVACY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web-platform",
+      "title": "웹·PWA·공유·배포",
+      "commands": [
+        "pnpm test:web",
+        "pnpm build:web",
+        "pnpm typecheck"
+      ],
+      "requirements": [
+        {
+          "id": "WEB-001",
+          "verification": "automated",
+          "sources": [
+            "scripts/web/html.mjs",
+            "scripts/build-web.mjs",
+            "scripts/serve-web.mjs",
+            "vercel.json"
+          ],
+          "tests": [
+            "tests/web-content.test.mjs",
+            "tests/web-server.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/web/html.mjs",
+              "contains": "resolvePublicOrigin"
+            }
+          ]
+        },
+        {
+          "id": "WEB-002",
+          "verification": "automated",
+          "sources": [
+            "scripts/web/service-worker.mjs",
+            "src/components/web/WebInstall.tsx",
+            "scripts/build-web.mjs"
+          ],
+          "tests": [
+            "tests/web-offline.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/web/service-worker.mjs",
+              "contains": "createServiceWorker"
+            }
+          ]
+        },
+        {
+          "id": "WEB-003",
+          "verification": "automated",
+          "sources": [
+            "scripts/prepare-web-assets.mjs",
+            "scripts/build-web.mjs",
+            "vercel.json",
+            "scripts/verify-local.mjs"
+          ],
+          "tests": [
+            "tests/web-content.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/prepare-web-assets.mjs",
+              "contains": "writeMaterialImage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spec-governance",
+      "title": "현재 명세·변경·근거·실행 검증",
+      "commands": [
+        "pnpm spec:check",
+        "pnpm test:spec-tools"
+      ],
+      "requirements": [
+        {
+          "id": "GOV-001",
+          "verification": "source-reviewed",
+          "sources": [
+            "AGENTS.md",
+            "scripts/spec-tools.mjs"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "AGENTS.md",
+              "contains": "spec:context"
+            }
+          ]
+        },
+        {
+          "id": "GOV-002",
+          "verification": "automated",
+          "sources": [
+            "scripts/spec-tools.mjs"
+          ],
+          "tests": [
+            "tests/spec-tools.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/spec-tools.mjs",
+              "contains": "checkPolicies"
+            }
+          ]
+        },
+        {
+          "id": "GOV-003",
+          "verification": "automated",
+          "sources": [
+            "scripts/spec-tools.mjs",
+            "scripts/verify-local.mjs",
+            ".github/workflows/policy-checks.yml"
+          ],
+          "tests": [
+            "tests/spec-tools.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/spec-tools.mjs",
+              "contains": "assertChangeEvidence"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

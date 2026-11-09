@@ -40,3 +40,6 @@ yarn-error.*
 /android
 /public/media/
 /public/icons/
+
+# OpenSpec-generated Claude workflows are project tools.
+!.claude/skills/openspec-*/

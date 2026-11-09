@@ -1,6 +1,8 @@
 # 개발·운영 안내
 
-[서비스 소개로 돌아가기](README.md)
+[서비스 소개로 돌아가기](README.md) · [OpenSpec 관리](openspec/README.md)
+
+현재 동작과 작업 상태는 `openspec/specs/`, `openspec/completed-work.md`, `openspec/roadmap.md`로 관리합니다. 이 문서는 실행·운영 절차의 상세 참조이며 미확정 외부 설정은 `openspec/known-gaps.md`에서 구분합니다. 관련 문맥은 `pnpm spec:context <영역 또는 경로>`, 전체 로컬 검증은 `pnpm verify:local`을 사용합니다.
 
 웹 실행, 배포, 분석 설정과 콘텐츠 검수 절차를 정리한 문서입니다.
 
@@ -57,7 +59,7 @@ pnpm serve:web
 - 서비스 워커와 설치 설정은 재검증할 수 있는 응답 헤더를 사용합니다. 기본 호스팅만 사용하고 Vercel Web Analytics·Speed Insights는 활성화하지 않습니다. GA4는 별도 설정이 없으면 비활성입니다.
 - `preview`에 푸시하면 Preview 배포를 확인하고, `preview`를 `main`에 병합하면 Production 배포를 확인합니다.
 
-첫 배포 후 운영 HTTPS 주소에서 `/`, `/search`, `/play/play_001`을 직접 열고 새로고침, 놀이 이미지, 공유 미리보기, 홈 화면 설치를 확인합니다. 공개 배포 전에 아래 ‘고지와 공개 전 확인’의 운영자·문의 연락처 등 미정 항목도 확정합니다.
+첫 배포 후 운영 HTTPS 주소에서 `/`, `/search`, `/play/play_001`을 직접 열고 새로고침, 놀이 이미지, 공유 미리보기, 홈 화면 설치를 확인합니다. 공개 배포 전에는 아래 ‘고지와 공개 전 확인’의 외부 운영 설정을 확인합니다. 문의 창구는 현재 공통 고지의 값을 사용합니다.
 
 ### 선택적 GA4 웹 분석
 

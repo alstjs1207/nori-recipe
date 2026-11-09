@@ -1,0 +1,1472 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": ".agents/skills/.openspec-target",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".agents/skills/openspec-apply-change/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".agents/skills/openspec-archive-change/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".agents/skills/openspec-explore/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".agents/skills/openspec-propose/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".agents/skills/openspec-sync-specs/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".agents/skills/openspec-update-change/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/commands/opsx/apply.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/commands/opsx/archive.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/commands/opsx/explore.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/commands/opsx/propose.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/commands/opsx/sync.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/commands/opsx/update.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/generate-material-images/SKILL.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/generate-play-images/SKILL.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/generate-play-images/references/base-prompt.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/generate-play-images/references/style-examples/style-01.png",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/generate-play-images/references/style-examples/style-02.png",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/generate-play-images/references/style-examples/style-03.png",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/import-plays/SKILL.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/normalize-materials/SKILL.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/openspec-apply-change/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/openspec-archive-change/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/openspec-explore/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/openspec-propose/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/openspec-sync-specs/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/openspec-update-change/SKILL.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".claude/skills/play-recipe/SKILL.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".claude/skills/validate-plays/SKILL.md",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": ".github/workflows/policy-checks.yml",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": "ASSET-LICENSE.md",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "CLAUDE.md",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": "DEVELOPMENT.md",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "HOME_RECOMMENDATION_RULES.md",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "README.md",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app.json",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(main)/_layout.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(main)/_layout.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(main)/favorites.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/favorites.web.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/feedback/[id].tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/feedback/[id].web.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/history.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/history.web.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/index.tsx",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "app/(main)/mypage.tsx",
+      "domains": [
+        "local-data",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(main)/mypage.web.tsx",
+      "domains": [
+        "local-data",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(main)/play/[id].tsx",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "app/(main)/play/[id].web.tsx",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "app/(main)/record.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/record.web.tsx",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "app/(main)/search.tsx",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "app/(main)/search.web.tsx",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "app/(main)/settings.tsx",
+      "domains": [
+        "local-data",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(main)/settings.web.tsx",
+      "domains": [
+        "local-data",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/(onboarding)/_layout.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "app/(onboarding)/child-info.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "app/(onboarding)/first-result.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "app/(onboarding)/index.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "app/(onboarding)/materials.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "app/_layout.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/index.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/index.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "app/start.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "app/start.web.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "babel.config.js",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "data/materials.json",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "data/plays.json",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "data/review-batches/collection-7ee1d0ef6113.json",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "data/review-batches/instagram-14-20261014.json",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "index.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "metro.config.js",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "package.json",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/apply-material-review.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/apply-play-review.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/build-play-catalog.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/build-play-review.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/build-web.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/material-audit.ts",
+      "domains": [
+        "content-review",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "scripts/prepare-material-images.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/prepare-play-images.ts",
+      "domains": [
+        "content-review",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "scripts/prepare-play-review.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/prepare-review-images.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/prepare-web-assets.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/review/backoffice-html.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/backoffice.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/catalog-client.js",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/catalog.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/material-images.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/material-review-client.js",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/material-review-core.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/material-review-html.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/recommendations.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/review-client.js",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/review-core.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/review-history.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/review-shared.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/review.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/serve-web.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/spec-tools.mjs",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": "scripts/upload.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/validate-play-content.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/verify-local.mjs",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": "scripts/web/html.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/web/service-worker.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/analytics/adapter-preview.test.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/adapter.test.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/analytics.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/analytics.web.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/client.test.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/client.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/feedback.test.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/feedback.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/feedback.web.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/invitation.test.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/invitation.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/policy.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/animations/motion.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/IntentReadinessPanel.tsx",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/components/NewPlayBadge.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/NewPlayBadge.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/motion/MotionPressable.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/onboarding/OnboardingProgressHeader.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/onboarding/OnboardingStepScreen.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/ContentImage.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/ContentImage.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/HomeRedesign.tsx",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/components/web/MaterialPicker.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/NoriUI.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/PlayWebActions.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/PlayWebActions.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/WebAnalytics.tsx",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/components/web/WebFirstVisit.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/components/web/WebFirstVisit.web.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/components/web/WebInstall.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/WebSelect.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/WebShell.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/WebShell.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/WebWelcome.tsx",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/constants/devAreas.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/constants/feedback.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/constants/legalNotices.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/constants/materialImageSources.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materialImageSources.web.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materialImageUrls.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materialImageVersions.json",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materialVisuals.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materials.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/playImageUrls.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/playImageVersions.json",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/playImages.test.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/playImages.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/playImages.web.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/theme.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/constants/welcomeImageUrl.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/constants/welcomeImageVersion.json",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/data/content.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/db/index.ts",
+      "domains": [
+        "local-data",
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/db/index.web.ts",
+      "domains": [
+        "local-data",
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/db/queries.ts",
+      "domains": [
+        "local-data",
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/db/schema.ts",
+      "domains": [
+        "local-data",
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/engine/activityIntent.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/contentSafety.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/diversity.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/engine.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/fallback.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/hardFilter.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/intentCatalog.json",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/intentRecommendation.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/intentSignals.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/materialFit.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/materialIntent.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/recommend.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/rules.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/softScore.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/types.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/weights.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/hooks/useAppFonts.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/hooks/useAppFonts.web.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/hooks/useContentDimensions.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/hooks/useIsNewPlay.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/hooks/useNewPlayTime.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/onboarding/dateUtils.test.ts",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/onboarding/utils.test.ts",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/onboarding/utils.ts",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/play/feedbackSignals.test.ts",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/play/feedbackSignals.ts",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/play/newPlay.test.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/newPlay.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/presentation.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/safety.test.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/safety.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/search.test.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/search.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/searchSort.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/play/stepProgress.test.ts",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/play/stepProgress.ts",
+      "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/store/playsStore.ts",
+      "domains": [
+        "catalog"
+      ]
+    },
+    {
+      "path": "src/store/sessionStore.ts",
+      "domains": [
+        "local-data",
+        "onboarding",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/types/db.ts",
+      "domains": [
+        "local-data",
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/types/index.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/types/play.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/types/recommendation.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/types/user.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/utils/playEmoji.test.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/utils/playEmoji.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tests/material-images.test.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "tests/material-review.test.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "tests/play-review.test.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "tests/review-workflow.test.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "tests/spec-tools.test.mjs",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": "tests/web-content.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tests/web-offline.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tests/web-server.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tools/local-review/IMAGE-WORKFLOW.md",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/README.md",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/browser.js",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/codex-client.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/codex-requests.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/codex-worker.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/files.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/recommendation-client.ts",
+      "domains": [
+        "local-studio",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "tools/local-review/recommendation-model.ts",
+      "domains": [
+        "local-studio",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "tools/local-review/recommendations.mjs",
+      "domains": [
+        "local-studio",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "tools/local-review/server.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/service.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/tests/codex-requests.test.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/tests/fixture.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/tests/recommendation-model.test.cts",
+      "domains": [
+        "local-studio",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "tools/local-review/tests/recommendations.test.mjs",
+      "domains": [
+        "local-studio",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "tools/local-review/tests/server.test.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tsconfig.json",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "vercel.json",
+      "domains": [
+        "web-platform"
+      ]
+    }
+  ]
+}

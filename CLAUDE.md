@@ -1,7 +1,8 @@
 # Play Recipe
 
 육아 놀이 레시피 앱 프로젝트. 놀이 데이터 수집 → 재료 표준화 → 모바일 앱 소비 파이프라인으로 구성.
-상세 계획서: `docs/plan.md`
+현재 명세·완료/예정·공백과 검증 절차는 `AGENTS.md` → `openspec/README.md` → `pnpm spec:context <영역 또는 경로>`를 따른다.
+`docs/plan.md`는 과거 설계 이력이다. 현재 작업 상태는 `openspec/completed-work.md`와 `openspec/roadmap.md`에서 확인한다. 이 문서는 구조·콘텐츠 절차의 상세 참조이며 미구현 계획을 현재 기능으로 승격하지 않는다.
 
 ## 프로젝트 구조
 
@@ -114,9 +115,9 @@ fine_motor, gross_motor, cognitive, language, emotional, social, sensory
 - Phase 1은 서버 없이 완전 로컬 동작 (오프라인 퍼스트)
 
 ### 테스트
-- 범위: `src/engine/` 추천 엔진 단위 테스트만 필수
-- 엔진 외 코드 (UI, DB, store)는 테스트 불필요
-- plan.md STEP 3의 테스트 케이스 기준 준수
+- 관련 영역의 기존 회귀를 실행한다. 추천 엔진 외에도 웹·분석·검수·로컬 스튜디오·명세 도구 회귀가 존재한다.
+- `pnpm spec:check`와 완료 준비 시 `pnpm verify:local`을 사용한다. 실제 실행 결과를 change/audit에 기록한다.
+- source-reviewed인 UI/DB/store를 자동 검증 완료로 표시하지 않는다. 저장 정책 변경 때 기존 데이터·실패 복구 회귀를 검토한다.
 
 ### 웹 분석
 - GA4는 웹/PWA의 정확한 운영 origin에서 이용자의 별도 분석 동의 후에만 활성화. 개발·미리보기·네이티브는 전송하지 않음.

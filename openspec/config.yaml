@@ -1,0 +1,21 @@
+schema: spec-driven
+context: |
+  한국어 아티팩트. OpenSpec Requirement/Scenario/SHALL/MUST/WHEN/THEN 구조 유지.
+  nori-recipe 원본은 /Users/msyu/study/play-recipe. Expo 54, React Native, TypeScript strict, pnpm 10.33.0.
+  현재 계약은 openspec/specs/, 완료 근거는 completed-work.md, 공백은 known-gaps.md, 후속 계획은 roadmap.md.
+  현재는 로컬 게스트 서비스. SQLite/AsyncStorage, 서버 계정·동기화·구독·네이티브 OTA는 미구현.
+  홈 규칙은 recommendations 명세와 HOME_RECOMMENDATION_RULES.md를 함께 확인. 차이는 숨기지 않는다.
+  수집은 draft→실제 이미지 준비→배치→사용자 검수. 이미지 준비·JSON 가져오기는 승인 아님.
+  분석은 운영 origin+버전 3 동의에서만 전송. Preview/네이티브는 전송 안 함.
+  preview 개발/미리보기→main 병합/운영 배포. 커밋·푸시·배포는 사용자 요청 범위에서만 수행.
+rules:
+  proposal:
+    - 현재 구현·사용자 결정·제안을 구분하고 영향 영역과 기존 요구사항 ID를 적는다.
+    - 기존 계획의 가격·일정·접근 권한을 승인된 정책으로 옮기지 않는다.
+  specs:
+    - 안정적인 ID와 WHEN/THEN을 유지하고 실패·기존 데이터 보존 시나리오를 포함한다.
+    - 미구현 기능과 미확정 정책을 현재 specs로 승격하지 않는다.
+  design:
+    - 웹/네이티브 저장·배포 경계와 기존 로컬 데이터·해시·승인 호환성을 설명한다.
+  tasks:
+    - 문서 완료와 실제 구현·테스트·운영 확인을 구분한다. 실제 실행 증거를 남긴다.

@@ -1,0 +1,45 @@
+name: Policy and regression checks
+
+on:
+  pull_request:
+  push:
+    branches: [preview, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: policy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy-and-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENSPEC_TELEMETRY: "0"
+      EXPO_NO_TELEMETRY: "1"
+      EXPO_NO_DOTENV: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check PR policy change evidence
+        if: github.event_name == 'pull_request'
+        env:
+          POLICY_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: pnpm spec:changed "$POLICY_BASE_SHA"
+      - name: Check pushed policy change evidence
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          POLICY_BASE_SHA: ${{ github.event.before }}
+        run: pnpm spec:changed "$POLICY_BASE_SHA"
+      - run: pnpm verify:local
