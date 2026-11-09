@@ -63,7 +63,7 @@ function WebShellContent({ children }: PropsWithChildren) {
   }
 
   function openProfileSettings() {
-    const birthMonthInput = document.querySelector<HTMLInputElement>(
+    const birthMonthInput = document.querySelector<HTMLDivElement>(
       ".settings-page .birth-month-input",
     );
     if (birthMonthInput) {

@@ -1938,21 +1938,76 @@ fieldset {
   gap: 9px;
   min-width: 0;
 }
-.birth-month-field > label {
+.birth-month-label {
   font-size: 13px;
   font-weight: 650;
 }
-.birth-month-input {
-  display: block;
-  width: 100%;
+.birth-month-wheels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.birth-wheel-column {
   min-width: 0;
-  min-height: 52px;
-  padding: 13px;
+  display: grid;
+  gap: 8px;
+}
+.birth-wheel-label {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+.birth-wheel {
+  --wheel-padding: 88px;
+  height: calc(46px + var(--wheel-padding) * 2);
+  padding: var(--wheel-padding) 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: white;
+  border-radius: 16px;
+  background: linear-gradient(to bottom, white var(--wheel-padding), var(--lavender) var(--wheel-padding), var(--lavender) calc(var(--wheel-padding) + 44px), white calc(var(--wheel-padding) + 44px));
+}
+@media (max-height: 500px) {
+  .birth-wheel {
+    --wheel-padding: 44px;
+  }
+}
+.birth-wheel::-webkit-scrollbar {
+  display: none;
+}
+.birth-wheel[aria-disabled="true"] {
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.5;
+}
+.birth-wheel-option {
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  scroll-snap-align: center;
+  cursor: pointer;
+  user-select: none;
   color: var(--ink);
-  font-size: 16px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.birth-wheel-option[aria-selected="true"] {
+  color: var(--violet);
+  font-weight: 750;
+}
+.birth-wheel-option.is-placeholder {
+  color: var(--muted);
+  font-size: 14px;
+}
+.birth-wheel-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
 }
 .birth-month-summary {
   margin: 0;
