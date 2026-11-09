@@ -81,6 +81,7 @@ input[type="radio"] {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .web-toolbar {
   display: flex;
@@ -2499,6 +2500,9 @@ fieldset {
     padding: 8px 10px calc(8px + var(--safe-bottom));
     background: #fffffffa;
     min-height: 73px;
+  }
+  .web-shell:has(> .nori-nav-bottom) .nori-scroll-page {
+    padding-bottom: 0;
   }
   .nori-nav-bottom a {
     flex-direction: column;

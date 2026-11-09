@@ -189,7 +189,7 @@ export function WebNavigation({
     <nav className={`nori-nav nori-nav-${placement}`} aria-label="주 메뉴">
       {items.map((item) => {
         const active =
-          item.href === "/" ? pathname === "/" : pathname === item.href;
+          item.href === "/" ? pathname === "/" || pathname === "/start" : pathname === item.href;
         return (
           <Link
             key={item.href}

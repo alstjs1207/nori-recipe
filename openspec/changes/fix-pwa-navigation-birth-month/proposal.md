@@ -6,7 +6,7 @@
 
 ## What Changes
 
-- PWA의 iOS 전체 화면 메타데이터·안전 영역과 설치 안내를 보완한다(WEB-002).
+- PWA의 iOS 상태 표시줄·안전 영역과 설치 안내를 보완한다. 실기기 보고 후 black-translucent 강제를 제거하고 첫 방문부터 공통 하단 메뉴를 표시한다(WEB-002).
 - 상세 뒤로가기가 방문한 탭을 따르며 탐색 조건·스크롤을 보존한다(CAT-004, CAT-002).
 - 탐색은 월령 단위를 유지하고 적용·취소와 전체 월령·우리 아이 바로가기가 있는 단일 휠 선택창을 제공한다(CAT-002).
 - 웹/PWA 첫 시작·설정에서 생년월을 년·월 두 휠로 선택하고 기기 현재 연월로 개월수를 자동 표시한다(ONB-001, ONB-002).
@@ -26,4 +26,4 @@
 
 ## Impact
 
-`public/index.html`, `public/web.css`, 웹 탭 레이아웃, WebInstall/WebShell, WebWelcome/settings 및 출생월 유틸. DB 스키마·서버 API·콘텐츠·추천 정책은 유지한다. 원본 `/Users/msyu/study/play-recipe`의 preview에서 작업하며 별도 작업 폴더는 만들지 않는다. 후속 사용자 요청으로 preview 커밋·푸시를 수행한다. main 병합·운영 배포·archive는 포함하지 않는다.
+`public/index.html`, `public/web.css`, 웹 탭 레이아웃, WebInstall/WebShell, WebWelcome/settings 및 출생월 유틸. DB 스키마·서버 API·콘텐츠·추천 정책은 유지한다. 원본 `/Users/msyu/study/play-recipe`의 preview에서 작업하며 별도 작업 폴더는 만들지 않는다. 후속 사용자 요청으로 preview 커밋·푸시를 수행한다. 기존 변경의 운영 배포는 완료됐으나 2026-11-10 사용자 명시 승인에 따라 이번 실기기 후속 수정을 preview 커밋·푸시 후 main 병합·운영 배포한다. 실제 iPhone 확인 전까지 archive하지 않는다.

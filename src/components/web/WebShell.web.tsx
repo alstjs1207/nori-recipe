@@ -112,6 +112,7 @@ function WebShellContent({ children }: PropsWithChildren) {
         </div>
       ) : null}
       <main className="web-app">{children}</main>
+      <WebNavigation placement="bottom" />
       <span className="sr-only" role="status">
         {offlineReady ? "오프라인 이용 준비 완료" : ""}
       </span>

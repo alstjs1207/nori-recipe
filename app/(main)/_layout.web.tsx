@@ -1,5 +1,4 @@
 import { Tabs } from "expo-router";
-import { WebNavigation } from "@/components/web/NoriUI";
 
 export default function MainWebLayout() {
   return (
@@ -9,7 +8,7 @@ export default function MainWebLayout() {
         headerShown: false,
         sceneStyle: { backgroundColor: "#FAFAFE" },
       }}
-      tabBar={() => <WebNavigation placement="bottom" />}
+      tabBar={() => null}
     >
       <Tabs.Screen name="index" options={{ title: "발견" }} />
       <Tabs.Screen name="search" options={{ title: "탐색" }} />

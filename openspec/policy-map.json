@@ -605,7 +605,9 @@
             "public/index.html",
             "public/web.css",
             "public/manifest.webmanifest",
-            "src/components/web/WebShell.web.tsx"
+            "src/components/web/WebShell.web.tsx",
+            "app/(main)/_layout.web.tsx",
+            "src/components/web/NoriUI.tsx"
           ],
           "tests": [
             "tests/web-offline.test.mjs"

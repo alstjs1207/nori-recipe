@@ -90,3 +90,41 @@ Ego Browser 전용 TaskSpace 59, 테스트 origin `http://127.0.0.1:4187`. 실�
 화면 근거: [모바일 탐색 월령 시트](verification/search-age-sheet.png), [데스크톱 선택창](verification/search-age-desktop.png).
 
 탐색 휠 검증용 4189 포트 서버(PID 7162)를 종료하고 포트 해제를 확인했다. 원본 `/Users/msyu/study/play-recipe`에서만 작업했으며 별도 작업 폴더는 만들지 않았다.
+
+
+## iPhone 실기기 보고 후 하단 메뉴 보완 — 2026-11-09
+
+사용자가 운영 설치 화면 두 장을 제공했다. 첫 방문에는 메뉴가 없고 프로필 입력 후에는 메뉴 아래에 빈 띠가 보였다. 앞선 Chromium viewport 검증만으로 iPhone 설치 상태가 정상이라고 판단할 수 없음을 확인했다.
+
+### 원인과 수정
+
+- 첫 방문 index/start가 main Tabs 밖에 있어 탭 내부의 하단 메뉴가 렌더되지 않았다. 메뉴를 공통 WebShell로 이동하고 Tabs의 tabBar는 null로 하여 첫 방문·설정·일반 화면에서 한 번만 표시한다. 상세·피드백 숨김과 탭 방문 이력은 유지한다.
+- 앞서 추가한 black-translucent 상태 표시줄 강제 설정을 제거한다. [WebKit 개발자의 제거 안내](https://bugs.webkit.org/show_bug.cgi?id=317153#c2) 및 [설치 앱 viewport에 상태 표시줄 높이만큼 공백이 보고된 이슈](https://bugs.webkit.org/show_bug.cgi?id=313800)를 확인했다. 첨부 화면과 유사한 현상이라는 추론이며 사용자 기기의 iOS 버전·viewport 수치는 측정하지 않았다.
+- 화면 높이를 screen.height나 상태 표시줄 높이로 강제 늘리지 않는다. standalone·viewport-fit=cover와 dynamic viewport는 유지한다.
+- 모바일에서 메뉴가 있으면 콘텐츠 padding-bottom은0, 메뉴에만 safe-bottom을 적용한다. 메뉴가 없는 상세·피드백 및 데스크톱에는 콘텐츠의 안전 여백을 유지한다.
+
+### 검증
+
+- Node24.21.0·pnpm10.33.0, `pnpm verify:local` exit0. 기존 **211개 회귀**, 타입·콘텐츠·이미지·명세·웹 빌드 통과.
+- `pnpm spec:changed 4c35b10`, `git diff --check` 통과. 명세 시나리오78개, 관리 소스244개.
+- Ego Browser TaskSpace63, 테스트 origin `127.0.0.1:4190`. 393×852에서 safe-top59px·safe-bottom34px 에뮬레이션.
+- 프로필 없는 첫 루트 방문: 메뉴1개, 발견·탐색·저장·기록4개 링크. nav top752/bottom852, viewport852. 메뉴 padding-bottom42px, 콘텐츠 padding-bottom0. 기존 강제 status-bar meta 없음.
+- 첫 방문에서 설정 이동: 메뉴1개·bottom852. 생년월2024년1월 저장 후 발견 이동:34개월, 메뉴1개·bottom852, 콘텐츠 padding0.
+- 탐색에서 종이·시간30, scrollTop300 → 상세: 메뉴0개·콘텐츠 padding34px. 뒤로가기: 메뉴1개·bottom852, 검색어·시간·scrollTop300 보존.
+- 입력 포커스 및 viewport 높이를520으로 줄인 경우 메뉴bottom520, 콘텐츠 높이320. 실제 iPhone 소프트 키보드의 재현은 아니다.
+- 852×393 가로: 기존 반응형 정책에 따라 헤더 메뉴flex·하단 메뉴none, app bottom393, 콘텐츠 padding21px, 가로 넘침 없음.
+- [첫 방문 메뉴](verification/bottom-first-visit.png), [설정 후 발견](verification/bottom-home.png)을 시각 확인했다.
+
+### 남은 실기기 확인
+
+현재 브라우저 에뮬레이션은 iOS WebKit 설치 앱의 viewport·설치 시점 상태 표시줄 설정을 재현하지 못한다. 실제 홈 화면 앱을 다시 열고 새 버전을 적용한 뒤 공백·상태 표시줄·키보드·회전을 확인해야 한다. iOS가 기존 설치 당시 설정을 유지하는 경우에만 홈 화면 아이콘 재추가가 필요할 수 있으며 저장소·설정·기록 삭제는 요구하지 않는다. tasks4.2와 작업중 상태를 유지한다.
+
+하단 메뉴 검증용 4190 포트 서버(PID24649)를 종료하고 포트 해제를 확인했다. 원본 폴더에서 작업했으며 별도 작업 폴더는 만들지 않았다.
+
+### 원격 반영 승인 대기
+
+로컬 구현·검증을 마친 뒤 staging·commit·preview push 실행 요청이 자동 승인 검토에서 거부됐다. 사유는 이번 새 실기기 후속 수정에는 커밋·푸시 승인이 명시되지 않았으며 구현 범위를 넘어서는 영구적 원격 변경이라는 판단이다. 명령 실행 전 거부되어 이번 변경의 staging·커밋·푸시·main 병합·운영 배포는 수행하지 않았다. 사용자에게 이번 수정의 preview 커밋·푸시와 main 병합·운영 배포 승인을 요청한다. 브라우저 TaskSpace63은 finish({keep:[]})로 종료했다.
+
+### 후속 승인 — 2026-11-10
+
+사용자가 이번 수정의 preview 커밋·푸시와 main 병합·운영 배포까지 명시적으로 승인했다. 앞선 승인 대기는 해소됐으며 검증된 변경만 반영한다. 실기기 최종 확인 항목과 작업중 상태는 유지한다.
