@@ -7,7 +7,7 @@ const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const readJson = (root, name) => JSON.parse(readFileSync(path.join(root, name), "utf8"));
 const roots = ["app", "src", "scripts", "tests", "tools", "data/review-batches", ".github/workflows", ".agents/skills"];
 const collectionSkills = ["play-recipe", "normalize-materials", "import-plays", "validate-plays", "generate-play-images", "generate-material-images"];
-const rootFiles = ["data/plays.json", "data/materials.json", "package.json", "pnpm-lock.yaml", "app.json", "vercel.json", "metro.config.js", "babel.config.js", "tsconfig.json", "index.ts", "AGENTS.md", "CLAUDE.md", "README.md", "DEVELOPMENT.md", "HOME_RECOMMENDATION_RULES.md", "ASSET-LICENSE.md", ".gitignore"];
+const rootFiles = ["data/plays.json", "data/materials.json", "package.json", "pnpm-lock.yaml", "app.json", "vercel.json", "metro.config.js", "babel.config.js", "tsconfig.json", "index.ts", "AGENTS.md", "CLAUDE.md", "README.md", "DEVELOPMENT.md", "HOME_RECOMMENDATION_RULES.md", "ASSET-LICENSE.md", "LICENSE", "NOTICE", "SECURITY.md", ".gitignore"];
 function walk(root, dir) {
   const absolute = path.join(root, dir);
   if (!existsSync(absolute)) return [];
@@ -29,6 +29,7 @@ export function sourceFiles(root) {
   ])].sort();
 }
 export function classify(file) {
+  if (["LICENSE", "NOTICE", "SECURITY.md", "ASSET-LICENSE.md"].includes(file)) return ["spec-governance"];
   if (/openspec-|\/opsx\/|spec-tools|policy-checks|verify-local|AGENTS\.md|CLAUDE\.md/.test(file)) return ["spec-governance"];
   if (file === "HOME_RECOMMENDATION_RULES.md") return ["recommendations"];
   if (/^src\/engine\//.test(file)) return ["recommendations"];
@@ -186,7 +187,7 @@ export function checkPolicies(root) {
 
 export function assertChangeEvidence(changedPaths, catalog, read) {
   const behavior = changedPaths.filter((p) =>
-    /^(app|src|scripts|tools|data|\.github|\.agents|\.claude)\/|^(package\.json|pnpm-lock\.yaml|app\.json|vercel\.json|metro\.config\.js|babel\.config\.js|tsconfig\.json|index\.ts|AGENTS\.md|CLAUDE\.md|HOME_RECOMMENDATION_RULES\.md)$/.test(
+    /^(app|src|scripts|tools|data|\.github|\.agents|\.claude)\/|^(package\.json|pnpm-lock\.yaml|app\.json|vercel\.json|metro\.config\.js|babel\.config\.js|tsconfig\.json|index\.ts|AGENTS\.md|CLAUDE\.md|HOME_RECOMMENDATION_RULES\.md|LICENSE|NOTICE|SECURITY\.md|ASSET-LICENSE\.md)$/.test(
       p,
     ),
   );

@@ -35,7 +35,7 @@ You may not, without prior written permission:
 
 This document covers visual assets only. It does not define the license for the source code, data files, documentation, dependencies, or third-party materials in this repository.
 
-If this repository later includes a source code license, that license does not apply to the visual assets listed above unless it explicitly says so.
+The project source code license is Apache License 2.0 (see `LICENSE` and `NOTICE`). It does not apply to the visual assets listed above. Their use remains governed by this document or a separate license provided for the specific asset.
 
 ## Third-Party Assets
 

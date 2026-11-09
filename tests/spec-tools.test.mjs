@@ -88,6 +88,11 @@ test("require domain-specific change evidence for runtime, data, deletion and to
   }
   assert.deepEqual(assertChangeEvidence(["src/engine/recommend.ts", "openspec/specs/recommendations/spec.md"], catalog, () => ""), ["recommendations"]);
   assert.throws(() => assertChangeEvidence(["src/future/feature.ts"], catalog, () => ""), /Unclassified changed/);
+  for (const file of ["LICENSE", "NOTICE", "SECURITY.md", "ASSET-LICENSE.md"]) {
+    assert.deepEqual(classify(file), ["spec-governance"]);
+    assert.throws(() => assertChangeEvidence([file], catalog, () => ""), /Missing policy\/change evidence/);
+    assert.deepEqual(assertChangeEvidence([file, "openspec/changes/a/proposal.md"], catalog, () => "GOV-001"), ["spec-governance"]);
+  }
 });
 
 test("local verification isolates build origins from server fixtures and disables analytics", async () => {

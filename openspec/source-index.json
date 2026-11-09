@@ -196,7 +196,7 @@
     {
       "path": "ASSET-LICENSE.md",
       "domains": [
-        "web-platform"
+        "spec-governance"
       ]
     },
     {
@@ -218,9 +218,27 @@
       ]
     },
     {
+      "path": "LICENSE",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
+      "path": "NOTICE",
+      "domains": [
+        "spec-governance"
+      ]
+    },
+    {
       "path": "README.md",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "SECURITY.md",
+      "domains": [
+        "spec-governance"
       ]
     },
     {

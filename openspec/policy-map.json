@@ -679,6 +679,29 @@
               "contains": "assertChangeEvidence"
             }
           ]
+        },
+        {
+          "id": "GOV-004",
+          "verification": "source-reviewed",
+          "sources": [
+            "LICENSE",
+            "NOTICE",
+            "SECURITY.md",
+            "ASSET-LICENSE.md",
+            "README.md",
+            "package.json"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "LICENSE",
+              "contains": "Apache License"
+            },
+            {
+              "path": "SECURITY.md",
+              "contains": "alstjs1207@naver.com"
+            }
+          ]
         }
       ]
     }
