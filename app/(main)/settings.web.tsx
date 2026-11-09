@@ -1,13 +1,10 @@
 import { WebPage } from "@/components/web/NoriUI";
-import { WebSelect } from "@/components/web/WebSelect";
+import { BirthMonthField } from "@/components/web/BirthMonthField";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { MATERIAL_DISPLAY_NAMES } from "@/constants/materials";
 import { resetUserActivity } from "@/db/queries";
-import {
-  getAgeMonthsFromBirthMonth,
-  getBirthMonthOptions,
-} from "@/onboarding/utils";
+import { formatBirthMonthInput, getBirthMonthInputError, parseBirthMonthInput } from "@/onboarding/birthMonthInput";
 import { useSessionStore } from "@/store/sessionStore";
 import {
   Icon,
@@ -36,10 +33,10 @@ export default function SettingsWebScreen() {
   );
   const materials = useSelectedMaterials();
   const [name, setName] = useState(initialName);
-  const [age, setAge] = useState<number | null>(
+  const [birthMonth, setBirthMonth] = useState(
     profile.childBirthMonth === null
-      ? null
-      : Math.min(48, getAgeMonthsFromBirthMonth(profile.childBirthMonth)),
+      ? ""
+      : formatBirthMonthInput(profile.childBirthMonth),
   );
   const [saving, setSaving] = useState(false);
   const [picker, setPicker] = useState(false);
@@ -50,13 +47,10 @@ export default function SettingsWebScreen() {
     useCallback(() => {
       const current = useSessionStore.getState();
       setName(current.childName);
-      setAge(
+      setBirthMonth(
         current.userContext.childBirthMonth === null
-          ? null
-          : Math.min(
-              48,
-              getAgeMonthsFromBirthMonth(current.userContext.childBirthMonth),
-            ),
+          ? ""
+          : formatBirthMonthInput(current.userContext.childBirthMonth),
       );
       setConfirm(null);
       setPicker(false);
@@ -70,18 +64,16 @@ export default function SettingsWebScreen() {
     policyRef.current.scrollIntoView({ block: "start" });
   }, [privacy]));
   async function saveProfile() {
-    if (saving || age === null) return;
+    if (saving || getBirthMonthInputError(birthMonth, useSessionStore.getState().userContext.childBirthMonth)) return;
+    const monthIndex = parseBirthMonthInput(birthMonth);
+    if (monthIndex === null) return;
     setSaving(true);
     setError(null);
     setNotice(null);
     try {
-      const option = getBirthMonthOptions().find(
-        (item) => item.ageMonths === age,
-      );
-      if (!option) return;
       await upsert({
         ...useSessionStore.getState().userContext,
-        childBirthMonth: option.monthIndex,
+        childBirthMonth: monthIndex,
       });
       await updateProfile({ childName: name.trim() });
       await useSessionStore.getState().completeOnboarding();
@@ -149,31 +141,11 @@ export default function SettingsWebScreen() {
               onChange={(event) => setName(event.target.value)}
             />
           </label>
-          <label className="settings-field">
-            아이의 월령
-            <WebSelect
-              variant="form"
-              className="age-select"
-              aria-label="아이 월령 설정"
-              value={age ?? ""}
-              onChange={(event) =>
-                setAge(
-                  event.target.value === "" ? null : Number(event.target.value),
-                )
-              }
-            >
-              <option value="">월령을 선택해 주세요</option>
-              {Array.from({ length: 49 }, (_, month) => (
-                <option key={month} value={month}>
-                  {month}개월
-                </option>
-              ))}
-            </WebSelect>
-          </label>
+          <BirthMonthField value={birthMonth} onChange={setBirthMonth} savedBirthMonth={profile.childBirthMonth} disabled={saving} />
           <button
             className="primary-button"
             type="submit"
-            disabled={age === null || saving}
+            disabled={getBirthMonthInputError(birthMonth, profile.childBirthMonth) !== null || saving}
           >
             {saving ? "저장 중…" : "아이 설정 저장"}
             <Icon name="check" size={18} />

@@ -792,6 +792,12 @@
       ]
     },
     {
+      "path": "src/components/web/BirthMonthField.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/components/web/ContentImage.tsx",
       "domains": [
         "web-platform"
@@ -1152,6 +1158,18 @@
       "path": "src/hooks/useNewPlayTime.ts",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "src/onboarding/birthMonthInput.test.ts",
+      "domains": [
+        "onboarding"
+      ]
+    },
+    {
+      "path": "src/onboarding/birthMonthInput.ts",
+      "domains": [
+        "onboarding"
       ]
     },
     {

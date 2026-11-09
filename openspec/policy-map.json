@@ -29,11 +29,16 @@
           "id": "ONB-002",
           "verification": "automated",
           "sources": [
-            "src/onboarding/utils.ts"
+            "src/onboarding/utils.ts",
+            "src/onboarding/birthMonthInput.ts",
+            "src/components/web/BirthMonthField.tsx",
+            "src/components/web/WebWelcome.tsx",
+            "app/(main)/settings.web.tsx"
           ],
           "tests": [
             "src/onboarding/utils.test.ts",
-            "src/onboarding/dateUtils.test.ts"
+            "src/onboarding/dateUtils.test.ts",
+            "src/onboarding/birthMonthInput.test.ts"
           ],
           "anchors": [
             {
@@ -212,7 +217,9 @@
             "src/constants/playImages.ts",
             "src/constants/playImages.web.ts",
             "app/(main)/play/[id].tsx",
-            "app/(main)/play/[id].web.tsx"
+            "app/(main)/play/[id].web.tsx",
+            "app/(main)/_layout.web.tsx",
+            "src/components/web/NoriUI.tsx"
           ],
           "tests": [
             "src/play/safety.test.ts",
@@ -590,7 +597,11 @@
           "sources": [
             "scripts/web/service-worker.mjs",
             "src/components/web/WebInstall.tsx",
-            "scripts/build-web.mjs"
+            "scripts/build-web.mjs",
+            "public/index.html",
+            "public/web.css",
+            "public/manifest.webmanifest",
+            "src/components/web/WebShell.web.tsx"
           ],
           "tests": [
             "tests/web-offline.test.mjs"

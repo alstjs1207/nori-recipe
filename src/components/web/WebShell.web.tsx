@@ -63,12 +63,12 @@ function WebShellContent({ children }: PropsWithChildren) {
   }
 
   function openProfileSettings() {
-    const ageSelect = document.querySelector<HTMLSelectElement>(
-      ".settings-page .age-select",
+    const birthMonthInput = document.querySelector<HTMLInputElement>(
+      ".settings-page .birth-month-input",
     );
-    if (ageSelect) {
-      ageSelect.scrollIntoView({ block: "center" });
-      ageSelect.focus({ preventScroll: true });
+    if (birthMonthInput) {
+      birthMonthInput.scrollIntoView({ block: "center" });
+      birthMonthInput.focus({ preventScroll: true });
       return;
     }
     router.push("/mypage");

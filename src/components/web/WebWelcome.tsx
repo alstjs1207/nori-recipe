@@ -1,12 +1,9 @@
 import { WebPage } from "./NoriUI";
 import { getWelcomeImageUrl } from "@/constants/welcomeImageUrl";
-import { WebSelect } from "./WebSelect";
+import { BirthMonthField } from "./BirthMonthField";
 import { useState } from "react";
 import { Link, router } from "expo-router";
-import {
-  getAgeMonthsFromBirthMonth,
-  getBirthMonthOptions,
-} from "@/onboarding/utils";
+import { formatBirthMonthInput, getBirthMonthInputError, parseBirthMonthInput } from "@/onboarding/birthMonthInput";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { trackAnalytics } from "@/analytics/analytics";
@@ -27,10 +24,10 @@ export function WebWelcome() {
   const plays = usePlaysStore((state) => state.plays);
   const materials = useSelectedMaterials();
   const favorites = useWebFavorites();
-  const [age, setAge] = useState<number | null>(
+  const [birthMonth, setBirthMonth] = useState(
     profile.childBirthMonth === null
-      ? null
-      : Math.min(48, getAgeMonthsFromBirthMonth(profile.childBirthMonth)),
+      ? ""
+      : formatBirthMonthInput(profile.childBirthMonth),
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,17 +35,15 @@ export function WebWelcome() {
     plays.filter((play) => play.id === id),
   );
   async function start() {
-    if (age === null || saving) return;
+    if (getBirthMonthInputError(birthMonth, profile.childBirthMonth) || saving) return;
+    const monthIndex = parseBirthMonthInput(birthMonth);
+    if (monthIndex === null) return;
     setSaving(true);
     setError(null);
     try {
-      const option = getBirthMonthOptions().find(
-        (item) => item.ageMonths === age,
-      );
-      if (!option) throw new Error("월령을 선택해 주세요.");
       await upsertUserContext({
         ...profile,
-        childBirthMonth: option.monthIndex,
+        childBirthMonth: monthIndex,
       });
       await completeOnboarding();
       trackAnalytics({ name: "tutorial_complete" });
@@ -90,32 +85,12 @@ export function WebWelcome() {
           </div>
           <section className="welcome-start">
             <span className="eyebrow">오늘의 첫 놀이</span>
-            <h2>우리 아이는 몇 개월인가요?</h2>
-            <p>월령을 알려주시면 지금 즐기기 좋은 놀이를 추천해드려요.</p>
-            <label htmlFor="child-age">아이의 월령</label>
-            <WebSelect
-              id="child-age"
-              variant="form"
-              aria-label="아이 월령"
-              value={age ?? ""}
-              onChange={(event) =>
-                setAge(
-                  event.target.value === "" ? null : Number(event.target.value),
-                )
-              }
-              className="age-select"
-            >
-              <option value="">월령을 선택해 주세요</option>
-              {Array.from({ length: 49 }, (_, month) => (
-                <option key={month} value={month}>
-                  {month}개월
-                  {month >= 12 ? ` · 만 ${Math.floor(month / 12)}세` : ""}
-                </option>
-              ))}
-            </WebSelect>
+            <h2>우리 아이는 언제 태어났나요?</h2>
+            <p>생년월을 알려주시면 지금 즐기기 좋은 놀이를 추천해드려요.</p>
+            <BirthMonthField value={birthMonth} onChange={setBirthMonth} savedBirthMonth={profile.childBirthMonth} disabled={saving} />
             <button
               className="primary-button"
-              disabled={age === null || saving}
+              disabled={getBirthMonthInputError(birthMonth, profile.childBirthMonth) !== null || saving}
               type="button"
               onClick={() => {
                 void start();

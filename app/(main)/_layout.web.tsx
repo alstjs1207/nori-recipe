@@ -4,6 +4,7 @@ import { WebNavigation } from "@/components/web/NoriUI";
 export default function MainWebLayout() {
   return (
     <Tabs
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: "#FAFAFE" },
