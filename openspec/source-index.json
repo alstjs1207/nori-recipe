@@ -840,6 +840,12 @@
       ]
     },
     {
+      "path": "src/components/web/SearchAgePicker.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/components/web/WebAnalytics.tsx",
       "domains": [
         "privacy"
@@ -885,6 +891,12 @@
       "path": "src/components/web/WebWelcome.tsx",
       "domains": [
         "onboarding"
+      ]
+    },
+    {
+      "path": "src/components/web/WheelPicker.tsx",
+      "domains": [
+        "web-platform"
       ]
     },
     {

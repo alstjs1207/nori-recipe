@@ -15,6 +15,9 @@
 - iOS black-translucent 메타데이터, dynamic viewport, 가산 안전 영역을 사용한다. 설치 여부는 display-mode 및 iOS navigator.standalone을 확인한다. 브라우저 도구막대는 CSS로 숨길 수 없어 수동 안내에서 웹 앱으로 열기를 명시한다.
 - 기본 신규 입력 범위 0–48개월은 유지하되, 이미 저장된 오래된 생년월은 그대로 표시·저장할 수 있다. 생년월 원문을 분석에 추가하지 않는다.
 
+- 탐색 월령은 SearchAgePicker의 로컬 draft에서 선택하고 적용할 때만 기존 검색 age state를 갱신한다. 모바일은 하단 시트, 데스크톱은 가운데 dialog로 열고 HTML dialog의 포커스 제한·Escape·닫기 시 포커스 복원을 이용한다. 기존 프로필이 48개월을 넘으면 그 월령도 복원 옵션으로 유지한다.
+- 생년월과 탐색은 공용 WheelPicker를 사용한다. 기존 년·월 휠의 동작은 유지하고 탐색에서만 단일 개월 휠을 쓴다.
+
 ## Risks / Trade-offs
 
 - 실제 iPhone의 설치·상태 표시줄은 데스크톱 에뮬레이션으로 확정할 수 없다 → 로컬 검증과 iPhone 설치 확인을 구분하고 후자를 미완료로 남긴다.

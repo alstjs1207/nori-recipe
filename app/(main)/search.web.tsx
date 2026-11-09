@@ -2,6 +2,7 @@ import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebSelect } from "@/components/web/WebSelect";
+import { SearchAgePicker } from "@/components/web/SearchAgePicker";
 import { Link, router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
@@ -184,27 +185,7 @@ export default function SearchWebScreen() {
             />
           </div>
           <div className="search-filter-row">
-            <label className="select-control">
-              <span className="sr-only">놀이 추천 월령</span>
-              <WebSelect
-                aria-label="놀이 추천 월령"
-                value={age ?? "all"}
-                onChange={(event) =>
-                  setAge(
-                    event.target.value === "all"
-                      ? null
-                      : Number(event.target.value),
-                  )
-                }
-              >
-                <option value="all">전체 월령</option>
-                {Array.from({ length: 49 }, (_, month) => (
-                  <option key={month} value={month}>
-                    {month}개월
-                  </option>
-                ))}
-              </WebSelect>
-            </label>
+            <SearchAgePicker value={age} profileAge={profileAge} onChange={setAge} />
             <label className="select-control">
               <span className="sr-only">놀이 시간</span>
               <WebSelect

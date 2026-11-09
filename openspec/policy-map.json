@@ -33,7 +33,8 @@
             "src/onboarding/birthMonthInput.ts",
             "src/components/web/BirthMonthField.tsx",
             "src/components/web/WebWelcome.tsx",
-            "app/(main)/settings.web.tsx"
+            "app/(main)/settings.web.tsx",
+            "src/components/web/WheelPicker.tsx"
           ],
           "tests": [
             "src/onboarding/utils.test.ts",
@@ -181,7 +182,10 @@
           "sources": [
             "src/play/search.ts",
             "src/play/searchSort.ts",
-            "src/play/presentation.ts"
+            "src/play/presentation.ts",
+            "app/(main)/search.web.tsx",
+            "src/components/web/SearchAgePicker.tsx",
+            "src/components/web/WheelPicker.tsx"
           ],
           "tests": [
             "src/play/search.test.ts"
