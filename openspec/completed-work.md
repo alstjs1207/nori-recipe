@@ -20,3 +20,11 @@
 | 최신 시작 화면 그림 | `4413901` (2026-11-06) | assets/nori-welcome-hero-boy-20261106-v6.png, welcomeImageVersion, web-platform |
 
 OpenSpec 최초 도입 자체의 완료 작업·검증은 `changes/archive/2026-11-09-establish-spec-management/`에 보존한다. 기존 기능별 가짜 과거 change나 당시 검증 결과를 만들지 않는다.
+
+## 후속 완료 기록
+
+### 2026-11-10 PWA 화면·상세 복귀·생년월 및 탐색 월령 휠
+
+첫 방문의 공통 하단 메뉴와 iOS 안전 여백 보완, 상세에서 원래 탭으로 복귀, 생년월의 년·월 휠과 개월수 자동 계산, 탐색의 독립 월령 휠을 구현했다. `23a391e`·`98f98b6`·`4c35b10`·`6f6da68`을 거쳐 preview·main과 운영 배포를 마쳤다. 로컬 211개 회귀·타입·빌드, preview/main CI 및 배포 확인에 더해 2026-11-10 사용자가 실제 iPhone 앱의 상하단·회전·설치 모드·입력·뒤로가기 정상 동작을 확인했다.
+
+사용자 완료 요청으로 기존 작업중 지정을 해제했다. [완료 태스크](changes/archive/2026-11-10-fix-pwa-navigation-birth-month/tasks.md) · [검증 기록](changes/archive/2026-11-10-fix-pwa-navigation-birth-month/verification.md). 실기기 근거는 사용자 보고이며 기종·iOS 버전은 별도로 수집하지 않았다.

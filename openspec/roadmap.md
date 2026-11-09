@@ -4,7 +4,6 @@
 
 | 우선순위/상태 | 작업 | 현재 준비 / 미구현 | 다음 문서 |
 | --- | --- | --- | --- |
-| 작업중 / 실기기 확인 대기 | PWA 화면·상세 복귀·생년월 입력 | 2026-11-09 웹/PWA 구현·로컬 검증 완료. 실제 iPhone 설치 확인 전까지 작업중 유지 | [태스크](changes/fix-pwa-navigation-birth-month/tasks.md) · [제안](changes/fix-pwa-navigation-birth-month/proposal.md) |
 | 우선 확인 / 결정 필요 | 홈 세트 수·수명·완료 후 전환 | 엔진·고정 저장은 구현. 후보 부족 정책과 UI 회귀·다음 세트 시점은 미확인 | `changes/clarify-home-set-lifecycle/` |
 | 후속 / 제안·미착수 | 계정·소셜 로그인·Supabase 동기화 | v3 메타데이터만 있음. 서버 client/auth/store·migration·업로드 구현 없음. upload.ts는 예외를 던지는 placeholder | `changes/plan-account-sync/` |
 | 후속 / 정책 충돌·미착수 | 발달 리포트·구독 | 로컬 영역 통계는 있음. report/subscribe 라우트·subscriptionStore·결제 SDK 없음. 구 계획의 '로그인만 필요'와 '구독 전용'이 충돌 | `changes/plan-reports-subscriptions/` |
