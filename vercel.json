@@ -15,6 +15,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/intro",
+      "destination": "/intro/index.html"
+    },
+    {
       "source": "/play/:id(play_\\d{3})",
       "destination": "/play/:id/index.html"
     }
@@ -26,6 +30,12 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "same-origin" },
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/intro/media/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {

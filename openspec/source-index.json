@@ -672,6 +672,12 @@
       ]
     },
     {
+      "path": "scripts/web/intro.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "scripts/web/service-worker.mjs",
       "domains": [
         "web-platform"
@@ -1363,6 +1369,14 @@
     },
     {
       "path": "tests/web-content.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tests/web-intro.test.mjs",
       "domains": [
         "catalog",
         "privacy",

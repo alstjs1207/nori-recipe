@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { prepareWebAssets } from "./prepare-web-assets.mjs";
 import { createServiceWorker } from "./web/service-worker.mjs";
 import { resolvePublicOrigin, withSiteMetadata, withPlayMetadata, withPublicOrigin } from "./web/html.mjs";
+import { writeIntroPage } from "./web/intro.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
@@ -57,6 +58,10 @@ async function build() {
     await fs.mkdir(directory, { recursive: true });
     await fs.writeFile(path.join(directory, "index.html"), withPublicOrigin(withPlayMetadata(html, play, playImageVersions[play.id]), publicOrigin));
   }
+  // Service introduction page (/intro): numbers come from the same live plays and material registry as this build.
+  const registry = JSON.parse(await fs.readFile(path.join(root, "data/materials.json"), "utf8"));
+  const materialImageVersions = JSON.parse(await fs.readFile(path.join(root, "src/constants/materialImageVersions.json"), "utf8"));
+  const intro = await writeIntroPage({ root, dist, plays, registry, playImageVersions, materialImageVersions, publicOrigin });
   const assets = (await filesIn(dist)).filter((file) => /\.(js|css|ttf|woff2?)$/.test(file)).map((file) => `/${path.relative(dist, file).split(path.sep).join("/")}`);
   const precache = [...new Set(["/", "/index.html", "/offline.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", ...assets])];
   // Code, styles, content and media changes all invalidate the previous cache.
@@ -69,6 +74,7 @@ async function build() {
   await fs.writeFile(path.join(dist, "sw.js"), createServiceWorker(version, precache));
   await fs.writeFile(path.join(dist, "build-report.json"), JSON.stringify({ ...report, version, playLinks: plays.length, precacheFiles: precache.length }, null, 2));
   console.info(`PWA ready: ${plays.length} public play links, ${precache.length} shell assets, cache ${version}`);
+  console.info(`Intro page: /intro with ${intro.data.playCount} plays, ${intro.data.materialCount} materials, ${Object.keys(intro.screens).length} screens`);
 }
 
 build().catch((error) => { console.error(error.message); process.exitCode = 1; });
