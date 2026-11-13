@@ -1,6 +1,6 @@
 # Tasks
 
-상태: **작업중 / Preview 확인 대기**. 2026-11-13 사용자 요청 범위는 구현과 preview 배포까지다. 운영(main) 반영과 archive는 Preview 확인 후 별도 요청으로 진행한다.
+상태: **완료**. 2026-11-13 사용자가 Vercel Preview에서 확인했다고 보고하고 main 반영을 요청했다.
 
 ## 1. 실제 화면 캡처
 
@@ -20,5 +20,11 @@
 
 - [x] 3.1 `tests/web-intro.test.mjs`로 동작 효과의 숨김 규칙 범위·동작 줄이기·세어 올리기 최종 값과 데이터 기반 수치·하드코딩 방지·발달영역 표시명 대조·브랜드·분석 스크립트 부재·공개 링크·검수 중 그림 제외·해시 WebP·origin 치환·로컬 서버/Vercel 경로를 검증한다(WEB-004).
 - [x] 3.2 `pnpm spec:index`, `pnpm spec:check`, `pnpm spec:changed`, `pnpm verify:local`을 실행하고 결과를 [검증 기록](verification.md)에 남긴다.
-- [ ] 3.3 preview 푸시 후 Vercel Preview 주소에서 `/intro`와 화면 이미지·시작 링크를 확인한다.
-- [ ] 3.4 사용자 확인 후 main 반영·운영 배포, 현재 명세·policy-map 동기화와 archive를 진행한다.
+- [x] 3.3 preview 푸시 후 Vercel Preview 주소에서 `/intro`와 화면 이미지·시작 링크를 확인한다. Preview는 Vercel 로그인 보호로 에이전트가 직접 열지 못했고, 2026-11-13 사용자가 확인했다고 보고했다.
+- [x] 3.4 사용자 확인 후 main 반영·운영 배포, 현재 명세·policy-map 동기화와 archive를 진행한다. main을 `4dd31f2`로 fast-forward·푸시했고 Production 배포·CI 성공, 운영 `/intro` 확인 후 WEB-004를 현재 명세와 policy-map에 반영했다.
+
+## Workflow follow-up
+
+- 구현은 `b1a84cf`·`4dd31f2`로 preview에 반영했고, 2026-11-13 사용자 요청에 따라 main을 fast-forward해 운영 배포했다. main에는 이전에 preview에만 있던 문서 커밋 `b9c8fff`·`617e2ca`도 함께 반영됐다.
+- 이번 완료 기록(명세 동기화·policy-map·archive)은 문서 작업이며 preview에 커밋·푸시한다. main 반영·운영 재배포는 포함하지 않는다.
+

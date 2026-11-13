@@ -1,6 +1,6 @@
 # 검증 기록
 
-날짜: 2026-11-13. 원본 `/Users/msyu/study/play-recipe`(작업 폴더 `nori-recipe`), 브랜치 `preview`, 시작 HEAD `617e2ca`. 별도 worktree 없음. 상태 **작업중 / Preview 확인 대기**, archive하지 않음.
+날짜: 2026-11-13. 원본 `/Users/msyu/study/play-recipe`(작업 폴더 `nori-recipe`), 브랜치 `preview`, 시작 HEAD `617e2ca`. 별도 worktree 없음. 상태 **완료**(운영 배포 후 archive).
 
 ## 실행 결과
 
@@ -28,3 +28,12 @@
 - `pnpm verify:local`: exit 0. spec-tools 7, 앱 단위 123, play-review 27, local-review 26, web 34(web-intro 6), 총 **217개 통과**. `spec validate --strict`, `spec:check`, `spec:changed origin/preview`, `git diff --check` 통과.
 - 브라우저(로컬 `/intro`): 히어로 숫자 세어 올리기 중간값(40·13·1) → 최종값(208·66·7), 준비 시간 막대 `scaleX(0)` → `scaleX(1)`·숫자 180, 끝까지 스크롤 후 등장 요소 26개 모두 불투명, 데모 월령 변경 시 개수 21 → 32 전환·`bump`·카드 `card-in` 애니메이션 확인.
 - headless Chrome 390×844: `prefers-reduced-motion: reduce`에서 `js-motion` 없음·숨김 0·숫자 최종값·막대 정지·재료 띠 정지. 자바스크립트 꺼짐에서 숨김 0·숫자 최종값·막대 정지(재료 띠는 CSS 애니메이션 유지).
+
+## 운영 배포 (2026-11-13)
+
+- Vercel Preview `4dd31f2`: 배포 성공, CI `Policy and regression checks` 성공. Preview 화면은 Vercel 로그인 보호로 에이전트가 직접 열지 못했으며 사용자가 확인했다고 보고했다.
+- main `6f6da68..4dd31f2` fast-forward·푸시 → Vercel Production 배포 성공, main CI 성공.
+- `https://www.nori-recipe.com/intro` 200, `/` 200. canonical `https://www.nori-recipe.com/intro`, 화면 WebP 7개 주소, `data-count-to` 208·66·7·180 확인.
+- headless Chrome으로 운영 `/intro` 확인: 390px·1280px 모두 `js-motion` 적용·끝까지 스크롤 후 등장 요소 숨김 0·숫자 최종값·가로 넘침 0. 동작 줄이기·자바스크립트 꺼짐에서도 숨김 0·숫자 최종값.
+- 앱 내부 브라우저 패널이 숨겨진 상태(백그라운드 페이지)에서는 IntersectionObserver·requestAnimationFrame이 멈춰 숫자 0·등장 전 상태로 보였다. 패널을 다시 보이거나 일반 브라우저에서 열면 정상이며, 운영 결함으로 보지 않는다.
+

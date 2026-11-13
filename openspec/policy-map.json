@@ -637,6 +637,24 @@
               "contains": "writeMaterialImage"
             }
           ]
+        },
+        {
+          "id": "WEB-004",
+          "verification": "automated",
+          "sources": [
+            "scripts/web/intro.mjs",
+            "scripts/build-web.mjs",
+            "vercel.json"
+          ],
+          "tests": [
+            "tests/web-intro.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/web/intro.mjs",
+              "contains": "collectIntroData"
+            }
+          ]
         }
       ]
     },

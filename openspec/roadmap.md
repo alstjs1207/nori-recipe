@@ -4,7 +4,6 @@
 
 | 우선순위/상태 | 작업 | 현재 준비 / 미구현 | 다음 문서 |
 | --- | --- | --- | --- |
-| 작업중 / Preview 확인 대기 | 서비스 소개 페이지 `/intro` | 2026-11-13 데이터 기반 수치·실제 화면 캡처·로컬 검증 완료, preview 배포. 운영 반영·archive는 Preview 확인 후 | [태스크](changes/add-intro-landing-page/tasks.md) · [제안](changes/add-intro-landing-page/proposal.md) |
 | 우선 확인 / 결정 필요 | 홈 세트 수·수명·완료 후 전환 | 엔진·고정 저장은 구현. 후보 부족 정책과 UI 회귀·다음 세트 시점은 미확인 | `changes/clarify-home-set-lifecycle/` |
 | 작업 예정 / 미착수 | 최근 본 놀이 | 2026-11-09 사용자 요청으로 계획 등록. 완료 기록과 별도인 로컬 열람 목록·재열람·비우기·게스트 분리 구현 예정 | [태스크](changes/add-recently-viewed-plays/tasks.md) · [제안](changes/add-recently-viewed-plays/proposal.md) |
 | 작업 예정 / 선행 정책 결정 후 착수 | 같은 재료로 다른 추천 받기 | 2026-11-09 사용자 요청으로 계획 등록. 모두 완료한 뒤 같은 재료의 다음 세트를 명시적으로 요청하는 안. REC-006·GAP-001·GAP-002와 조율하며 미완료 세트 고정 유지 | [태스크](changes/add-same-material-recommendation-refresh/tasks.md) · [제안](changes/add-same-material-recommendation-refresh/proposal.md) |
