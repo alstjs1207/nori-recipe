@@ -34,7 +34,7 @@ test("소개 페이지 숫자는 공개 놀이·재료 데이터에서 계산한
   assert.equal(subset.playCount, 3);
   assert.equal(subset.plays.length, 3);
   const html = renderIntroPage({ data: subset, screens: screensFor() });
-  assert.match(html, /<strong>3개<\/strong><span>함께할 놀이/);
+  assert.match(html, /<strong><span data-count-to="3" aria-hidden="true">3<\/span><span class="sr">3<\/span>개<\/strong><span>함께할 놀이/);
 });
 
 test("발달영역 표시명은 앱 상수와 같은 순서·이름을 사용한다", async () => {
@@ -103,4 +103,22 @@ test("/intro는 로컬 서버와 Vercel에서 정적 소개 페이지로 제공�
     await new Promise((resolve) => server.close(resolve));
     await fs.rm(directory, { recursive: true, force: true });
   }
+});
+
+test("동작 효과는 스크립트·동작 줄이기 설정을 따르고 내용을 숨긴 채 두지 않는다", () => {
+  const data = collectIntroData({ plays: bundle.plays, registry });
+  const html = renderIntroPage({ data, screens: screensFor() });
+  const css = html.match(/<style>([\s\S]*?)<\/style>/)[1].replace(/\/\*[\s\S]*?\*\//g, "");
+  // 처음에 숨기는 규칙은 모두 .js-motion 아래에만 있어 스크립트가 없으면 내용이 그대로 보인다.
+  for (const rule of css.split("}").filter((part) => /opacity:0|scaleX\(0\)/.test(part))) {
+    assert.match(rule.trim(), /^(?:\.js-motion |@keyframes|from\{)/, rule);
+  }
+  assert.match(html, /prefers-reduced-motion: no-preference/);
+  assert.match(html, /@media \(prefers-reduced-motion:reduce\)/);
+  // 세어 올리는 숫자는 서버 렌더 값이 최종 값이며 화면 낭독기용 최종 값을 함께 둔다.
+  for (const [, value, shown, spoken] of html.matchAll(/data-count-to="(\d+)" aria-hidden="true">([^<]+)<\/span><span class="sr">([^<]+)</g)) {
+    assert.equal(shown, Number(value).toLocaleString("ko-KR"));
+    assert.equal(spoken, shown);
+  }
+  assert.ok((html.match(/data-count-to=/g) ?? []).length >= 4);
 });

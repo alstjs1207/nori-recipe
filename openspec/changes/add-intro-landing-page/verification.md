@@ -22,3 +22,9 @@
 - 7개 화면 WebP 모두 200 응답·naturalWidth 780 로드 확인(지연 로딩).
 - 미리 찾아보기 기본값(25–36개월, 사용 빈도 상위 재료 4종)에서 결과 수·카드 3개·`/play/<id>` 링크 표시 확인.
 - 실제 iPhone·Vercel Preview 확인은 미완료(tasks 3.3).
+
+## 후속: 동작 효과 (2026-11-13)
+
+- `pnpm verify:local`: exit 0. spec-tools 7, 앱 단위 123, play-review 27, local-review 26, web 34(web-intro 6), 총 **217개 통과**. `spec validate --strict`, `spec:check`, `spec:changed origin/preview`, `git diff --check` 통과.
+- 브라우저(로컬 `/intro`): 히어로 숫자 세어 올리기 중간값(40·13·1) → 최종값(208·66·7), 준비 시간 막대 `scaleX(0)` → `scaleX(1)`·숫자 180, 끝까지 스크롤 후 등장 요소 26개 모두 불투명, 데모 월령 변경 시 개수 21 → 32 전환·`bump`·카드 `card-in` 애니메이션 확인.
+- headless Chrome 390×844: `prefers-reduced-motion: reduce`에서 `js-motion` 없음·숨김 0·숫자 최종값·막대 정지·재료 띠 정지. 자바스크립트 꺼짐에서 숨김 0·숫자 최종값·막대 정지(재료 띠는 CSS 애니메이션 유지).

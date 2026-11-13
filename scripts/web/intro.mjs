@@ -144,7 +144,7 @@ section{padding:72px 0;scroll-margin-top:60px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:32px 0 0;padding:0;list-style:none}
 .stats li{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 12px}
 .stats strong{display:block;font-size:clamp(22px,5vw,30px);font-weight:800;color:var(--accent);line-height:1.2}
-.stats span{font-size:13px;color:var(--muted)}
+.stats li>span{font-size:13px;color:var(--muted)}
 .phone{margin:0 auto;width:min(300px,78vw);border-radius:40px;padding:10px;background:#19192F;box-shadow:0 30px 60px rgba(25,25,47,.18)}
 .phone img{border-radius:30px;width:100%;height:auto;background:var(--bg)}
 .hero-visual{position:relative}
@@ -169,6 +169,7 @@ section{padding:72px 0;scroll-margin-top:60px}
 .demo .group+.group{margin-top:18px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
+.chip{transition:background-color .2s ease,border-color .2s ease,color .2s ease}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .result{margin-top:20px;padding-top:18px;border-top:1px dashed var(--line)}
 .result-count{font-weight:800;font-size:18px;margin:0}
@@ -183,8 +184,7 @@ section{padding:72px 0;scroll-margin-top:60px}
 .meter{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
 .meter-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .meter-head strong{font-size:clamp(28px,6vw,40px);color:var(--accent);font-weight:800;line-height:1.1;white-space:nowrap}
-.meter-head span{text-align:right}
-.meter-head span{color:var(--muted);font-size:14px}
+.meter-head>span{text-align:right;color:var(--muted);font-size:14px}
 .bar{height:12px;border-radius:999px;background:var(--pill);margin-top:14px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:inherit;background:var(--accent)}
 .ages{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0 0;padding:0;list-style:none}
@@ -198,7 +198,7 @@ section{padding:72px 0;scroll-margin-top:60px}
 .duo{display:flex;gap:16px;justify-content:center;align-items:flex-start}
 .duo .phone{width:min(240px,44vw);padding:7px;border-radius:32px}
 .duo .phone img{border-radius:26px}
-.duo .phone:nth-child(2){margin-top:48px}
+.duo>:nth-child(2){margin-top:48px}
 .steps{list-style:none;padding:0;margin:0;display:grid;gap:12px;counter-reset:step}
 .steps li{counter-increment:step;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 16px 60px;position:relative}
 .steps li::before{content:counter(step,decimal-leading-zero);position:absolute;left:16px;top:16px;width:32px;height:32px;border-radius:50%;background:var(--pill);color:var(--accent);font-weight:800;font-size:13px;display:grid;place-items:center}
@@ -228,16 +228,56 @@ footer nav{display:flex;gap:16px}
   .areas{grid-template-columns:repeat(4,1fr)}
   .wrap{padding:0 24px}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rail{animation:none;flex-wrap:wrap;width:auto;justify-content:center}.rail .dup{display:none}.btn{transition:none}}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* 동작 효과: <head>의 스크립트가 동작 줄이기 미설정·IntersectionObserver 지원일 때만 .js-motion을 붙인다. 스크립트가 없으면 모든 내용이 처음부터 보인다. */
+.js-motion [data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .7s ease var(--d,0ms),transform .7s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
+.js-motion [data-reveal].is-in{opacity:1;transform:none}
+.js-motion .bar i{transform:scaleX(0);transform-origin:left center;transition:transform 1.4s cubic-bezier(.2,.7,.2,1) .35s}
+.js-motion .meter.is-in .bar i{transform:scaleX(1)}
+.js-motion .cards li{animation:card-in .42s cubic-bezier(.2,.7,.2,1) both}
+.js-motion .cards li:nth-child(2){animation-delay:70ms}
+.js-motion .cards li:nth-child(3){animation-delay:140ms}
+.js-motion .result-count em.bump{animation:bump .4s ease}
+@keyframes card-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes bump{40%{transform:scale(1.25)}}
+.result-count em{display:inline-block}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rail{animation:none;flex-wrap:wrap;width:auto;justify-content:center}.rail .dup{display:none}.btn,.chip{transition:none}}
 `;
 
 const SCRIPT = `
+function tween(el, from, to, ms){
+  var start = null;
+  function frame(now){
+    if (start === null) start = now;
+    var t = Math.min(1, (now - start) / ms);
+    var eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(from + (to - from) * eased).toLocaleString('ko-KR');
+    if (t < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+(function(){
+  if (!document.documentElement.classList.contains('js-motion')) return;
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      observer.unobserve(el);
+      if (el.hasAttribute('data-reveal')) el.classList.add('is-in');
+      if (el.hasAttribute('data-count-to')) tween(el, 0, Number(el.getAttribute('data-count-to')), 1200);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  document.querySelectorAll('[data-count-to]').forEach(function(el){ el.textContent = '0'; observer.observe(el); });
+  document.querySelectorAll('[data-reveal]').forEach(function(el){ observer.observe(el); });
+})();
 (function(){
   var data = JSON.parse(document.getElementById('intro-data').textContent);
   var root = document.getElementById('demo');
   if (!root) return;
   var state = { bucket: data.defaultBucket, materials: new Set(data.defaultMaterials) };
+  var motion = document.documentElement.classList.contains('js-motion');
   var countEl = root.querySelector('[data-count]');
+  var shown = 0;
   var listEl = root.querySelector('[data-list]');
   var emptyEl = root.querySelector('[data-empty]');
   function render(){
@@ -245,7 +285,11 @@ const SCRIPT = `
     var matches = data.plays.filter(function(p){
       return p.ageMin <= b.max && p.ageMax >= b.min && p.required.every(function(m){ return state.materials.has(m); });
     }).sort(function(a, c){ return c.required.length - a.required.length || a.prepTime - c.prepTime || a.name.localeCompare(c.name, 'ko'); });
-    countEl.textContent = matches.length;
+    if (motion && shown !== matches.length) {
+      tween(countEl, shown, matches.length, 380);
+      countEl.classList.remove('bump'); void countEl.offsetWidth; countEl.classList.add('bump');
+    } else countEl.textContent = matches.length;
+    shown = matches.length;
     listEl.textContent = '';
     matches.slice(0, 3).forEach(function(p){
       var li = document.createElement('li');
@@ -278,6 +322,8 @@ const SCRIPT = `
 export function renderIntroPage({ data, screens, playImageVersions = {}, materialImageVersions = {} }) {
   const n = (value) => escapeHtml(value.toLocaleString("ko-KR"));
   const ageLabel = `${data.ageMin}–${data.ageMax}개월`;
+  // 숫자를 0부터 세어 올리는 표시. 화면 낭독기는 최종 값만 읽고, 스크립트가 없으면 최종 값이 그대로 보인다.
+  const count = (value) => `<span data-count-to="${value}" aria-hidden="true">${n(value)}</span><span class="sr">${n(value)}</span>`;
   const materialChip = (slug) => `<span class="mat"><img src="${escapeHtml(versioned(`/media/materials/${slug}.webp`, materialImageVersions[slug]))}" alt="" width="32" height="32" loading="lazy" />${escapeHtml(data.displayNames[slug])}</span>`;
   const half = Math.ceil(data.materialSlugs.length / 2);
   const rows = [data.materialSlugs.slice(0, half), data.materialSlugs.slice(half)];
@@ -325,6 +371,7 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, materia
 <meta property="og:image:type" content="image/jpeg" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <style>${STYLE}</style>
+<script>try{if(window.matchMedia&&matchMedia("(prefers-reduced-motion: no-preference)").matches&&"IntersectionObserver" in window)document.documentElement.classList.add("js-motion")}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -342,15 +389,15 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, materia
 <div class="hero-actions"><a class="btn btn-primary" href="/">웹에서 바로 시작하기</a><a class="btn btn-ghost" href="/search">놀이 둘러보기</a></div>
 <p class="hero-note">회원가입 없이, 생년월만 고르면 시작해요.</p>
 <ul class="stats" aria-label="노리 레시피 놀이 현황">
-<li><strong>${n(data.playCount)}개</strong><span>함께할 놀이</span></li>
-<li><strong>${n(data.materialCount)}가지</strong><span>집에 있는 재료</span></li>
-<li><strong>${n(data.devAreas.length)}개</strong><span>발달 영역</span></li>
+<li><strong>${count(data.playCount)}개</strong><span>함께할 놀이</span></li>
+<li><strong>${count(data.materialCount)}가지</strong><span>집에 있는 재료</span></li>
+<li><strong>${count(data.devAreas.length)}개</strong><span>발달 영역</span></li>
 </ul>
 </div>
 <div class="hero-visual">${phone(screens.home, { loading: "eager" })}</div>
 </div></section>
 
-<section class="marquee bg-white" aria-labelledby="mat-title"><div class="wrap">
+<section class="marquee bg-white" aria-labelledby="mat-title"><div class="wrap" data-reveal>
 <h2 id="mat-title">종이 한 장, 휴지심 하나로도<br /><em>충분해요</em></h2>
 <p class="lead">교구를 따로 사지 않아도 괜찮아요. 집에 있는 재료 ${n(data.materialCount)}가지로 놀이를 찾아요.</p>
 </div>
@@ -358,13 +405,13 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, materia
 </section>
 
 <section id="recommend"><div class="wrap feature">
-<div class="copy">
+<div class="copy" data-reveal>
 <span class="eyebrow">맞춤 추천</span>
 <h2 style="margin-top:14px">월령과 재료만 고르면<br /><em>오늘의 놀이</em>가 나와요</h2>
 <p class="lead">아이의 월령, 우리 집 재료, 최근에 한 놀이를 함께 살펴 오늘 해볼 놀이를 골라 드려요. 직접 골라 보세요.</p>
 <ul class="points"><li>놀이 시간·준비 시간·난이도를 먼저 보고 고를 수 있어요</li><li>부족한 재료가 있으면 시작 전에 알려 드려요</li><li>아래 결과는 실제 서비스의 공개 놀이 ${n(data.playCount)}개에서 찾아요</li></ul>
 </div>
-<div class="demo" id="demo" hidden>
+<div class="demo" id="demo" data-reveal style="--d:120ms" hidden>
 <div class="group"><h3 id="demo-age">아이 월령</h3><div class="chips" role="group" aria-labelledby="demo-age">${data.buckets.map((bucket, index) => `<button type="button" class="chip" data-bucket="${index}" aria-pressed="${index === defaultBucket}">${bucket.min}–${bucket.max}개월</button>`).join("")}</div></div>
 <div class="group"><h3 id="demo-mat">우리 집 재료</h3><div class="chips" role="group" aria-labelledby="demo-mat">${data.popularMaterials.map((slug) => `<button type="button" class="chip" data-material="${escapeHtml(slug)}" aria-pressed="false">${escapeHtml(data.displayNames[slug])}</button>`).join("")}</div></div>
 <div class="result" aria-live="polite"><p class="result-count">지금 바로 할 수 있는 놀이 <em data-count>0</em>개</p><ul class="cards" data-list></ul><p class="empty" data-empty hidden>재료를 하나 더 골라 보세요.</p></div>
@@ -373,60 +420,60 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, materia
 </div></section>
 
 <section id="materials" class="bg-card"><div class="wrap feature flip">
-<div class="copy">
+<div class="copy" data-reveal>
 <span class="eyebrow">재료로 찾기</span>
 <h2 style="margin-top:14px">놀이 이름을 몰라도<br /><em>재료</em>에서 시작해요</h2>
 <p class="lead">가지고 있는 재료를 그림으로 골라 두면, 그 재료로 할 수 있는 놀이를 먼저 보여 드려요. 재료는 ${n(data.categoryCount)}개 분류로 정리되어 있어요.</p>
-<div class="meter">
-<div class="meter-head"><strong>${n(data.quickPrepCount)}개</strong><span>준비 ${QUICK_PREP_MINUTES}분 이내 놀이 · 전체 ${n(data.playCount)}개 중 ${quickRatio}%</span></div>
+<div class="meter" data-reveal style="--d:150ms">
+<div class="meter-head"><strong>${count(data.quickPrepCount)}개</strong><span>준비 ${QUICK_PREP_MINUTES}분 이내 놀이 · 전체 ${n(data.playCount)}개 중 ${quickRatio}%</span></div>
 <div class="bar" role="img" aria-label="전체 놀이 중 준비 ${QUICK_PREP_MINUTES}분 이내 놀이 비율 ${quickRatio}%"><i style="width:${quickRatio}%"></i></div>
 </div>
 </div>
-<div>${phone(screens.materials)}</div>
+<div data-reveal style="--d:120ms">${phone(screens.materials)}</div>
 </div></section>
 
 <section class="bg-white"><div class="wrap feature">
-<div class="copy">
+<div class="copy" data-reveal>
 <span class="eyebrow">발달 영역 탐색</span>
 <h2 style="margin-top:14px">이 놀이,<br /><em>어떤 경험</em>과 이어질까요?</h2>
 <p class="lead">월령·장소·재료·발달 영역으로 놀이를 좁혀 보세요. 놀이마다 연결되는 발달 영역을 함께 표시해요.</p>
 <ul class="ages" aria-label="월령별 놀이 수">${data.buckets.map((bucket) => `<li><strong>${n(bucket.count)}개</strong>${bucket.min}–${bucket.max}개월</li>`).join("")}</ul>
 </div>
-<div>${phone(screens.search)}</div>
+<div data-reveal style="--d:120ms">${phone(screens.search)}</div>
 </div>
-<div class="wrap"><ul class="areas" aria-label="발달 영역별 놀이 수">${data.devAreas.map((area) => `<li><strong>${escapeHtml(area.label)}<span>${n(area.count)}개</span></strong><p>${escapeHtml(area.detail)}</p></li>`).join("")}</ul></div>
+<div class="wrap"><ul class="areas" aria-label="발달 영역별 놀이 수">${data.devAreas.map((area, index) => `<li data-reveal style="--d:${index * 60}ms"><strong>${escapeHtml(area.label)}<span>${n(area.count)}개</span></strong><p>${escapeHtml(area.detail)}</p></li>`).join("")}</ul></div>
 </section>
 
 <section id="guide" class="bg-warm"><div class="wrap feature flip">
-<div class="copy">
+<div class="copy" data-reveal>
 <span class="eyebrow">놀이 가이드</span>
 <h2 style="margin-top:14px">처음 해보는 놀이도<br /><em>순서대로</em> 따라 해요</h2>
 <p class="lead">준비물부터 안전 확인까지, 놀이마다 같은 순서로 담았어요.</p>
 <ol class="steps" style="margin-top:24px">
-<li><strong>이것만 준비해요</strong><span>꼭 필요한 재료와 없어도 되는 재료, 시작 전에 확인할 점</span></li>
-<li><strong>이렇게 놀아요</strong><span>단계별 진행 방법과 아이 반응에 맞춘 팁</span></li>
-<li><strong>안전하게 함께해요</strong><span>놀이별 안전 유의사항과 재료별 주의 안내</span></li>
+<li data-reveal style="--d:100ms"><strong>이것만 준비해요</strong><span>꼭 필요한 재료와 없어도 되는 재료, 시작 전에 확인할 점</span></li>
+<li data-reveal style="--d:220ms"><strong>이렇게 놀아요</strong><span>단계별 진행 방법과 아이 반응에 맞춘 팁</span></li>
+<li data-reveal style="--d:340ms"><strong>안전하게 함께해요</strong><span>놀이별 안전 유의사항과 재료별 주의 안내</span></li>
 </ol>
 </div>
-<div class="duo">${phone(screens.detailPrep)}${phone(screens.detailSafety)}</div>
+<div class="duo"><div data-reveal style="--d:80ms">${phone(screens.detailPrep)}</div><div data-reveal style="--d:240ms">${phone(screens.detailSafety)}</div></div>
 </div></section>
 
 <section id="record" class="bg-white"><div class="wrap feature">
-<div class="copy">
+<div class="copy" data-reveal>
 <span class="eyebrow">찜과 기록</span>
 <h2 style="margin-top:14px">아이가 좋아했던 놀이,<br /><em>다시 꺼내 봐요</em></h2>
 <p class="lead">해보고 싶은 놀이는 찜해 두고, 함께한 놀이는 별점과 아이 반응, 한 줄 메모로 남겨요. 남긴 기록은 다음 추천에 반영돼요.</p>
 <ul class="points"><li>이번 달 함께한 놀이 수와 경험한 발달 영역을 한눈에 봐요</li><li>기록은 이용 중인 기기에만 저장돼요</li></ul>
 </div>
-<div class="duo">${phone(screens.favorites)}${phone(screens.record)}</div>
+<div class="duo"><div data-reveal style="--d:80ms">${phone(screens.favorites)}</div><div data-reveal style="--d:240ms">${phone(screens.record)}</div></div>
 </div></section>
 
-<section id="faq"><div class="wrap faq">
+<section id="faq"><div class="wrap faq" data-reveal>
 <h2>자주 묻는 질문</h2>
 ${faqs.map(([q, a]) => `<details><summary>${escapeHtml(q)}</summary><p>${escapeHtml(a)}</p></details>`).join("\n")}
 </div></section>
 
-<section class="final"><div class="wrap">
+<section class="final"><div class="wrap" data-reveal>
 <h2>아이와의 오늘,<br /><em>지금 시작해요</em></h2>
 <p class="lead">생년월을 고르고 우리 집 재료를 골라 보세요.</p>
 <div class="hero-actions"><a class="btn btn-primary" href="/">웹에서 바로 시작하기</a><a class="btn btn-ghost" href="/search">놀이 둘러보기</a></div>
