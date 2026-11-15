@@ -11,6 +11,10 @@ test("보류·보관 놀이와 검토 중인 그림은 이미지 주소를 제�
     assert.equal(getPlayThumbnailSource(play.id) !== null, visible, play.id);
   }
   assert.equal(getPlayImageSource("play_missing"), null);
+  for (const id of ["play_missing", "../play_001", "__proto__"]) assert.equal(getPlayImageUrl(id), "/nori-icon.svg");
+  for (const play of loadPlaysBundle().plays.filter((play) => play.status !== "live" || play.imageStatus === "review")) {
+    assert.equal(getPlayImageUrl(play.id), "/nori-icon.svg", play.id);
+  }
 });
 
 test("교체한 놀이의 상세와 썸네일은 이미지 버전이 포함된 주소를 공유한다", () => {

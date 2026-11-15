@@ -1,0 +1,427 @@
+{
+  "dateKst": "2026-11-15",
+  "project": {
+    "ref": "clqthwgsmumiwnnqjtbe",
+    "name": "nori-recipe",
+    "organization": "alstjs1207",
+    "organizationId": "pyrxoupdliycqfoylymj",
+    "plan": "Free",
+    "region": "ap-northeast-2",
+    "environment": "main / PRODUCTION",
+    "origin": "https://clqthwgsmumiwnnqjtbe.supabase.co"
+  },
+  "displayedOrganizationUsage": {
+    "billingCycle": "2026-11-05 / 2026-12-05",
+    "projects": 2,
+    "storageGb": 0.006,
+    "storageAllowanceGb": 1,
+    "egressGb": 0.25,
+    "egressAllowanceGb": 5,
+    "cachedEgressGb": 0.005,
+    "cachedEgressAllowanceGb": 5,
+    "refreshDelay": "up to 1 hour; displayed usage is not an immediate after-upload measurement"
+  },
+  "capacityPlan": {
+    "originalCount": 224,
+    "originalBytes": 140445124,
+    "publicPlayCount": 208,
+    "detailBytes": 15362308,
+    "thumbnailBytes": 2543786,
+    "plannedBytes": 158351218
+  },
+  "buckets": [
+    {
+      "name": "play-originals",
+      "public": false,
+      "fileSizeLimit": 16777216,
+      "allowedMimeTypes": [
+        "image/jpeg"
+      ],
+      "scratchObjectsRemaining": 0
+    },
+    {
+      "name": "play-assets",
+      "public": true,
+      "fileSizeLimit": 16777216,
+      "allowedMimeTypes": [
+        "image/webp"
+      ],
+      "scratchObjectsRemaining": 0
+    }
+  ],
+  "images": [
+    {
+      "id": "play_006",
+      "baselineCommit": "5f6f23e25a2b5dd4c902e17d82e1746fe6ef7752",
+      "contentHash": "595483e24adfdbf3e168025c83878a71a556aa25bdc74add65fc99134d3ac7cc",
+      "originalSha256": "94634f002912e3c448e576de318965778cae1c9c523c0ee3117ca29327ad27ea",
+      "originalBytes": 299396,
+      "version": "9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b",
+      "detail": {
+        "path": "play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp",
+        "sha256": "6a0a1dfa60158d59039df4e7e59e749b09385e1aadecaa0e5dfdea5bf191be98",
+        "bytes": 92238,
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp"
+      },
+      "thumbnail": {
+        "path": "play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/thumbnail.webp",
+        "sha256": "26bd09106c89f7212b8a8f2ab2687ecbaf719cef8d8c95f6ce2e60fb1ded3180",
+        "bytes": 13798,
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/thumbnail.webp"
+      },
+      "upload": "verified",
+      "restore": "restored",
+      "rerunCreates": 0
+    },
+    {
+      "id": "play_013",
+      "baselineCommit": "5f6f23e25a2b5dd4c902e17d82e1746fe6ef7752",
+      "contentHash": "7169c99f1dde33e603facc15cd39c9988f2b2ea3f959a714c8795e48aab57b17",
+      "originalSha256": "a385f8b38ce66bfa1bfe385673d5aad10a8acc1ff687e2aebda327c17d8f4a6e",
+      "originalBytes": 810438,
+      "version": "464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded",
+      "detail": {
+        "path": "play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp",
+        "sha256": "7651fe33b6f8d487a534da9b7d8bae08a4f0abea8ff7ef1234532c288514efaf",
+        "bytes": 61566,
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp"
+      },
+      "thumbnail": {
+        "path": "play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/thumbnail.webp",
+        "sha256": "4b8d3fd4fa6b5033862b74b3e6afa4356f5d398b595435b8bb46eedc3dde1e7d",
+        "bytes": 11636,
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/thumbnail.webp"
+      },
+      "upload": "verified",
+      "restore": "restored",
+      "rerunCreates": 0
+    },
+    {
+      "id": "play_076",
+      "baselineCommit": "5f6f23e25a2b5dd4c902e17d82e1746fe6ef7752",
+      "contentHash": "7b7e3052aec5fad23747b1733456668db38327fec2f51b517a74005e7ed07690",
+      "originalSha256": "4072f4389b6ce513f2a39f3e04197aaaf641c6c98f38d8456cc7aa93af47f548",
+      "originalBytes": 186542,
+      "version": "a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea",
+      "detail": {
+        "path": "play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/detail.webp",
+        "sha256": "1d14acba9dc3e2784a39dc22913350bc57a16e0e8d471369df1c79b5780f9011",
+        "bytes": 49118,
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/detail.webp"
+      },
+      "thumbnail": {
+        "path": "play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/thumbnail.webp",
+        "sha256": "009eb262a99144a1dd8241faf1938f59044ac3f41adf650ba7fa4b47943c4b29",
+        "bytes": 8186,
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/thumbnail.webp"
+      },
+      "upload": "verified",
+      "restore": "restored",
+      "rerunCreates": 0
+    }
+  ],
+  "uploadedObjects": 9,
+  "uploadedBytes": 1532918,
+  "permissions": [
+    {
+      "bucket": "play-originals",
+      "object": "_permission-probe/5ce8a653-fc6a-424f-ae37-5445431c5f43.jpeg",
+      "tests": [
+        {
+          "operation": "create",
+          "principal": "admin",
+          "status": 200
+        },
+        {
+          "operation": "read",
+          "principal": "admin",
+          "status": 200,
+          "hashMatches": true
+        },
+        {
+          "operation": "public-read",
+          "principal": "anonymous",
+          "status": 400
+        },
+        {
+          "operation": "object-read",
+          "principal": "anonymous",
+          "status": 400
+        },
+        {
+          "operation": "list",
+          "principal": "anonymous",
+          "status": 400,
+          "visibleObjects": null
+        },
+        {
+          "operation": "create",
+          "principal": "anonymous",
+          "status": 400
+        },
+        {
+          "operation": "update",
+          "principal": "anonymous",
+          "status": 400
+        },
+        {
+          "operation": "delete",
+          "principal": "anonymous",
+          "status": 400,
+          "affectedObjects": null
+        },
+        {
+          "operation": "public-read",
+          "principal": "anon",
+          "status": 400
+        },
+        {
+          "operation": "object-read",
+          "principal": "anon",
+          "status": 400
+        },
+        {
+          "operation": "list",
+          "principal": "anon",
+          "status": 200,
+          "visibleObjects": 0
+        },
+        {
+          "operation": "create",
+          "principal": "anon",
+          "status": 400
+        },
+        {
+          "operation": "update",
+          "principal": "anon",
+          "status": 400
+        },
+        {
+          "operation": "delete",
+          "principal": "anon",
+          "status": 200,
+          "affectedObjects": 0
+        },
+        {
+          "operation": "cleanup-delete",
+          "principal": "admin",
+          "status": 200,
+          "deleted": [
+            "_permission-probe/5ce8a653-fc6a-424f-ae37-5445431c5f43.jpeg"
+          ]
+        },
+        {
+          "operation": "after-cleanup-read-fresh",
+          "principal": "admin",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "bucket": "play-assets",
+      "object": "_permission-probe/5ce8a653-fc6a-424f-ae37-5445431c5f43.webp",
+      "tests": [
+        {
+          "operation": "create",
+          "principal": "admin",
+          "status": 200
+        },
+        {
+          "operation": "read",
+          "principal": "admin",
+          "status": 200,
+          "hashMatches": true
+        },
+        {
+          "operation": "public-read",
+          "principal": "anonymous",
+          "status": 200
+        },
+        {
+          "operation": "object-read",
+          "principal": "anonymous",
+          "status": 200
+        },
+        {
+          "operation": "list",
+          "principal": "anonymous",
+          "status": 400,
+          "visibleObjects": null
+        },
+        {
+          "operation": "create",
+          "principal": "anonymous",
+          "status": 400
+        },
+        {
+          "operation": "update",
+          "principal": "anonymous",
+          "status": 400
+        },
+        {
+          "operation": "delete",
+          "principal": "anonymous",
+          "status": 400,
+          "affectedObjects": null
+        },
+        {
+          "operation": "public-read",
+          "principal": "anon",
+          "status": 200
+        },
+        {
+          "operation": "object-read",
+          "principal": "anon",
+          "status": 200
+        },
+        {
+          "operation": "list",
+          "principal": "anon",
+          "status": 200,
+          "visibleObjects": 0
+        },
+        {
+          "operation": "create",
+          "principal": "anon",
+          "status": 400
+        },
+        {
+          "operation": "update",
+          "principal": "anon",
+          "status": 400
+        },
+        {
+          "operation": "delete",
+          "principal": "anon",
+          "status": 200,
+          "affectedObjects": 0
+        },
+        {
+          "operation": "cleanup-delete",
+          "principal": "admin",
+          "status": 200,
+          "deleted": [
+            "_permission-probe/5ce8a653-fc6a-424f-ae37-5445431c5f43.webp"
+          ]
+        },
+        {
+          "operation": "after-cleanup-read-fresh",
+          "principal": "admin",
+          "status": 400
+        }
+      ]
+    }
+  ],
+  "build": {
+    "plays": 3,
+    "reviewImages": 0,
+    "originalMB": 0,
+    "detailMB": 0.2,
+    "thumbnailMB": 0.03,
+    "imageMode": "public",
+    "verifiedPublicAssets": 6,
+    "version": "738a50bdebb6",
+    "date": "2026-11-14T22:20:14.196Z",
+    "node": "v24.22.2",
+    "sourcePlayIds": [
+      "play_006",
+      "play_013",
+      "play_076"
+    ],
+    "noPlayOriginals": true,
+    "noAdminCredentials": true
+  },
+  "browser": {
+    "detailChecks": [
+      {
+        "path": "/play/play_006",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp",
+        "width": 960,
+        "og": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp",
+        "canonical": "http://127.0.0.1:4187/play/play_006"
+      },
+      {
+        "path": "/play/play_076",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/detail.webp",
+        "width": 960,
+        "og": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/detail.webp",
+        "canonical": "http://127.0.0.1:4187/play/play_076"
+      },
+      {
+        "path": "/play/play_013",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp",
+        "width": 960,
+        "og": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp",
+        "canonical": "http://127.0.0.1:4187/play/play_013"
+      }
+    ],
+    "cache": [
+      {
+        "cache": "nori-web-738a50bdebb6-media",
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/thumbnail.webp",
+        "type": "cors",
+        "status": 200,
+        "bytes": 8186,
+        "sha256": "009eb262a99144a1dd8241faf1938f59044ac3f41adf650ba7fa4b47943c4b29"
+      },
+      {
+        "cache": "nori-web-738a50bdebb6-media",
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/thumbnail.webp",
+        "type": "cors",
+        "status": 200,
+        "bytes": 13798,
+        "sha256": "26bd09106c89f7212b8a8f2ab2687ecbaf719cef8d8c95f6ce2e60fb1ded3180"
+      },
+      {
+        "cache": "nori-web-738a50bdebb6-media",
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/thumbnail.webp",
+        "type": "cors",
+        "status": 200,
+        "bytes": 11636,
+        "sha256": "4b8d3fd4fa6b5033862b74b3e6afa4356f5d398b595435b8bb46eedc3dde1e7d"
+      },
+      {
+        "cache": "nori-web-738a50bdebb6-media",
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp",
+        "type": "cors",
+        "status": 200,
+        "bytes": 92238,
+        "sha256": "6a0a1dfa60158d59039df4e7e59e749b09385e1aadecaa0e5dfdea5bf191be98"
+      },
+      {
+        "cache": "nori-web-738a50bdebb6-media",
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_076/a8ec341432c635e32c9d11305f61b8f377394f4737ff70ddd742cc69516a11ea/detail.webp",
+        "type": "cors",
+        "status": 200,
+        "bytes": 49118,
+        "sha256": "1d14acba9dc3e2784a39dc22913350bc57a16e0e8d471369df1c79b5780f9011"
+      },
+      {
+        "cache": "nori-web-738a50bdebb6-media",
+        "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp",
+        "type": "cors",
+        "status": 200,
+        "bytes": 61566,
+        "sha256": "7651fe33b6f8d487a534da9b7d8bae08a4f0abea8ff7ef1234532c288514efaf"
+      }
+    ]
+  },
+  "preservation": {
+    "trackedFilesComparedWithHead": 318,
+    "trackedBytesUnchanged": true,
+    "originalJpegsKept": 224,
+    "publicSourceSnapshot": {
+      "schemaVersion": 1,
+      "storage": null,
+      "entries": {}
+    }
+  },
+  "limits": [
+    "Only three approved live images migrated",
+    "No native export or physical-device offline validation",
+    "No external sharing-bot crawl",
+    "No hosted Preview or Production deployment",
+    "No business database/auth changes",
+    "No source JPEG deletion or Git tracking changes"
+  ]
+}

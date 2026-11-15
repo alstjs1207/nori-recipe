@@ -105,6 +105,10 @@ test("local verification isolates build origins from server fixtures and disable
     assert.equal(env.EXPO_PUBLIC_GA_ENABLED, "false");
     assert.equal(env.EXPO_PUBLIC_GA_MEASUREMENT_ID, "");
     assert.equal(env.VERCEL, "");
+    assert.equal(env.PLAY_IMAGE_PUBLIC_MANIFEST, "");
+    assert.equal(env.PLAY_IMAGE_PUBLIC_ORIGIN, "");
+    assert.equal(env.PLAY_IMAGE_PUBLIC_BUCKET, "");
+    assert.equal(env.PLAY_IMAGE_PUBLIC_ASSET_DIR, "");
     if (command === "build:web") assert.equal(env.PUBLIC_ORIGIN, "https://nori.example.test");
     else assert.equal(Object.hasOwn(env, "PUBLIC_ORIGIN"), false);
   }

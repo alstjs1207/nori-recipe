@@ -1,3 +1,4 @@
+import { PlayImage } from "@/components/web/PlayImage.web";
 import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { WebSelect } from "@/components/web/WebSelect";
@@ -162,7 +163,7 @@ export default function RecordWebScreen() {
                         href={`/play/${log.playId}`}
                         className="record-entry-heading"
                       >
-                        <img
+                        <PlayImage
                           src={play ? getPlayImageUrl(log.playId, "thumbnail") : "/nori-icon.svg"}
                           alt=""
                           loading="lazy"

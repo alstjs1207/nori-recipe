@@ -344,7 +344,8 @@
       "commands": [
         "pnpm check:play-content",
         "pnpm test:play-review",
-        "pnpm check:play-images"
+        "pnpm check:play-images",
+        "pnpm test:play-image-storage"
       ],
       "requirements": [
         {
@@ -401,6 +402,46 @@
             {
               "path": "scripts/review/review-core.mjs",
               "contains": "export function applyApproval"
+            }
+          ]
+        },
+        {
+          "id": "CON-004",
+          "verification": "automated",
+          "sources": [
+            "scripts/migrate-play-images.mjs",
+            "scripts/play-image-storage/manifest.mjs",
+            "scripts/play-image-storage/migration.mjs",
+            "scripts/play-image-storage/stores.mjs",
+            "scripts/play-image-storage/files.mjs"
+          ],
+          "tests": [
+            "tests/play-image-storage.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/play-image-storage/migration.mjs",
+              "contains": "export async function migrate"
+            }
+          ]
+        },
+        {
+          "id": "CON-005",
+          "verification": "automated",
+          "sources": [
+            "scripts/migrate-play-images.mjs",
+            "scripts/play-image-storage/manifest.mjs",
+            "scripts/play-image-storage/migration.mjs",
+            "scripts/play-image-storage/stores.mjs",
+            "scripts/play-image-storage/files.mjs"
+          ],
+          "tests": [
+            "tests/play-image-storage.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/play-image-storage/migration.mjs",
+              "contains": "export async function restore"
             }
           ]
         }
@@ -582,16 +623,25 @@
             "scripts/web/html.mjs",
             "scripts/build-web.mjs",
             "scripts/serve-web.mjs",
-            "vercel.json"
+            "vercel.json",
+            "scripts/web/play-images.mjs",
+            "src/constants/playImageManifest.ts",
+            "src/constants/playImageUrls.ts",
+            "src/constants/playImageWebManifest.json"
           ],
           "tests": [
             "tests/web-content.test.mjs",
-            "tests/web-server.test.mjs"
+            "tests/web-server.test.mjs",
+            "tests/web-play-images.test.mjs"
           ],
           "anchors": [
             {
               "path": "scripts/web/html.mjs",
               "contains": "resolvePublicOrigin"
+            },
+            {
+              "path": "scripts/web/html.mjs",
+              "contains": "export function withPlayMetadata"
             }
           ]
         },
@@ -607,15 +657,29 @@
             "public/manifest.webmanifest",
             "src/components/web/WebShell.web.tsx",
             "app/(main)/_layout.web.tsx",
-            "src/components/web/NoriUI.tsx"
+            "src/components/web/NoriUI.tsx",
+            "src/components/web/PlayImage.web.tsx",
+            "src/components/web/ContentImage.web.tsx",
+            "src/constants/playImageManifest.ts",
+            "public/pwa.js",
+            "src/components/web/WebWelcome.tsx"
           ],
           "tests": [
-            "tests/web-offline.test.mjs"
+            "tests/web-offline.test.mjs",
+            "tests/web-pwa-lifecycle.test.mjs"
           ],
           "anchors": [
             {
               "path": "scripts/web/service-worker.mjs",
               "contains": "createServiceWorker"
+            },
+            {
+              "path": "scripts/web/service-worker.mjs",
+              "contains": "const storage = STORAGE"
+            },
+            {
+              "path": "public/pwa.js",
+              "contains": "nori:offline-error"
             }
           ]
         },
@@ -626,15 +690,35 @@
             "scripts/prepare-web-assets.mjs",
             "scripts/build-web.mjs",
             "vercel.json",
-            "scripts/verify-local.mjs"
+            "scripts/verify-local.mjs",
+            "scripts/web/play-images.mjs",
+            "src/constants/playImageManifest.ts",
+            "src/constants/playImageUrls.ts",
+            "src/constants/playImageWebManifest.json",
+            "scripts/web/public-image-assets.mjs",
+            "scripts/web/build-output.mjs"
           ],
           "tests": [
-            "tests/web-content.test.mjs"
+            "tests/web-content.test.mjs",
+            "tests/web-play-images.test.mjs",
+            "tests/web-build.test.mjs"
           ],
           "anchors": [
             {
               "path": "scripts/prepare-web-assets.mjs",
               "contains": "writeMaterialImage"
+            },
+            {
+              "path": "scripts/web/play-images.mjs",
+              "contains": "export async function withWebImageManifest"
+            },
+            {
+              "path": "scripts/web/public-image-assets.mjs",
+              "contains": "export async function verifyPublicImageAssets"
+            },
+            {
+              "path": "scripts/web/build-output.mjs",
+              "contains": "export async function publishWebBuild"
             }
           ]
         },
@@ -644,10 +728,15 @@
           "sources": [
             "scripts/web/intro.mjs",
             "scripts/build-web.mjs",
-            "vercel.json"
+            "vercel.json",
+            "scripts/web/play-images.mjs",
+            "src/constants/playImageManifest.ts",
+            "src/constants/playImageUrls.ts",
+            "src/constants/playImageWebManifest.json"
           ],
           "tests": [
-            "tests/web-intro.test.mjs"
+            "tests/web-intro.test.mjs",
+            "tests/web-play-images.test.mjs"
           ],
           "anchors": [
             {

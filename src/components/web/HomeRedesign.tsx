@@ -1,3 +1,4 @@
+import { PlayImage } from "@/components/web/PlayImage.web";
 import { WebPage } from "./NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { Link } from "expo-router";
@@ -174,7 +175,7 @@ export function HomeRedesign({
                   },
                 }}
               >
-                <img
+                <PlayImage
                   src={getPlayImageUrl(featured.id)}
                   alt=""
                   fetchPriority="high"

@@ -3,12 +3,24 @@ import test from "node:test";
 import vm from "node:vm";
 import { createServiceWorker } from "../scripts/web/service-worker.mjs";
 
-function worker(version = "test") {
+const STORAGE = { origin: "https://storage.fixture.invalid", bucket: "public-fixture" };
+const storageUrl = (id = "play_301", version = "a".repeat(64), kind = "detail") => `${STORAGE.origin}/storage/v1/object/public/${STORAGE.bucket}/${id}/${version}/${kind}.webp`;
+
+function corsResponse(body, { status = 200, type = "cors", contentType = "image/webp", redirected = false } = {}) {
+  const response = new Response(body, { status, headers: { "content-type": contentType } });
+  Object.defineProperties(response, { type: { value: type }, redirected: { value: redirected },
+    clone: { value: () => corsResponse(body, { status, type, contentType, redirected }) } });
+  return response;
+}
+
+function worker(version = "test", storage = null) {
   const stores = new Map();
   const listeners = new Map();
   const httpCache = new Map();
   let online = true;
   let status = 200;
+  let remoteOptions = {};
+  const fetched = [];
   let claimed = false;
   let skipped = false;
   const key = (request) => new URL(typeof request === "string" ? request : request.url, "http://localhost").href;
@@ -31,9 +43,14 @@ function worker(version = "test") {
     async delete(name) { return stores.delete(name); },
   };
   const self = { location: { origin: "http://localhost" }, addEventListener: (name, callback) => listeners.set(name, callback), clients: { async claim() { claimed = true; } }, skipWaiting: () => { skipped = true; } };
-  vm.runInNewContext(createServiceWorker(version, ["/index.html", "/offline.html", "/entry.js", "/web.css"]), { self, caches, URL, Request, Response, fetch: async (request) => { if (!online) throw new Error("offline"); return new Response(`network:${request.url}`, { status }); } });
+  vm.runInNewContext(createServiceWorker(version, ["/index.html", "/offline.html", "/entry.js", "/web.css"], storage), { self, caches, URL, Request, Response, fetch: async (request) => {
+    fetched.push(request.url);
+    if (!online) throw new Error("offline");
+    return new URL(request.url).origin === STORAGE.origin ? corsResponse(`network:${request.url}`, { status, ...remoteOptions }) : new Response(`network:${request.url}`, { status });
+  } });
   return {
     caches, stores, setOnline: (value) => { online = value; }, setStatus: (value) => { status = value; }, claimed: () => claimed, skipped: () => skipped,
+    fetched, setRemote: (value) => { remoteOptions = value; },
     seedHttpCache: (url, body) => { httpCache.set(key(url), body); },
     async lifecycle(name) { const promises = []; listeners.get(name)({ waitUntil: (promise) => promises.push(promise) }); await Promise.all(promises); },
     message(data) { listeners.get("message")({ data }); },
@@ -51,6 +68,67 @@ test("새 버전 설치는 HTTP 캐시에 남은 이전 스타일 대신 새 스
   await app.lifecycle("install");
   app.setOnline(false);
   assert.equal(await (await app.fetch("/web.css", { destination: "style" })).text(), "shell:/web.css");
+});
+
+test("허용한 Storage CORS 이미지는 방문 후 오프라인에서 표시하고 미방문 이미지는 기본 표시한다", async () => {
+  const app = worker("storage", STORAGE);
+  await app.lifecycle("install");
+  const request = { destination: "image", mode: "cors", credentials: "same-origin" };
+  assert.match(await (await app.fetch(storageUrl(), request)).text(), /network:/);
+  app.setOnline(false);
+  assert.equal(await (await app.fetch("/nori-icon.svg", { destination: "image" })).text(), "shell:/nori-icon.svg");
+  assert.match(await (await app.fetch(storageUrl(), request)).text(), /network:/);
+  assert.equal(await (await app.fetch(storageUrl("play_302"), request)).text(), "shell:/nori-icon.svg");
+  const cache = await app.caches.open("nori-web-storage-media");
+  assert.equal((await cache.keys()).length, 1);
+});
+
+test("Storage 404·5xx·opaque·비이미지·redirect 응답은 캐시하지 않고 기본 표시 후 재시도한다", async () => {
+  for (const options of [{ status: 404 }, { status: 503 }, { type: "opaque" }, { type: "opaqueredirect" }, { contentType: "text/html" }, { redirected: true }]) {
+    const app = worker("errors", STORAGE);
+    await app.lifecycle("install"); app.setRemote(options);
+    const request = { destination: "image" };
+    assert.equal(await (await app.fetch(storageUrl(), request)).text(), "shell:/nori-icon.svg");
+    const cache = await app.caches.open("nori-web-errors-media");
+    assert.equal((await cache.keys()).length, 0);
+    app.setRemote({});
+    assert.match(await (await app.fetch(storageUrl(), request)).text(), /network:/);
+    assert.equal((await cache.keys()).length, 1);
+  }
+});
+
+test("Storage origin·버킷·객체 경로·요청 모드를 정확히 제한한다", async () => {
+  const app = worker("allowlist", STORAGE);
+  await app.lifecycle("install");
+  for (const url of [
+    storageUrl().replace(STORAGE.origin, "https://other.fixture.invalid"),
+    storageUrl().replace("public-fixture", "private-fixture"),
+    storageUrl().replace("/object/public/", "/object/authenticated/"),
+    storageUrl().replace("detail.webp", "original.jpeg"),
+    storageUrl() + "?token=not-allowed",
+    storageUrl().replace("/play_301/", "/other/"),
+  ]) assert.equal(await app.fetch(url, { destination: "image" }), undefined, url);
+  for (const options of [{ mode: "no-cors" }, { method: "POST" }, { credentials: "include" }, { destination: "script" }]) {
+    assert.equal(await app.fetch(storageUrl(), { destination: "image", ...options }), undefined);
+  }
+  assert.deepEqual(app.fetched, []);
+  const sameOrigin = worker("same-origin", { origin: "http://localhost", bucket: "public-fixture" });
+  assert.equal(await sameOrigin.fetch("/storage/v1/object/authenticated/private-fixture/play_301/original.jpeg", { destination: "image" }), undefined);
+});
+
+test("동시 요청에서도 로컬+Storage 이미지 합계 80개를 유지하고 버전 경로를 별도 캐시한다", async () => {
+  const app = worker("bounded", STORAGE);
+  await app.lifecycle("install");
+  await app.fetch(storageUrl(), { destination: "image" });
+  const next = storageUrl("play_301", "b".repeat(64));
+  assert.match(await (await app.fetch(next, { destination: "image" })).text(), /bbbb/);
+  await Promise.all(Array.from({ length: 90 }, (_, i) => app.fetch(i % 2 ? storageUrl(`play_${400 + i}`) : `/media/thumbs/play_${400 + i}.webp`, { destination: "image" })));
+  const cache = await app.caches.open("nori-web-bounded-media");
+  assert.equal((await cache.keys()).length, 80);
+  assert.equal(await cache.match(storageUrl()), undefined);
+  assert.equal(app.skipped(), false);
+  app.message({ type: "SKIP_WAITING" });
+  assert.equal(app.skipped(), true);
 });
 
 test("이전 워커가 활성 상태여도 새 HTML의 해시 스타일은 이전 CSS와 섞이지 않는다", async () => {
@@ -78,6 +156,21 @@ test("오프라인에서 기존 상세 HTML, 처음 여는 놀이의 앱 셸, �
   assert.equal(await (await app.fetch("/play/play_002", { mode: "navigate" })).text(), "shell:/index.html");
   assert.match(await (await app.fetch("/media/plays/play_001.webp", { destination: "image" })).text(), /network:.*webp/);
   assert.equal((await app.fetch("/media/plays/unseen.webp", { destination: "image" })).type, "error");
+});
+
+test("온라인 설치 직후 앱을 한 번도 열지 않아도 첫 오프라인 기본 화면·설정 셸을 제공한다", async () => {
+  const app = worker("first-offline", STORAGE);
+  await app.lifecycle("install"); await app.lifecycle("activate");
+  assert.deepEqual(app.fetched, []);
+  app.setOnline(false);
+  for (const route of ["/", "/start", "/settings", "/mypage"]) {
+    assert.equal(await (await app.fetch(route, { mode: "navigate" })).text(), "shell:/index.html");
+  }
+  for (const [file, destination] of [["/entry.js", "script"], ["/web.css", "style"], ["/nori-icon.svg", "image"]]) {
+    assert.equal(await (await app.fetch(file, { destination })).text(), `shell:${file}`);
+  }
+  assert.equal(await (await app.fetch(storageUrl(), { destination: "image" })).text(), "shell:/nori-icon.svg");
+  assert.equal((await app.caches.open("nori-web-first-offline-media")).entries.size, 0);
 });
 
 test("서버 장애 시 캐시로 돌아가고 잘못된 놀이의 404는 그대로 유지한다", async () => {

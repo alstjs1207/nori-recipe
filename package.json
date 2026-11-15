@@ -11,6 +11,8 @@
     "web": "node scripts/prepare-web-assets.mjs && expo start --web",
     "prepare:play-images": "tsx scripts/prepare-play-images.ts",
     "check:play-images": "tsx scripts/prepare-play-images.ts --verify-only",
+    "images:storage": "node scripts/migrate-play-images.mjs",
+    "test:play-image-storage": "node --test tests/play-image-storage.test.mjs",
     "check:play-content": "node scripts/validate-play-content.mjs",
     "review:build": "node scripts/build-play-review.mjs",
     "review:prepare": "node scripts/prepare-play-review.mjs",

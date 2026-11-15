@@ -6,6 +6,102 @@
 
 웹 실행, 배포, 분석 설정과 콘텐츠 검수 절차를 정리한 문서입니다.
 
+## 놀이 이미지 이관 도구 — 로컬 구현과 전체 업로드
+
+`images:storage`는 CON-004·CON-005의 관리용 계획·불변 객체 전송·검증 복원 도구입니다. 기본 웹 빌드와 네이티브는 기존 파일을 계속 사용하며, 웹·공유는 아래 공개 매니페스트 설정을 명시한 빌드에서만 전환합니다. 이 도구는 놀이 JSON, 검수 결과, 승인, Git 추적, 버킷 설정과 배포를 변경하지 않습니다. 2026-11-15 별도 사용자 요청으로 3개 파일럿에 이어 원본224개·공개 파생416개 전체 업로드/다운로드 해시 검증을 완료했습니다. 네이티브·Git 추적·배포 전환은 미완료이며 아래 전체 실행 기록과 [파일럿 보고서](openspec/changes/migrate-play-images-to-supabase-storage/evidence/storage-pilot-2026-11-15.md)를 구분합니다.
+
+Node 24/pnpm 10.33.0에서 `pnpm test:play-image-storage`로 실행합니다. 테스트는 임시 Git 저장소·JPEG·디렉터리 객체 저장소와 주입한 가짜 HTTP 응답만 사용합니다. 외부 요청이나 관리자 환경변수는 필요하지 않습니다. `verify:local`에도 같은 회귀가 포함됩니다.
+
+### 계획과 로컬 전송 연습
+
+모든 명령은 **`--write`가 없으면 dry-run**입니다. 계획은 JPEG 전체 디코딩과 체크섬·파생 변환을 메모리에서 검사합니다. 전송/복원 dry-run은 원본과 기존 로컬 관리 파일만 확인하며 객체 다운로드·업로드와 파일 쓰기는 하지 않습니다.
+
+```sh
+# 이미 승인되어 커밋된 live 상태를 명시적인 기준으로 고정합니다.
+# 이 예시의 버킷 이름은 로컬 fixture 이름이며 실제 프로젝트 설정이 아닙니다.
+pnpm images:storage plan --ids play_013 --baseline-ref 5f6f23e25a2b5dd4c902e17d82e1746fe6ef7752 --original-bucket private-fixture --public-bucket public-fixture
+
+# 위 명령에 --write를 붙이면 generated/play-image-storage/admin-plan.json만 기록합니다.
+# 연습용 객체 디렉터리를 만든 뒤, --write 없이 전송 계획만 확인합니다.
+mkdir -p generated/play-image-storage/fixture-objects
+pnpm images:storage migrate --store-dir generated/play-image-storage/fixture-objects
+
+# 로컬 객체 쓰기/해시 재검증은 위 migrate 명령에 --write를 붙여 실행합니다.
+# 복원 대상에 다른 바이트가 있으면 거부하며, 기존 파일을 지우거나 덮어쓰지 않습니다.
+pnpm images:storage restore --ids play_013 --store-dir generated/play-image-storage/fixture-objects
+```
+
+`plan`의 `--ids` 생략 시 현재 놀이 전체를 대상으로 합니다. 공개 후보는 기준 커밋과 **현재 live 상태·내용 해시·원본 바이트가 모두 일치**해야 합니다. 기준 커밋은 기존 게시 결과를 보존하는 신뢰 기준이며, 생성 영수증·임의 JSON·이관 실행을 새 사용자 승인으로 해석하지 않습니다. 변경은 `REVIEW_REQUIRED`로 차단됩니다. 기존 검수 절차로 사용자 검수·반영을 마친 결과가 보존된 기준을 선택해야 하며, 단순히 기준을 바꾸어 재검수를 우회하지 않습니다. 계획의 커밋은 전체 SHA로 고정되고 실행 시 다시 대조합니다.
+
+- `admin-plan.json`: ID·내용 해시·기준 승인 해시·원본/상세/썸네일의 전체 SHA-256·바이트 수·버전 경로·관리 버킷 매핑. 공개 앱에 넣지 않습니다.
+- `state.json`: 대상 저장소 식별 해시, 객체별 완료/다운로드 검증, ID별 실패 코드와 정리 후보. 같은 저장소에서 재실행하면 기존 객체를 읽어 실제 해시를 다시 확인하고 누락된 객체만 생성합니다. 다른 바이트의 동일 경로 객체는 덮어쓰지 않습니다.
+- `public-candidate.json`: 검증 완료한 live ID의 공개 버킷·불변 상세/썸네일 경로·체크섬만 포함합니다. 원본 경로·비공개 버킷·서명 URL·자격 증명은 제외합니다. 명시한 웹 빌드의 입력으로 사용할 수 있으며, 파일 생성만으로 앱이나 배포를 전환하지 않습니다.
+
+기본 경로는 모두 기존 ignore 대상인 `generated/play-image-storage/` 안입니다. `--plan`, `--state`, `--public-manifest`로 이 디렉터리 안의 서로 다른 `.json` 경로를 선택할 수 있습니다. 파일 경로의 심볼릭 링크와 경로 탈출은 거부합니다. 쓰기 실행은 state 잠금 파일을 사용합니다. 비정상 종료로 `.lock`이 남으면 사용 중인 실행이 없는지 확인한 뒤 해당 잠금만 정리하고 재실행합니다. 계획·체크포인트·공개 후보는 원본을 삭제하거나 Git 추적을 제외할 근거가 아닙니다.
+
+부분 실패 시 완료한 객체·원본·기존 정상 후보를 보존하고 CLI는 종료 코드 1을 반환합니다. 해당 ID의 원본·상세·썸네일 다운로드 해시가 모두 맞기 전에는 새 공개 후보를 활성화하지 않습니다. draft/archived/review 전환 및 바이트·내용 변경은 기존 후보에서 제외하고 공개 객체 정리 후보를 생성합니다. 전송 직후 비공개로 바뀐 부분 객체도 포함합니다. **정리 후보는 자동 삭제나 삭제 승인이 아닙니다.** 배포·롤백·다른 참조를 확인하는 별도 단계가 필요합니다.
+
+복원은 비공개 매핑으로 원본을 다운로드해 해시·JPEG 디코딩을 검증한 후 임시 파일에서 배타적으로 생성합니다. 동일 바이트는 재사용하고, 다른 파일·손상·누락·전송 실패는 기존 원본과 완료 결과를 보존합니다. 로컬 검수 UI에 복원을 자동 연결하는 3.2는 아직 미구현입니다.
+
+### 관리 환경변수와 실제 실행 경계
+
+디렉터리 모드는 자격 증명을 읽거나 보내지 않습니다. 환경변수만으로 원격 모드가 켜지지 않으며 `.env`를 자동 로드하지 않습니다. 실제 환경은 승인한 실행 범위에서 `--store-dir` 대신 **`--remote`**를 명시하며, 원격 쓰기는 추가로 `--write`가 필요합니다. fixture 회귀와 실제 파일럿 결과는 구분해 기록합니다.
+
+| 변수 | 용도 |
+| --- | --- |
+| `PLAY_IMAGE_STORAGE_URL` | 승인한 대상 프로젝트의 HTTPS origin. 경로·query·인증 정보는 허용하지 않음 |
+| `PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY` | 신뢰하는 로컬 관리자 실행에만 주입하는 service_role 키. 앱·Git·일반 CI/Vercel·공개 환경변수에 넣지 않음 |
+
+버킷은 계획의 `--original-bucket`, `--public-bucket`으로 명시하며 서로 같을 수 없습니다. 키와 응답 본문은 체크포인트·공개 후보·오류 보고에 기록하지 않습니다. 어댑터는 인증된 객체 GET과 `x-upsert: false`인 생성 POST만 제공합니다. 버킷 생성·RLS/권한 설정·갱신/덮어쓰기·삭제 API는 없습니다. 프로토콜은 [Supabase 공식 Storage SDK의 업로드·다운로드 구현](https://github.com/supabase/storage-js/blob/master/src/packages/StorageFileApi.ts)을 대조했습니다. fixture 성공과 실제 권한/CORS 결과는 별도로 기록합니다.
+
+2026-11-15 확인한 실제 서비스 자산 origin은 `https://clqthwgsmumiwnnqjtbe.supabase.co`입니다. 비공개 `play-originals`는 JPEG, 공개 `play-assets`는 WebP만 받으며 각각16MiB 제한입니다. 앱용 anon 키나 쓰기 정책은 추가하지 않았습니다. 파일럿은 승인된 `play_006`, `play_013`, `play_076`만 포함합니다. 관리 계획·state·공개 후보와 생성 웹은 `generated/play-image-storage/live-clqthwgsmumiwnnqjtbe/`에 있습니다. 이 3개 후보를 전체224개 데이터의 빌드에 지정하면 나머지 필수 자산 누락으로 실패하는 것이 정상입니다. 사용자 확인용 3개 희소 fixture에서만 연결했으며 원본 데이터·기본 빌드·Vercel 변수는 전환하지 않았습니다.
+
+### 웹·공유·PWA의 공개 매니페스트 연결 — 로컬 fixture 검증
+
+`pnpm build:web`은 다음 세 값을 **모두 명시한 경우에만** 공개 이미지 모드를 사용합니다. 기본값은 기존 로컬 이미지입니다. 아래 예시는 로컬 fixture 전용이며 실제 Storage 설정·업로드·배포 명령이 아닙니다.
+
+```sh
+PLAY_IMAGE_PUBLIC_MANIFEST=/path/to/fixture/public-candidate.json \
+PLAY_IMAGE_PUBLIC_ORIGIN=http://127.0.0.1:4501 \
+PLAY_IMAGE_PUBLIC_BUCKET=public-fixture \
+PLAY_IMAGE_PUBLIC_ASSET_DIR=/path/to/fixture/public-assets \
+PUBLIC_ORIGIN=http://127.0.0.1:4500 \
+pnpm build:web
+```
+
+| 빌드 변수 | 역할 |
+| --- | --- |
+| `PLAY_IMAGE_PUBLIC_MANIFEST` | 관리용 계획이 아닌 공개 후보 JSON의 로컬 파일 경로 |
+| `PLAY_IMAGE_PUBLIC_ORIGIN` | 명시적으로 허용할 공개 이미지 origin. HTTPS 또는 localhost/loopback HTTP만 허용 |
+| `PLAY_IMAGE_PUBLIC_BUCKET` | 공개 후보와 일치해야 하는 공개 버킷 이름. 경로·와일드카드는 허용하지 않음 |
+| `PLAY_IMAGE_PUBLIC_ASSET_DIR` | 선택 사항. `<버킷>/<ID>/<버전>/detail.webp`·`thumbnail.webp`가 있는 공개 자산 디렉터리. 지정하면 네트워크를 사용하지 않음 |
+
+관리자 키·비공개 버킷 매핑·놀이 원본 JPEG는 공개 빌드에 필요하지 않으며 읽지 않습니다. 공개 후보의 원본/파생 해시와 버전 경로 결합, 현재 내용 해시를 대조하고, **모든 live·검토 제외 ID의 상세/썸네일 바이트**를 검증합니다. 필수 후보·파일 누락, 잘못된 SHA-256/바이트 수, 손상 WebP는 빌드를 실패시킵니다. draft/archived/review는 필수 목록에서 제외하고 기존 기본 표시를 유지합니다. 런타임의 잘못된 ID 기본 표시와 빌드 입력 누락 실패를 구분합니다. 현재 로컬 원본을 새 승인 기준으로 삼지 않고 마지막 승인된 공개 매니페스트를 사용합니다. 변경 이미지의 승인/후보 생성은 기존 1.3 도구·사용자 검수 단계의 책임입니다.
+
+`PLAY_IMAGE_PUBLIC_ASSET_DIR`을 지정한 경우 파일이 없거나 손상돼도 HTTP로 우회하지 않습니다. CI의 공개 자산 artifact/cache를 이 경로에 복원해 재검증할 수 있습니다. 이 변수 없이 공개 모드를 명시하면 허용된 공개 URL에 인증 없는 GET(`credentials: omit`, redirect 금지)으로 내려받아 검증합니다. 원본·서명 URL·관리자 SDK로 대체하지 않습니다. 응답 본문은 오류 보고에 넣지 않고, 자산당 16MiB 상한·상세 960px 이내/썸네일 320px 이내의 단일 WebP 디코딩을 검사합니다. 이번 로컬 fixture 실행에서는 실제 Storage GET도 실행하지 않았습니다.
+
+### 원본 없는 웹 빌드·실패 보존과 CI/Vercel 경계
+
+공개 모드의 놀이 이미지는 원본 변환 단계를 건너뛰며 `playImageVersions.json`과 로컬 `public/media/plays`·`thumbs`를 수정하지 않습니다. 재료·온보딩·브랜드 이미지는 이관 대상이 아니므로 기존 저장소 자산을 계속 사용합니다. 새 출력에는 예전 로컬 놀이 WebP 경로를 포함하지 않고 검증된 공개 URL을 사용합니다. 원본 JPEG·Git 추적·네이티브 매핑은 변경하지 않습니다.
+
+`build:web`은 전체 준비·Expo export·공유/소개·PWA 후처리를 `generated/web-build-*/next`에서 끝낸 뒤 성공한 출력만 `dist`로 교체합니다. 필수 자산 오류·export·후처리 실패는 기존 `dist`를 보존합니다. 출력 교체가 실패하면 직전 출력을 복원하며, 복원까지 실패한 경우에는 직전 출력의 정확한 보존 경로를 오류로 남기고 해당 폴더를 지우지 않습니다. 그 경우 경로/사용 중인 실행을 확인해 복구해야 합니다. 일반 실패의 임시 출력과 잠금은 정리합니다. 이는 로컬 출력 보존이며 운영 배포의 무중단/자동 롤백을 보장하는 실행 증거가 아닙니다.
+
+공개 모드 export는 dotenv를 비활성화하고, child 환경에서 `PLAY_IMAGE_*`, `SUPABASE`·`SERVICE_ROLE`을 포함한 관리자 관련 변수를 제외합니다. GA4의 기존 환경·운영 origin·동의 정책은 유지합니다. 공개 빌드에 관리자 키를 설정하지 않습니다.
+
+현재 CI(`policy-checks.yml`)는 Node 24/pnpm 10.33.0에서 `verify:local`을 실행합니다. 그 안의 웹 회귀는 `.git`·`images/plays`·관리자 환경변수가 없는 소스 fixture에서 실제 전체 앱 Expo export도 실행하며, 원본 복원은 수행하지 않습니다. top-level 기본 빌드는 기존 로컬 이미지 모드를 유지합니다. Vercel은 여전히 `pnpm build:web`/`dist`를 사용하며, 향후 승인된 공개 배포로 전환할 때 세 공개 설정과 매니페스트 파일을 공급해야 합니다. 자산 디렉터리를 공급한다면 공개 artifact/cache만 사용합니다. 일반 CI/Vercel에 원본이나 관리자 키를 주지 않습니다. 이번에 원격 CI 실행·Vercel 변수·배포/롤백은 변경하거나 검증하지 않았습니다.
+
+`node --test tests/web-build.test.mjs`는 필수 누락·손상·전송 오류·export/후처리/교체 실패·복원 실패 보존을 검사합니다. 실제 export fixture는 앱/소스/설정과 기존 공용 자산만 준비하고 놀이 원본·Git·사용자 기록은 복사하지 않습니다. 합성 공개 WebP를 해시 검증한 뒤 관리자 키·외부 요청 없이 빌드하고 임시 소스 fixture를 제거합니다. 공개 이미지 모드의 성공은 Storage 업로드·실환경 접근 권한·운영 배포 완료를 뜻하지 않습니다.
+
+Expo export 동안 정제한 공개 URL 스냅샷만 `src/constants/playImageWebManifest.json`에 주입하고 정상 종료·예외 모두 기존 파일로 복원합니다. 같은 스냅샷을 웹 화면·공유 OG·소개 페이지가 사용합니다. 강제 프로세스 종료 때는 잠금 소유 실행이 끝났는지 확인하고 이 파일을 기본 설정(`{"schemaVersion":1,"storage":null,"entries":{}}`)으로 복원한 뒤 재실행합니다. `pnpm web`의 개발 서버는 기본 로컬 이미지 모드이며 Storage 연결 검증은 위 빌드와 정적 서버로 수행합니다.
+
+공유 canonical과 OG 페이지 주소는 기존 `PUBLIC_ORIGIN`/`VERCEL_URL` 규칙을 유지하고, Storage 이미지의 절대 URL은 사이트 origin으로 치환하지 않습니다. Preview에서는 운영 `PUBLIC_ORIGIN`을 비워 `VERCEL_URL`을 사용하고 Production에서만 운영 값을 사용합니다. 실제 CI/Vercel 변수는 이 로컬 작업에서 변경하지 않습니다.
+
+웹 놀이 이미지는 `crossOrigin="anonymous"`로 요청하고 실패하면 기본 아이콘을 표시합니다. 서비스 워커는 지정 origin·공개 버킷의 `<playId>/<64자리 버전>/detail.webp`·`thumbnail.webp` CORS 이미지 GET만 추가 캐시합니다. 원본·서명/인증 경로·다른 버킷·무관한 origin·query가 있는 URL·opaque·오류·비이미지·redirect 응답은 정상 Storage 캐시로 넣지 않습니다. 실패 대체 이미지를 원격 URL의 정상 캐시로 기록하지 않아 다음 요청에서 재시도할 수 있습니다.
+
+서비스 워커가 활성화된 뒤 방문한 캐시 이미지는 오프라인에서 표시하며, 미방문/누락 이미지는 기본 표시합니다. 앱 셸에 기본 아이콘을 포함하고 본문·찜·기록 흐름을 유지합니다. 로컬+Storage 미디어 합계 **80개**와 사용자가 선택하는 새 버전 적용을 유지합니다. 첫 서비스 워커가 제어권을 얻기 전에 로드된 이미지는 제어 후 재방문에서 캐시될 수 있으며, 모든 미방문 이미지의 오프라인 제공은 보장하지 않습니다.
+
+`pnpm test:web`, `pnpm test`, `pnpm typecheck`로 URL/공유/캐시 회귀를 확인합니다. `verify:local`은 외부 공개 이미지 빌드 변수를 비우고 기본 로컬 모드로 전체 회귀를 실행합니다. 현재 검증은 fixture·localhost 브라우저 기준이며 실제 Supabase 공개 접근·CORS·공유 봇 및 운영 HTTPS 배포 검증은 미완료입니다. 원본 JPEG와 네이티브 정적 참조는 유지합니다.
+
 ## 웹과 PWA 실행
 
 기존 iOS/Android 앱과 같은 추천 엔진·데이터를 사용하는 모바일 웹을 제공합니다. 웹 첫 방문에서는 아이 생년월을 입력하면 추천을 볼 수 있고, `/play/play_001` 형태의 놀이 링크는 온보딩 없이 열립니다. 상세 화면에서 링크를 공유하거나 복사할 수 있습니다.
@@ -346,3 +442,40 @@ JSON 가져오기는 기록만 저장합니다. 스킬/CLI로 파일을 수정�
 저장소 복제 후 `pnpm check:play-images`로 이미지 누락을 확인하고 `pnpm build:web`으로 웹용 WebP 이미지·썸네일·아이콘과 PWA 빌드 결과를 생성합니다. 데이터 백업, 수집 결과, 로컬 설정과 생성된 빌드 파일은 기존 제외 규칙으로 관리합니다.
 
 이미지를 교체할 때는 선택적으로 `pnpm prepare:play-images /path/to/source/images/plays`를 사용할 수 있습니다. 변경된 이미지는 소스 파일과 함께 커밋합니다. EAS Build에도 같은 이미지와 두 데이터 파일이 포함됩니다.
+
+### 2026-11-15 전체 업로드 결과와 공개 빌드 입력
+
+[전체 보고서](openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-upload-2026-11-15.md)에 원본224개·공개208개 놀이/416개 파일, 총640개 객체의 다운로드 해시·원본 익명 차단·공개 익명/CORS 검증 결과를 기록했습니다. 원본·기존 앱 참조·Git 추적·루트 dist는 유지합니다. 이전의3개 파일럿 후보는 당시 부분 입력이며 아래 전체 공개 매니페스트가 전체 데이터의 빌드 입력입니다.
+
+```sh
+PLAY_IMAGE_PUBLIC_MANIFEST=openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-public-manifest-2026-11-15.json \
+PLAY_IMAGE_PUBLIC_ORIGIN=https://clqthwgsmumiwnnqjtbe.supabase.co \
+PLAY_IMAGE_PUBLIC_BUCKET=play-assets \
+pnpm build:web
+```
+
+위 명령은 관리자 키 없이416개를 익명 검증하고 로컬 dist를 만드는 공개 모드 예시입니다. 실제 확인은 원본 JPEG/키 없는 별도 희소 소스 fixture에서 수행해 원본 프로젝트의 dist를 교체하지 않았습니다. 확인용 생성 웹은 `generated/play-image-storage/full-clqthwgsmumiwnnqjtbe-2026-11-15/web`이며 `createWebServer({directory: <생성 웹>})`로 localhost:4188에서 제공합니다. 사용자 확인을 위해 서버와 결과 탭을 유지합니다. 전체 월령 탐색에서208개를 볼 수 있으며 사용자 월령 설정은 바꾸지 않습니다.
+
+관리 계획·state·직전 정상 후보는 같은 generated 실행 디렉터리에 보존합니다. 관리자 키를 파일에 저장하지 않으며, 재실행은 같은 계획/state/공개 후보와 `--remote --write`를 사용합니다. 기존 버전 삭제·원본 Git 추적 제외·기본 빌드/Vercel/네이티브 전환은 수행하지 않았습니다. 공유 봇·실기기/네이티브 검증은 남아 있습니다.
+
+### 웹 전용·첫 오프라인 기본 화면과 공유 검사 — 2026-11-15
+
+사용자 요청으로 이번 이관의 네이티브 빌드/번들 전환을 제외합니다. 기존 네이티브 코드·이미지 매핑은 유지합니다. 온라인에서 기본 화면 준비를 마친 뒤 처음 오프라인으로 열어도 홈·설정·이용 안내를 표시하는 범위를 검증했습니다. 설치 안내에서 준비 중/기본 화면 준비 완료/실패를 구분하며, 첫 셸 설치 실패는 완료로 표시하지 않습니다. 이미 활성화된 셸은 오프라인 재등록 실패에서도 유지하고 새 버전은 선택 적용합니다.
+
+전체 놀이 이미지 선저장은 추가하지 않았습니다. 방문 미디어80개 제한·미방문 이미지 기본 표시를 유지하고 환영 그림도 실패하면 캐시된 기본 아이콘을 표시합니다. 브라우저가 사이트 데이터/캐시를 삭제한 경우 온라인에서 다시 준비해야 합니다. 최초 준비 전의 인터넷 없는 첫 방문을 보장하지 않습니다.
+
+로컬 공유 검사는 JavaScript 실행 없이 HTML의 OG/canonical을 읽고 실제 공개 이미지의 무인증 GET·해시와 제외 ID의404를 검사합니다. User-Agent 요청 검사는 해당 소셜 서비스가 실제로 수집/표시한 증거가 아닙니다. 카카오 실제 확인은 [공식 URL 메타정보 도구](https://developers.kakao.com/tool/debugger/sharing)에 로그인하고 승인한 외부 HTTPS 페이지를 조회해야 합니다. 외부 배포·메타정보 초기화·메시지 발송은 이번에 실행하지 않았습니다.
+
+[실행 보고서](openspec/changes/migrate-play-images-to-supabase-storage/evidence/web-basic-offline-2026-11-15.md)와 JSON에 첫 오프라인 브라우저/fixture 및 공유 HTTP 결과를 구분해 기록합니다.
+
+### Preview 공개 이미지 배포 설정 — 2026-11-15
+
+후속 사용자 승인으로 nori-recipe 프로젝트의 **Preview 환경에만** 아래 Config 변수를 설정했습니다. 관리자 키 없이 전체 공개416개 자산을 검증하는 배포 빌드를 사용합니다.
+
+| Preview 변수 | 값 |
+| --- | --- |
+| `PLAY_IMAGE_PUBLIC_MANIFEST` | `openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-public-manifest-2026-11-15.json` |
+| `PLAY_IMAGE_PUBLIC_ORIGIN` | `https://clqthwgsmumiwnnqjtbe.supabase.co` |
+| `PLAY_IMAGE_PUBLIC_BUCKET` | `play-assets` |
+
+Production의 기존 PUBLIC_ORIGIN/GA4 설정은 유지하고 Preview는 VERCEL_URL을 canonical/OG 페이지 주소로 사용합니다. System Environment Variables 접근은 기존 활성 상태입니다. Preview의 실제 배포 URL·커밋·Ready/CI 결과는 해당 Vercel/GitHub 배포 기록과 이번 실행 결과에서 확인합니다. 실제 카카오 미리보기는 별도 로그인 후 확인 전까지 완료로 표시하지 않습니다.

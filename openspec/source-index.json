@@ -521,6 +521,36 @@
       ]
     },
     {
+      "path": "scripts/migrate-play-images.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/play-image-storage/files.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/play-image-storage/manifest.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/play-image-storage/migration.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/play-image-storage/stores.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "scripts/prepare-material-images.mjs",
       "domains": [
         "content-review"
@@ -666,6 +696,12 @@
       ]
     },
     {
+      "path": "scripts/web/build-output.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "scripts/web/html.mjs",
       "domains": [
         "web-platform"
@@ -673,6 +709,18 @@
     },
     {
       "path": "scripts/web/intro.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/web/play-images.mjs",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/web/public-image-assets.mjs",
       "domains": [
         "web-platform"
       ]
@@ -834,6 +882,12 @@
       ]
     },
     {
+      "path": "src/components/web/PlayImage.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/components/web/PlayWebActions.tsx",
       "domains": [
         "web-platform"
@@ -966,6 +1020,13 @@
       ]
     },
     {
+      "path": "src/constants/playImageManifest.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
       "path": "src/constants/playImageUrls.ts",
       "domains": [
         "catalog",
@@ -974,6 +1035,13 @@
     },
     {
       "path": "src/constants/playImageVersions.json",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/playImageWebManifest.json",
       "domains": [
         "catalog",
         "content-review"
@@ -1350,6 +1418,12 @@
       ]
     },
     {
+      "path": "tests/play-image-storage.test.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "tests/play-review.test.mjs",
       "domains": [
         "content-review"
@@ -1365,6 +1439,14 @@
       "path": "tests/spec-tools.test.mjs",
       "domains": [
         "spec-governance"
+      ]
+    },
+    {
+      "path": "tests/web-build.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
       ]
     },
     {
@@ -1385,6 +1467,22 @@
     },
     {
       "path": "tests/web-offline.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tests/web-play-images.test.mjs",
+      "domains": [
+        "catalog",
+        "privacy",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "tests/web-pwa-lifecycle.test.mjs",
       "domains": [
         "catalog",
         "privacy",

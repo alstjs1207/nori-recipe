@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 // No publication, content approval, real Codex requests or analytics transmission.
 export const commands = [
   "spec:check", "test:spec-tools", "check:play-content", "check:play-images",
-  "test", "test:play-review", "test:local-review", "test:web", "typecheck", "build:web",
+  "test", "test:play-review", "test:play-image-storage", "test:local-review", "test:web", "typecheck", "build:web",
 ];
 export function verificationEnvironment(command, inherited = process.env) {
   const env = {
@@ -14,6 +14,8 @@ export function verificationEnvironment(command, inherited = process.env) {
     EXPO_PUBLIC_GA_ENABLED: "false", EXPO_PUBLIC_GA_MEASUREMENT_ID: "",
     EXPO_PUBLIC_ANALYTICS_ORIGIN: "", EXPO_PUBLIC_ANALYTICS_PREVIEW: "false",
     VERCEL: "", VERCEL_ENV: "", VERCEL_URL: "", VERCEL_PROJECT_PRODUCTION_URL: "",
+    PLAY_IMAGE_PUBLIC_MANIFEST: "", PLAY_IMAGE_PUBLIC_ORIGIN: "", PLAY_IMAGE_PUBLIC_BUCKET: "",
+    PLAY_IMAGE_PUBLIC_ASSET_DIR: "",
   };
   // The local server distinguishes an absent origin from an empty origin.
   delete env.PUBLIC_ORIGIN;

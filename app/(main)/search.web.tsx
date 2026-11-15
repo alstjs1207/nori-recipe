@@ -1,3 +1,4 @@
+import { PlayImage } from "@/components/web/PlayImage.web";
 import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
@@ -363,7 +364,7 @@ export default function SearchWebScreen() {
             {results.map((play) => (
               <article className="search-result" key={play.id}>
                 <Link href={`/play/${play.id}`} className="search-result-link" onPress={() => rememberPlayEntry(play.id, "search")}>
-                  <img
+                  <PlayImage
                     src={getPlayImageUrl(play.id, "thumbnail")}
                     alt=""
                     loading="lazy"

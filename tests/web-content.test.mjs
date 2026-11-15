@@ -9,6 +9,8 @@ import { validatePlayBundle } from "../scripts/validate-play-content.mjs";
 import { removeUnpublishedImages, writePlayImages, writeMaterialImage, writeWelcomeImage } from "../scripts/prepare-web-assets.mjs";
 import { resolvePublicOrigin, withSiteMetadata, withPlayMetadata, withPublicOrigin } from "../scripts/web/html.mjs";
 
+import { localWebImages } from "../src/constants/playImageManifest.ts";
+
 const bundle = JSON.parse(await fs.readFile(new URL("../data/plays.json", import.meta.url), "utf8"));
 const registry = JSON.parse(await fs.readFile(new URL("../data/materials.json", import.meta.url), "utf8"));
 function fixture(overrides) {
@@ -60,7 +62,7 @@ test("시작 전 준비 조건은 비어 있지 않은 문자열 배열로 검�
 });
 
 test("공유 이미지에도 교체한 그림의 버전 주소를 사용한다", () => {
-  const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), localWebImages(bundle.plays, { play_006: "123456abcdef" }));
   assert.ok(html.includes('property="og:image" content="__NORI_ORIGIN__/media/plays/play_006.webp?v=123456abcdef"'));
 });
 
@@ -81,7 +83,7 @@ test("메인 공유 이미지는 공개된 1200×630 JPEG이며 운영·미리�
 });
 
 test("놀이 상세는 메인 공유 정보를 중복 없이 해당 놀이 이미지로 대체한다", () => {
-  const html = withPlayMetadata(withPublicOrigin(withSiteMetadata('<head><title>노리</title></head>'), "https://www.nori-recipe.com"), bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  const html = withPlayMetadata(withPublicOrigin(withSiteMetadata('<head><title>노리</title></head>'), "https://www.nori-recipe.com"), bundle.plays.find((play) => play.id === "play_006"), localWebImages(bundle.plays, { play_006: "123456abcdef" }));
   assert.equal((html.match(/property="og:image"/g) ?? []).length, 1);
   assert.equal((html.match(/name="twitter:image"/g) ?? []).length, 1);
   assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1);
@@ -97,7 +99,7 @@ test("Vercel 정적 HTML의 공유 주소는 운영 도메인과 미리보기 �
   assert.equal(resolvePublicOrigin({ ...env, PUBLIC_ORIGIN: "https://custom.example.com/" }), "https://custom.example.com");
   assert.equal(resolvePublicOrigin({ VERCEL: "1", VERCEL_ENV: "production", VERCEL_URL: "nori.vercel.app" }), "https://nori.vercel.app");
   assert.equal(resolvePublicOrigin({}), null);
-  const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), "123456abcdef");
+  const html = withPlayMetadata("<head><title>노리</title></head>", bundle.plays.find((play) => play.id === "play_006"), localWebImages(bundle.plays, { play_006: "123456abcdef" }));
   const deployed = withPublicOrigin(html, resolvePublicOrigin({ ...env, VERCEL_ENV: "production" }));
   assert.ok(deployed.includes('href="https://nori.example.com/play/play_006"'));
   assert.ok(deployed.includes('content="https://nori.example.com/media/plays/play_006.webp?v=123456abcdef"'));

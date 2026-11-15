@@ -1,3 +1,4 @@
+import { PlayImage } from "@/components/web/PlayImage.web";
 import { WebPage } from "@/components/web/NoriUI";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import {
@@ -135,7 +136,7 @@ export default function PlayDetailWebScreen() {
         <article className="nori-page detail-page">
           <div className="detail-overview">
             <div className="detail-art">
-              <img
+              <PlayImage
                 src={getPlayImageUrl(play.id)}
                 alt={`${play.name} 놀이 일러스트`}
                 fetchPriority="high"

@@ -1,5 +1,6 @@
 import { WebPage } from "./NoriUI";
 import { getWelcomeImageUrl } from "@/constants/welcomeImageUrl";
+import { PlayImage } from "./PlayImage.web";
 import { BirthMonthField } from "./BirthMonthField";
 import { useState } from "react";
 import { Link, router } from "expo-router";
@@ -72,7 +73,7 @@ export function WebWelcome() {
               <br className="mobile-only" /> 놀이를 만나보세요.
             </p>
             <div className="welcome-art">
-              <img
+              <PlayImage
                 src={getWelcomeImageUrl()}
                 alt="엄마와 남자아이가 종이컵과 크레용으로 함께 노는 모습"
                 fetchPriority="high"

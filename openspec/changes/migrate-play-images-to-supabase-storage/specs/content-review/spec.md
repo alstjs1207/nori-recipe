@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: CON-004 놀이 이미지의 비공개 원본과 공개 서비스 자산
 
@@ -18,6 +18,11 @@
 
 - **WHEN** 놀이가 draft·archived이거나 이미지가 review 상태다
 - **THEN** 신규 공개 이미지 게시와 앱의 해당 이미지 참조를 제외하고 기존 기본 표시 정책을 유지한다. 원본을 업로드한 사실만으로 승인·live 상태를 바꾸지 않는다.
+
+#### Scenario: 관리 경계
+
+- **WHEN** 관리 도구를 기본 옵션 또는 디렉터리 fixture 모드로 실행한다
+- **THEN** 기본 dry-run은 객체와 파일을 쓰지 않고 환경변수만으로 원격 접속을 활성화하지 않으며, 공개 후보에 원본 접근 정보와 자격 증명을 포함하지 않는다.
 
 ### Requirement: CON-005 놀이 이미지 이관의 무결성과 검수 호환성
 

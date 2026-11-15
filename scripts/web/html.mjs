@@ -1,3 +1,4 @@
+import { DEFAULT_PLAY_IMAGE, DEFAULT_PLAY_SHARE_IMAGE, playImageUrl, publicPlayImage } from "../../src/constants/playImageManifest.ts";
 export function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 }
@@ -46,11 +47,12 @@ export function withSiteMetadata(html) {
   });
 }
 
-export function withPlayMetadata(html, play, imageVersion) {
+export function withPlayMetadata(html, play, manifest) {
   const title = escapeHtml(`${play.name} · 노리 레시피`);
   const description = escapeHtml(`${play.ageMin}~${play.ageMax}개월 · 준비 ${play.prepTime}분 · ${play.steps[0] ?? "아이와 함께 해보는 놀이"}`);
   const url = `__NORI_ORIGIN__/play/${encodeURIComponent(play.id)}`;
-  const image = `__NORI_ORIGIN__/media/plays/${encodeURIComponent(play.id)}.webp${imageVersion ? `?v=${encodeURIComponent(imageVersion)}` : ""}`;
+  const candidate = publicPlayImage(play) ? playImageUrl(manifest, play.id) : DEFAULT_PLAY_IMAGE;
+  const image = escapeHtml(candidate === DEFAULT_PLAY_IMAGE ? `__NORI_ORIGIN__${DEFAULT_PLAY_SHARE_IMAGE}` : candidate.startsWith("/") ? `__NORI_ORIGIN__${candidate}` : candidate);
   return withShareMetadata(html.replace(/<title>[^<]*<\/title>/, () => `<title>${title}</title>`)
     .replace(/<meta name="description"[^>]*\/>/, () => `<meta name="description" content="${description}" />`),
   { title, description, url, image, type: "article" });

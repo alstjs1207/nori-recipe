@@ -6,10 +6,10 @@
 
 ## What Changes
 
-- 상태: **작업 예정·미착수**. 2026-11-14 사용자 요청에 따른 OpenSpec 계획 등록이며, 프로젝트·버킷 생성이나 업로드·코드 변경을 이번에 실행하지 않는다.
+- 상태: **부분 구현·전체 업로드 검증**. 2026-11-14 계획 등록 뒤 2026-11-15 로컬 도구·웹·공유·PWA·공개 자산 빌드를 구현했다. 후속 사용자 요청으로 지정 프로젝트의 버킷/접근 제어를 확인하고 원본 224개·승인된 live 208개의 파생 이미지 416개를 실제 업로드·다운로드 해시 검증했다. 기존 원본·데이터·참조는 유지한다. 네이티브는 후속 사용자 요청으로 제외한다. 온라인 준비 후 PWA의 첫 오프라인 기본 화면/안내와 공유 미리보기를 확인하며 Git 추적 제외·배포와 나머지 실환경 검증은 미완료다.
 - 놀이 대표 이미지에 한해 Supabase 프로젝트 하나의 Storage를 사용한다. 원본은 비공개 버킷, 승인된 서비스용 상세·썸네일은 공개 버킷으로 분리한다. 공개 이미지는 다운로드 가능하며 복사 방지를 보장하지 않는다.
 - 기존 놀이 ID·원본 해시·검수 승인과 연결한 버전 매니페스트를 Git에서 관리한다. 같은 경로를 덮어쓰는 대신 내용 버전별 경로로 이미지 교체를 구분한다.
-- 업로드·무결성 및 접근 권한 검증 → 웹·공유 이미지·PWA·네이티브 연결 검증 → Git의 놀이 이미지 추적 제외 순서로 전환한다. 네이티브에는 원본 대신 승인된 서비스용 이미지를 빌드 시 준비해 기존 번들 이미지의 오프라인 이용을 보존한다.
+- 업로드·무결성 및 접근 권한 검증 → 웹·공유 이미지·기본 PWA 오프라인 검증 → Git의 놀이 이미지 추적 제외 순서로 전환한다. 온라인에서 셸 준비를 마친 뒤 첫 오프라인 기본 화면/안내를 제공하며 전체 이미지 선저장은 요구하지 않는다. 기존 방문 이미지80개·선택 업데이트를 유지한다.
 - 로컬 검수용 원본은 유지하고 새 checkout에서도 필요한 자산을 복원할 절차를 제공한다. 기존 검수·생성·승인 도구는 원본 해시를 계속 사용한다.
 - 놀이·재료 JSON, 게스트 ID, SQLite/AsyncStorage, 찜·놀이 기록, GA4 동의·전송 정책은 유지한다. DB 이관·로그인·동기화는 `plan-account-sync`의 별도 후속 계획으로 남긴다.
 - 이번 이관 대상은 `images/plays/`의 놀이 대표 이미지다. 재료·온보딩·로고·아이콘 이관, 워터마크 도입, 과거 Git 이력 재작성은 포함하지 않는다.
@@ -27,7 +27,7 @@
 
 ## Impact
 
-- `images/plays/`, `.gitignore`, `src/constants/playImages.ts`, `playImages.web.ts`, `playImageUrls.ts`, `playImageVersions.json` 및 새 자산 매니페스트·동기화 도구.
+- `images/plays/`, `.gitignore`, `playImages.web.ts`, `playImageUrls.ts`, `playImageVersions.json` 및 새 자산 매니페스트·동기화 도구.
 - `scripts/prepare-play-images.ts`, `scripts/prepare-web-assets.mjs`, `scripts/build-web.mjs`, `scripts/web/html.mjs`, `scripts/web/service-worker.mjs`: 빌드 입력·원격 URL·공유 이미지·다른 origin의 이미지 캐시 대응.
 - `scripts/review/`, 이미지 준비·승인 스크립트와 `tools/local-review/`: 원본 복원과 해시 검증, 승인된 서비스용 이미지 게시 연결.
 - `DEVELOPMENT.md`, CI/Vercel 설정, 이미지·웹·검수 회귀, 관련 현재 명세·policy-map·source-index는 실제 구현 시 함께 갱신한다.

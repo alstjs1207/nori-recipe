@@ -1,0 +1,213 @@
+{
+  "dateKst": "2026-11-15",
+  "scope": "web only; online preparation then first offline basic screens and help; no all-image precache",
+  "native": "excluded by user, existing source and mapping preserved",
+  "build": {
+    "plays": 208,
+    "reviewImages": 0,
+    "originalMB": 0,
+    "detailMB": 15.36,
+    "thumbnailMB": 2.54,
+    "imageMode": "public",
+    "verifiedPublicAssets": 416,
+    "version": "6c5543aa46ff",
+    "date": "2026-11-15T01:48:42.341Z",
+    "publicAssetsDownloaded": 416,
+    "playJpegsPresent": false,
+    "adminCredentials": false
+  },
+  "browser": {
+    "home": {
+      "online": false,
+      "path": "/",
+      "firstWelcome": true,
+      "monthPrompt": true,
+      "offlineNotice": true,
+      "images": [
+        {
+          "src": "http://127.0.0.1:62397/nori-icon.svg",
+          "width": 150
+        },
+        {
+          "src": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/thumbnail.webp",
+          "width": 320
+        },
+        {
+          "src": "",
+          "width": 0
+        },
+        {
+          "src": "",
+          "width": 0
+        }
+      ],
+      "storageReady": true
+    },
+    "settings": {
+      "online": false,
+      "path": "/settings",
+      "installGuidance": true,
+      "ready": true,
+      "errors": false
+    },
+    "onlinePreparationRoute": "/settings",
+    "homePreviouslyVisited": false,
+    "testServerStopped": true,
+    "pageOfflineEmulation": true,
+    "scope": "basic screens and help only; all images not required",
+    "guidance": {
+      "online": false,
+      "items": [
+        {
+          "title": "기록은 어디에 저장되나요?",
+          "text": "기록은 어디에 저장되나요?\n\n설정, 저장한 놀이, 놀이 기록은 현재 브라우저에 보관돼요. 다른 기기나 브라우저와 자동으로 공유되지 않으며, 브라우저 데이터를 지우면 함께 삭제될 수 있어요."
+        },
+        {
+          "title": "아이에게 맞는 놀이인가요?",
+          "text": "아이에게 맞는 놀이인가요?\n\n월령은 놀이를 고르는 참고 기준이에요. 아이마다 발달과 관심이 다르니 아이의 반응을 살피며 시간을 조절해 주세요. 놀이 전 준비물과 안전 안내를 확인하고 보호자가 가까이에서 함께해 주세요."
+        }
+      ],
+      "ready": true
+    }
+  },
+  "shareHttp": {
+    "date": "2026-11-15T01:50:46.657Z",
+    "verification": "HTTP request simulation; not an actual social-service crawl",
+    "rows": [
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_001",
+        "htmlStatus": 200,
+        "imageStatus": 200,
+        "canonical": "http://127.0.0.1:62397/play/play_001",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_001/15649d9180de2080fd25b7db041cc45085e19ec823c1c459ca51ee9b774a1dbd/detail.webp",
+        "type": "webp",
+        "width": 960,
+        "height": 960,
+        "hashMatches": true
+      },
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_115",
+        "htmlStatus": 200,
+        "imageStatus": 200,
+        "canonical": "http://127.0.0.1:62397/play/play_115",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_115/9ecb0e389496ff0f2dc5844614d19ca1d9a5777ffaacd94a569359785f419a37/detail.webp",
+        "type": "webp",
+        "width": 960,
+        "height": 960,
+        "hashMatches": true
+      },
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_225",
+        "htmlStatus": 200,
+        "imageStatus": 200,
+        "canonical": "http://127.0.0.1:62397/play/play_225",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_225/80b10a1cb46dbe32a2a3774a123fa0f3e8b91df6ffe39020912e5482b578e299/detail.webp",
+        "type": "webp",
+        "width": 960,
+        "height": 960,
+        "hashMatches": true
+      },
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_028",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_054",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_227",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "facebookexternalhit/1.1",
+        "id": "play_999",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_001",
+        "htmlStatus": 200,
+        "imageStatus": 200,
+        "canonical": "http://127.0.0.1:62397/play/play_001",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_001/15649d9180de2080fd25b7db041cc45085e19ec823c1c459ca51ee9b774a1dbd/detail.webp",
+        "type": "webp",
+        "width": 960,
+        "height": 960,
+        "hashMatches": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_115",
+        "htmlStatus": 200,
+        "imageStatus": 200,
+        "canonical": "http://127.0.0.1:62397/play/play_115",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_115/9ecb0e389496ff0f2dc5844614d19ca1d9a5777ffaacd94a569359785f419a37/detail.webp",
+        "type": "webp",
+        "width": 960,
+        "height": 960,
+        "hashMatches": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_225",
+        "htmlStatus": 200,
+        "imageStatus": 200,
+        "canonical": "http://127.0.0.1:62397/play/play_225",
+        "image": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_225/80b10a1cb46dbe32a2a3774a123fa0f3e8b91df6ffe39020912e5482b578e299/detail.webp",
+        "type": "webp",
+        "width": 960,
+        "height": 960,
+        "hashMatches": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_028",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_054",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_227",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      },
+      {
+        "profile": "Twitterbot/1.0",
+        "id": "play_999",
+        "htmlStatus": 404,
+        "publicImageExcluded": true
+      }
+    ],
+    "kakaoActualPreview": "not verified: requires external HTTPS and official-tool login"
+  },
+  "preservation": {
+    "files": 820,
+    "allHashesUnchanged": true
+  },
+  "actualKakaoPreviewVerified": false,
+  "deploymentPerformed": false,
+  "verification": {
+    "node": "24.22.2",
+    "pnpm": "10.33.0",
+    "verifyLocal": "passed",
+    "tests": 255,
+    "strictValidate": "passed"
+  }
+}

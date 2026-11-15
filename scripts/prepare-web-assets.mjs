@@ -3,8 +3,12 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
+import { publicImageInput } from "./web/play-images.mjs";
+import { localWebImages } from "../src/constants/playImageManifest.ts";
+import { verifyPublicImageAssets } from "./web/public-image-assets.mjs";
+import { validatePlayBundle } from "./validate-play-content.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 sharp.concurrency(2);
 
 export async function removeUnpublishedImages(directory, publishedImages) {
@@ -41,15 +45,19 @@ export async function writeWelcomeImage({ source, output }) {
   return crypto.createHash("sha256").update(await fs.readFile(output)).digest("hex").slice(0, 12);
 }
 
-export async function prepareWebAssets() {
+export async function prepareWebAssets({ root = project, env = process.env, fetchImpl = globalThis.fetch } = {}) {
   let bundle;
   try { bundle = JSON.parse(await fs.readFile(path.join(root, "data/plays.json"), "utf8")); }
-  catch { throw new Error("data/plays.json이 필요합니다. 저장소의 놀이 데이터와 images/plays를 확인해 주세요."); }
+  catch { throw new Error("data/plays.json이 필요합니다. 저장소의 놀이 데이터를 확인해 주세요."); }
   const plays = bundle.plays.filter((play) => play.status === "live");
+  const registry = JSON.parse(await fs.readFile(path.join(root, "data/materials.json"), "utf8"));
+  if (validatePlayBundle(bundle, registry).errors.length) throw new Error("Invalid play content for web build");
+  const publicInput = publicImageInput({ plays: bundle.plays, registry, env });
+  const publicReport = publicInput ? await verifyPublicImageAssets(publicInput, { fetchImpl }) : null;
   const output = path.join(root, "public/media");
   await Promise.all(["plays", "thumbs", "materials", "welcome"].map((dir) => fs.mkdir(path.join(output, dir), { recursive: true })));
   const publishedImages = new Set(plays.map((play) => `${play.id}.webp`));
-  for (const dir of ["plays", "thumbs"]) {
+  for (const dir of publicInput ? [] : ["plays", "thumbs"]) {
     await removeUnpublishedImages(path.join(output, dir), publishedImages);
   }
   const icon = path.join(root, "public/nori-icon.svg");
@@ -57,7 +65,7 @@ export async function prepareWebAssets() {
   let detailBytes = 0;
   let thumbnailBytes = 0;
   const playImageVersions = {};
-  const tasks = plays.map((play) => async () => {
+  const tasks = (publicInput ? [] : plays).map((play) => async () => {
     const sizes = await writePlayImages(play, { sourceDirectory: path.join(root, "images/plays"), detailDirectory: path.join(output, "plays"), thumbnailDirectory: path.join(output, "thumbs"), icon });
     originalBytes += sizes.sourceBytes;
     detailBytes += sizes.detailBytes;
@@ -77,7 +85,8 @@ export async function prepareWebAssets() {
   const sortedVersions = Object.fromEntries(Object.entries(materialImageVersions).sort(([a], [b]) => a.localeCompare(b)));
   await fs.writeFile(path.join(root, "src/constants/materialImageVersions.json"), JSON.stringify(sortedVersions, null, 2) + "\n");
   const sortedPlayVersions = Object.fromEntries(Object.entries(playImageVersions).sort(([a], [b]) => a.localeCompare(b)));
-  await fs.writeFile(path.join(root, "src/constants/playImageVersions.json"), JSON.stringify(sortedPlayVersions, null, 2) + "\n");
+  const playImageManifest = publicInput?.manifest ?? localWebImages(bundle.plays, sortedPlayVersions);
+  if (!publicInput) await fs.writeFile(path.join(root, "src/constants/playImageVersions.json"), JSON.stringify(sortedPlayVersions, null, 2) + "\n");
   const welcomeImageVersion = await writeWelcomeImage({
     source: path.join(root, "assets/nori-welcome-hero-boy-20261106-v6.png"),
     output: path.join(output, "welcome/hero.webp"),
@@ -89,9 +98,9 @@ export async function prepareWebAssets() {
   await Promise.all([192, 512].map((size) => sharp(icon).resize(size, size).png().toFile(path.join(icons, `icon-${size}.png`))));
   await sharp(icon).resize(180, 180).png().toFile(path.join(icons, "apple-touch-icon.png"));
   await sharp(icon).resize(384, 384).extend({ top: 64, bottom: 64, left: 64, right: 64, background: "#FAFAFE" }).png().toFile(path.join(icons, "maskable-512.png"));
-  const report = { plays: plays.length, reviewImages: plays.filter((play) => play.imageStatus === "review").length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +(detailBytes / 1e6).toFixed(2), thumbnailMB: +(thumbnailBytes / 1e6).toFixed(2) };
+  const report = { plays: plays.length, reviewImages: plays.filter((play) => play.imageStatus === "review").length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +((publicReport?.detailBytes ?? detailBytes) / 1e6).toFixed(2), thumbnailMB: +((publicReport?.thumbnailBytes ?? thumbnailBytes) / 1e6).toFixed(2), imageMode: publicInput ? "public" : "local", verifiedPublicAssets: publicReport?.verifiedPublicAssets ?? 0 };
   console.info("Web images:", JSON.stringify(report));
-  return { plays, report, playImageVersions: sortedPlayVersions, welcomeImageVersion };
+  return { plays, report, playImageVersions: sortedPlayVersions, playImageManifest, welcomeImageVersion };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

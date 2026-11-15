@@ -1,12 +1,13 @@
 import playImageVersions from "./playImageVersions.json";
+import prepared from "./playImageWebManifest.json";
+import { loadPlaysBundle } from "@/data/content";
+import { playImageUrl, visibleWebImages, type WebImageManifest } from "./playImageManifest";
 
-const versions: Partial<Record<string, string>> = playImageVersions;
+const manifest = visibleWebImages(prepared as WebImageManifest, loadPlaysBundle().plays, playImageVersions);
 
 export function getPlayImageUrl(
   playId: string,
   size: "detail" | "thumbnail" = "detail",
 ): string {
-  const version = versions[playId];
-  const directory = size === "thumbnail" ? "thumbs" : "plays";
-  return `/media/${directory}/${encodeURIComponent(playId)}.webp${version ? `?v=${version}` : ""}`;
+  return playImageUrl(manifest, playId, size);
 }

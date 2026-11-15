@@ -1,3 +1,4 @@
+import { PlayImage } from "@/components/web/PlayImage.web";
 import { Link, useNavigation, usePathname } from "expo-router";
 import {
   useCallback,
@@ -315,7 +316,7 @@ export function PlayCard({
         if (recommendationPosition !== undefined) trackAnalytics({ name: "recommendation_click", params: { play_id: play.id, position: recommendationPosition, is_new: Number(isNewPlay(play.createdAt)) } });
       }}>
         <div className="play-card-art">
-          <img
+          <PlayImage
             src={getPlayImageUrl(play.id, "thumbnail")}
             alt=""
             loading="lazy"

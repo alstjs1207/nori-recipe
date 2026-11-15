@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import sharp from "sharp";
+import { localWebImages, playImageUrl } from "../../src/constants/playImageManifest.ts";
 import { escapeHtml, withPublicOrigin } from "./html.mjs";
 
 // 서비스 소개 페이지(/intro). 숫자는 모두 빌드 시점의 공개 놀이·재료 데이터에서 계산한다.
@@ -296,6 +297,8 @@ function tween(el, from, to, ms){
       var a = document.createElement('a');
       a.className = 'card'; a.href = '/play/' + encodeURIComponent(p.id);
       var img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      img.onerror = () => { img.onerror = null; img.src = '/nori-icon.svg'; };
       img.src = p.thumb; img.alt = ''; img.width = 64; img.height = 64; img.loading = 'lazy';
       var box = document.createElement('div');
       var t = document.createElement('strong'); t.textContent = p.name;
@@ -319,7 +322,7 @@ function tween(el, from, to, ms){
 })();
 `;
 
-export function renderIntroPage({ data, screens, playImageVersions = {}, materialImageVersions = {} }) {
+export function renderIntroPage({ data, screens, playImageVersions = {}, playImageManifest = localWebImages(data.plays.map((play) => ({ id: play.id, status: "live", imageStatus: play.hasImage ? null : "review" })), playImageVersions), materialImageVersions = {} }) {
   const n = (value) => escapeHtml(value.toLocaleString("ko-KR"));
   const ageLabel = `${data.ageMin}–${data.ageMax}개월`;
   // 숫자를 0부터 세어 올리는 표시. 화면 낭독기는 최종 값만 읽고, 스크립트가 없으면 최종 값이 그대로 보인다.
@@ -340,7 +343,7 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, materia
     plays: data.plays.map((play) => ({
       id: play.id, name: play.name, ageMin: play.ageMin, ageMax: play.ageMax, prepTime: play.prepTime,
       durationMin: play.durationMin, durationMax: play.durationMax, required: play.required,
-      thumb: play.hasImage ? versioned(`/media/thumbs/${play.id}.webp`, playImageVersions[play.id]) : "/nori-icon.svg",
+      thumb: play.hasImage ? playImageUrl(playImageManifest, play.id, "thumbnail") : "/nori-icon.svg",
     })),
   };
   const title = "노리 레시피 · 집에 있는 재료로 찾는 오늘의 놀이";
@@ -488,7 +491,7 @@ ${faqs.map(([q, a]) => `<details><summary>${escapeHtml(q)}</summary><p>${escapeH
 }
 
 // 캡처 원본을 내용 해시 이름의 WebP로 변환하고 /intro/index.html을 쓴다.
-export async function writeIntroPage({ root, dist, plays, registry, playImageVersions = {}, materialImageVersions = {}, publicOrigin = null }) {
+export async function writeIntroPage({ root, dist, plays, registry, playImageVersions = {}, playImageManifest, materialImageVersions = {}, publicOrigin = null }) {
   const data = collectIntroData({ plays, registry });
   const mediaDirectory = path.join(dist, "intro", "media");
   await fs.mkdir(mediaDirectory, { recursive: true });
@@ -499,7 +502,7 @@ export async function writeIntroPage({ root, dist, plays, registry, playImageVer
     await fs.writeFile(path.join(mediaDirectory, name), webp);
     screens[key] = { src: `${INTRO_PATH}/media/${name}`, alt: screen.alt };
   }
-  const html = renderIntroPage({ data, screens, playImageVersions, materialImageVersions });
+  const html = renderIntroPage({ data, screens, playImageVersions, playImageManifest, materialImageVersions });
   await fs.writeFile(path.join(dist, "intro", "index.html"), withPublicOrigin(html, publicOrigin));
   return { data, screens, html };
 }
