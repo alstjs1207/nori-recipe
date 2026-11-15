@@ -433,7 +433,8 @@
             "scripts/play-image-storage/manifest.mjs",
             "scripts/play-image-storage/migration.mjs",
             "scripts/play-image-storage/stores.mjs",
-            "scripts/play-image-storage/files.mjs"
+            "scripts/play-image-storage/files.mjs",
+            ".gitignore"
           ],
           "tests": [
             "tests/play-image-storage.test.mjs"
@@ -696,12 +697,15 @@
             "src/constants/playImageUrls.ts",
             "src/constants/playImageWebManifest.json",
             "scripts/web/public-image-assets.mjs",
-            "scripts/web/build-output.mjs"
+            "scripts/web/build-output.mjs",
+            ".gitignore",
+            ".github/workflows/policy-checks.yml"
           ],
           "tests": [
             "tests/web-content.test.mjs",
             "tests/web-play-images.test.mjs",
-            "tests/web-build.test.mjs"
+            "tests/web-build.test.mjs",
+            "tests/spec-tools.test.mjs"
           ],
           "anchors": [
             {
@@ -719,6 +723,10 @@
             {
               "path": "scripts/web/build-output.mjs",
               "contains": "export async function publishWebBuild"
+            },
+            {
+              "path": "scripts/verify-local.mjs",
+              "contains": "export function verificationCommands"
             }
           ]
         },

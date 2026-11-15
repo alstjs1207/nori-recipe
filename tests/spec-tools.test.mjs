@@ -114,3 +114,28 @@ test("local verification isolates build origins from server fixtures and disable
   }
   assert.equal(inherited.PUBLIC_ORIGIN, "https://production.example");
 });
+
+test("public verification replaces only the private-original check and isolates public inputs to the build", async () => {
+  const { verificationEnvironment, verificationCommands, commands } = await import("../scripts/verify-local.mjs");
+  const options = { publicImages: true };
+  const inherited = { PLAY_IMAGE_PUBLIC_MANIFEST: "/fixture/public.json", PLAY_IMAGE_PUBLIC_ORIGIN: "https://storage.fixture.invalid",
+    PLAY_IMAGE_PUBLIC_BUCKET: "public-fixture", PLAY_IMAGE_PUBLIC_ASSET_DIR: "/fixture/assets",
+    PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY: "fixture-private", SUPABASE_SERVICE_ROLE_KEY: "fixture-private",
+    EXPO_PUBLIC_GA_ENABLED: "true", VERCEL_ENV: "production" };
+  assert.deepEqual(verificationCommands(), commands);
+  assert.deepEqual(verificationCommands(options), commands.filter((command) => command !== "check:play-images"));
+  for (const command of commands) {
+    const env = verificationEnvironment(command, inherited, options);
+    for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET", "PLAY_IMAGE_PUBLIC_ASSET_DIR"]) {
+      assert.equal(env[key], command === "build:web" ? inherited[key] : "");
+    }
+    assert.equal(env.PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY, undefined);
+    assert.equal(env.SUPABASE_SERVICE_ROLE_KEY, undefined);
+    assert.equal(env.EXPO_PUBLIC_GA_ENABLED, "false");
+    assert.equal(env.VERCEL_ENV, "");
+  }
+  for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET"]) {
+    assert.throws(() => verificationEnvironment("build:web", { ...inherited, [key]: "" }, options), /requires/);
+  }
+  assert.equal(inherited.PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY, "fixture-private");
+});

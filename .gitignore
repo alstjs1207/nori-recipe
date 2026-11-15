@@ -41,5 +41,8 @@ yarn-error.*
 /public/media/
 /public/icons/
 
+# Play originals stay local; deployed web builds verify public Storage assets.
+/images/plays/
+
 # OpenSpec-generated Claude workflows are project tools.
 !.claude/skills/openspec-*/

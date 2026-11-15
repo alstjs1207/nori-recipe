@@ -8,7 +8,7 @@
 
 ## 놀이 이미지 이관 도구 — 로컬 구현과 전체 업로드
 
-`images:storage`는 CON-004·CON-005의 관리용 계획·불변 객체 전송·검증 복원 도구입니다. 기본 웹 빌드와 네이티브는 기존 파일을 계속 사용하며, 웹·공유는 아래 공개 매니페스트 설정을 명시한 빌드에서만 전환합니다. 이 도구는 놀이 JSON, 검수 결과, 승인, Git 추적, 버킷 설정과 배포를 변경하지 않습니다. 2026-11-15 별도 사용자 요청으로 3개 파일럿에 이어 원본224개·공개 파생416개 전체 업로드/다운로드 해시 검증을 완료했습니다. 네이티브·Git 추적·배포 전환은 미완료이며 아래 전체 실행 기록과 [파일럿 보고서](openspec/changes/migrate-play-images-to-supabase-storage/evidence/storage-pilot-2026-11-15.md)를 구분합니다.
+`images:storage`는 CON-004·CON-005의 관리용 계획·불변 객체 전송·검증 복원 도구입니다. 이 도구 자체는 놀이 JSON, 검수 결과, 승인, Git 추적, 버킷 설정과 배포를 변경하지 않습니다. 원본224개·공개 파생416개의 전체 업로드/다운로드 해시 검증과 공개 이미지 기반 Preview 배포를 완료했습니다. 후속 사용자 요청에 따라 검증된 놀이 원본224개는 로컬에 보존하고 Git 추적에서 제외합니다. 재료·온보딩·브랜드 이미지와 과거 Git 이력은 유지합니다. 네이티브는 사용자 결정으로 제외하며, 아래 단계별 실행 기록은 당시 결과입니다.
 
 Node 24/pnpm 10.33.0에서 `pnpm test:play-image-storage`로 실행합니다. 테스트는 임시 Git 저장소·JPEG·디렉터리 객체 저장소와 주입한 가짜 HTTP 응답만 사용합니다. 외부 요청이나 관리자 환경변수는 필요하지 않습니다. `verify:local`에도 같은 회귀가 포함됩니다.
 
@@ -82,13 +82,13 @@ pnpm build:web
 
 ### 원본 없는 웹 빌드·실패 보존과 CI/Vercel 경계
 
-공개 모드의 놀이 이미지는 원본 변환 단계를 건너뛰며 `playImageVersions.json`과 로컬 `public/media/plays`·`thumbs`를 수정하지 않습니다. 재료·온보딩·브랜드 이미지는 이관 대상이 아니므로 기존 저장소 자산을 계속 사용합니다. 새 출력에는 예전 로컬 놀이 WebP 경로를 포함하지 않고 검증된 공개 URL을 사용합니다. 원본 JPEG·Git 추적·네이티브 매핑은 변경하지 않습니다.
+공개 모드의 놀이 이미지는 원본 변환 단계를 건너뛰며 `playImageVersions.json`과 로컬 `public/media/plays`·`thumbs`를 수정하지 않습니다. 재료·온보딩·브랜드 이미지는 이관 대상이 아니므로 기존 저장소 자산을 계속 사용합니다. 새 출력에는 예전 로컬 놀이 WebP 경로를 포함하지 않고 검증된 공개 URL을 사용합니다. 원본 JPEG의 로컬 바이트와 네이티브 매핑은 유지하며, 놀이 원본의 Git 추적은 제외합니다.
 
 `build:web`은 전체 준비·Expo export·공유/소개·PWA 후처리를 `generated/web-build-*/next`에서 끝낸 뒤 성공한 출력만 `dist`로 교체합니다. 필수 자산 오류·export·후처리 실패는 기존 `dist`를 보존합니다. 출력 교체가 실패하면 직전 출력을 복원하며, 복원까지 실패한 경우에는 직전 출력의 정확한 보존 경로를 오류로 남기고 해당 폴더를 지우지 않습니다. 그 경우 경로/사용 중인 실행을 확인해 복구해야 합니다. 일반 실패의 임시 출력과 잠금은 정리합니다. 이는 로컬 출력 보존이며 운영 배포의 무중단/자동 롤백을 보장하는 실행 증거가 아닙니다.
 
 공개 모드 export는 dotenv를 비활성화하고, child 환경에서 `PLAY_IMAGE_*`, `SUPABASE`·`SERVICE_ROLE`을 포함한 관리자 관련 변수를 제외합니다. GA4의 기존 환경·운영 origin·동의 정책은 유지합니다. 공개 빌드에 관리자 키를 설정하지 않습니다.
 
-현재 CI(`policy-checks.yml`)는 Node 24/pnpm 10.33.0에서 `verify:local`을 실행합니다. 그 안의 웹 회귀는 `.git`·`images/plays`·관리자 환경변수가 없는 소스 fixture에서 실제 전체 앱 Expo export도 실행하며, 원본 복원은 수행하지 않습니다. top-level 기본 빌드는 기존 로컬 이미지 모드를 유지합니다. Vercel은 여전히 `pnpm build:web`/`dist`를 사용하며, 향후 승인된 공개 배포로 전환할 때 세 공개 설정과 매니페스트 파일을 공급해야 합니다. 자산 디렉터리를 공급한다면 공개 artifact/cache만 사용합니다. 일반 CI/Vercel에 원본이나 관리자 키를 주지 않습니다. 이번에 원격 CI 실행·Vercel 변수·배포/롤백은 변경하거나 검증하지 않았습니다.
+현재 CI(`policy-checks.yml`)는 Node 24/pnpm 10.33.0에서 `pnpm verify:local --public-images`를 실행합니다. 이 명시적 모드만 로컬 JPEG 존재 검사를 공개 자산 전체 해시·크기·WebP 검증 빌드로 대체합니다. 나머지 회귀·타입·명세 검사는 유지하며 실패 시 중단합니다. 세 공개 설정은 `build:web`에만 전달하고 관리자 변수·dotenv·분석 전송은 차단합니다. 공개 설정 누락은 검사 시작 전에 실패합니다. 플래그 없는 `verify:local`은 원본이 준비된 관리자 로컬 검증용으로 유지합니다. Vercel Preview는 기존 세 공개 변수와 `pnpm build:web`/`dist`를 사용합니다. 원본이나 관리자 키를 CI/Vercel에 공급하지 않습니다. Production 전환은 별도 승인 대상입니다.
 
 `node --test tests/web-build.test.mjs`는 필수 누락·손상·전송 오류·export/후처리/교체 실패·복원 실패 보존을 검사합니다. 실제 export fixture는 앱/소스/설정과 기존 공용 자산만 준비하고 놀이 원본·Git·사용자 기록은 복사하지 않습니다. 합성 공개 WebP를 해시 검증한 뒤 관리자 키·외부 요청 없이 빌드하고 임시 소스 fixture를 제거합니다. 공개 이미지 모드의 성공은 Storage 업로드·실환경 접근 권한·운영 배포 완료를 뜻하지 않습니다.
 
@@ -100,7 +100,7 @@ Expo export 동안 정제한 공개 URL 스냅샷만 `src/constants/playImageWeb
 
 서비스 워커가 활성화된 뒤 방문한 캐시 이미지는 오프라인에서 표시하며, 미방문/누락 이미지는 기본 표시합니다. 앱 셸에 기본 아이콘을 포함하고 본문·찜·기록 흐름을 유지합니다. 로컬+Storage 미디어 합계 **80개**와 사용자가 선택하는 새 버전 적용을 유지합니다. 첫 서비스 워커가 제어권을 얻기 전에 로드된 이미지는 제어 후 재방문에서 캐시될 수 있으며, 모든 미방문 이미지의 오프라인 제공은 보장하지 않습니다.
 
-`pnpm test:web`, `pnpm test`, `pnpm typecheck`로 URL/공유/캐시 회귀를 확인합니다. `verify:local`은 외부 공개 이미지 빌드 변수를 비우고 기본 로컬 모드로 전체 회귀를 실행합니다. 현재 검증은 fixture·localhost 브라우저 기준이며 실제 Supabase 공개 접근·CORS·공유 봇 및 운영 HTTPS 배포 검증은 미완료입니다. 원본 JPEG와 네이티브 정적 참조는 유지합니다.
+`pnpm test:web`, `pnpm test`, `pnpm typecheck`로 URL/공유/캐시 회귀를 확인합니다. 기본 `verify:local`은 공개 이미지 빌드 변수를 비우며, 원본 없는 환경은 아래 공개 모드를 명시합니다. 실제 Supabase 공개 GET·CORS와 Preview 화면/OG/캐시는 확인했으나 실제 공유 봇은 Preview 로그인 보호로 미확인입니다. 원본 JPEG의 로컬 바이트와 네이티브 정적 참조는 유지합니다.
 
 ## 웹과 PWA 실행
 
@@ -114,7 +114,7 @@ pnpm serve:web
 
 로컬 주소는 `http://127.0.0.1:4173`입니다. 포트는 `PORT`, 바인딩 주소는 `HOST` 환경 변수로 바꿀 수 있습니다. 배포 도메인이 정해지면 `PUBLIC_ORIGIN=https://example.com`으로 공유 메타데이터의 기준 주소를 지정할 수 있습니다. 서버는 빌드 결과를 제공하며 계정 서버는 포함하지 않습니다. 웹 사용량 분석은 아래 GA4 설정과 이용자의 별도 참여 선택에 따라 작동합니다.
 
-- 빌드에 필요한 `data/plays.json`, `data/materials.json`, `images/plays/`는 Git 저장소에 포함합니다. Vercel에서도 저장소를 복제한 뒤 같은 파일로 빌드합니다. `public/media/`, `public/icons/`와 `dist/`는 빌드 과정에서 생성하며 Git에 포함하지 않습니다.
+- `data/plays.json`, `data/materials.json`과 승인 공개 매니페스트는 Git에 포함합니다. `images/plays/`는 로컬 검수용으로 보존하며 Git에서 제외합니다. 새 checkout의 웹 빌드는 아래 공개 설정을 사용합니다. `generated/`, `public/media/`, `public/icons/`, `dist/`도 Git에 포함하지 않습니다.
 - `build:web`은 웹용 WebP 상세 이미지·썸네일·재료 이미지와 설치 아이콘을 생성합니다. 원본 앱 이미지는 변경하지 않습니다. 웹에서는 시스템 한글 폰트를 사용하고, 화면 밖 이미지는 지연 로딩합니다.
 - 재료 이미지 주소에는 이미지 내용의 해시를 붙입니다. 빌드가 `src/constants/materialImageVersions.json`을 갱신하므로 기본 아이콘을 새 그림으로 바꾼 뒤에도 이전 이미지 캐시와 구분됩니다.
 - 개발 중에는 `pnpm web`을 사용할 수 있습니다. 설치·오프라인·업데이트 검증에는 위의 웹 빌드와 서버 명령을 사용합니다.
@@ -437,11 +437,21 @@ JSON 가져오기는 기록만 저장합니다. 스킬/CLI로 파일을 수정�
 
 ## 배포용 놀이 이미지와 데이터
 
-`images/plays/play_001.jpeg`부터 `play_191.jpeg`까지의 놀이 이미지 191장과 `data/plays.json`, `data/materials.json`을 Git에서 관리합니다. 재료·온보딩 이미지와 앱 아이콘도 저장소에 포함되어 있으므로 웹 빌드에 필요한 콘텐츠를 별도로 복사할 필요가 없습니다.
+놀이 원본224개는 비공개 Storage와 관리자 로컬 `images/plays/`에 보존하고 Git에서 제외합니다. 기존 Git 이력에는 원본이 남습니다. 놀이·재료 JSON, 공개 매니페스트, 재료·온보딩·브랜드 이미지는 Git에 유지합니다.
 
-저장소 복제 후 `pnpm check:play-images`로 이미지 누락을 확인하고 `pnpm build:web`으로 웹용 WebP 이미지·썸네일·아이콘과 PWA 빌드 결과를 생성합니다. 데이터 백업, 수집 결과, 로컬 설정과 생성된 빌드 파일은 기존 제외 규칙으로 관리합니다.
+새 checkout에서는 Node24/pnpm10.33.0으로 다음 공개 설정을 주고 검증하거나 빌드합니다. 공개416개 다운로드·해시 검증이 있어 네트워크가 필요합니다. 오프라인 검증은 검증할 공개 파일을 별도로 준비한 `PLAY_IMAGE_PUBLIC_ASSET_DIR`을 사용합니다. 불완전한 파일은 원본/네트워크로 우회하지 않고 실패합니다.
 
-이미지를 교체할 때는 선택적으로 `pnpm prepare:play-images /path/to/source/images/plays`를 사용할 수 있습니다. 변경된 이미지는 소스 파일과 함께 커밋합니다. EAS Build에도 같은 이미지와 두 데이터 파일이 포함됩니다.
+```sh
+export PLAY_IMAGE_PUBLIC_MANIFEST=openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-public-manifest-2026-11-15.json
+export PLAY_IMAGE_PUBLIC_ORIGIN=https://clqthwgsmumiwnnqjtbe.supabase.co
+export PLAY_IMAGE_PUBLIC_BUCKET=play-assets
+pnpm verify:local --public-images
+# 빌드만 실행하려면 pnpm build:web
+```
+
+관리 검수·기존 로컬 모드의 `pnpm web`·네이티브 정적 참조에는 원본이 필요합니다. 보존한 관리 계획/state를 안전한 경로에서 제공하고 위 `images:storage restore` 절차로 비공개 원본을 복원한 뒤 `pnpm check:play-images`를 실행합니다. 기존 원본은 덮어쓰지 않습니다. 관리 계획/키를 공개 매니페스트나 Git에 넣지 않습니다. 원본 복원의 검수 UI 자동 연결(3.2)은 미완료이며 웹 빌드에서는 복원하지 않습니다. 이미지 교체는 기존 검수 승인·공개 매니페스트 갱신 절차를 거치고 JPEG 자체는 커밋하지 않습니다.
+
+직전 정상 Preview는 커밋 `1906483e2697a2713a650ed2a14f9fe5ff39079c`, 배포 `4HCRzSHHS3h1NFXqfyud6tQHyqW3`입니다. 해당 커밋의 공개 매니페스트와 불변 객체 버전을 유지합니다. 필요 시 그 매니페스트/웹 코드를 복구해 공개 빌드하거나 Vercel에서 직전 배포를 선택합니다. 이번 변경에서 Storage 객체 삭제·실제 롤백·과거 이력 재작성은 하지 않습니다.
 
 ### 2026-11-15 전체 업로드 결과와 공개 빌드 입력
 

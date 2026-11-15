@@ -42,4 +42,9 @@ jobs:
         env:
           POLICY_BASE_SHA: ${{ github.event.before }}
         run: pnpm spec:changed "$POLICY_BASE_SHA"
-      - run: pnpm verify:local
+      - name: Verify without private play originals
+        env:
+          PLAY_IMAGE_PUBLIC_MANIFEST: openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-public-manifest-2026-11-15.json
+          PLAY_IMAGE_PUBLIC_ORIGIN: https://clqthwgsmumiwnnqjtbe.supabase.co
+          PLAY_IMAGE_PUBLIC_BUCKET: play-assets
+        run: pnpm verify:local --public-images

@@ -152,3 +152,17 @@ Node24.22.2/pnpm10.33.0에서 기준 커밋과 원본/승인 해시가 맞는 �
 ## Preview 배포 승인·준비 — 2026-11-15
 
 사용자가 ‘preview 배포 해줘’로 이전 배포 제외 범위를 Preview 커밋·푸시·Vercel 배포까지 확장했다. 기존 원격 preview는 기준5f6f23e, main/Production은4dd31f2임을 확인했다. Vercel nori-recipe의 Preview에 공개 매니페스트·Storage origin·공개 버킷 Config 변수3개를 저장하고 새로고침 후 Preview 전용임을 재확인했다. Production 변수·DB·Storage 권한은 변경하지 않았다. 로컬255개 테스트·타입/웹 빌드와 spec/check/strict 검증은 통과한 상태이며 실제 배포/CI 완료와 구분한다. 실제 카카오 도구 로그인·최종 미리보기 확인은2.4 미완료로 유지한다.
+
+## 놀이 원본 Git 제외·Preview 재배포 — 2026-11-15
+
+사용자가 ‘일단 놀이이미지를 gitignore에 추가해 preview에 배포’하도록 요청했다. spec-driven 진행은8/13 완료이며, 이번 범위는4.2의 Git 추적 제외·웹/CI 연결에 한한다. 실제 공유 봇·새 checkout의 관리자 원본 복원 통합·실제 버전 롤백까지 완료한 것이 아니므로4.2 전체 체크박스는 미완료로 유지한다. 나머지 미완료 항목을 자동 구현하지 않는다.
+
+시작 시 원격 preview와 HEAD는1906483e2697a2713a650ed2a14f9fe5ff39079c, main은4dd31f2980497f8945f64713a6fcc6e64153950f다. 별도 worktree/clone 없이 원본 `/Users/msyu/study/play-recipe`를 사용한다. 이전 Preview 배포4HCRzSHHS3h1NFXqfyud6tQHyqW3는Ready이며 공개416개 검증·이미지/OG/CORS 캐시·기본 셸 준비를 확인했다. Vercel 로그인 보호로 실제 공유 봇은 미완료다.
+
+전체 업로드 보고서의224개 ID와 추적 파일 집합·원본 SHA-256·크기·다운로드 검증 결과를 대조한 뒤 `git rm --cached`로 인덱스에서만 제외했다. `/images/plays/`를 ignore하고 로컬224개 JPEG와 재료/기타 이미지·기존 승인·내용·DB/store·GA4·네이티브 매핑은 보존한다. 기존 generated/public/dist 캐시 ignore를 유지한다. 과거 Git 이력·Storage 객체·DB·권한·Production은 변경하지 않는다.
+
+WEB-003/GOV-003: CI는 공개 설정3개와 `verify:local --public-images`를 사용한다. 이 명시적 모드만 원본 존재 검사 대신 전체 공개 이미지 해시·크기·WebP 빌드를 수행하며 다른 회귀/타입/명세 검사·실패 중단·분석 차단은 유지한다. 공개 입력은 빌드에만 전달하고 관리자 변수는 제거하며 설정 누락 시 검사 전 실패한다. 플래그 없는 로컬 검증·원본 검사는 보존한 관리자 파일로 계속 실행할 수 있다. CON-005·WEB-001/002/004·LOC-001/002·PRI-001/002의 기존 승인·게스트 데이터·공유/PWA/GA4 계약은 유지한다.
+
+직전 정상 커밋/공개 매니페스트/객체 버전은 보존하고 DEVELOPMENT.md에 새 checkout 공개 명령·관리 복원 경계·직전 배포 복구 절차를 기록했다. 실제 관리자 복원·호스팅 롤백은 이번에 수행하지 않으며 전체4.2 완료로 보고하지 않는다. 검증·새 Preview 결과는 실제 성공 후 별도로 기록한다.
+
+로컬 마감: Node24.22.2/pnpm10.33.0에서 `pnpm verify:local` 종료0. 명세 도구8·단위123·검수27·Storage15·로컬 검수26·웹57, 총256개와 타입·기본 웹/PWA 빌드 통과. 원본/재료 이미지·JSON·검수·DB/store·분석·네이티브 매핑318개 파일의 전후 SHA-256 일치, 로컬 JPEG224개 유지와 Git 추적0개·재료 이미지 비제외를 확인했다. 원본 없는 전체 앱 fixture의 성공/필수 누락·해시 오류 실패 보존과 공개 CI 환경 격리 회귀가 포함된다. strict change validate·spec:index(261개)·spec:changed·diff 검사를 통과했다. 최초 명세 길이 경고는 Scenario로 구분해 수정 후 전체 검증을 재실행했다. 새 원격 CI/Preview의 최종 결과는 로컬 성공과 구분한다.
