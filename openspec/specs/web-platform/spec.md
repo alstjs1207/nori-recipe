@@ -74,7 +74,7 @@ Storage 캐시는 허용 origin·공개 버킷의 익명 CORS 이미지로 제�
 
 ### Requirement: WEB-003 에셋 준비와 브랜치 배포 경계
 
-빌드 SHALL 놀이 원본을 로컬에 보존하고 Git에서 제외하며, 공개 모드에서는 원본·관리자 키 없이 내용 해시·파생 바이트를 검증한 동일 URL을 웹·공유·소개에 사용한다. 필수 오류는 출력 교체 전에 실패하고 기존 출력을 보존한다. 원본 없는 CI는 명시적 공개 검증 모드를 사용한다. 기본 로컬 모드는 복원한 원본이 필요하다. 재료·아이콘·내용 해시 CSS 생성과 비공개/검토/잘못된 ID 기본 표시를 유지한다. 개발은 preview→Vercel Preview, 확인한 preview의 main 병합은 Production이며 PUBLIC_ORIGIN 운영 값은 Production에만 둔다. 로컬 검증은 커밋·푸시·배포를 하지 않는다. 네이티브는 제외하며 Production 전환·실제 공유 봇 검증은 미완료다.
+빌드 SHALL 놀이 원본을 로컬에 보존하고 Git에서 제외하며, 공개 모드에서는 원본·관리자 키 없이 내용 해시·파생 바이트를 검증한 동일 URL을 웹·공유·소개에 사용한다. 필수 오류는 출력 교체 전에 실패하고 기존 출력을 보존한다. 원본 없는 CI는 명시적 공개 검증 모드를 사용한다. 기본 로컬 모드는 복원한 원본이 필요하다. 재료·아이콘·내용 해시 CSS 생성과 비공개/검토/잘못된 ID 기본 표시를 유지한다. 개발은 preview→Vercel Preview, 확인한 preview의 main 병합은 Production이며 PUBLIC_ORIGIN 운영 값은 Production에만 둔다. 로컬 검증은 커밋·푸시·배포를 하지 않는다. 네이티브는 제외하며 웹 이관의 운영 배포·사용자 링크 공유 확인을 완료했다.
 
 #### Scenario: 에셋 교체
 
@@ -148,3 +148,5 @@ Storage 캐시는 허용 origin·공개 버킷의 익명 CORS 이미지로 제�
 2026-11-15 실제 Storage의 3개 이미지로 원본/관리자 키 없는 희소 앱 export·화면/OG·CORS 캐시를 확인했다. [실행 보고서](../../changes/migrate-play-images-to-supabase-storage/evidence/storage-pilot-2026-11-15.md)에 범위를 기록하며 실기기 오프라인·공유 봇·호스팅 배포는 미확인이다.
 
 2026-11-15 공개416개 실제 익명 GET·CORS·무결성 및 원본/관리자 키 없는 전체208개 앱 export를 검증했다. [전체 실행 보고서](../../changes/migrate-play-images-to-supabase-storage/evidence/full-upload-2026-11-15.md)는 로컬 확인 결과이며 기본 참조·운영 배포는 유지한다.
+
+2026-11-15 웹 이관의 최종 상태는 [완료 검증](../../changes/migrate-play-images-to-supabase-storage/verification.md)을 따른다. Preview/Production·원본 없는 CI·익명 공유 HTML/이미지6개 체인과 운영 PWA 선택 업데이트/CORS 캐시 해시를 확인했고 사용자가 실제 링크 공유의 정상 표시를 확인했다. 앞의 파일럿/로컬 기록은 당시 검증 범위다. 플랫폼·기종·카카오 공식 도구 로그인 여부는 사용자 확인에 덧붙여 추정하지 않는다.

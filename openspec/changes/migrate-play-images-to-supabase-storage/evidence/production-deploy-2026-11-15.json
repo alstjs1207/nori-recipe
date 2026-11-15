@@ -1,0 +1,149 @@
+{
+  "checkedAt": "2026-11-15T10:06:49.736Z",
+  "source": "/Users/msyu/study/play-recipe",
+  "commit": "d0bb44102e71fd77a28912394eab78f2e3da8be4",
+  "mergedFrom": "preview",
+  "mergedInto": "main",
+  "mergeMethod": "fast-forward",
+  "production": {
+    "state": "READY",
+    "deploymentId": "FuaYGqvGu2nCJ2bU65PxBzi3woVk",
+    "origin": "https://www.nori-recipe.com",
+    "duration": "2m30s",
+    "build": {
+      "plays": 208,
+      "reviewImages": 0,
+      "originalMB": 0,
+      "detailMB": 15.36,
+      "thumbnailMB": 2.54,
+      "imageMode": "public",
+      "verifiedPublicAssets": 416,
+      "version": "93f47b0b481b",
+      "playLinks": 208,
+      "precacheFiles": 13
+    },
+    "configAdded": [
+      "PLAY_IMAGE_PUBLIC_MANIFEST",
+      "PLAY_IMAGE_PUBLIC_ORIGIN",
+      "PLAY_IMAGE_PUBLIC_BUCKET"
+    ]
+  },
+  "ci": {
+    "state": "success",
+    "run": 43702112769,
+    "url": "https://github.com/alstjs1207/nori-recipe/actions/runs/43702112769",
+    "tests": 256
+  },
+  "shareChecks": [
+    {
+      "id": "play_001",
+      "ua": "facebookexternalhit/1.1",
+      "htmlStatus": 200,
+      "canonical": "https://www.nori-recipe.com/play/play_001",
+      "ogImage": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_001/15649d9180de2080fd25b7db041cc45085e19ec823c1c459ca51ee9b774a1dbd/detail.webp",
+      "imageStatus": 200,
+      "hashVerified": true,
+      "cors": "*"
+    },
+    {
+      "id": "play_001",
+      "ua": "Twitterbot/1.0",
+      "htmlStatus": 200,
+      "canonical": "https://www.nori-recipe.com/play/play_001",
+      "ogImage": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_001/15649d9180de2080fd25b7db041cc45085e19ec823c1c459ca51ee9b774a1dbd/detail.webp",
+      "imageStatus": 200,
+      "hashVerified": true,
+      "cors": "*"
+    },
+    {
+      "id": "play_006",
+      "ua": "facebookexternalhit/1.1",
+      "htmlStatus": 200,
+      "canonical": "https://www.nori-recipe.com/play/play_006",
+      "ogImage": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp",
+      "imageStatus": 200,
+      "hashVerified": true,
+      "cors": "*"
+    },
+    {
+      "id": "play_006",
+      "ua": "Twitterbot/1.0",
+      "htmlStatus": 200,
+      "canonical": "https://www.nori-recipe.com/play/play_006",
+      "ogImage": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_006/9991a2b13bd48b66346a1d7630722e05b78204c44ec6cf6f172cbb62915bad6b/detail.webp",
+      "imageStatus": 200,
+      "hashVerified": true,
+      "cors": "*"
+    },
+    {
+      "id": "play_013",
+      "ua": "facebookexternalhit/1.1",
+      "htmlStatus": 200,
+      "canonical": "https://www.nori-recipe.com/play/play_013",
+      "ogImage": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp",
+      "imageStatus": 200,
+      "hashVerified": true,
+      "cors": "*"
+    },
+    {
+      "id": "play_013",
+      "ua": "Twitterbot/1.0",
+      "htmlStatus": 200,
+      "canonical": "https://www.nori-recipe.com/play/play_013",
+      "ogImage": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_013/464a1d6c36741fabaa1e31bb66928db019e20a59568dce6128559e35cbbb8ded/detail.webp",
+      "imageStatus": 200,
+      "hashVerified": true,
+      "cors": "*"
+    }
+  ],
+  "excluded": [
+    {
+      "id": "play_028",
+      "status": 404
+    },
+    {
+      "id": "play_054",
+      "status": 404
+    },
+    {
+      "id": "play_999",
+      "status": 404
+    },
+    {
+      "id": "invalid",
+      "status": 404
+    }
+  ],
+  "limits": [
+    "자동 HTTP 검사와 사용자 공유 확인을 구분한다. 모든 플랫폼·카카오 공식 디버거 실행·실기기 전체 검증을 주장하지 않는다.",
+    "관리 복원 통합·실제 전체 복원/롤백·서비스 내 제공처 고지는 후속 목록에 남긴다."
+  ],
+  "changesOutsideDeployment": [],
+  "temporaryWorktreesCreated": 0,
+  "browser": {
+    "url": "https://www.nori-recipe.com/play/play_001",
+    "pwaReady": true,
+    "waiting": false,
+    "cacheNames": [
+      "nori-web-93f47b0b481b-shell",
+      "nori-web-93f47b0b481b-media"
+    ],
+    "publicImage": {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/play-assets/play_001/15649d9180de2080fd25b7db041cc45085e19ec823c1c459ca51ee9b774a1dbd/detail.webp",
+      "status": 200,
+      "type": "cors",
+      "bytes": 81370,
+      "sha256": "f0984e7f2c6ce6f6e2aa6f6953c0ecc22d2a2d58397431f6716407368237fd13"
+    },
+    "selectedUpdate": "passed"
+  },
+  "preservedLocalOriginals": 224,
+  "unchangedProtectedFiles": 318,
+  "existingProductionOriginAndGASettings": "preserved",
+  "databaseOrStorageMutations": "none",
+  "userConfirmation": {
+    "dateKst": "2026-11-15",
+    "evidence": "사용자가 실제 링크 공유의 정상 표시를 확인함",
+    "platform": "미수집"
+  }
+}

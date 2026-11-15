@@ -44,3 +44,9 @@ If any asset in this repository is based on or provided by a third party, that a
 ## Permission Requests
 
 For permission to use any visual asset outside this project, contact the project owner and describe the intended use.
+
+## Asset Delivery
+
+As of 2026-11-15, approved play detail images and thumbnails are delivered through Supabase Storage at `clqthwgsmumiwnnqjtbe.supabase.co` from the public `play-assets` bucket. Play originals are stored privately and retained locally by maintainers; they are no longer tracked in the current Git tree. Past Git history is retained. Public delivery does not change the asset license.
+
+Material, onboarding, and brand assets continue to use the existing repository and Vercel delivery. Material-image migration is follow-up work. This technical delivery record does not assert completion of the service's additional provider/privacy notice review, which remains tracked in OpenSpec follow-ups.

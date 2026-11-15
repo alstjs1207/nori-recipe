@@ -489,3 +489,11 @@ pnpm build:web
 | `PLAY_IMAGE_PUBLIC_BUCKET` | `play-assets` |
 
 Production의 기존 PUBLIC_ORIGIN/GA4 설정은 유지하고 Preview는 VERCEL_URL을 canonical/OG 페이지 주소로 사용합니다. System Environment Variables 접근은 기존 활성 상태입니다. Preview의 실제 배포 URL·커밋·Ready/CI 결과는 해당 Vercel/GitHub 배포 기록과 이번 실행 결과에서 확인합니다. 실제 카카오 미리보기는 별도 로그인 후 확인 전까지 완료로 표시하지 않습니다.
+
+### 놀이 이미지 웹 이관 완료 — 2026-11-15
+
+위 날짜별 단계 기록의 미완료 설명은 당시 상태입니다. 현재는 원본224개 비공개 보존·파생416개 공개 검증·원본 로컬 유지/Git 제외·원본 없는 CI·웹/공유/PWA·Preview/Production 배포를 완료했습니다. main과 preview의 구현 커밋은 `d0bb441`이며 운영은 `https://www.nori-recipe.com`입니다. Preview와 Production에 동일한 세 공개 설정을 구성했고 운영 PUBLIC_ORIGIN/GA4 설정은 보존했습니다. 사용자가 실제 링크 공유의 정상 표시를 확인했습니다. 플랫폼/기종·공식 디버거 실행은 추정하지 않습니다.
+
+[최종 검증](openspec/changes/migrate-play-images-to-supabase-storage/verification.md)과 [완료 기록](openspec/completed-work.md)을 참고하세요. 재료 이미지는 Git·Vercel 제공을 유지하며 별도 후속입니다. 관리 복원 UI·실제 전체 복원/호스팅 롤백·서비스 내 추가 제공처 고지는 [미완료 후속](openspec/follow-ups/play-image-operations.md)에 남깁니다. 수동 관리 복원/충돌 방지 도구와 미구현 UI 연결을 구분합니다. 자산 제공 경로·권리 범위는 ASSET-LICENSE.md에도 기록했습니다.
+
+현재 공개 매니페스트는 CI와 두 배포 환경이 `openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-public-manifest-2026-11-15.json`에서 읽습니다. 완료 정리만을 위해 이 경로를 이동하면 새 빌드가 실패하므로 이번에는 폴더를 유지합니다. archive는 안정적 자산 입력 경로로 전환한 뒤 수행합니다. 이번 문서 커밋은 Preview에만 푸시하며 main/운영 재배포는 별도 요청 대상으로 유지합니다.

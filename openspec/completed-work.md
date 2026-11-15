@@ -34,3 +34,11 @@ OpenSpec 최초 도입 자체의 완료 작업·검증은 `changes/archive/2026-
 앱과 분리된 정적 소개 페이지를 웹 빌드에서 생성한다. 놀이·재료·월령·발달영역 수치는 빌드 시점 데이터에서 계산하고, 화면은 실제 서비스 웹 캡처를 해시 WebP로 제공한다. 월령·재료 미리 찾아보기 데모와 숫자 세어 올리기·막대 채우기·스크롤 등장·데모 결과 전환 효과(동작 줄이기·스크립트 미실행 시 미적용)를 포함한다. `b1a84cf`·`4dd31f2`를 preview에 반영하고 사용자 Preview 확인 후 main fast-forward로 운영 배포했다. 로컬 217개 회귀·타입·빌드, preview/main CI·배포, 운영 `/intro` 응답과 headless Chrome 확인을 마쳤다.
 
 [완료 태스크](changes/archive/2026-11-13-add-intro-landing-page/tasks.md) · [검증 기록](changes/archive/2026-11-13-add-intro-landing-page/verification.md). Preview 화면 확인 근거는 사용자 보고다.
+
+### 2026-11-15 놀이 이미지 Supabase Storage 웹 이관
+
+원본224개를 비공개 보존하고 승인 live208개 놀이의 상세/썸네일416개를 공개 자산으로 제공한다. 다운로드 SHA-256·접근 제어를 검증했고 로컬 원본은 유지하면서 Git 추적만 제외했다. 웹·공유·소개는 같은 매니페스트의 버전 URL을 사용한다. 기본 PWA 셸·CORS 방문 이미지 캐시80개·선택 업데이트와 사용자 로컬 데이터·기존 승인·GA4 정책을 유지했다.
+
+구현 커밋1906483·d0bb441, preview/main의 원본 없는 CI256개 테스트·공개416개 검증과 Vercel 운영배포FuaYGqvGu2nCJ2bU65PxBzi3woVk Ready를 확인했다. 운영 HTTP6개 공유 체인·제외/오류4개404, 이미지960px·canonical/OG·새 버전 선택 후 실제 CORS 캐시 해시를 검증했다. 사용자가2026-11-15 실제 링크 공유의 정상 표시를 확인하고 완료 정리를 요청했다. 플랫폼·기종은 수집하지 않았다.
+
+[완료 태스크](changes/migrate-play-images-to-supabase-storage/tasks.md) · [최종 검증](changes/migrate-play-images-to-supabase-storage/verification.md) · [관리·재료 후속](follow-ups/play-image-operations.md). 관리 복원 UI·전체 실제 복원/롤백·서비스 내 추가 제공처 고지는 미완료 후속으로 유지하고 네이티브는 사용자 결정으로 제외한다. 공개 매니페스트가 실제 빌드 입력이므로 이번에는 change 경로를 유지하며 archive 이동은 하지 않는다.
