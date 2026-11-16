@@ -42,3 +42,12 @@ OpenSpec 최초 도입 자체의 완료 작업·검증은 `changes/archive/2026-
 구현 커밋1906483·d0bb441, preview/main의 원본 없는 CI256개 테스트·공개416개 검증과 Vercel 운영배포FuaYGqvGu2nCJ2bU65PxBzi3woVk Ready를 확인했다. 운영 HTTP6개 공유 체인·제외/오류4개404, 이미지960px·canonical/OG·새 버전 선택 후 실제 CORS 캐시 해시를 검증했다. 사용자가2026-11-15 실제 링크 공유의 정상 표시를 확인하고 완료 정리를 요청했다. 플랫폼·기종은 수집하지 않았다.
 
 [완료 태스크](changes/migrate-play-images-to-supabase-storage/tasks.md) · [최종 검증](changes/migrate-play-images-to-supabase-storage/verification.md) · [관리·재료 후속](follow-ups/play-image-operations.md). 관리 복원 UI·전체 실제 복원/롤백·서비스 내 추가 제공처 고지는 미완료 후속으로 유지하고 네이티브는 사용자 결정으로 제외한다. 공개 매니페스트가 실제 빌드 입력이므로 이번에는 change 경로를 유지하며 archive 이동은 하지 않는다.
+
+
+### 2026-11-16 재료 이미지 Supabase Storage 이관 — Preview 완료
+
+실제 JPEG67개를 비공개 보존하고 승인 매핑66개만192px WebP로 공개한다. 미매핑1개는 비공개만, 검수 대기5개는 브랜드 기본 표시를 유지한다.133개 업로드/다운로드 SHA와 원본 전체 복원·재실행 신규 생성0개·공개66개 CORS/익명 GET·원본67개 차단·임시 객체로 익명 쓰기/삭제 차단을 확인했다. 검증 JPEG67개만 Git 제외하고 로컬 놀이224개/재료67개·데이터/검수/매핑·DB/분석 등317개 해시를 보존했다.
+
+구현0183e28을 preview에 푸시했다. 로컬 Node24.21.0·원격 CI Node24.22.2/pnpm10.33.0에서266개 회귀·타입·원본 없는 실제 공개482개 빌드 성공, Vercel Cr1LM2Kvg36vKvk37EtHAGAjrM3E Ready·실제 재료 표시/공유OG/소개·CORS 캐시44개 해시/분석 미전송을 확인했다. 오프라인 방문 재료와 기본 start/설정 안내는 로컬 실제 브라우저에서 검증했다. 임시 서버·최소 소스 fixture를 정리했다. 기존 놀이 동작·main d0bb441/운영93f47b0b481b는 유지한다.
+
+[태스크9/9](changes/migrate-material-images-to-supabase-storage/tasks.md) · [검증](changes/migrate-material-images-to-supabase-storage/verification.md). CI/Preview가 공개 매니페스트를 change 경로에서 읽으므로 archive 이동은 하지 않는다. main 병합/운영 배포·네이티브·기존 관리 UI 복원/전체 놀이 롤백·서비스 고지 후속은 이번 완료에 포함하지 않는다.

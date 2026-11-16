@@ -5,7 +5,7 @@
 ## 재료 이미지 이관 — 사용자 지정 후속
 
 - [x] 대상 재료 이미지·원본/공개 파생·해시·복원 및 빌드 경계를 조사하고 [별도 change](../changes/migrate-material-images-to-supabase-storage/proposal.md)를 작성했다.
-- [x] 후속 구현 요청에 따라 원본67개 비공개·승인 매핑66개 공개를 실제 이관·다운로드/복원 검증했다. 로컬 바이트는 유지하고 검증한67개만 Git 제외했다. Preview 배포 진행/완료 상태는 [재료 태스크](../changes/migrate-material-images-to-supabase-storage/tasks.md)를 따른다.
+- [x] 후속 구현 요청에 따라 원본67개 비공개·승인 매핑66개 공개를 실제 이관·다운로드/복원 검증했다. 로컬 바이트는 유지하고 검증한67개만 Git 제외했다. 원본 없는 CI266개·Preview Ready와 실제 웹/PWA 확인도 완료했다. 자세한 상태는 [재료 태스크](../changes/migrate-material-images-to-supabase-storage/tasks.md)를 따른다.
 
 ## 관리자 원본 복원 통합 — 기존 3.2, 미구현
 

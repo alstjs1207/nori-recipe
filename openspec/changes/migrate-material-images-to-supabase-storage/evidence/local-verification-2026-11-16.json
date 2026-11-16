@@ -1,6 +1,6 @@
 {
   "date": "2026-11-16",
-  "node": "v25.9.0",
+  "node": "v24.21.0",
   "requiredNode": "24",
   "pnpm": "10.33.0",
   "command": "pnpm verify:local --public-images",

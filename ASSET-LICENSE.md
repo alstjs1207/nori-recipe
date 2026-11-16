@@ -53,4 +53,4 @@ Material, onboarding, and brand assets continue to use the existing repository a
 
 ## 재료 이미지 제공 — 2026-11-16
 
-기존 재료 JPEG67개는 비공개 Supabase Storage와 관리자 로컬 `images/material/`에 유지하며 검증한 파일의 Git 추적만 제외합니다. 승인된 실제 매핑66개의 서비스용 WebP만 `material-assets` 공개 버킷에서 제공하고 검수 대기5개의 브랜드 기본 표시와 미사용 원본의 비공개 보관을 유지합니다. 이 위치 변경은 기존 이미지의 권리·재배포 허락 범위를 추가로 확정하지 않습니다. 실제 이관/검증·Preview 진행은 `openspec/changes/migrate-material-images-to-supabase-storage/`의 근거를 따르며 Production은 변경하지 않습니다.
+기존 재료 JPEG67개는 비공개 Supabase Storage와 관리자 로컬 `images/material/`에 유지하며 검증한 파일의 Git 추적만 제외합니다. 승인된 실제 매핑66개의 서비스용 WebP만 `material-assets` 공개 버킷에서 제공하고 검수 대기5개의 브랜드 기본 표시와 미사용 원본의 비공개 보관을 유지합니다. 이 위치 변경은 기존 이미지의 권리·재배포 허락 범위를 추가로 확정하지 않습니다. 실제 이관/검증·Preview 완료는 `openspec/changes/migrate-material-images-to-supabase-storage/`의 근거를 따르며 Production은 변경하지 않습니다.

@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-16",
+  "originalProject": "/Users/msyu/study/play-recipe",
+  "separateWorktreeOrClone": false,
+  "removedSparseSourceFixture": "/Users/msyu/study/play-recipe/generated/material-image-storage/source-fixture",
+  "uniqueSourceChanges": false,
+  "dependentSymlinks": [],
+  "temporaryServer": {
+    "pid": 28893,
+    "port": 4196,
+    "terminated": true
+  },
+  "publicAssetsAndAdminPlanPreserved": true,
+  "originalMaterialFiles": 67,
+  "originalPlayFiles": 224
+}

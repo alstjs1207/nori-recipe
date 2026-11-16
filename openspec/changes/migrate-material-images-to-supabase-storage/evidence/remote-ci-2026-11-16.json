@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-16",
+  "commit": "0183e28359c7149596bb245c800821723ed53feb",
+  "runId": 43820770194,
+  "url": "https://github.com/alstjs1207/nori-recipe/actions/runs/43820770194",
+  "status": "completed",
+  "conclusion": "success",
+  "totalTests": 266,
+  "testCounts": [
+    8,
+    123,
+    27,
+    15,
+    8,
+    26,
+    59
+  ],
+  "verifiedPlayAssets": true,
+  "verifiedMaterialAssets": true,
+  "originalMBZero": true,
+  "pnpm10330": true,
+  "nodeVersions": [
+    "v24.22.2"
+  ]
+}

@@ -21,4 +21,10 @@
 
 Vercel Preview에만 `MATERIAL_IMAGE_PUBLIC_MANIFEST`, `MATERIAL_IMAGE_PUBLIC_ORIGIN`, `MATERIAL_IMAGE_PUBLIC_BUCKET` 공개 Config3개를 추가했다. 기존 PLAY_IMAGE 공개 설정과 Production PUBLIC_ORIGIN/GA4/배포·DB/Auth는 유지했다. 관리자 키는 파일·앱·Git·CI/Vercel에 저장하지 않았으며 로그인 브라우저에서 로컬 Node24의 표준입력 파이프로만 전달했다.
 
-preview push·원격 CI·Vercel Ready·실제 배포 화면은 확인 후 기록한다. main 병합·Production 배포·네이티브 전환·관리 UI 복원·놀이 전체 실제 롤백·서비스 내 제공처 고지 보강은 이번 범위가 아니다. 공개 매니페스트는 CI/Preview의 고정 입력이므로 change 폴더를 이동하지 않는다.
+구현 커밋 `0183e28359c7149596bb245c800821723ed53feb`을 preview에 푸시하고 원격 보존을 확인했다. [GitHub CI43820770194](https://github.com/alstjs1207/nori-recipe/actions/runs/43820770194)는 Node24.22.2/pnpm10.33.0 새 checkout에서266개·원본0MB·공개416+66개 검증에 성공했다. [원격 CI](evidence/remote-ci-2026-11-16.json). [Vercel Cr1LM2Kvg36vKvk37EtHAGAjrM3E](https://vercel.com/alstjs1207s-projects/nori-recipe/Cr1LM2Kvg36vKvk37EtHAGAjrM3E)는 Ready이며 [실제 Preview](https://nori-recipe-8qnkalwb3-alstjs1207s-projects.vercel.app/)의192px 재료·놀이 OG/정확한 canonical·소개 Storage URL·CORS 캐시44개 해시·분석 요청0개를 확인했다. [배포/브라우저](evidence/preview-deploy-2026-11-16.json). 로그인 보호를 유지한다. 운영의 기존 캐시버전93f47b0b481b와 main d0bb441은 변경하지 않았다.
+
+임시4196 서버를 종료하고 원본 없는 소스 fixture를 제거했다. 고유 소스 차이·다른 심볼릭 링크 의존성0개를 확인했으며 실제 공개 다운로드·관리 계획/state·로컬 원본과 모든 영구 evidence는 원본 프로젝트에 보존했다. [정리 결과](evidence/cleanup-2026-11-16.json). main 병합·Production 배포·네이티브 전환·관리 UI 복원·놀이 전체 실제 롤백·서비스 내 제공처 고지 보강은 이번 범위가 아니다. 공개 매니페스트는 CI/Preview의 고정 입력이므로 change 폴더를 이동하지 않는다.
+
+## 완료 문서 변경 근거
+
+GOV-001·GOV-002·GOV-003에 따라 실제 실행한 근거와 미래 후속을 구분하고9/9 완료를 기록한다. 이번 마감 문서 커밋은 검증 보고서·라이선스 적용 범위의 위치 안내·roadmap/known-gaps를 갱신하며 앱 동작·승인·개인정보 정책을 추가 변경하지 않는다. 기존 CON-006·WEB-002·WEB-003·PRI-001~004·CAT-001/004의 실행 결과는 위 근거를 따른다.

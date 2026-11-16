@@ -19,4 +19,4 @@
 ## 4. 통합과 Preview
 
 - [x] 4.1 Node24/pnpm10.33.0 공개 verify 전체 회귀·타입·빌드·spec:index/check·strict change·spec:changed를 통과하고 현재 명세와 완료 근거를 갱신한다.
-- [ ] 4.2 preview 커밋/푸시·원격 커밋 보존·CI·Vercel Ready·실제 웹/PWA를 확인하고 URL/한계를 기록한다. main/Production 보존을 원격 재확인한다.
+- [x] 4.2 preview 커밋/푸시·원격 커밋 보존·CI·Vercel Ready·실제 웹/PWA를 확인하고 URL/한계를 기록한다. main/Production 보존을 원격 재확인한다.
