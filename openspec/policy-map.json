@@ -345,7 +345,8 @@
         "pnpm check:play-content",
         "pnpm test:play-review",
         "pnpm check:play-images",
-        "pnpm test:play-image-storage"
+        "pnpm test:play-image-storage",
+        "pnpm test:material-image-storage"
       ],
       "requirements": [
         {
@@ -443,6 +444,27 @@
             {
               "path": "scripts/play-image-storage/migration.mjs",
               "contains": "export async function restore"
+            }
+          ]
+        },
+        {
+          "id": "CON-006",
+          "verification": "automated",
+          "sources": [
+            "scripts/migrate-material-images.mjs",
+            "scripts/material-image-storage/manifest.mjs",
+            "scripts/material-image-storage/migration.mjs",
+            "scripts/material-image-storage/stores.mjs",
+            "src/constants/materialImageSourceHashes.json",
+            ".gitignore"
+          ],
+          "tests": [
+            "tests/material-image-storage.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/material-image-storage/migration.mjs",
+              "contains": "export async function migrate"
             }
           ]
         }
@@ -663,11 +685,15 @@
             "src/components/web/ContentImage.web.tsx",
             "src/constants/playImageManifest.ts",
             "public/pwa.js",
-            "src/components/web/WebWelcome.tsx"
+            "src/components/web/WebWelcome.tsx",
+            "scripts/web/material-images.mjs",
+            "src/constants/materialImageManifest.ts",
+            "src/constants/materialImageWebManifest.json"
           ],
           "tests": [
             "tests/web-offline.test.mjs",
-            "tests/web-pwa-lifecycle.test.mjs"
+            "tests/web-pwa-lifecycle.test.mjs",
+            "tests/web-build.test.mjs"
           ],
           "anchors": [
             {
@@ -699,7 +725,10 @@
             "scripts/web/public-image-assets.mjs",
             "scripts/web/build-output.mjs",
             ".gitignore",
-            ".github/workflows/policy-checks.yml"
+            ".github/workflows/policy-checks.yml",
+            "scripts/web/material-images.mjs",
+            "src/constants/materialImageManifest.ts",
+            "src/constants/materialImageWebManifest.json"
           ],
           "tests": [
             "tests/web-content.test.mjs",

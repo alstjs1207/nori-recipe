@@ -109,6 +109,8 @@ test("local verification isolates build origins from server fixtures and disable
     assert.equal(env.PLAY_IMAGE_PUBLIC_ORIGIN, "");
     assert.equal(env.PLAY_IMAGE_PUBLIC_BUCKET, "");
     assert.equal(env.PLAY_IMAGE_PUBLIC_ASSET_DIR, "");
+    assert.equal(env.MATERIAL_IMAGE_PUBLIC_MANIFEST, "");
+    assert.equal(env.MATERIAL_IMAGE_STORAGE_SERVICE_ROLE_KEY, undefined);
     if (command === "build:web") assert.equal(env.PUBLIC_ORIGIN, "https://nori.example.test");
     else assert.equal(Object.hasOwn(env, "PUBLIC_ORIGIN"), false);
   }
@@ -120,21 +122,23 @@ test("public verification replaces only the private-original check and isolates 
   const options = { publicImages: true };
   const inherited = { PLAY_IMAGE_PUBLIC_MANIFEST: "/fixture/public.json", PLAY_IMAGE_PUBLIC_ORIGIN: "https://storage.fixture.invalid",
     PLAY_IMAGE_PUBLIC_BUCKET: "public-fixture", PLAY_IMAGE_PUBLIC_ASSET_DIR: "/fixture/assets",
+    MATERIAL_IMAGE_PUBLIC_MANIFEST: "/fixture/material.json", MATERIAL_IMAGE_PUBLIC_ORIGIN: "https://storage.fixture.invalid", MATERIAL_IMAGE_PUBLIC_BUCKET: "material-fixture", MATERIAL_IMAGE_PUBLIC_ASSET_DIR: "/fixture/assets", MATERIAL_IMAGE_STORAGE_SERVICE_ROLE_KEY: "secret",
     PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY: "fixture-private", SUPABASE_SERVICE_ROLE_KEY: "fixture-private",
     EXPO_PUBLIC_GA_ENABLED: "true", VERCEL_ENV: "production" };
   assert.deepEqual(verificationCommands(), commands);
   assert.deepEqual(verificationCommands(options), commands.filter((command) => command !== "check:play-images"));
   for (const command of commands) {
     const env = verificationEnvironment(command, inherited, options);
-    for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET", "PLAY_IMAGE_PUBLIC_ASSET_DIR"]) {
+    for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET", "PLAY_IMAGE_PUBLIC_ASSET_DIR", "MATERIAL_IMAGE_PUBLIC_MANIFEST", "MATERIAL_IMAGE_PUBLIC_ORIGIN", "MATERIAL_IMAGE_PUBLIC_BUCKET", "MATERIAL_IMAGE_PUBLIC_ASSET_DIR"]) {
       assert.equal(env[key], command === "build:web" ? inherited[key] : "");
     }
     assert.equal(env.PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY, undefined);
+    assert.equal(env.MATERIAL_IMAGE_STORAGE_SERVICE_ROLE_KEY, undefined);
     assert.equal(env.SUPABASE_SERVICE_ROLE_KEY, undefined);
     assert.equal(env.EXPO_PUBLIC_GA_ENABLED, "false");
     assert.equal(env.VERCEL_ENV, "");
   }
-  for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET"]) {
+  for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET", "MATERIAL_IMAGE_PUBLIC_MANIFEST", "MATERIAL_IMAGE_PUBLIC_ORIGIN", "MATERIAL_IMAGE_PUBLIC_BUCKET"]) {
     assert.throws(() => verificationEnvironment("build:web", { ...inherited, [key]: "" }, options), /requires/);
   }
   assert.equal(inherited.PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY, "fixture-private");

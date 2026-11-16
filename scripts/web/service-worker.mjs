@@ -1,6 +1,6 @@
 import { storageImages } from "../../src/constants/playImageManifest.ts";
 
-function workerProgram(VERSION, PRECACHE, STORAGE) {
+function workerProgram(VERSION, PRECACHE, STORAGE, MATERIAL_STORAGE) {
   const SHELL = VERSION + '-shell';
   const MEDIA = VERSION + '-media';
   const MEDIA_LIMIT = 80;
@@ -73,7 +73,13 @@ function workerProgram(VERSION, PRECACHE, STORAGE) {
     const storage = STORAGE && url.origin === STORAGE.origin && !url.search && !url.hash && url.pathname.startsWith(prefix) &&
       /^play_\d{3,}\/[a-f0-9]{64}\/(detail|thumbnail)\.webp$/.test(url.pathname.slice(prefix.length)) &&
       request.destination === 'image' && request.mode === 'cors' && request.credentials !== 'include';
+    const materialPrefix = MATERIAL_STORAGE && "/storage/v1/object/public/" + MATERIAL_STORAGE.bucket + "/";
+    const material = MATERIAL_STORAGE && url.origin === MATERIAL_STORAGE.origin && !url.search && !url.hash && url.pathname.startsWith(materialPrefix) &&
+      /^materials\/[a-z][a-z0-9_]*\/[a-f0-9]{64}\/icon\.webp$/.test(url.pathname.slice(materialPrefix.length)) &&
+      request.destination === "image" && request.mode === "cors" && request.credentials !== "include";
+    if (material) { event.respondWith(asset(request, true, true)); return; }
     if (storage) { event.respondWith(asset(request, true, true)); return; }
+    if (MATERIAL_STORAGE && url.origin === MATERIAL_STORAGE.origin && url.pathname.startsWith("/storage/")) return;
     if (STORAGE && url.origin === STORAGE.origin && url.pathname.startsWith('/storage/')) return;
     if (url.origin !== self.location.origin || url.pathname === '/sw.js') return;
     if (request.mode === 'navigate') { event.respondWith(navigation(request)); return; }
@@ -84,8 +90,9 @@ function workerProgram(VERSION, PRECACHE, STORAGE) {
   });
 }
 
-export function createServiceWorker(version, precache, storage = null) {
+export function createServiceWorker(version, precache, storage = null, materialStorage = null) {
   const allowed = storageImages(storage);
-  const shell = [...new Set([...precache, ...(allowed ? ['/nori-icon.svg'] : [])])];
-  return `(${workerProgram.toString()})(${JSON.stringify(`nori-web-${version}`)}, ${JSON.stringify(shell)}, ${JSON.stringify(allowed)});\n`;
+  const materialAllowed = storageImages(materialStorage);
+  const shell = [...new Set([...precache, ...((allowed || materialAllowed) ? ['/nori-icon.svg'] : [])])];
+  return `(${workerProgram.toString()})(${JSON.stringify(`nori-web-${version}`)}, ${JSON.stringify(shell)}, ${JSON.stringify(allowed)}, ${JSON.stringify(materialAllowed)});\n`;
 }

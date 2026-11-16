@@ -33,7 +33,7 @@ export async function verifyPublicImageAssets(input, { fetchImpl = globalThis.fe
     try { directory = fs.realpathSync(input.directory); if (!fs.statSync(directory).isDirectory()) throw Error(); }
     catch { throw new Error("Public image asset directory unavailable"); }
   }
-  const report = { imageMode: "public", verifiedPublicAssets: 0, detailBytes: 0, thumbnailBytes: 0 };
+  const report = { imageMode: "public", verifiedPublicAssets: 0, detailBytes: 0, thumbnailBytes: 0, iconBytes: 0 };
   for (const asset of input.assets) {
     if (asset.bytes > LIMIT) throw assetError(asset, "size exceeds limit");
     let bytes;
@@ -47,7 +47,7 @@ export async function verifyPublicImageAssets(input, { fetchImpl = globalThis.fe
     } else bytes = await download(asset, fetchImpl);
     if (bytes.length !== asset.bytes || sha256(bytes) !== asset.sha256) throw assetError(asset, "integrity mismatch");
     try {
-      const max = asset.kind === "detail" ? 960 : 320;
+      const max = asset.kind === "detail" ? 960 : asset.kind === "icon" ? 192 : 320;
       const image = sharp(bytes, { failOn: "warning", limitInputPixels: max * max });
       const metadata = await image.metadata();
       if (metadata.format !== "webp" || !metadata.width || !metadata.height || metadata.width > max || metadata.height > max || (metadata.pages ?? 1) !== 1) throw Error();

@@ -38,7 +38,9 @@
     "spec:changed": "node scripts/spec-tools.mjs changed",
     "spec:check": "openspec validate --all --strict --no-interactive && openspec validate --archived --strict --no-interactive && node scripts/spec-tools.mjs check",
     "test:spec-tools": "node --test tests/spec-tools.test.mjs",
-    "verify:local": "node scripts/verify-local.mjs"
+    "verify:local": "node scripts/verify-local.mjs",
+    "materials:storage": "node scripts/migrate-material-images.mjs",
+    "test:material-image-storage": "node --test tests/material-image-storage.test.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/ibm-plex-sans-kr": "^0.4.1",

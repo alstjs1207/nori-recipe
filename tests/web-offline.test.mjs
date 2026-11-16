@@ -13,7 +13,7 @@ function corsResponse(body, { status = 200, type = "cors", contentType = "image/
   return response;
 }
 
-function worker(version = "test", storage = null) {
+function worker(version = "test", storage = null, materialStorage = null) {
   const stores = new Map();
   const listeners = new Map();
   const httpCache = new Map();
@@ -43,7 +43,7 @@ function worker(version = "test", storage = null) {
     async delete(name) { return stores.delete(name); },
   };
   const self = { location: { origin: "http://localhost" }, addEventListener: (name, callback) => listeners.set(name, callback), clients: { async claim() { claimed = true; } }, skipWaiting: () => { skipped = true; } };
-  vm.runInNewContext(createServiceWorker(version, ["/index.html", "/offline.html", "/entry.js", "/web.css"], storage), { self, caches, URL, Request, Response, fetch: async (request) => {
+  vm.runInNewContext(createServiceWorker(version, ["/index.html", "/offline.html", "/entry.js", "/web.css"], storage, materialStorage), { self, caches, URL, Request, Response, fetch: async (request) => {
     fetched.push(request.url);
     if (!online) throw new Error("offline");
     return new URL(request.url).origin === STORAGE.origin ? corsResponse(`network:${request.url}`, { status, ...remoteOptions }) : new Response(`network:${request.url}`, { status });
@@ -234,4 +234,17 @@ test("이전 놀이 그림이 캐시에 있어도 새 버전 상세·썸네일�
     assert.equal(await (await cache.match(previous)).text(), "old small-cap scene");
     app.setOnline(true);
   }
+});
+
+
+const MATERIAL_STORAGE={...STORAGE,bucket:"material-fixture"};
+const materialUrl=(slug="paper",version="b".repeat(64))=>`${STORAGE.origin}/storage/v1/object/public/material-fixture/materials/${slug}/${version}/icon.webp`;
+test("재료 CORS·오프라인·에러·정확한 경로와 놀이/로컬 합계80개를 유지한다",async()=>{
+  const app=worker("materials",STORAGE,MATERIAL_STORAGE);await app.lifecycle("install");const request={destination:"image",credentials:"same-origin"};
+  assert.match(await(await app.fetch(materialUrl(),request)).text(),/network:/);app.setOnline(false);
+  assert.match(await(await app.fetch(materialUrl(),request)).text(),/network:/);assert.equal(await(await app.fetch(materialUrl("unvisited"),request)).text(),"shell:/nori-icon.svg");app.setOnline(true);
+  for(const url of [materialUrl()+"?token=secret",materialUrl().replace("/public/","/authenticated/"),materialUrl().replace("icon.webp","original.jpeg"),materialUrl().replace("/paper/","/play_001/x/"),materialUrl().replace("/paper/","/Paper/"),materialUrl().replace(STORAGE.origin,"https://other.invalid")])assert.equal(await app.fetch(url,request),undefined);
+  for(const opts of [{status:404},{type:"opaque"},{redirected:true},{contentType:"text/html"}]){app.setRemote(opts);assert.equal(await(await app.fetch(materialUrl("failed"),request)).text(),"shell:/nori-icon.svg");}
+  app.setRemote({});await Promise.all(Array.from({length:90},(_,i)=>app.fetch(i%3===0?materialUrl("material_"+i):i%3===1?storageUrl("play_"+(400+i)):`/media/local-${i}.webp`,request)));
+  const cache=await app.caches.open("nori-web-materials-media");assert.equal((await cache.keys()).length,80);app.message({type:"SKIP_WAITING"});assert.equal(app.skipped(),true);
 });

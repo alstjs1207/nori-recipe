@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-16",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "actualPublicObjects": 482,
+  "noGit": true,
+  "noOriginals": true,
+  "noAdminCredentials": true,
+  "report": {
+    "plays": 208,
+    "reviewImages": 0,
+    "originalMB": 0,
+    "detailMB": 15.36,
+    "thumbnailMB": 2.54,
+    "imageMode": "public",
+    "verifiedPublicAssets": 416,
+    "materialImageMode": "public",
+    "verifiedMaterialAssets": 66,
+    "version": "5914948b4cfe"
+  }
+}

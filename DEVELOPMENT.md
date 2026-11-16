@@ -497,3 +497,35 @@ Production의 기존 PUBLIC_ORIGIN/GA4 설정은 유지하고 Preview는 VERCEL_
 [최종 검증](openspec/changes/migrate-play-images-to-supabase-storage/verification.md)과 [완료 기록](openspec/completed-work.md)을 참고하세요. 재료 이미지는 Git·Vercel 제공을 유지하며 별도 후속입니다. 관리 복원 UI·실제 전체 복원/호스팅 롤백·서비스 내 추가 제공처 고지는 [미완료 후속](openspec/follow-ups/play-image-operations.md)에 남깁니다. 수동 관리 복원/충돌 방지 도구와 미구현 UI 연결을 구분합니다. 자산 제공 경로·권리 범위는 ASSET-LICENSE.md에도 기록했습니다.
 
 현재 공개 매니페스트는 CI와 두 배포 환경이 `openspec/changes/migrate-play-images-to-supabase-storage/evidence/full-public-manifest-2026-11-15.json`에서 읽습니다. 완료 정리만을 위해 이 경로를 이동하면 새 빌드가 실패하므로 이번에는 폴더를 유지합니다. archive는 안정적 자산 입력 경로로 전환한 뒤 수행합니다. 이번 문서 커밋은 Preview에만 푸시하며 main/운영 재배포는 별도 요청 대상으로 유지합니다.
+
+## 재료 이미지 Storage 이관 — 2026-11-16
+
+`pnpm materials:storage`는 CON-006 재료 전용 도구입니다. 놀이 도구의 play ID 경로 검증은 유지합니다. 기본은 dry-run이며 `--write`만 로컬 관리 파일/객체를 씁니다. 디렉터리 fixture는 키를 읽지 않고 네트워크 요청을 하지 않습니다.
+
+```sh
+pnpm materials:storage plan --baseline-ref 936905b4102b816bc318304d7a4db88007faccf4 --original-bucket material-originals --public-bucket material-assets --write
+mkdir -p generated/material-image-storage/fixture-objects
+pnpm materials:storage migrate --store-dir generated/material-image-storage/fixture-objects
+# 로컬 전송/다운로드 검증은 위 명령에 --write 추가
+pnpm materials:storage restore --store-dir generated/material-image-storage/fixture-objects
+```
+
+관리 계획·state·공개 후보는 `generated/material-image-storage/` 안의 별도 JSON 경로(`--plan`, `--state`, `--public-manifest`)만 허용하며 심볼릭 링크/경로 탈출·충돌·중복 실행을 차단합니다. 기존 바이트와 다른 객체는 덮어쓰지 않습니다. 원본과 정의/승인 매핑을 IO 전후 재검증하고 부분 실패는 종료1·체크포인트·완료 객체로 남깁니다. 재실행은 실제 GET을 다시 검증합니다. 비공개 전환/바이트 변경은 후보에서 제외하고 부분 객체까지 정리 후보로 남기되 원격 삭제하지 않습니다. 복원은 전체 비공개 원본을 다운로드해 SHA-256/JPEG 확인 후 없는 파일만 배타적으로 생성하며 충돌 원본을 보존합니다.
+
+원격은 `--remote`를 명시하고 로컬 실행 메모리에만 `MATERIAL_IMAGE_STORAGE_URL`/`MATERIAL_IMAGE_STORAGE_SERVICE_ROLE_KEY`를 주입합니다. 키·관리 계획은 앱·Git·CI·Vercel·공개 후보에 넣지 않습니다. 도구는 버킷/DB/Auth/RLS 수정이나 객체 삭제/덮어쓰기 API를 제공하지 않습니다. `material-originals`는 비공개 JPEG, `material-assets`는 공개 WebP·각16MiB·별도 쓰기 정책 없음입니다. 실제 실행 결과는 해당 change evidence에서 fixture와 구분합니다.
+
+공개 빌드는 기존 놀이 설정에 아래 세 재료 설정을 함께 명시합니다. 공개 SHA·크기·192px 단일 WebP와 현재 정의/매핑/고정 원본 해시를 대조하며 관리자 원본·Git·키 없이 빌드합니다. `MATERIAL_IMAGE_PUBLIC_ASSET_DIR` 지정 시 검증할 버킷/객체 디렉터리만 읽으며 누락 시 네트워크로 우회하지 않습니다. 공개 검증 입력은 `verify:local --public-images`의 build:web에만 전달하고 모든 테스트/Expo에서 관리자 값·dotenv·분석을 차단합니다.
+
+```sh
+export MATERIAL_IMAGE_PUBLIC_MANIFEST=openspec/changes/migrate-material-images-to-supabase-storage/evidence/public-manifest-2026-11-16.json
+export MATERIAL_IMAGE_PUBLIC_ORIGIN=https://clqthwgsmumiwnnqjtbe.supabase.co
+export MATERIAL_IMAGE_PUBLIC_BUCKET=material-assets
+# 앞 절의 PLAY_IMAGE_PUBLIC_* 세 설정도 필요
+pnpm verify:local --public-images
+```
+
+웹·소개가 같은 불변 재료 URL을 사용하고 대기5개는 기본 아이콘입니다. PWA는 재료/놀이의 서로 다른 공개 경로만 익명 CORS 이미지로 캐시하며 로컬과 합계80개·선택 업데이트·첫 오프라인 기본 화면을 유지합니다. 전체 재료/놀이 선저장은 하지 않습니다. 로컬 검수·기본 로컬 빌드·네이티브 정적 매핑에는 원본이 필요합니다. 소스 snapshot은 export 중에만 주입하고 성공/실패 모두 원복합니다.
+
+실제 원본67개/공개66개 업로드와 다운로드 해시·원본 전체 복원·원본 없는 실제 공개482개 소스 빌드·익명 원본/변경 차단 검증을 완료했습니다. 원본 JPEG67개는 정확한 파일 경로별 Git 제외이며 로컬에 남습니다. 미매핑1개는 비공개만, 대기5개는 브랜드 기본 표시입니다. 새 이미지는 기존 검수·기준 커밋을 통과하고 공개 매니페스트와 `materialImageSourceHashes.json`의 고정 승인 해시를 함께 갱신해야 합니다. 기준 커밋의 과거 이미지를 복원/재검증 근거로 유지합니다.
+
+Preview에는 `MATERIAL_IMAGE_PUBLIC_MANIFEST`/`ORIGIN`/`BUCKET`에 해당하는 위 세 공개 Config만 추가했습니다. Production 환경·기존 놀이 설정·DB/Auth/쓰기 정책은 유지합니다. 실제 삭제 시험은 새로 생성한 임시 시험 객체에만 수행했고 모두 정리했습니다. RLS로 삭제가 차단돼도 HTTP200/빈 배열을 반환할 수 있어 요청 상태뿐 아니라 실제 객체 목록과 바이트 보존으로 검증합니다. 서비스 SDK 프로토콜은 [Supabase StorageFileApi](https://github.com/supabase/storage-js/blob/master/src/packages/StorageFileApi.ts)를 대조했습니다. 관리자 도구 자체의 원격 삭제 API는 추가하지 않습니다.

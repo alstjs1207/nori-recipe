@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | 우선 확인 / 결정 필요 | 홈 세트 수·수명·완료 후 전환 | 엔진·고정 저장은 구현. 후보 부족 정책과 UI 회귀·다음 세트 시점은 미확인 | `changes/clarify-home-set-lifecycle/` |
 | 완료 / 2026-11-15 | 놀이 이미지 웹 Supabase Storage 이관 | 원본224개·공개416개 검증, Git 제외·웹/PWA·공유·원본 없는 CI·Preview/Production 완료. 사용자 실제 공유 표시 확인 | [완료 기록](completed-work.md) · [태스크](changes/migrate-play-images-to-supabase-storage/tasks.md) |
-| 후속 / 미착수 | 재료 이미지 Storage 이관 | 사용자 후속 지정. 현재 Git 원본·Vercel 제공 유지. 별도 요청 후 조사·계획·이관 | [후속 목록](follow-ups/play-image-operations.md) |
+| 진행 / 로컬·실제 Storage 검증 완료 | 재료 이미지 Storage 이관 | 비공개 원본67개·공개 파생66개 검증, 로컬 원본/Git 제외·웹/PWA·원본 없는 빌드 완료. Preview 배포 확인 진행 | [재료 change](changes/migrate-material-images-to-supabase-storage/tasks.md) |
 | 후속 / 미구현·미검증 | 이미지 관리 복원·운영 롤백·서비스 고지 보강 | 기존3.2·4.2/4.3의 남은 부분. 수동 도구·복구 절차/문서 고지와 UI 자동 연결·실제 복원/롤백·서비스 내 고지를 구분 | [후속 목록](follow-ups/play-image-operations.md) |
 | 작업 예정 / 미착수 | 최근 본 놀이 | 2026-11-09 사용자 요청으로 계획 등록. 완료 기록과 별도인 로컬 열람 목록·재열람·비우기·게스트 분리 구현 예정 | [태스크](changes/add-recently-viewed-plays/tasks.md) · [제안](changes/add-recently-viewed-plays/proposal.md) |
 | 작업 예정 / 선행 정책 결정 후 착수 | 같은 재료로 다른 추천 받기 | 2026-11-09 사용자 요청으로 계획 등록. 모두 완료한 뒤 같은 재료의 다음 세트를 명시적으로 요청하는 안. REC-006·GAP-001·GAP-002와 조율하며 미완료 세트 고정 유지 | [태스크](changes/add-same-material-recommendation-refresh/tasks.md) · [제안](changes/add-same-material-recommendation-refresh/proposal.md) |

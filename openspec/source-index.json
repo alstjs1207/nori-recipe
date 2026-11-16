@@ -521,6 +521,30 @@
       ]
     },
     {
+      "path": "scripts/material-image-storage/manifest.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/material-image-storage/migration.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/material-image-storage/stores.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/migrate-material-images.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "scripts/migrate-play-images.mjs",
       "domains": [
         "content-review"
@@ -711,6 +735,12 @@
       "path": "scripts/web/intro.mjs",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/web/material-images.mjs",
+      "domains": [
+        "content-review"
       ]
     },
     {
@@ -978,6 +1008,20 @@
       ]
     },
     {
+      "path": "src/constants/materialImageManifest.ts",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materialImageSourceHashes.json",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
       "path": "src/constants/materialImageSources.ts",
       "domains": [
         "catalog",
@@ -1000,6 +1044,13 @@
     },
     {
       "path": "src/constants/materialImageVersions.json",
+      "domains": [
+        "catalog",
+        "content-review"
+      ]
+    },
+    {
+      "path": "src/constants/materialImageWebManifest.json",
       "domains": [
         "catalog",
         "content-review"
@@ -1403,6 +1454,12 @@
       "path": "src/utils/playEmoji.ts",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "tests/material-image-storage.test.mjs",
+      "domains": [
+        "content-review"
       ]
     },
     {

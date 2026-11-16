@@ -3,6 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
+import { publicMaterialInput } from "./web/material-images.mjs";
 import { publicImageInput } from "./web/play-images.mjs";
 import { localWebImages } from "../src/constants/playImageManifest.ts";
 import { verifyPublicImageAssets } from "./web/public-image-assets.mjs";
@@ -54,6 +55,9 @@ export async function prepareWebAssets({ root = project, env = process.env, fetc
   if (validatePlayBundle(bundle, registry).errors.length) throw new Error("Invalid play content for web build");
   const publicInput = publicImageInput({ plays: bundle.plays, registry, env });
   const publicReport = publicInput ? await verifyPublicImageAssets(publicInput, { fetchImpl }) : null;
+  const materialInput = publicMaterialInput({ root, env });
+  const materialReport = materialInput ? await verifyPublicImageAssets(materialInput, { fetchImpl }) : null;
+  const materialImageManifest = materialInput?.manifest ?? { schemaVersion: 1, storage: null, entries: {} };
   const output = path.join(root, "public/media");
   await Promise.all(["plays", "thumbs", "materials", "welcome"].map((dir) => fs.mkdir(path.join(output, dir), { recursive: true })));
   const publishedImages = new Set(plays.map((play) => `${play.id}.webp`));
@@ -75,7 +79,7 @@ export async function prepareWebAssets({ root = project, env = process.env, fetc
   const sourceFile = path.join(root, "src/constants/materialImageSources.ts");
   const materialSource = await fs.readFile(sourceFile, "utf8");
   const materialImageVersions = {};
-  for (const [, slug, relative] of materialSource.matchAll(/^\s+(\w+): require\("([^"]+)"\),?$/gm)) {
+  for (const [, slug, relative] of (materialInput ? [] : materialSource.matchAll(/^\s+(\w+): require\("([^"]+)"\),?$/gm))) {
     tasks.push(async () => {
       materialImageVersions[slug] = await writeMaterialImage(slug, { source: path.resolve(path.dirname(sourceFile), relative), directory: path.join(output, "materials") });
     });
@@ -83,7 +87,7 @@ export async function prepareWebAssets({ root = project, env = process.env, fetc
   let cursor = 0;
   await Promise.all(Array.from({ length: 4 }, async () => { while (cursor < tasks.length) { const task = tasks[cursor++]; await task(); } }));
   const sortedVersions = Object.fromEntries(Object.entries(materialImageVersions).sort(([a], [b]) => a.localeCompare(b)));
-  await fs.writeFile(path.join(root, "src/constants/materialImageVersions.json"), JSON.stringify(sortedVersions, null, 2) + "\n");
+  if (!materialInput) await fs.writeFile(path.join(root, "src/constants/materialImageVersions.json"), JSON.stringify(sortedVersions, null, 2) + "\n");
   const sortedPlayVersions = Object.fromEntries(Object.entries(playImageVersions).sort(([a], [b]) => a.localeCompare(b)));
   const playImageManifest = publicInput?.manifest ?? localWebImages(bundle.plays, sortedPlayVersions);
   if (!publicInput) await fs.writeFile(path.join(root, "src/constants/playImageVersions.json"), JSON.stringify(sortedPlayVersions, null, 2) + "\n");
@@ -98,9 +102,9 @@ export async function prepareWebAssets({ root = project, env = process.env, fetc
   await Promise.all([192, 512].map((size) => sharp(icon).resize(size, size).png().toFile(path.join(icons, `icon-${size}.png`))));
   await sharp(icon).resize(180, 180).png().toFile(path.join(icons, "apple-touch-icon.png"));
   await sharp(icon).resize(384, 384).extend({ top: 64, bottom: 64, left: 64, right: 64, background: "#FAFAFE" }).png().toFile(path.join(icons, "maskable-512.png"));
-  const report = { plays: plays.length, reviewImages: plays.filter((play) => play.imageStatus === "review").length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +((publicReport?.detailBytes ?? detailBytes) / 1e6).toFixed(2), thumbnailMB: +((publicReport?.thumbnailBytes ?? thumbnailBytes) / 1e6).toFixed(2), imageMode: publicInput ? "public" : "local", verifiedPublicAssets: publicReport?.verifiedPublicAssets ?? 0 };
+  const report = { plays: plays.length, reviewImages: plays.filter((play) => play.imageStatus === "review").length, originalMB: +(originalBytes / 1e6).toFixed(2), detailMB: +((publicReport?.detailBytes ?? detailBytes) / 1e6).toFixed(2), thumbnailMB: +((publicReport?.thumbnailBytes ?? thumbnailBytes) / 1e6).toFixed(2), imageMode: publicInput ? "public" : "local", verifiedPublicAssets: publicReport?.verifiedPublicAssets ?? 0, materialImageMode: materialInput ? "public" : "local", verifiedMaterialAssets: materialReport?.verifiedPublicAssets ?? 0 };
   console.info("Web images:", JSON.stringify(report));
-  return { plays, report, playImageVersions: sortedPlayVersions, playImageManifest, welcomeImageVersion };
+  return { plays, report, materialImageManifest, playImageVersions: sortedPlayVersions, playImageManifest, welcomeImageVersion };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

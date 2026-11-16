@@ -23,7 +23,7 @@ function tree(root, prefix = "") {
     return entry.isDirectory() ? Object.entries(tree(root, name)) : [[name, sha256(fs.readFileSync(path.join(root, name)))]];
   }));
 }
-async function fixture(t, wholeApp = false) {
+async function fixture(t, wholeApp = false, materialMode = true) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "nori-public-build-"));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   // A sparse fixture, never a clone/worktree: no .git, credentials or play JPEGs.
@@ -33,7 +33,7 @@ async function fixture(t, wholeApp = false) {
     // Only already-public assets and dependencies are shared, never images/plays.
     fs.appendFileSync(path.join(root, "metro.config.js"), `\nmodule.exports.watchFolders = [${JSON.stringify(project)}];\n`);
   } else {
-    for (const file of ["materialImageSources.ts", "playImageWebManifest.json", "playImageVersions.json"]) put(root, `src/constants/${file}`, fs.readFileSync(path.join(project, "src/constants", file)));
+    for (const file of ["materialImageSources.ts", "materialImageVersions.json", "materialImageWebManifest.json", "materialImageSourceHashes.json", "playImageWebManifest.json", "playImageVersions.json"]) put(root, `src/constants/${file}`, fs.readFileSync(path.join(project, "src/constants", file)));
   }
   fs.mkdirSync(path.join(root, "public"));
   for (const entry of fs.readdirSync(path.join(project, "public"), { withFileTypes: true })) {
@@ -43,7 +43,7 @@ async function fixture(t, wholeApp = false) {
   fs.symlinkSync(path.join(project, "node_modules"), path.join(root, "node_modules"), "dir");
   fs.mkdirSync(path.join(root, "images"));
   for (const entry of fs.readdirSync(path.join(project, "images"), { withFileTypes: true })) {
-    if (entry.name !== "plays") fs.symlinkSync(path.join(project, "images", entry.name), path.join(root, "images", entry.name), entry.isDirectory() ? "dir" : "file");
+    if (entry.name !== "plays" && !(materialMode && entry.name === "material")) fs.symlinkSync(path.join(project, "images", entry.name), path.join(root, "images", entry.name), entry.isDirectory() ? "dir" : "file");
   }
   const bundle = json(path.join(project, "data/plays.json"));
   const registry = json(path.join(project, "data/materials.json"));
@@ -68,7 +68,22 @@ async function fixture(t, wholeApp = false) {
   const env = { PATH: process.env.PATH, ...Object.fromEntries(Object.entries(process.env).filter(([key]) => ["HOME", "TMPDIR", "SystemRoot"].includes(key))),
     PLAY_IMAGE_PUBLIC_MANIFEST: manifestFile, PLAY_IMAGE_PUBLIC_ORIGIN: "https://storage.fixture.invalid", PLAY_IMAGE_PUBLIC_BUCKET: "public-fixture", PLAY_IMAGE_PUBLIC_ASSET_DIR: path.join(root, "objects"),
     PUBLIC_ORIGIN: "https://fixture.example.test", EXPO_PUBLIC_GA_ENABLED: "false", EXPO_NO_TELEMETRY: "1" };
-  return { root, bundle, registry, candidate, save, bytes, env, before: tree(path.join(root, "dist")),
+  let materialCandidate;
+  if (materialMode) {
+    const {versionOf, TRANSFORM: materialTransform} = await import("../scripts/material-image-storage/manifest.mjs");
+    const {materialDefinitionHash} = await import("../scripts/review/material-images.mjs");
+    const hashes = json(path.join(project,"src/constants/materialImageSourceHashes.json"));
+    const materialEntries = Object.fromEntries(Object.entries(hashes).map(([slug,item])=>{
+      const version=versionOf(item.sourceHash,assetHash);
+      const icon={path:`materials/${slug}/${version}/icon.webp`,sha256:assetHash,bytes:bytes.length};
+      put(root,`objects/material-fixture/${icon.path}`,bytes);
+      return [slug,{sourceHash:item.sourceHash,contentHash:materialDefinitionHash(registry,slug),version,icon}];
+    }));
+    materialCandidate={schemaVersion:1,transform:materialTransform,bucket:"material-fixture",entries:materialEntries};
+    put(root,"material-public.json",JSON.stringify(materialCandidate));
+    Object.assign(env,{MATERIAL_IMAGE_PUBLIC_MANIFEST:path.join(root,"material-public.json"),MATERIAL_IMAGE_PUBLIC_ORIGIN:env.PLAY_IMAGE_PUBLIC_ORIGIN,MATERIAL_IMAGE_PUBLIC_BUCKET:"material-fixture",MATERIAL_IMAGE_PUBLIC_ASSET_DIR:env.PLAY_IMAGE_PUBLIC_ASSET_DIR});
+  }
+  return { materialCandidate, root, bundle, registry, candidate, save, bytes, env, before: tree(path.join(root, "dist")),
     originalSnapshot: fs.readFileSync(path.join(root, "src/constants/playImageWebManifest.json")),
     assetFile: (id, kind = "detail") => path.join(root, "objects/public-fixture", candidate.entries[id][kind].path) };
 }
@@ -170,17 +185,19 @@ test("export 실패·후처리 실패·출력 교체 실패에서도 기존 배�
 });
 
 test("웹 export 환경은 관리자 값과 dotenv를 필요로 하지 않는다", () => {
-  const inherited = { PATH: "/fixture", PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY: "secret", SUPABASE_SERVICE_ROLE_KEY: "secret", EXPO_PUBLIC_SUPABASE_KEY: "secret", PLAY_IMAGE_PUBLIC_ASSET_DIR: "/fixture/assets", EXPO_PUBLIC_GA_ENABLED: "false" };
+  const inherited = { PATH: "/fixture", MATERIAL_IMAGE_STORAGE_SERVICE_ROLE_KEY: "secret", MATERIAL_IMAGE_PUBLIC_BUCKET: "material-fixture", PLAY_IMAGE_STORAGE_SERVICE_ROLE_KEY: "secret", SUPABASE_SERVICE_ROLE_KEY: "secret", EXPO_PUBLIC_SUPABASE_KEY: "secret", PLAY_IMAGE_PUBLIC_ASSET_DIR: "/fixture/assets", EXPO_PUBLIC_GA_ENABLED: "false" };
   const env = webExportEnvironment(inherited, true);
-  for (const key of Object.keys(inherited).filter((key) => /SUPABASE|PLAY_IMAGE/.test(key))) assert.equal(env[key], undefined);
+  for (const key of Object.keys(inherited).filter((key) => /SUPABASE|PLAY_IMAGE|MATERIAL_IMAGE/.test(key))) assert.equal(env[key], undefined);
   assert.equal(env.EXPO_NO_DOTENV, "1"); assert.equal(env.EXPO_PUBLIC_GA_ENABLED, "false"); assert.equal(inherited.SUPABASE_SERVICE_ROLE_KEY, "secret");
 });
 
-test("깨끗한 소스 fixture의 실제 앱 Expo export는 놀이 JPEG·관리자 키 없이 성공한다", { timeout: 120_000 }, async (t) => {
+test("깨끗한 소스 fixture의 실제 앱 Expo export는 놀이/재료 JPEG·관리자 키 없이 성공한다", { timeout: 120_000 }, async (t) => {
   const f = await fixture(t, true);
   assert.equal(fs.existsSync(path.join(f.root, ".git")), false); assert.equal(fs.existsSync(path.join(f.root, "images/plays")), false);
   assert.ok(Object.keys(f.env).every((key) => !/SERVICE_ROLE|SUPABASE/.test(key)));
   const report = await buildWeb({ root: f.root, env: f.env, fetchImpl: () => { throw Error("network forbidden"); } });
+  assert.equal(fs.existsSync(path.join(f.root, "images/material")), false);
+  assert.equal(report.verifiedMaterialAssets, Object.keys(f.materialCandidate.entries).length);
   assert.equal(report.verifiedPublicAssets, f.bundle.plays.filter((play) => play.status === "live" && play.imageStatus !== "review").length * 2); assert.equal(report.originalMB, 0);
   const jsRoot = path.join(f.root, "dist/_expo/static/js");
   const scripts = [];
@@ -191,4 +208,18 @@ test("깨끗한 소스 fixture의 실제 앱 Expo export는 놀이 JPEG·관리�
   assert.deepEqual(fs.readFileSync(path.join(f.root, "src/constants/playImageWebManifest.json")), f.originalSnapshot);
   assert.equal(fs.existsSync(path.join(f.root, "images/plays")), false);
   assert.equal(fs.existsSync(path.join(f.root, "dist/media/plays")), false);
+  assert.equal(fs.existsSync(path.join(f.root, "dist/media/materials")), false);
+  assert.match(fs.readFileSync(path.join(f.root, "dist/intro/index.html"), "utf8"), /material-fixture\/materials\/paper\/[a-f0-9]{64}\/icon.webp/);
+});
+
+
+test("재료 필수 후보·파일·해시 오류는 export 전에 중단하고 기존 출력을 보존한다",async(t)=>{
+  for (const reason of ["missing-entry","missing-file","hash-mismatch"]) {
+    const f=await fixture(t,false,true);const entry=f.materialCandidate.entries.paper;let exported=false;
+    if(reason==="missing-entry"){delete f.materialCandidate.entries.paper;put(f.root,"material-public.json",JSON.stringify(f.materialCandidate));}
+    else if(reason==="missing-file")fs.unlinkSync(path.join(f.root,"objects/material-fixture",entry.icon.path));
+    else put(f.root,`objects/material-fixture/${entry.icon.path}`,Buffer.alloc(entry.icon.bytes));
+    await assert.rejects(buildWeb({root:f.root,env:f.env,exportApp:()=>{exported=true;throw Error();}}),/missing|integrity/);
+    assert.equal(exported,false);unchanged(f);
+  }
 });

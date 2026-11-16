@@ -1,0 +1,848 @@
+{
+  "date": "2026-11-16",
+  "resume": {
+    "verified": 133,
+    "created": 0
+  },
+  "restoration": {
+    "files": 67,
+    "sha256Verified": true,
+    "isolated": true
+  },
+  "access": {
+    "originalAnonymous": [
+      {
+        "sourceHash": "5e2aefd2cfd88fa1f9ea78a9cbf204c6de56777ea38ca1b42c4674dfa67f2f17",
+        "status": 400
+      },
+      {
+        "sourceHash": "012c26b957c384db11969a478094d7cde66a3ab6973360a321ce44150ba950fb",
+        "status": 400
+      },
+      {
+        "sourceHash": "54f68167bed6a599a5e166f4bdcb93f62ca4b19aa708a0a3c3e630e38f9cf775",
+        "status": 400
+      },
+      {
+        "sourceHash": "6c2abc1b4ad550584645e8f46c9d4a5b82126ba438668483baaab543ca52eac6",
+        "status": 400
+      },
+      {
+        "sourceHash": "98548dc7da087b5e410d370d7ef6a0ff7cce5d046f59cac7e785d12ad61e9aba",
+        "status": 400
+      },
+      {
+        "sourceHash": "aa40cd53baf498c784a2e76012a9a76df000b45c1f7eb43e14c2f81c00d7c70d",
+        "status": 400
+      },
+      {
+        "sourceHash": "468ca67f0d9e1e9410ae205fa2d7175b833ce489bccbeac303a82d8e5e9b61c3",
+        "status": 400
+      },
+      {
+        "sourceHash": "5422def62af0644065e42527feb6707ec8752c757d9dd27cd05a8a58cfe66bff",
+        "status": 400
+      },
+      {
+        "sourceHash": "41eff0257cee59e68cf732daecfb0b5ef3c8000870700e5b7be0b66d9d49ee32",
+        "status": 400
+      },
+      {
+        "sourceHash": "e39aa0022d1c3225295b6fddc4a1e035e4da5cf49da2a3313b065fa36e80e596",
+        "status": 400
+      },
+      {
+        "sourceHash": "944d1c9858130c83f38fc2d307049297f3d5e730f22c4bb54768c7a9afa4b847",
+        "status": 400
+      },
+      {
+        "sourceHash": "b91b226daefa35c2a8c5b91fdb8052368b541b758e2a0567f0cfdf484c9974da",
+        "status": 400
+      },
+      {
+        "sourceHash": "195663efe8f4ebc7bac6e1fd1f34515da820faf0f55bb580a376a3c98c47fedf",
+        "status": 400
+      },
+      {
+        "sourceHash": "38804019ed5eb828942ffd3f2ea6b05d2c8742fa631a43094c108acfcdf7dfe8",
+        "status": 400
+      },
+      {
+        "sourceHash": "ae763cd97566dcc661ef0baabd1e6efdbb71828b03891c0db2d9b134f2278aa3",
+        "status": 400
+      },
+      {
+        "sourceHash": "1f879ab1576751c41348595a6d3c6a6bfd0f2766aa4decbc8bf81ad34c7b5658",
+        "status": 400
+      },
+      {
+        "sourceHash": "a7f4d4417ee7d4823a07bc29d168e1cdc96fb6da42f646b3d46880d22ea9c26f",
+        "status": 400
+      },
+      {
+        "sourceHash": "5cf9e10ce76f6608031b00a21e1a82afd04df74b65de551b1651849df0636d7c",
+        "status": 400
+      },
+      {
+        "sourceHash": "b1c981f0c4f6560e4717f79e658a1db4dec17566ec4947cef9a8ea94e457219f",
+        "status": 400
+      },
+      {
+        "sourceHash": "3c079ba8fc098506cebc57a290fc4d5c2cb01f26bef3f060e51cb4d5076449a4",
+        "status": 400
+      },
+      {
+        "sourceHash": "4735ac29fee2aea9f5665a1c7f5f3f45f5dd15506e14b0630286a2a9326f56c1",
+        "status": 400
+      },
+      {
+        "sourceHash": "9936f2c569ecc9c441d40ce6bf244a0f8d42dc2f45d2964cbc9463f2fd439d5f",
+        "status": 400
+      },
+      {
+        "sourceHash": "469a9821899ca8f37c854952d890fcb532440eb7219bf0ef8f0de6cea40fc780",
+        "status": 400
+      },
+      {
+        "sourceHash": "e3fd15e91a2e4af946426b4055ab3a6af62447bd01ac04112d0b43d3fde6662c",
+        "status": 400
+      },
+      {
+        "sourceHash": "e4bf17e19a1f2a02db6ff418219bfefe7c4c1b469f24319a91381189daf3fd28",
+        "status": 400
+      },
+      {
+        "sourceHash": "26e10a9c4dceec0d762daaaf790ad9eecf31c1d9b8ff48ddd51577863ae351d1",
+        "status": 400
+      },
+      {
+        "sourceHash": "6d247c6ccbf43e8254dae08ee1bdfc89caf1864cb066d79852a1d48aa6e95f68",
+        "status": 400
+      },
+      {
+        "sourceHash": "6191959b66878ce00e28f43bc0a93bd8d7c5e10ecef69a04daa5fb6d4816f3aa",
+        "status": 400
+      },
+      {
+        "sourceHash": "bba5bf844a51bba6dedf174897c928de821f2f18712da8b15cb4751635cd4d67",
+        "status": 400
+      },
+      {
+        "sourceHash": "a9665241e45442d1c7ac7e88e96140c25a3bd32bb74ce45d91f7eb35c30df40d",
+        "status": 400
+      },
+      {
+        "sourceHash": "fa97162440c6e53b4107a3db05462a496726e56fdf16c53c0736e6d252c4857a",
+        "status": 400
+      },
+      {
+        "sourceHash": "c8fb220fb2ec13b2f3eff5c89d514d3045c6e4fbde685db14d85cd0f3a234bf1",
+        "status": 400
+      },
+      {
+        "sourceHash": "3b9fb03c9eaf99b2e921addb0f36392190034ee1d826e3aa4fef0ab731daf36c",
+        "status": 400
+      },
+      {
+        "sourceHash": "648578837d6248abc72db923940a77ba91deaa12ebf323207863161cc4083f9c",
+        "status": 400
+      },
+      {
+        "sourceHash": "7e0d4d20c8b8fa9d79283c959cd40c90895b6a51b532544975b7a0feeeb1c242",
+        "status": 400
+      },
+      {
+        "sourceHash": "481f50c77d945c082926e42599246e36f3def593fb1a13947c061262673916d9",
+        "status": 400
+      },
+      {
+        "sourceHash": "55bd254e40b716c348f7e0b937e0ee14bb04060a8260e8a1c984db259e796a10",
+        "status": 400
+      },
+      {
+        "sourceHash": "7a0db810bb2d8a95397abe42646c9891aeb15f53e7bd39c1e436fafe20e10815",
+        "status": 400
+      },
+      {
+        "sourceHash": "88d6a666668c0d30e341dfea1621389803e4076546795d93409cc3d1792975a3",
+        "status": 400
+      },
+      {
+        "sourceHash": "5739429203bf65e148fb4d24e607933da5553a42d0a6e925594e726125a09142",
+        "status": 400
+      },
+      {
+        "sourceHash": "4242f9a012909a89f01398082057fdacf40393df18b6eaaa40679c38e5e7f22d",
+        "status": 400
+      },
+      {
+        "sourceHash": "734844c5dea433d9fad25c648b05b24ce227248ce451dc4ad008f38ed02cbc18",
+        "status": 400
+      },
+      {
+        "sourceHash": "50b319544e2f264b483b02ba488decb09e25d18aff15daadd81e2955b00f2173",
+        "status": 400
+      },
+      {
+        "sourceHash": "3ebd82b1c9b0694dc6f06afde41db913508aaa8c44e3c4afab4681bf0b68d959",
+        "status": 400
+      },
+      {
+        "sourceHash": "fb56c6f7d1939c0666bfd44117120f8c232e7e1148cc2444c84a814bb916c340",
+        "status": 400
+      },
+      {
+        "sourceHash": "fdd56d8fcfc00eeddc93f037834695cd10858eab0103a59ab87f48901b766e5f",
+        "status": 400
+      },
+      {
+        "sourceHash": "7a931a1fb87d6955fbed98ec8a10c42bd4364053b0da542e2b95010bec79b6d1",
+        "status": 400
+      },
+      {
+        "sourceHash": "8da61a5660c7541462cbaae7864579c05791abfb99c613e8207b2970eef893f9",
+        "status": 400
+      },
+      {
+        "sourceHash": "906b7ff875abbe6fb95ac1d3bcde22051be1486ff7d076b1bec7a2b736a55d97",
+        "status": 400
+      },
+      {
+        "sourceHash": "3671bad79593dd1722406941a82f930770d3bef52647793c15ea916a0dd8d791",
+        "status": 400
+      },
+      {
+        "sourceHash": "f128efdb4a63ef0f6755c645212d9da16114e8df7a93f3a87355d6a9bc69e61e",
+        "status": 400
+      },
+      {
+        "sourceHash": "c4383024fff90d23fdc7548e262913c545e3e82afb97568a751b2066c8bc5b06",
+        "status": 400
+      },
+      {
+        "sourceHash": "6a95d785dc0ee506c873ba6c6bcfd78d050b3a119245cc1bf634d5ef8341e4a8",
+        "status": 400
+      },
+      {
+        "sourceHash": "80164f660aad7032eaa29de335af23ebb7f305d8b843085bd23f3c05e8265a65",
+        "status": 400
+      },
+      {
+        "sourceHash": "4aed83454c227e2afa20e303835b4adcb9c8183018edfea042bdd806695584da",
+        "status": 400
+      },
+      {
+        "sourceHash": "cd0b98909b93f1ced1704fec2e871868762cafa7fd2f8dbc524026d9801dffc8",
+        "status": 400
+      },
+      {
+        "sourceHash": "b48b7229864e5981a0938bf8405466a319e848d23828cabe08922d446d2ca7b4",
+        "status": 400
+      },
+      {
+        "sourceHash": "794bbb3b285b7ed618c73015c6d3aa13d8e2d2e7f2eda6cdde887017386f9702",
+        "status": 400
+      },
+      {
+        "sourceHash": "ece7d46f9e696642dcf2cb83eadf81d919407f68158d82c7af13505747a58082",
+        "status": 400
+      },
+      {
+        "sourceHash": "496a5bed26101ba8d936cb5bf2495f8ca0e517e947ea59c4d765e58683821798",
+        "status": 400
+      },
+      {
+        "sourceHash": "d761a0009e64e4cf4e9e562363dfcebc3b665a6edd7939f27c8cbd7a8e7181e4",
+        "status": 400
+      },
+      {
+        "sourceHash": "f75667a14cbc8894a6f421de53a2486958a08a369264f16402f34c73c15aa19d",
+        "status": 400
+      },
+      {
+        "sourceHash": "97a28a6fec8790bf5be3503cbc5343cc899f8fc44ba88a66a9471b53acfe212e",
+        "status": 400
+      },
+      {
+        "sourceHash": "abbd5fc4e5a03ebdca29f67ddfa155ebd0bd5e4afa291cbd22bdb85bac8c1257",
+        "status": 400
+      },
+      {
+        "sourceHash": "a4ebc5a3a807beb1dc524c0a65cbe4d4b3fa9b09cd13292f8f9b2f687d1cce11",
+        "status": 400
+      },
+      {
+        "sourceHash": "7dfe0222fd9c7906184681bf18eb20b553104390a227e6ff3a358a7c791d149f",
+        "status": 400
+      },
+      {
+        "sourceHash": "cc431d80b8d26c92fe3445d308f1f143676be8a89508d73f42495ae02fc5a638",
+        "status": 400
+      }
+    ],
+    "publicAnonymous": [
+      {
+        "slug": "ball",
+        "status": 200,
+        "sha256": "86718f54573b2941e8abdf3684ed2fce028aea602885fda4120f09dec1497f6d",
+        "bytes": 1296,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "basket",
+        "status": 200,
+        "sha256": "ff9ae4ba0867a51162523cd2fb2e5a984cc7c3ead3aed527c427557b5bcaae07",
+        "bytes": 1356,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "animal_toy",
+        "status": 200,
+        "sha256": "c8199a10b44d20901f920b7241abc047d49450f811410d1c98dc10646ef3dfac",
+        "bytes": 2060,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "balloon",
+        "status": 200,
+        "sha256": "0a9f1d9026a14dba50936e41a5fcd0ee118fbb4ce588e92c2d24e56eb67ad5c1",
+        "bytes": 950,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "bead",
+        "status": 200,
+        "sha256": "6ae797e6ebb8ab62cff4e0b1808ffd8ecb24d45d99f94a2a0db8cf2d51261585",
+        "bytes": 1912,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "blanket",
+        "status": 200,
+        "sha256": "c479d2c9e5ff63d5f4ba67adef16158de9ddeb16a7dbd3e14b65edc3f9e9ba90",
+        "bytes": 1560,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "block",
+        "status": 200,
+        "sha256": "cf69665b76d44ddbdaffc7855707cc5759e29d7cfd735143e4b5f3f92244a38b",
+        "bytes": 766,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "bottle",
+        "status": 200,
+        "sha256": "d113a399f47359fa7be8b12e3a4d6e4879bd6cef819cc9706cb8f10976c73072",
+        "bytes": 636,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "book",
+        "status": 200,
+        "sha256": "dfa792992b88494128bbe712398998e8444a76a1f3a59a63477e415ee48c1d1b",
+        "bytes": 1012,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "bowl",
+        "status": 200,
+        "sha256": "2747717697f419e15a72021e6a2948702b5a60ba0509635e454f389cbb9adcd2",
+        "bytes": 794,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "bubble",
+        "status": 200,
+        "sha256": "ad181f15c9d0047d112819b50a7f27a5a146052ae92f401a734fe1cbdb29d766",
+        "bytes": 1120,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "brush",
+        "status": 200,
+        "sha256": "a30ec9c724f1fcfd5d97ffb163a6fd21111f31d75d81734f6e8838fa524950de",
+        "bytes": 878,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "car_toy",
+        "status": 200,
+        "sha256": "56753f27ea4fb3d4520322cb83a306f3f31f72fe0e912455f2bdbcefe7de2c61",
+        "bytes": 1398,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "cardboard_tube",
+        "status": 200,
+        "sha256": "f9230643ccadd6ea8e236880d0f8995ea2e99eaf7a4f9997017c70f0fa522e39",
+        "bytes": 880,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "cardboard",
+        "status": 200,
+        "sha256": "db9f3c5f1fc7ebdfbf4118cf21cd5db54fc15ff421e670247bd82187646b1699",
+        "bytes": 1310,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "chair",
+        "status": 200,
+        "sha256": "91c8a432b5a40825d3157189a8d302ee42250a38400390f4faa5b0e229b65edc",
+        "bytes": 1612,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "clay",
+        "status": 200,
+        "sha256": "59116f01b3a5aabcba042684e255ce0880e11b9224154dc17c68bf14cebba827",
+        "bytes": 1032,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "cotton_pad",
+        "status": 200,
+        "sha256": "99e13418c6622ba13564765504361374efcb633a45d4586922753bb4447aafe4",
+        "bytes": 828,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "cloth",
+        "status": 200,
+        "sha256": "9e0cd1325d45426ffd626a77f06165c649dd4a529ed4c806710edaf9759a15b7",
+        "bytes": 1006,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "chopsticks",
+        "status": 200,
+        "sha256": "8629e1be781a7ad6901551ce6d562d3fa1505ea00d5cdb5877032d3719127edf",
+        "bytes": 534,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "cotton_swab",
+        "status": 200,
+        "sha256": "a58f6e13174d59dd222be5e11037be8326ca0eb05220fc9b71ae43d39ba04acb",
+        "bytes": 958,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "crayon",
+        "status": 200,
+        "sha256": "55b6a249d0c54e01723d0c99fea404ceee2d2bed18a1eee45c86b9f438f73c8d",
+        "bytes": 1082,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "cup",
+        "status": 200,
+        "sha256": "4008e0a37f61f15f83c89825a87ba7643690961a081a834ad2da3d520c62ed9c",
+        "bytes": 732,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "dropper",
+        "status": 200,
+        "sha256": "bb64de9b73b4a723e147e3c409a9e981c87f7ef601da4816a218e55b864ed42f",
+        "bytes": 822,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "flour",
+        "status": 200,
+        "sha256": "9ed48318be8f515877f9f6839042c7e96734d9e6062d85f0a970c4c81f136f3e",
+        "bytes": 1116,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "flashlight",
+        "status": 200,
+        "sha256": "4449b11ac8be807025031528685c3c81b1cd47478d1ff812939502ac14184ed6",
+        "bytes": 940,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "doll",
+        "status": 200,
+        "sha256": "c9e02c0a37187a47afd938d52c271a8afc904487f277dc79af054d83caf2c818",
+        "bytes": 1408,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "glue",
+        "status": 200,
+        "sha256": "8b4772b3e1e92b13b4ebcd97c06100a68b078c4bc7f7cb20c11dcc883e28104d",
+        "bytes": 1010,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "foam",
+        "status": 200,
+        "sha256": "ec2d96693049d8c416f1d529156609a69a73007384e11c950027f8ac5c686ea2",
+        "bytes": 1234,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "large_lid_container",
+        "status": 200,
+        "sha256": "19bf69ba2681bd664f2ec13da8d60d9bcfda1253de3c597d499fdbc9661a70fc",
+        "bytes": 1042,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "hula_hoop",
+        "status": 200,
+        "sha256": "3171e70c0d75ea22c34e14d6403082d3e936fb74274cb2858b3f5c3951da55c6",
+        "bytes": 1100,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "magnetic_tile",
+        "status": 200,
+        "sha256": "54c966bfb6ff8dd9eec264670d26c1dfb93101ed4a4aad5b044fb1735749337a",
+        "bytes": 1082,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "kinetic_sand",
+        "status": 200,
+        "sha256": "7e53948dc0791ff6846ad17c733e0df98d8f06e5a29dc8af08afe82560c4677f",
+        "bytes": 1512,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "marble",
+        "status": 200,
+        "sha256": "6572b4a031c5641c9e2e7a26facaf6f2ead5d3fc5d48661f7cda08f47c358dcb",
+        "bytes": 1516,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "mat",
+        "status": 200,
+        "sha256": "3ad1f00f5417b59d46504a9865652bbb74d57b282b89673ade4a9a7e5ff12dbc",
+        "bytes": 1460,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "paper_cup",
+        "status": 200,
+        "sha256": "a2aa9840faecd3fcb60cf273b27045bdfefd4087679201f78ac11ce93b8d64f6",
+        "bytes": 658,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "paint",
+        "status": 200,
+        "sha256": "c938774f45b704fa485cf39449b9fd60089afe6580cb52de6ae988c9b37dbb43",
+        "bytes": 1280,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "mirror",
+        "status": 200,
+        "sha256": "edd8fdd36aff420d240a001980a4ca405b3b735b4172246a7e29e6d3b045d9ce",
+        "bytes": 1234,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "paper",
+        "status": 200,
+        "sha256": "b4d5ad1ab292e235b495cedce07be01a9cda733e124310dd66b7f2d2d14073ea",
+        "bytes": 1516,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "paper_towel",
+        "status": 200,
+        "sha256": "381f2cdb111b7b2fda2fd9688f1bab90d91618a4192257dcd0a2776be24cf322",
+        "bytes": 884,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "paper_plate",
+        "status": 200,
+        "sha256": "15e43e0cb012a69f19914b7599b0bc48953cf229352bae10853bb2e0acc91802",
+        "bytes": 1062,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "plant_material",
+        "status": 200,
+        "sha256": "25c57eab5b53af85844594ef4fd1594df63870385a6dc546c34975341e3c5026",
+        "bytes": 1886,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "play_corn",
+        "status": 200,
+        "sha256": "dd57ce16690f26eb3148c7db5acdca26d4724f96575976318b73362981254ffe",
+        "bytes": 1602,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "pom_pom",
+        "status": 200,
+        "sha256": "c9de7bbbbda6a076f7961702df7a80f95df5b64f8c3864dab6670dd68d9b70b0",
+        "bytes": 1218,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "puzzle",
+        "status": 200,
+        "sha256": "c89e814e1245f92b2f54250391b7c720e68dcd0049bc81d706e914717eee619b",
+        "bytes": 1602,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "rice_flour",
+        "status": 200,
+        "sha256": "7499b068407fce86bf1a5c97228faf2928a2ebdd6580f2197e3e5ecc0d389620",
+        "bytes": 1132,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "rubber_band",
+        "status": 200,
+        "sha256": "1bcd1c7e231f7975d970c489382a3c47219dba4ea64f89e590165b296fcf6136",
+        "bytes": 2174,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "shape_ruler",
+        "status": 200,
+        "sha256": "af76cfa884d63d2a0316ad3045b1e42b84130131cc53d4ad552758ed1a099731",
+        "bytes": 948,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "salt",
+        "status": 200,
+        "sha256": "17ab09124f7d9957a8ae2198204a5e2ffc5000584117ee7163b03733fdd5425e",
+        "bytes": 806,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "scissors",
+        "status": 200,
+        "sha256": "be622e94ca3920c3d2c390936d4e580dbb696c6d4e7b196e671a9bc6f265fd6c",
+        "bytes": 918,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "sand",
+        "status": 200,
+        "sha256": "984284500cf6f8b73089daee14d797e7fd10d4601068b9f6804077558ee6b57c",
+        "bytes": 640,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "slime",
+        "status": 200,
+        "sha256": "13d07f15c2345ab1be334f01914b6b8da6d8b529d4c054fb58c77129900d61eb",
+        "bytes": 976,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "smartphone",
+        "status": 200,
+        "sha256": "378fc738edc239d461287e28197fe41b7c8ef3ddc7b7222faf50d89b0e6ae441",
+        "bytes": 914,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "straw",
+        "status": 200,
+        "sha256": "869a7d4b2ae7107a4e3d434f006c95b13a1bca7e5a5d2663b1513cee4f0f519e",
+        "bytes": 786,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "sticker",
+        "status": 200,
+        "sha256": "b91d4c67febac48cf1159170d1beab3de56da6e3195c5c82eab881c8c2431de8",
+        "bytes": 1436,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "spoon",
+        "status": 200,
+        "sha256": "ad68a813bed6102ff4868a761ec228abebe7e4ee187497211d44f399f26599be",
+        "bytes": 624,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "soft_food",
+        "status": 200,
+        "sha256": "d66e770a7afd44f4dcc53a68962c80f71f3c3abf4b44f6d02ac30e140f639e6b",
+        "bytes": 1120,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "string",
+        "status": 200,
+        "sha256": "77178ec63528202bb57ed39757b1e82d6d15bef0dad68461c4e277b37c03ef71",
+        "bytes": 1370,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "tape",
+        "status": 200,
+        "sha256": "b965f3829619a8663c7a9ffc7ec14f1ab6ec6bd721858fb20b19172f85ecd4ea",
+        "bytes": 1060,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "tissue",
+        "status": 200,
+        "sha256": "2777b340198acd250c2559c4cade8ac6929bd9c6c4815a981ce51a9bbcbf90e8",
+        "bytes": 590,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "transparent_cup",
+        "status": 200,
+        "sha256": "846c2e576ebc8260bf115364f21c48e08a5814076c7103ee4aa488b5404dca1a",
+        "bytes": 832,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "tongs",
+        "status": 200,
+        "sha256": "661fc4935ab464c52edbcb6f28a199867d9e098676cede9cb8ddad34f1026e4e",
+        "bytes": 1064,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "tray",
+        "status": 200,
+        "sha256": "1374bf5ac1137029ad82093227f8832a145c8e6ca0ef5600d1a3e691024ec3f2",
+        "bytes": 852,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "water",
+        "status": 200,
+        "sha256": "d396cd685bd21fe66c918a7e63ecc9f8378d063e937de161ed5f6b4917e64a53",
+        "bytes": 710,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "water_beads",
+        "status": 200,
+        "sha256": "e038bec7cda9b4ac379d8190cf677b1c0291feab56b07452df5e6e4f29dd7c43",
+        "bytes": 960,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      },
+      {
+        "slug": "water_bin",
+        "status": 200,
+        "sha256": "6444a96580afb0aa4e16928bbb8ee40f37f4affb8df20962fa87fdd4d1e8a8f2",
+        "bytes": 804,
+        "cors": "*",
+        "cacheControl": "public, max-age=31536000"
+      }
+    ],
+    "mutations": [
+      {
+        "op": "upload",
+        "role": "no-key",
+        "status": 400,
+        "noObjectCreated": true
+      },
+      {
+        "op": "delete-existing-temporary-probe",
+        "role": "no-key",
+        "status": 400,
+        "deletedRows": null,
+        "probeUnchanged": true
+      },
+      {
+        "op": "upload",
+        "role": "anon-key",
+        "status": 400,
+        "noObjectCreated": true
+      },
+      {
+        "op": "delete-existing-temporary-probe",
+        "role": "anon-key",
+        "status": 200,
+        "deletedRows": 0,
+        "probeUnchanged": true
+      }
+    ],
+    "originalAuthenticated": {
+      "role": "anon-key",
+      "status": 400,
+      "denied": true
+    }
+  },
+  "temporaryProbeRemoved": true
+}

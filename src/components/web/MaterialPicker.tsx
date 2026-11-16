@@ -4,6 +4,7 @@ import {
   MATERIAL_DISPLAY_NAMES,
   type MaterialSlug,
 } from "@/constants/materials";
+import { PlayImage } from "./PlayImage.web";
 import { Icon } from "./NoriUI";
 import { getMaterialImageUrl } from "@/constants/materialImageUrls";
 
@@ -94,7 +95,7 @@ export function MaterialPicker({
                       )
                     }
                   />
-                  <img
+                  <PlayImage
                     src={getMaterialImageUrl(material)}
                     alt=""
                     loading="lazy"

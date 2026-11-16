@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 // No publication, content approval, real Codex requests or analytics transmission.
 export const commands = [
   "spec:check", "test:spec-tools", "check:play-content", "check:play-images",
-  "test", "test:play-review", "test:play-image-storage", "test:local-review", "test:web", "typecheck", "build:web",
+  "test", "test:play-review", "test:play-image-storage", "test:material-image-storage", "test:local-review", "test:web", "typecheck", "build:web",
 ];
 export function verificationCommands({ publicImages = false } = {}) {
   return publicImages ? commands.filter((command) => command !== "check:play-images") : [...commands];
@@ -19,9 +19,10 @@ export function verificationEnvironment(command, inherited = process.env, { publ
     VERCEL: "", VERCEL_ENV: "", VERCEL_URL: "", VERCEL_PROJECT_PRODUCTION_URL: "",
     PLAY_IMAGE_PUBLIC_MANIFEST: "", PLAY_IMAGE_PUBLIC_ORIGIN: "", PLAY_IMAGE_PUBLIC_BUCKET: "",
     PLAY_IMAGE_PUBLIC_ASSET_DIR: "",
+    MATERIAL_IMAGE_PUBLIC_MANIFEST: "", MATERIAL_IMAGE_PUBLIC_ORIGIN: "", MATERIAL_IMAGE_PUBLIC_BUCKET: "", MATERIAL_IMAGE_PUBLIC_ASSET_DIR: "",
   };
   for (const key of Object.keys(env)) {
-    if (key.startsWith("PLAY_IMAGE_STORAGE_") || key.includes("SUPABASE") || key.includes("SERVICE_ROLE")) delete env[key];
+    if ((key.startsWith("PLAY_IMAGE_STORAGE_") || key.startsWith("MATERIAL_IMAGE_STORAGE_")) || key.includes("SUPABASE") || key.includes("SERVICE_ROLE")) delete env[key];
   }
   if (publicImages && command === "build:web") {
     for (const key of ["PLAY_IMAGE_PUBLIC_MANIFEST", "PLAY_IMAGE_PUBLIC_ORIGIN", "PLAY_IMAGE_PUBLIC_BUCKET"]) {
@@ -29,6 +30,11 @@ export function verificationEnvironment(command, inherited = process.env, { publ
       env[key] = inherited[key];
     }
     env.PLAY_IMAGE_PUBLIC_ASSET_DIR = inherited.PLAY_IMAGE_PUBLIC_ASSET_DIR || "";
+    for (const key of ["MATERIAL_IMAGE_PUBLIC_MANIFEST", "MATERIAL_IMAGE_PUBLIC_ORIGIN", "MATERIAL_IMAGE_PUBLIC_BUCKET"]) {
+      if (!inherited[key]) throw new Error(`Public-image verification requires ${key}`);
+      env[key] = inherited[key];
+    }
+    env.MATERIAL_IMAGE_PUBLIC_ASSET_DIR = inherited.MATERIAL_IMAGE_PUBLIC_ASSET_DIR || "";
   }
   // The local server distinguishes an absent origin from an empty origin.
   delete env.PUBLIC_ORIGIN;

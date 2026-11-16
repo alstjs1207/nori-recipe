@@ -1,0 +1,266 @@
+{
+  "animal_toy": {
+    "sourceHash": "8da61a5660c7541462cbaae7864579c05791abfb99c613e8207b2970eef893f9",
+    "mappingHash": "462c5264f659982bfc97f10a9f4dd587977c474b241e7ffc2aaa942ce582d35f"
+  },
+  "ball": {
+    "sourceHash": "aa40cd53baf498c784a2e76012a9a76df000b45c1f7eb43e14c2f81c00d7c70d",
+    "mappingHash": "1c96b1f1497802825475a0e2bb15d68fa28b16c14f5d804afc712ebaac154212"
+  },
+  "balloon": {
+    "sourceHash": "4242f9a012909a89f01398082057fdacf40393df18b6eaaa40679c38e5e7f22d",
+    "mappingHash": "ba66ff5bc305dd9219648215535ae417158f15c28e72e9ba8f574f72cfb68b63"
+  },
+  "basket": {
+    "sourceHash": "c4383024fff90d23fdc7548e262913c545e3e82afb97568a751b2066c8bc5b06",
+    "mappingHash": "a61b79744e4b6365c5d65fceb8664401bcdecc1537eff946fad35c51d3fbe02d"
+  },
+  "bead": {
+    "sourceHash": "6191959b66878ce00e28f43bc0a93bd8d7c5e10ecef69a04daa5fb6d4816f3aa",
+    "mappingHash": "2d1e25fc2414eb18a745b5c2e776080aa36e2d36fe6057ad46f9e333abf2156d"
+  },
+  "blanket": {
+    "sourceHash": "e3fd15e91a2e4af946426b4055ab3a6af62447bd01ac04112d0b43d3fde6662c",
+    "mappingHash": "2fbdba3e9658b417d578673d32f3111e4837ccf73bc6deb92fd1a70d03d16f58"
+  },
+  "block": {
+    "sourceHash": "7a931a1fb87d6955fbed98ec8a10c42bd4364053b0da542e2b95010bec79b6d1",
+    "mappingHash": "f40c4b898c4cbc62f85d744560587f28c8761dd4c7c0f074f92e85bc297498a9"
+  },
+  "book": {
+    "sourceHash": "ae763cd97566dcc661ef0baabd1e6efdbb71828b03891c0db2d9b134f2278aa3",
+    "mappingHash": "ffd0c80c517733de4bf5870180dbd702a6dc1b407ab79518c6a9ad5d6d9d0604"
+  },
+  "bottle": {
+    "sourceHash": "944d1c9858130c83f38fc2d307049297f3d5e730f22c4bb54768c7a9afa4b847",
+    "mappingHash": "6210507fd6544b181135222a060754a83aaa8ce0811188a450300d1ad1860c3d"
+  },
+  "bowl": {
+    "sourceHash": "3c079ba8fc098506cebc57a290fc4d5c2cb01f26bef3f060e51cb4d5076449a4",
+    "mappingHash": "59e1e208ae63e24cb5ee54d0b2eed637a62bbdfee110b1389ffcc212956da786"
+  },
+  "brush": {
+    "sourceHash": "906b7ff875abbe6fb95ac1d3bcde22051be1486ff7d076b1bec7a2b736a55d97",
+    "mappingHash": "d91e055e880914b5c35d9ccf2638ed07e785c895da7d369e1deee8074080f27e"
+  },
+  "bubble": {
+    "sourceHash": "b1c981f0c4f6560e4717f79e658a1db4dec17566ec4947cef9a8ea94e457219f",
+    "mappingHash": "26adfc49d0e00049fadea3cb78e463a47b2d3fbd8216a08c9559ea838b221a3b"
+  },
+  "car_toy": {
+    "sourceHash": "38804019ed5eb828942ffd3f2ea6b05d2c8742fa631a43094c108acfcdf7dfe8",
+    "mappingHash": "06bd5a5365c016a7ddddd9cdf759c05cff006384742cb498f4df788f789164ed"
+  },
+  "cardboard": {
+    "sourceHash": "a7f4d4417ee7d4823a07bc29d168e1cdc96fb6da42f646b3d46880d22ea9c26f",
+    "mappingHash": "4332d712c64d8eb897f2f0d41e35b91763b822919b9d4e0061257b403ee7b4b7"
+  },
+  "cardboard_tube": {
+    "sourceHash": "cd0b98909b93f1ced1704fec2e871868762cafa7fd2f8dbc524026d9801dffc8",
+    "mappingHash": "929b3f9b0916c27b4546b8bbf61fdc62a69ce6919e05f3b60f1cdfb3f57261fb"
+  },
+  "chair": {
+    "sourceHash": "3671bad79593dd1722406941a82f930770d3bef52647793c15ea916a0dd8d791",
+    "mappingHash": "cc70a8e4d63f52abf747508cf6a3cbdfc72e621acffa72e643352758f3c32e7c"
+  },
+  "chopsticks": {
+    "sourceHash": "468ca67f0d9e1e9410ae205fa2d7175b833ce489bccbeac303a82d8e5e9b61c3",
+    "mappingHash": "ac951215751f6492c5fe6bf51976a4495525279a38345b5b8bac931f108cf482"
+  },
+  "clay": {
+    "sourceHash": "5739429203bf65e148fb4d24e607933da5553a42d0a6e925594e726125a09142",
+    "mappingHash": "a300b3999f5924ec9931dfd5d225572916eab87346166142c16498277665f47e"
+  },
+  "cloth": {
+    "sourceHash": "469a9821899ca8f37c854952d890fcb532440eb7219bf0ef8f0de6cea40fc780",
+    "mappingHash": "c1d2154bbfd11b4afdd8d5c2847cddaa952a847fb64b9d9c361591a81417d501"
+  },
+  "cotton_pad": {
+    "sourceHash": "f128efdb4a63ef0f6755c645212d9da16114e8df7a93f3a87355d6a9bc69e61e",
+    "mappingHash": "8d8ba4153ad0c62a83af81246e0741e2b0763a43bf70ba321c9baf6a1a0ed15c"
+  },
+  "cotton_swab": {
+    "sourceHash": "6a95d785dc0ee506c873ba6c6bcfd78d050b3a119245cc1bf634d5ef8341e4a8",
+    "mappingHash": "2ebd37d0012891137e038545060a62b6b173bd585f76f7c6aefe75ca2bd13693"
+  },
+  "crayon": {
+    "sourceHash": "5cf9e10ce76f6608031b00a21e1a82afd04df74b65de551b1651849df0636d7c",
+    "mappingHash": "14052b39ddb6a0ef85f63c21940aa7f543ba69697013588046924d933ea74949"
+  },
+  "cup": {
+    "sourceHash": "1f879ab1576751c41348595a6d3c6a6bfd0f2766aa4decbc8bf81ad34c7b5658",
+    "mappingHash": "7e74300582d0634d6da38415d31825166849cbcca57b2c0b0acdb0270ff11c46"
+  },
+  "doll": {
+    "sourceHash": "734844c5dea433d9fad25c648b05b24ce227248ce451dc4ad008f38ed02cbc18",
+    "mappingHash": "060a029aa9ed02e29ad858cf1416cb228c31be22e53490cac62ec2df3c9cf7e4"
+  },
+  "dropper": {
+    "sourceHash": "794bbb3b285b7ed618c73015c6d3aa13d8e2d2e7f2eda6cdde887017386f9702",
+    "mappingHash": "fb78c3e2b6f8696abe7e56ee3c6d6811f1c13c106f32ffd96a561888f0c4b3a7"
+  },
+  "flashlight": {
+    "sourceHash": "6d247c6ccbf43e8254dae08ee1bdfc89caf1864cb066d79852a1d48aa6e95f68",
+    "mappingHash": "e8d1098a590fe34f663c87c98262e356cac54913794e535305f0ad94f895e93f"
+  },
+  "flour": {
+    "sourceHash": "9936f2c569ecc9c441d40ce6bf244a0f8d42dc2f45d2964cbc9463f2fd439d5f",
+    "mappingHash": "a31ee38bc2c2fbe0f3741d264da9c8a8fae976d8f050cf242b9076f662d21452"
+  },
+  "foam": {
+    "sourceHash": "fb56c6f7d1939c0666bfd44117120f8c232e7e1148cc2444c84a814bb916c340",
+    "mappingHash": "723f57eca45ffac1b71085923157e2dff49dae517717d280b97518599934510f"
+  },
+  "glue": {
+    "sourceHash": "26e10a9c4dceec0d762daaaf790ad9eecf31c1d9b8ff48ddd51577863ae351d1",
+    "mappingHash": "93d1f66b2a52c5ccebcaed368c723f148d6f9c4ff6ed32186f1c0712b0b14922"
+  },
+  "hula_hoop": {
+    "sourceHash": "ece7d46f9e696642dcf2cb83eadf81d919407f68158d82c7af13505747a58082",
+    "mappingHash": "51f27fee7c056bd17b19e4121e3084ce74f92294d4888e00b873f69af5840521"
+  },
+  "kinetic_sand": {
+    "sourceHash": "3b9fb03c9eaf99b2e921addb0f36392190034ee1d826e3aa4fef0ab731daf36c",
+    "mappingHash": "f6aad9c89176bcee39a5230fec5ea3e75b28d3881383c37f99f04deb71bf6d41"
+  },
+  "large_lid_container": {
+    "sourceHash": "4aed83454c227e2afa20e303835b4adcb9c8183018edfea042bdd806695584da",
+    "mappingHash": "cf795e1ef86a9e8b310af05964640ec1d8928e2645eb966fd9bdfe9965105a8d"
+  },
+  "magnetic_tile": {
+    "sourceHash": "3ebd82b1c9b0694dc6f06afde41db913508aaa8c44e3c4afab4681bf0b68d959",
+    "mappingHash": "36e5d44583931d6162b822930e67c9bc2ce34943df825e60d1cced5141c2c668"
+  },
+  "marble": {
+    "sourceHash": "648578837d6248abc72db923940a77ba91deaa12ebf323207863161cc4083f9c",
+    "mappingHash": "f148ddd68eee12ff02ff305e94ea1f666617f6e539a72b9296b06dd98963bce7"
+  },
+  "mat": {
+    "sourceHash": "4735ac29fee2aea9f5665a1c7f5f3f45f5dd15506e14b0630286a2a9326f56c1",
+    "mappingHash": "67081b5db1c35122fe60a42ed78ba54ce5af283aff109bb99b715553456ec17a"
+  },
+  "mirror": {
+    "sourceHash": "98548dc7da087b5e410d370d7ef6a0ff7cce5d046f59cac7e785d12ad61e9aba",
+    "mappingHash": "ae7b5bc210a022ab16ec95c8026fbb742a3b65aa16743333ad4c26285735b04d"
+  },
+  "paint": {
+    "sourceHash": "c8fb220fb2ec13b2f3eff5c89d514d3045c6e4fbde685db14d85cd0f3a234bf1",
+    "mappingHash": "5402d0ab5cb978b9d6417586519b698608c0db827f8c1764277546ac0ae43ef4"
+  },
+  "paper": {
+    "sourceHash": "88d6a666668c0d30e341dfea1621389803e4076546795d93409cc3d1792975a3",
+    "mappingHash": "54954df1287ad421a27818fb91b3f4cecde0e4aa699369093005c90b0abc609e"
+  },
+  "paper_cup": {
+    "sourceHash": "496a5bed26101ba8d936cb5bf2495f8ca0e517e947ea59c4d765e58683821798",
+    "mappingHash": "d4c1db75e8e202ff97da8f01df0849d7d14378a2f71c1451c9b2f178cc3294d8"
+  },
+  "paper_plate": {
+    "sourceHash": "d761a0009e64e4cf4e9e562363dfcebc3b665a6edd7939f27c8cbd7a8e7181e4",
+    "mappingHash": "d7dbf5cdf7a66ca0015197e3af271024016c11c4b8fd78f5831f3c3f6b7eb2ed"
+  },
+  "paper_towel": {
+    "sourceHash": "f75667a14cbc8894a6f421de53a2486958a08a369264f16402f34c73c15aa19d",
+    "mappingHash": "c868f7970d3685881b4a09f497f270196d6b0114fa84b4766d08622879f44375"
+  },
+  "plant_material": {
+    "sourceHash": "b48b7229864e5981a0938bf8405466a319e848d23828cabe08922d446d2ca7b4",
+    "mappingHash": "2499e5efc0e742d5b623252563e5c332d9a31bd15e17ed05e2c7ccb24a3094b7"
+  },
+  "play_corn": {
+    "sourceHash": "a9665241e45442d1c7ac7e88e96140c25a3bd32bb74ce45d91f7eb35c30df40d",
+    "mappingHash": "0008a07e8bddd8b64b4277d2a808a5eaf18c33c3708b2c79dda1faf324d3fae9"
+  },
+  "pom_pom": {
+    "sourceHash": "abbd5fc4e5a03ebdca29f67ddfa155ebd0bd5e4afa291cbd22bdb85bac8c1257",
+    "mappingHash": "23b332d1d601f3d73cd692b17931ae3bb6ab08576e493e6acf7bfe5ea9800225"
+  },
+  "puzzle": {
+    "sourceHash": "e4bf17e19a1f2a02db6ff418219bfefe7c4c1b469f24319a91381189daf3fd28",
+    "mappingHash": "4842713f3e062404a1814bee436c12efcfd5a93a48f9a5b529b7f138a7c8bde6"
+  },
+  "rice_flour": {
+    "sourceHash": "481f50c77d945c082926e42599246e36f3def593fb1a13947c061262673916d9",
+    "mappingHash": "90e5c176d35aa9f00c4e7c7b7d9a58163b803db1fa2de19c880c2436fe258b9e"
+  },
+  "rubber_band": {
+    "sourceHash": "6c2abc1b4ad550584645e8f46c9d4a5b82126ba438668483baaab543ca52eac6",
+    "mappingHash": "c34ce5509e81d9a46ee00b4e5bca3e9110472fc223c41fe8535b90a07069aae7"
+  },
+  "salt": {
+    "sourceHash": "a4ebc5a3a807beb1dc524c0a65cbe4d4b3fa9b09cd13292f8f9b2f687d1cce11",
+    "mappingHash": "f585f16ec5e5c610f00d899bd5f266c6a7a72da5d36c8b2aaed1aeb8dee0ec1a"
+  },
+  "sand": {
+    "sourceHash": "7a0db810bb2d8a95397abe42646c9891aeb15f53e7bd39c1e436fafe20e10815",
+    "mappingHash": "895f53be0b6c6b850c182f5e42c322a894fe24ee8c413187594c71faa57f3ed6"
+  },
+  "scissors": {
+    "sourceHash": "5e2aefd2cfd88fa1f9ea78a9cbf204c6de56777ea38ca1b42c4674dfa67f2f17",
+    "mappingHash": "b9714ae5eba2d0a1af19a81b08ae5bf90abc17338448cae65dcfe29aa3bd1a1a"
+  },
+  "shape_ruler": {
+    "sourceHash": "fa97162440c6e53b4107a3db05462a496726e56fdf16c53c0736e6d252c4857a",
+    "mappingHash": "a7a5bc04e5e3f92eed9581a488bd3fe727ee68d75c629b7243df6ba210f5318e"
+  },
+  "slime": {
+    "sourceHash": "e39aa0022d1c3225295b6fddc4a1e035e4da5cf49da2a3313b065fa36e80e596",
+    "mappingHash": "12e1d6f213f356e369d7cb8b88d9b25c1c96d6ad8fe3008a8f2d6d2cbc3e6ebe"
+  },
+  "smartphone": {
+    "sourceHash": "195663efe8f4ebc7bac6e1fd1f34515da820faf0f55bb580a376a3c98c47fedf",
+    "mappingHash": "218088625a42f97e74dda17a140474fd6407dbd10d666e2ccb045481162968b6"
+  },
+  "soft_food": {
+    "sourceHash": "cc431d80b8d26c92fe3445d308f1f143676be8a89508d73f42495ae02fc5a638",
+    "mappingHash": "ea2fa96446540af10112c29dcd25dc07f85c437dcf71cce83b06b958d21dab2a"
+  },
+  "spoon": {
+    "sourceHash": "80164f660aad7032eaa29de335af23ebb7f305d8b843085bd23f3c05e8265a65",
+    "mappingHash": "c8402fe441c62f5cdd6c4fbfb827f0b93721da1e11fcf8cdb270c41feba45c61"
+  },
+  "sticker": {
+    "sourceHash": "55bd254e40b716c348f7e0b937e0ee14bb04060a8260e8a1c984db259e796a10",
+    "mappingHash": "03194d8bb74a8401c86d51490f018e468ce9b9fcb04fd39a6d5549be598765fd"
+  },
+  "straw": {
+    "sourceHash": "54f68167bed6a599a5e166f4bdcb93f62ca4b19aa708a0a3c3e630e38f9cf775",
+    "mappingHash": "0d166714ea20b94f68975bf83a98c4e57a343afe3b53c0d8dee0c51a39de8e75"
+  },
+  "string": {
+    "sourceHash": "5422def62af0644065e42527feb6707ec8752c757d9dd27cd05a8a58cfe66bff",
+    "mappingHash": "dff63cd06efadd046ef41f978071b33ef6ed969280c2507242d8376e65890469"
+  },
+  "tape": {
+    "sourceHash": "50b319544e2f264b483b02ba488decb09e25d18aff15daadd81e2955b00f2173",
+    "mappingHash": "dd412e7721a4a5742da1ade6d8965b76b607f7f8fc89d6af379627bcc7b49699"
+  },
+  "tissue": {
+    "sourceHash": "41eff0257cee59e68cf732daecfb0b5ef3c8000870700e5b7be0b66d9d49ee32",
+    "mappingHash": "23fd3de4fdf7405bc14494452301d3e9e628a9eaf60e632f08594a977ca9d0bf"
+  },
+  "tongs": {
+    "sourceHash": "bba5bf844a51bba6dedf174897c928de821f2f18712da8b15cb4751635cd4d67",
+    "mappingHash": "0cbbc308fbad2275456420a21563d13f9eeb91d77821f61fb78119ba0efb90c5"
+  },
+  "transparent_cup": {
+    "sourceHash": "97a28a6fec8790bf5be3503cbc5343cc899f8fc44ba88a66a9471b53acfe212e",
+    "mappingHash": "079b66e837a099615efc94831789d6df7469a82e41e462318d00552a732f286e"
+  },
+  "tray": {
+    "sourceHash": "7dfe0222fd9c7906184681bf18eb20b553104390a227e6ff3a358a7c791d149f",
+    "mappingHash": "e01d46f1e69758c7b375f0bbccd8142b5df5b51a4ee47b3baf27b94613f05bd8"
+  },
+  "water": {
+    "sourceHash": "012c26b957c384db11969a478094d7cde66a3ab6973360a321ce44150ba950fb",
+    "mappingHash": "30dbc4aad38c45263346482952d5160d198b293448fbb1fc3889bba693b2afb0"
+  },
+  "water_beads": {
+    "sourceHash": "fdd56d8fcfc00eeddc93f037834695cd10858eab0103a59ab87f48901b766e5f",
+    "mappingHash": "93d3a5094814a281930ec202b2a476f69516e8ece8a04ba98dea71efa45a56b1"
+  },
+  "water_bin": {
+    "sourceHash": "7e0d4d20c8b8fa9d79283c959cd40c90895b6a51b532544975b7a0feeeb1c242",
+    "mappingHash": "955e47430bbf7014a2318513782000a9124714d81499d4afea38e82c956e4455"
+  }
+}

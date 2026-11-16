@@ -141,7 +141,8 @@ test("기본 아이콘을 실제 재료 이미지로 교체하면 주소 버전�
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "nori-material-version-"));
   try {
     const icon = fileURLToPath(new URL("../public/nori-icon.svg", import.meta.url));
-    const plate = fileURLToPath(new URL("../images/material/paper_plate.jpeg", import.meta.url));
+    const plate = path.join(directory, "fixture-material.jpeg");
+    await sharp({ create: { width: 64, height: 64, channels: 3, background: "#aabbcc" } }).jpeg().toFile(plate);
     const oldVersion = await writeMaterialImage("paper_plate", { source: icon, directory });
     const newVersion = await writeMaterialImage("paper_plate", { source: plate, directory });
     assert.notEqual(newVersion, oldVersion);

@@ -1,9 +1,11 @@
 import type { MaterialSlug } from "./materials";
 import materialImageVersions from "./materialImageVersions.json";
 
+import manifest from "./materialImageWebManifest.json";
+import { materialImageUrl } from "./materialImageManifest";
+
 const versions: Partial<Record<MaterialSlug, string>> = materialImageVersions;
 
 export function getMaterialImageUrl(material: MaterialSlug): string {
-  const version = versions[material];
-  return `/media/materials/${material}.webp${version ? `?v=${version}` : ""}`;
+  return materialImageUrl(manifest, material, versions);
 }

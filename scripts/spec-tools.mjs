@@ -43,7 +43,7 @@ export function classify(file) {
   if (/^app\/\(main\)\/(settings|mypage)/.test(file)) return ["local-data", "privacy", "web-platform"];
   if (/^app\/\(main\)\/(search|play)|^src\/play\//.test(file)) return ["catalog"];
   if (/^tools\/local-review\//.test(file)) return /recommendation/.test(file) ? ["local-studio", "recommendations"] : ["local-studio", "content-review"];
-  if (/^scripts\/(?:play-image-storage\/|migrate-play-images\.mjs)|^tests\/play-image-storage\.test\.mjs$/.test(file)) return ["content-review"];
+  if (/^scripts\/(?:(?:play|material)-image-storage\/|migrate-(?:play|material)-images\.mjs)|^tests\/(?:play|material)-image-storage\.test\.mjs$/.test(file)) return ["content-review"];
   if (/^scripts\/review\/|^scripts\/(?:.*review|.*material-images|build-play-catalog|validate-play-content)|^tests\/(?:.*review|material-images)|^data\/|^\.claude\/skills\//.test(file)) return ["content-review"];
   if (/^scripts\/(prepare-play-images|material-audit)/.test(file)) return ["content-review", "recommendations"];
   if (/^src\/constants\/(?:playImage|materialImage|materials|materialVisuals)/.test(file)) return ["content-review", "catalog"];

@@ -7,6 +7,7 @@ import { prepareWebAssets } from "./prepare-web-assets.mjs";
 import { createServiceWorker } from "./web/service-worker.mjs";
 import { resolvePublicOrigin, withSiteMetadata, withPlayMetadata, withPublicOrigin } from "./web/html.mjs";
 import { writeIntroPage } from "./web/intro.mjs";
+import { withWebMaterialManifest } from "./web/material-images.mjs";
 import { withWebImageManifest } from "./web/play-images.mjs";
 import { publishWebBuild } from "./web/build-output.mjs";
 
@@ -20,7 +21,7 @@ async function filesIn(directory) {
 export function webExportEnvironment(inherited, publicMode) {
   const env = { ...inherited, CI: "1", EXPO_NO_TELEMETRY: "1" };
   for (const key of Object.keys(env)) {
-    if (key.startsWith("PLAY_IMAGE_") || key.includes("SUPABASE") || key.includes("SERVICE_ROLE")) delete env[key];
+    if ((key.startsWith("PLAY_IMAGE_") || key.startsWith("MATERIAL_IMAGE_")) || key.includes("SUPABASE") || key.includes("SERVICE_ROLE")) delete env[key];
   }
   if (publicMode) env.EXPO_NO_DOTENV = "1";
   return env;
@@ -53,15 +54,16 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
     }
   }
   return publishWebBuild(root, async (dist) => {
-    const { plays, report, playImageVersions, playImageManifest } = await prepareWebAssets({ root, env, fetchImpl });
+    const { plays, report, playImageVersions, playImageManifest, materialImageManifest } = await prepareWebAssets({ root, env, fetchImpl });
     // Exported public settings must reflect this build, not a previous environment.
-    const result = await withWebImageManifest(root, playImageManifest, () => exportApp({ root, dist, env: webExportEnvironment({ ...env, ...analyticsEnv }, Boolean(playImageManifest.storage)) }));
+    const result = await withWebImageManifest(root, playImageManifest, () => withWebMaterialManifest(root, materialImageManifest, () => exportApp({ root, dist, env: webExportEnvironment({ ...env, ...analyticsEnv }, Boolean(playImageManifest.storage || materialImageManifest.storage)) })));
     if (result.status !== 0) throw new Error(result.error?.message ?? `${result.stdout}\n${result.stderr}`);
     console.info(result.stdout.split("\n").filter((line) => /Bundled|_expo\/static\/js|Exported:/.test(line)).join("\n"));
     if (playImageManifest.storage) {
       // Legacy public/media from an earlier local build is not a verified input.
       await Promise.all(["plays", "thumbs"].map((directory) => fs.rm(path.join(dist, "media", directory), { recursive: true, force: true })));
     }
+    if (materialImageManifest.storage) await fs.rm(path.join(dist, "media/materials"), { recursive: true, force: true });
     const stylesheet = await fs.readFile(path.join(dist, "web.css"));
     const styleVersion = crypto.createHash("sha256").update(stylesheet).digest("hex").slice(0, 12);
     const styleName = `web.${styleVersion}.css`;
@@ -80,7 +82,7 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
     // Service introduction page (/intro): numbers come from the same live plays and material registry as this build.
     const registry = JSON.parse(await fs.readFile(path.join(root, "data/materials.json"), "utf8"));
     const materialImageVersions = JSON.parse(await fs.readFile(path.join(root, "src/constants/materialImageVersions.json"), "utf8"));
-    const intro = await writeIntroPage({ root, dist, plays, registry, playImageVersions, playImageManifest, materialImageVersions, publicOrigin });
+    const intro = await writeIntroPage({ root, dist, plays, registry, playImageVersions, playImageManifest, materialImageManifest, materialImageVersions, publicOrigin });
     const assets = (await filesIn(dist)).filter((file) => /\.(js|css|ttf|woff2?)$/.test(file)).map((file) => `/${path.relative(dist, file).split(path.sep).join("/")}`);
     const precache = [...new Set(["/", "/index.html", "/offline.html", "/nori-icon.svg", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", ...assets])];
     // Code, styles, content and media changes all invalidate the previous cache.
@@ -90,7 +92,7 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
       digest.update(await fs.readFile(file));
     }
     const version = digest.digest("hex").slice(0, 12);
-    await fs.writeFile(path.join(dist, "sw.js"), createServiceWorker(version, precache, playImageManifest.storage));
+    await fs.writeFile(path.join(dist, "sw.js"), createServiceWorker(version, precache, playImageManifest.storage, materialImageManifest.storage));
     await fs.writeFile(path.join(dist, "build-report.json"), JSON.stringify({ ...report, version, playLinks: plays.length, precacheFiles: precache.length }, null, 2));
     console.info(`PWA ready: ${plays.length} public play links, ${precache.length} shell assets, cache ${version}`);
     console.info(`Intro page: /intro with ${intro.data.playCount} plays, ${intro.data.materialCount} materials, ${Object.keys(intro.screens).length} screens`);

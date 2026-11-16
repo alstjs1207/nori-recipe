@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-16",
+  "node": "v25.9.0",
+  "requiredNode": "24",
+  "pnpm": "10.33.0",
+  "command": "pnpm verify:local --public-images",
+  "exitCode": 0,
+  "testCounts": [
+    8,
+    123,
+    27,
+    15,
+    8,
+    26,
+    59
+  ],
+  "totalTests": 266,
+  "verifiedPlayAssets": 416,
+  "verifiedMaterialAssets": 66,
+  "assetSource": "Actual anonymous downloads, SHA-256 verified; explicit local asset directory, no network fallback",
+  "buildReport": {
+    "plays": 208,
+    "reviewImages": 0,
+    "originalMB": 0,
+    "detailMB": 15.36,
+    "thumbnailMB": 2.54,
+    "imageMode": "public",
+    "verifiedPublicAssets": 416,
+    "materialImageMode": "public",
+    "verifiedMaterialAssets": 66,
+    "version": "3c56ea4a106e",
+    "playLinks": 208,
+    "precacheFiles": 13
+  },
+  "logSha256": "49ad9cdbe32a1f9db48e1cee5b5b109dac6d46ac3b0e44c48c92380805659f5c",
+  "specIndex": 270,
+  "specRequirements": 38,
+  "specScenarios": 106,
+  "strictChangeValidated": true,
+  "policyChangedValidated": true
+}

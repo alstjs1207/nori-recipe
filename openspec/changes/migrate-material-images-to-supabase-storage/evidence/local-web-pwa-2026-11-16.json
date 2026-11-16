@@ -1,0 +1,288 @@
+{
+  "controller": true,
+  "caches": [
+    "nori-web-5914948b4cfe-shell",
+    "nori-web-5914948b4cfe-media"
+  ],
+  "entries": [
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/blanket/0b13889086ed38ecdb3e34abd883285282cb7ced0ed8fb8f39bf1e047c39563f/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "c479d2c9e5ff63d5f4ba67adef16158de9ddeb16a7dbd3e14b65edc3f9e9ba90"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/tissue/f41a1bb50c14ec6db045ff95eef5aa5f3f313dc0f56f54260dac00b2e4dfb44d/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "2777b340198acd250c2559c4cade8ac6929bd9c6c4815a981ce51a9bbcbf90e8"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/sticker/fe295f63f9bdc05f28f009c8f172bfdc13c374f050893e876fcb2c8bdd6bd0ab/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "b91d4c67febac48cf1159170d1beab3de56da6e3195c5c82eab881c8c2431de8"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/cloth/329662d72626fafac4eff8b8b22a176556d717746d7d4b65db9ce6a662fae612/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "9e0cd1325d45426ffd626a77f06165c649dd4a529ed4c806710edaf9759a15b7"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/paper/ae16ee89543ed91ddb3e4421175ddd6269d032746b1a5c50cfbe4efed4cacf84/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "b4d5ad1ab292e235b495cedce07be01a9cda733e124310dd66b7f2d2d14073ea"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/cardboard/b1b471dbf38a100eb1cdac07abf99f4928dc51c13138a20e59ac124191cdb3d6/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "db9f3c5f1fc7ebdfbf4118cf21cd5db54fc15ff421e670247bd82187646b1699"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/flour/25b0986a4791b59ef49ee4f21721eeebda044a28505df61eb4738ba55260eada/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "9ed48318be8f515877f9f6839042c7e96734d9e6062d85f0a970c4c81f136f3e"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/bubble/97323c4169e0ccaec31ae19209e713e9803b9fcba6107a70ced32de0d813b5bd/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "ad181f15c9d0047d112819b50a7f27a5a146052ae92f401a734fe1cbdb29d766"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/paint/ea32d1dc317fb11b18636d38194f02bc9344077c32f2cf2487506d2b6dd519eb/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "c938774f45b704fa485cf39449b9fd60089afe6580cb52de6ae988c9b37dbb43"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/pom_pom/9c9c9ab56b26e2685bc64f2162ee8e087be25992a394217c85682d09ce13f692/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "c9de7bbbbda6a076f7961702df7a80f95df5b64f8c3864dab6670dd68d9b70b0"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/salt/c593282511f91e5b46d67f3650af3cca684b22a50d8d802bed032276a4829964/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "17ab09124f7d9957a8ae2198204a5e2ffc5000584117ee7163b03733fdd5425e"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/cotton_pad/0046ee246fafd849b5b82eb22491e87a017a7d690c0da7fff2389710bb67956a/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "99e13418c6622ba13564765504361374efcb633a45d4586922753bb4447aafe4"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/tray/42198d526963990b020fbd828779e289c6dc5b68b450c36806b59117d288822b/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "1374bf5ac1137029ad82093227f8832a145c8e6ca0ef5600d1a3e691024ec3f2"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/plant_material/cb69db94fb5d6a4e48dddc44a3a2b385da2af8291e3d5867ca70109d5bcb3956/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "25c57eab5b53af85844594ef4fd1594df63870385a6dc546c34975341e3c5026"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/spoon/0a2099e5399117be9f8b2f1e1ce500bea1d3e393453690b1e61959459ff0c904/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "ad68a813bed6102ff4868a761ec228abebe7e4ee187497211d44f399f26599be"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/cardboard_tube/b54df952a01650bc8f7e21c3768243a1ba878f7d98989485b5f8a29f2019f32c/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "f9230643ccadd6ea8e236880d0f8995ea2e99eaf7a4f9997017c70f0fa522e39"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/puzzle/99ee1cc46c519df4d4ffcad566c13beefda3d047d01ecac4bf9237c7cbf00ecb/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "c89e814e1245f92b2f54250391b7c720e68dcd0049bc81d706e914717eee619b"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/rubber_band/96ee9a280e23cfe464bcd3d0c99b830d17105cff1031aa24755566f40249dad3/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "1bcd1c7e231f7975d970c489382a3c47219dba4ea64f89e590165b296fcf6136"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/bottle/b01a609bdb87164171e26df27fde094f8afc053a0401751a28ede8dec25a09b0/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "d113a399f47359fa7be8b12e3a4d6e4879bd6cef819cc9706cb8f10976c73072"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/chopsticks/ac4efb39530c24ff305b6bfa78addab9827add5fe3737ed55e71da5298d3e8ba/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "8629e1be781a7ad6901551ce6d562d3fa1505ea00d5cdb5877032d3719127edf"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/crayon/7daba8830b65acb3e0188a496d9ca35b3f3fdb88c0b3965b0090d21345f29e46/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "55b6a249d0c54e01723d0c99fea404ceee2d2bed18a1eee45c86b9f438f73c8d"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/paper_plate/a7f7bac7b692e55e6683979de0519dd4866d55eea8d1d3e2a8be4fa1cd7f6be5/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "15e43e0cb012a69f19914b7599b0bc48953cf229352bae10853bb2e0acc91802"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/string/0963749a18dd0416716aa29a6fd42fa0f59ea138396d35a00a72725489b66b94/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "77178ec63528202bb57ed39757b1e82d6d15bef0dad68461c4e277b37c03ef71"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/rice_flour/56f5e3977935c0054997b01854660eeab226def27ac1388eb5cb468ea413e193/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "7499b068407fce86bf1a5c97228faf2928a2ebdd6580f2197e3e5ecc0d389620"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/glue/b02f3913c7def56197aa7e7023c2f754b7f42d6a7b09f57ee268542f20244de6/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "8b4772b3e1e92b13b4ebcd97c06100a68b078c4bc7f7cb20c11dcc883e28104d"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/water_beads/b943ad926cf68fcd82ba873c4b842d975292c45649236b096fa6aa70f0d5c388/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "e038bec7cda9b4ac379d8190cf677b1c0291feab56b07452df5e6e4f29dd7c43"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/water/dbc65d219ce47d7d9af555d75ff7e3edfb6ed18eb6ae52cfa727ef1dcd1d5f56/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "d396cd685bd21fe66c918a7e63ecc9f8378d063e937de161ed5f6b4917e64a53"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/block/60e7f5bfdd0a259fc56b862b8a12f282c39d085544c08e3025530fe54ac02384/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "cf69665b76d44ddbdaffc7855707cc5759e29d7cfd735143e4b5f3f92244a38b"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/balloon/3876dd469017fb20da74e0728e98bcf9fcb5e11a24c42c250f404507308c8859/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "0a9f1d9026a14dba50936e41a5fcd0ee118fbb4ce588e92c2d24e56eb67ad5c1"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/paper_towel/7a92aa700fa952d268570cda97b8c4279f2d554c7174aed823d3cdf54c4415db/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "381f2cdb111b7b2fda2fd9688f1bab90d91618a4192257dcd0a2776be24cf322"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/slime/680e1f7ae94e36c82c99051ab4450c6087a6342fe79440862660dcd52dbf91f4/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "13d07f15c2345ab1be334f01914b6b8da6d8b529d4c054fb58c77129900d61eb"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/water_bin/115e0c7739c0a2ce6fdf23332d877286daae65276a3538bafd3cca0e638a9a95/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "6444a96580afb0aa4e16928bbb8ee40f37f4affb8df20962fa87fdd4d1e8a8f2"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/book/ee979b6031e3f565a356546ce9a8e981fba3a025baaa0804f0ec4b9f78f86536/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "dfa792992b88494128bbe712398998e8444a76a1f3a59a63477e415ee48c1d1b"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/bowl/bd6f1cc8d8efc22bb7a36c5a5faa943482b0c6fdad697c9d7cff4ff0ca921d7b/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "2747717697f419e15a72021e6a2948702b5a60ba0509635e454f389cbb9adcd2"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/kinetic_sand/2a2306c692632367ccafb76e4f369b7b708c2ee2ba6234e33547c4acacb9f7a7/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "7e53948dc0791ff6846ad17c733e0df98d8f06e5a29dc8af08afe82560c4677f"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/tape/3189de8cef4b3763e9d2763a4e466abd91c9e1e54882cda3d5c3dc737c4df8f0/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "b965f3829619a8663c7a9ffc7ec14f1ab6ec6bd721858fb20b19172f85ecd4ea"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/soft_food/095f8bcc8c0fdcb4e305f326a65dc54aee2d8a4f3012d7934e777a1c03da0b82/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "d66e770a7afd44f4dcc53a68962c80f71f3c3abf4b44f6d02ac30e140f639e6b"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/straw/938b493e1990b45721d908bb3f02707ea908992719fac78ef92377c80be30147/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "869a7d4b2ae7107a4e3d434f006c95b13a1bca7e5a5d2663b1513cee4f0f519e"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/sand/f33461e1a86930cd76b0bc36d9d02bd9ad2eb0cf3fc40934009382f3d552836c/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "984284500cf6f8b73089daee14d797e7fd10d4601068b9f6804077558ee6b57c"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/cup/9a7cc5b05192885dcdc7986ca60624e461e5ad603e3680c1bc2f299f8fea6906/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "4008e0a37f61f15f83c89825a87ba7643690961a081a834ad2da3d520c62ed9c"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/paper_cup/7f64a008751eb02158a27e8f54a6d15117609a5aee5ab56106b184abf2d6e342/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "a2aa9840faecd3fcb60cf273b27045bdfefd4087679201f78ac11ce93b8d64f6"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/ball/9d6a6fbd5a64fc40106adaf5cd5884c1076e724c8f30dfa63937152830577dd5/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "86718f54573b2941e8abdf3684ed2fce028aea602885fda4120f09dec1497f6d"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/magnetic_tile/9cb5bf09af8074edcde61028ff6494a69c5233325a60807023416f1ced79adaf/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "54c966bfb6ff8dd9eec264670d26c1dfb93101ed4a4aad5b044fb1735749337a"
+    },
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/transparent_cup/784dc58d81f1ec2e35ae254b7a78a70e54316a3053ae02f2ad9bf9373244fb47/icon.webp",
+      "status": 200,
+      "type": "cors",
+      "sha256": "846c2e576ebc8260bf115364f21c48e08a5814076c7103ee4aa488b5404dca1a"
+    }
+  ],
+  "cacheCount": 44,
+  "analytics": 0,
+  "hashesMatch": true,
+  "offlineSettings": true,
+  "offlineImage": [
+    {
+      "url": "https://clqthwgsmumiwnnqjtbe.supabase.co/storage/v1/object/public/material-assets/materials/paper/ae16ee89543ed91ddb3e4421175ddd6269d032746b1a5c50cfbe4efed4cacf84/icon.webp",
+      "width": 192,
+      "complete": true
+    }
+  ],
+  "firstOfflineStart": {
+    "title": "노리 레시피 · 오늘의 육아 놀이",
+    "text": "노리 레시피\n아이와의 오늘을, 더 즐겁게\n발견\n탐색\n저장\n기록\n월령 설정\n0–48개월 · 집에 있는 재료로\n아이와의 오늘을,\n더 즐겁게.\n\n거창한 준비 없이도 괜찮아요.\n아이의 월령과 우리 집 재료에 맞는 놀이를 만나보세요.\n\n작은 놀이로 함께 자라요\n오늘의 첫 놀이\n우리 아이는 언제 태어났나요?\n\n생년월을 알려주시면 지금 즐기기 좋은 놀이를 추천해드려요.\n\n아이의 생년월\n태어난 년도\n년도 선택\n2026년\n2025년\n2024년\n2023년\n2022년\n태어난 월\n월 선택\n1월\n2월\n3월\n4월\n5월\n6월\n7월\n8월\n9월\n10월\n11월\n12월\n\n년과 월을 위아래로 밀어 선택해 주세요.\n\n생년월을 선택하면 개월수를 자동으로 알려드려요.\n\n맞춤 놀이 만나보기\n\n종이, 그릇, 컵, 크레용으로 시작해요.\n우리 집 재료는 언제든 바꿀 수 있어요.\n\n먼저 놀이 둘러보기\n\n회원가입 없이 시작해요.\n설정과 기록은 이 브라우저에 저장돼요.\n\n이런 놀이를 만나볼 수 있어요\n소근육 놀이\n끼적이기 (자유화)\n\n15–20분 · 준비 3분\n\n24–30개월\n\n우리 집 재료로 가능\n인지 놀이\n바람에 종이 움직이기\n\n10–20분 · 준비 10분\n\n15–24개월\n\n우리 집 재료로 가능\n사회성 놀이\n놀이터 모래 함께 놀기\n\n30–60분 · 준비 5분\n\n24–36개월\n\n필수 재료 1개 필요\n아이의 속도에 맞춰, 함께하는 시간을 즐겨요.\n내 설정 · 이용 안내\n기본 화면 오프라인 준비 완료"
+  }
+}

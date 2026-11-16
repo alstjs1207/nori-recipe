@@ -1,3 +1,4 @@
+import { materialImageUrl } from "../../src/constants/materialImageManifest.ts";
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -322,12 +323,12 @@ function tween(el, from, to, ms){
 })();
 `;
 
-export function renderIntroPage({ data, screens, playImageVersions = {}, playImageManifest = localWebImages(data.plays.map((play) => ({ id: play.id, status: "live", imageStatus: play.hasImage ? null : "review" })), playImageVersions), materialImageVersions = {} }) {
+export function renderIntroPage({ data, screens, playImageVersions = {}, playImageManifest = localWebImages(data.plays.map((play) => ({ id: play.id, status: "live", imageStatus: play.hasImage ? null : "review" })), playImageVersions), materialImageManifest = { schemaVersion: 1, storage: null, entries: {} }, materialImageVersions = {} }) {
   const n = (value) => escapeHtml(value.toLocaleString("ko-KR"));
   const ageLabel = `${data.ageMin}–${data.ageMax}개월`;
   // 숫자를 0부터 세어 올리는 표시. 화면 낭독기는 최종 값만 읽고, 스크립트가 없으면 최종 값이 그대로 보인다.
   const count = (value) => `<span data-count-to="${value}" aria-hidden="true">${n(value)}</span><span class="sr">${n(value)}</span>`;
-  const materialChip = (slug) => `<span class="mat"><img src="${escapeHtml(versioned(`/media/materials/${slug}.webp`, materialImageVersions[slug]))}" alt="" width="32" height="32" loading="lazy" />${escapeHtml(data.displayNames[slug])}</span>`;
+  const materialChip = (slug) => `<span class="mat"><img crossorigin="anonymous" onerror="this.onerror=null;this.src='/nori-icon.svg'" src="${escapeHtml(materialImageUrl(materialImageManifest, slug, materialImageVersions))}" alt="" width="32" height="32" loading="lazy" />${escapeHtml(data.displayNames[slug])}</span>`;
   const half = Math.ceil(data.materialSlugs.length / 2);
   const rows = [data.materialSlugs.slice(0, half), data.materialSlugs.slice(half)];
   const rail = (slugs, reverse) => {
@@ -491,7 +492,7 @@ ${faqs.map(([q, a]) => `<details><summary>${escapeHtml(q)}</summary><p>${escapeH
 }
 
 // 캡처 원본을 내용 해시 이름의 WebP로 변환하고 /intro/index.html을 쓴다.
-export async function writeIntroPage({ root, dist, plays, registry, playImageVersions = {}, playImageManifest, materialImageVersions = {}, publicOrigin = null }) {
+export async function writeIntroPage({ root, dist, plays, registry, playImageVersions = {}, playImageManifest, materialImageManifest = { schemaVersion: 1, storage: null, entries: {} }, materialImageVersions = {}, publicOrigin = null }) {
   const data = collectIntroData({ plays, registry });
   const mediaDirectory = path.join(dist, "intro", "media");
   await fs.mkdir(mediaDirectory, { recursive: true });
@@ -502,7 +503,7 @@ export async function writeIntroPage({ root, dist, plays, registry, playImageVer
     await fs.writeFile(path.join(mediaDirectory, name), webp);
     screens[key] = { src: `${INTRO_PATH}/media/${name}`, alt: screen.alt };
   }
-  const html = renderIntroPage({ data, screens, playImageVersions, playImageManifest, materialImageVersions });
+  const html = renderIntroPage({ data, screens, playImageVersions, playImageManifest, materialImageManifest, materialImageVersions });
   await fs.writeFile(path.join(dist, "intro", "index.html"), withPublicOrigin(html, publicOrigin));
   return { data, screens, html };
 }
