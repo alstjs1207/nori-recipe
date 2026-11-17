@@ -36,6 +36,9 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
   const publicOrigin = resolvePublicOrigin(env);
   const preview = env.VERCEL_ENV === "preview";
   const analyticsEnv = {
+    EXPO_PUBLIC_APP_TARGET: "web",
+    EXPO_PUBLIC_TOSS_APP_NAME: "",
+    TOSS_DEVTOOLS: "",
     EXPO_PUBLIC_ANALYTICS_PREVIEW: String(preview),
     ...(preview ? {
       EXPO_PUBLIC_GA_ENABLED: "false",

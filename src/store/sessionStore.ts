@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { appRuntime } from "@/platform/runtime";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
@@ -8,6 +8,8 @@ import type { HomeIntentConfirmation, UserContext } from "@/types";
 import { parseIntentConfirmation } from "@/engine/intentRecommendation";
 import { DEFAULT_USER_CONTEXT } from "@/types";
 import { resetAnalyticsConsent } from "@/analytics/analytics";
+
+const AsyncStorage = appRuntime.storage;
 
 const GUEST_ID_STORAGE_KEY = "nori-recipe/guest-id";
 const ONBOARDING_COMPLETE_STORAGE_KEY = "nori-recipe/onboarding-complete";
@@ -107,41 +109,41 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
     set({ status: "loading", error: null });
 
-    const guestId = await getOrCreateGuestId();
-    const [
-      childName,
-      familyType,
-      onboardingCompleted,
-      savedBirthMonth,
-      savedTodayMaterials,
-      savedPinnedRecommendationIds,
-      savedPinnedRecommendationKey,
-      savedIntentConfirmation,
-    ] = await Promise.all([
-      AsyncStorage.getItem(ONBOARDING_CHILD_NAME_STORAGE_KEY),
-      AsyncStorage.getItem(ONBOARDING_FAMILY_TYPE_STORAGE_KEY),
-      AsyncStorage.getItem(ONBOARDING_COMPLETE_STORAGE_KEY),
-      AsyncStorage.getItem(CHILD_BIRTH_MONTH_STORAGE_KEY),
-      AsyncStorage.getItem(TODAY_MATERIALS_STORAGE_KEY),
-      AsyncStorage.getItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
-      AsyncStorage.getItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
-      AsyncStorage.getItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
-    ]);
-
-    set({
-      guestId,
-      childName: childName ?? "",
-      familyType: familyType === "single" || familyType === "multiple" ? familyType : null,
-      onboardingCompleted: onboardingCompleted === "true",
-      todayMaterials: parseStoredMaterials(savedTodayMaterials),
-      pinnedHomeRecommendationIds: parseStoredStringArray(savedPinnedRecommendationIds),
-      pinnedHomeRecommendationKey: savedPinnedRecommendationKey,
-      homeIntentConfirmation: parseIntentConfirmation(savedIntentConfirmation),
-    });
-
-    const fallbackBirthMonth = savedBirthMonth !== null ? Number(savedBirthMonth) : null;
-
+    let fallbackBirthMonth: number | null = null;
     try {
+      const guestId = await getOrCreateGuestId();
+      const [
+        childName,
+        familyType,
+        onboardingCompleted,
+        savedBirthMonth,
+        savedTodayMaterials,
+        savedPinnedRecommendationIds,
+        savedPinnedRecommendationKey,
+        savedIntentConfirmation,
+      ] = await Promise.all([
+        AsyncStorage.getItem(ONBOARDING_CHILD_NAME_STORAGE_KEY),
+        AsyncStorage.getItem(ONBOARDING_FAMILY_TYPE_STORAGE_KEY),
+        AsyncStorage.getItem(ONBOARDING_COMPLETE_STORAGE_KEY),
+        AsyncStorage.getItem(CHILD_BIRTH_MONTH_STORAGE_KEY),
+        AsyncStorage.getItem(TODAY_MATERIALS_STORAGE_KEY),
+        AsyncStorage.getItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
+        AsyncStorage.getItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+        AsyncStorage.getItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
+      ]);
+
+      set({
+        guestId,
+        childName: childName ?? "",
+        familyType: familyType === "single" || familyType === "multiple" ? familyType : null,
+        onboardingCompleted: onboardingCompleted === "true",
+        todayMaterials: parseStoredMaterials(savedTodayMaterials),
+        pinnedHomeRecommendationIds: parseStoredStringArray(savedPinnedRecommendationIds),
+        pinnedHomeRecommendationKey: savedPinnedRecommendationKey,
+        homeIntentConfirmation: parseIntentConfirmation(savedIntentConfirmation),
+      });
+
+      fallbackBirthMonth = savedBirthMonth !== null ? Number(savedBirthMonth) : null;
       const storedContext = await getUserContext(guestId);
       const contextWithStoredProfile =
         storedContext.childBirthMonth === null && fallbackBirthMonth !== null

@@ -30,6 +30,7 @@
 | 로컬 서버·복구·Codex 요청·실험실 | [local-studio](specs/local-studio/spec.md) |
 | 분석 동의·허용 항목·소급 기록 | [privacy](specs/privacy/spec.md) |
 | 직접 링크·공유·PWA·배포 | [web-platform](specs/web-platform/spec.md) |
+| 토스 실행·사용자별 기기 저장·공유·출시 준비 | [toss-miniapp](specs/toss-miniapp/spec.md) |
 | 명세·변경·근거 검사 | [spec-governance](specs/spec-governance/spec.md) |
 
 ## 일상 작업

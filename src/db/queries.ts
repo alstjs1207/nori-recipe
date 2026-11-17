@@ -1,5 +1,5 @@
 import { CHILD_REACTION_PARSE_OPTIONS, type ChildReaction } from "@/constants/feedback";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { appRuntime } from "@/platform/runtime";
 import { randomUUID } from "expo-crypto";
 import { Platform } from "react-native";
 
@@ -18,6 +18,7 @@ import type {
 import { DEFAULT_USER_CONTEXT } from "@/types";
 
 const DEFAULT_SYNC_STATE: SyncState = "pending";
+const AsyncStorage = appRuntime.storage;
 
 /**
  * 웹(AsyncStorage) 폴백 저장 형태. 네이티브 SQLite 스키마(v3)와 parity를 맞추기 위해

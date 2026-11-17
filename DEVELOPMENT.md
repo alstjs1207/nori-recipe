@@ -2,6 +2,8 @@
 
 [서비스 소개로 돌아가기](README.md) · [OpenSpec 관리](openspec/README.md)
 
+앱인토스 전용 빌드·Devtools·출시 인계는 [토스 미니앱 안내](docs/toss-miniapp.md)를 따른다. `pnpm build:toss`는 별도 `dist-toss`와 `nori-recipe.ait`를 만들며 기존 웹 `dist`·Vercel 배포 흐름을 유지한다.
+
 현재 동작과 작업 상태는 `openspec/specs/`, `openspec/completed-work.md`, `openspec/roadmap.md`로 관리합니다. 이 문서는 실행·운영 절차의 상세 참조이며 미확정 외부 설정은 `openspec/known-gaps.md`에서 구분합니다. 관련 문맥은 `pnpm spec:context <영역 또는 경로>`, 전체 로컬 검증은 `pnpm verify:local`을 사용합니다.
 
 웹 실행, 배포, 분석 설정과 콘텐츠 검수 절차를 정리한 문서입니다.

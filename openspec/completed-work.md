@@ -51,3 +51,9 @@ OpenSpec 최초 도입 자체의 완료 작업·검증은 `changes/archive/2026-
 구현0183e28을 preview에 푸시했다. 로컬 Node24.21.0·원격 CI Node24.22.2/pnpm10.33.0에서266개 회귀·타입·원본 없는 실제 공개482개 빌드 성공, Vercel Cr1LM2Kvg36vKvk37EtHAGAjrM3E Ready·실제 재료 표시/공유OG/소개·CORS 캐시44개 해시/분석 미전송을 확인했다. 오프라인 방문 재료와 기본 start/설정 안내는 로컬 실제 브라우저에서 검증했다. 임시 서버·최소 소스 fixture를 정리했다. 기존 놀이 동작·main d0bb441/운영93f47b0b481b는 유지한다.
 
 [태스크9/9](changes/migrate-material-images-to-supabase-storage/tasks.md) · [검증](changes/migrate-material-images-to-supabase-storage/verification.md). CI/Preview가 공개 매니페스트를 change 경로에서 읽으므로 archive 이동은 하지 않는다. main 병합/운영 배포·네이티브·기존 관리 UI 복원/전체 놀이 롤백·서비스 고지 후속은 이번 완료에 포함하지 않는다.
+
+### 2026-11-17 토스 미니앱 핵심 기능 출시 준비
+
+기존 웹/PWA·저장 키·배포 흐름을 유지하면서 사용자 지정 appName `nori-recipe`의 독립 WebView SDK3.10.0 런타임·사용자별 기기 저장·토스 공유·내비게이션/안전 영역·플로팅 탭·AI 및 개인정보 고지를 구현했다. 로그인·결제·광고·서버 백업은 추가하지 않았다.
+
+Node24.22.1/pnpm10.33.0에서 기존 작업과 함께291개, 토스 커밋 범위만 분리한 상태에서279개 회귀·타입·웹 빌드 및 실제 토스 `.ait` 빌드를 통과했다. 비압축7.43MB·아티팩트3.94MB, 승인 공개 이미지482개 무결성을 확인했다. 공식 모의 SDK에서 월령·추천·찜·기록 저장/복원·공유 링크 생성/복사·전체 초기화를 확인하고 로고·콘솔 입력 정보·636×1048 참고 화면3장을 준비했다. 실제 토스앱 핵심 동작·심사·출시는 미검증이다. [태스크](changes/add-toss-miniapp/tasks.md) · [검증](changes/add-toss-miniapp/verification.md) · [출시 안내](../docs/toss-miniapp.md). 운영 배포는 하지 않았다.

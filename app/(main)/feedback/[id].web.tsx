@@ -1,4 +1,5 @@
 import { PlayImage } from "@/components/web/PlayImage.web";
+import { appRuntime } from "@/platform/runtime";
 import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { Link, router, useLocalSearchParams } from "expo-router";
@@ -68,7 +69,7 @@ export default function FeedbackWebScreen() {
   return (
     <WebPage>
       <div className="nori-page feedback-page">
-        <button
+        {appRuntime.target !== "toss" ? <button
           className="text-button feedback-back"
           type="button"
           disabled={saving}
@@ -78,7 +79,7 @@ export default function FeedbackWebScreen() {
         >
           <Icon name="back" size={18} />
           놀이로 돌아가기
-        </button>
+        </button> : null}
         {play ? (
           <>
             <header className="page-heading">
@@ -190,7 +191,7 @@ export default function FeedbackWebScreen() {
                 {saving ? "저장 중…" : "놀이 기록 저장"}
                 <Icon name="check" size={20} />
               </button>
-              <p className="local-data-note">기록은 이 브라우저에 저장돼요.</p>
+              <p className="local-data-note">{appRuntime.target === "toss" ? "기록은 현재 토스앱의 기기에 저장돼요." : "기록은 이 브라우저에 저장돼요."}</p>
             </form>
           </>
         ) : (

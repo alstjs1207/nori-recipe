@@ -1,4 +1,5 @@
 import { PlayImage } from "@/components/web/PlayImage.web";
+import { appRuntime } from "@/platform/runtime";
 import { WebPage } from "@/components/web/NoriUI";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import {
@@ -142,14 +143,14 @@ export default function PlayDetailWebScreen() {
                 fetchPriority="high"
               />
               <div className="detail-art-controls">
-                <button
+                {appRuntime.target !== "toss" ? <button
                   type="button"
                   className="icon-button"
                   aria-label="뒤로 가기"
                   onClick={back}
                 >
                   <Icon name="back" />
-                </button>
+                </button> : <span />}
                 <BookmarkButton
                   play={play}
                   saved={favorites.ids.has(play.id)}

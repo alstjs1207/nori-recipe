@@ -30,6 +30,10 @@
     "test": "tsx --test 'src/**/*.test.ts' 'src/**/*.test.tsx'",
     "typecheck": "tsc --noEmit",
     "build:web": "node scripts/build-web.mjs",
+    "build:toss": "node scripts/build-toss.mjs",
+    "check:toss": "node scripts/check-toss.mjs",
+    "test:toss": "node --test tests/toss-*.test.mjs",
+    "dev:toss": "node scripts/dev-toss.mjs",
     "serve:web": "node scripts/serve-web.mjs",
     "test:web": "node --test tests/web-*.test.mjs",
     "spec": "openspec",
@@ -43,6 +47,7 @@
     "test:material-image-storage": "node --test tests/material-image-storage.test.mjs"
   },
   "dependencies": {
+    "@apps-in-toss/web-framework": "3.10.0",
     "@expo-google-fonts/ibm-plex-sans-kr": "^0.4.1",
     "@expo-google-fonts/nanum-gothic": "^0.4.0",
     "@expo-google-fonts/noto-sans-kr": "^0.4.3",
@@ -68,6 +73,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@apps-in-toss/devtools": "3.10.0",
     "@expo/ngrok": "^4.1.0",
     "@fission-ai/openspec": "1.15.0",
     "@types/node": "^25.6.0",

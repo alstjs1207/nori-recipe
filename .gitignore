@@ -13,9 +13,12 @@ results/
 !/data/materials.json
 !/data/review-batches/
 !/data/review-batches/*.json
-docs/
+docs/*
+!docs/toss-miniapp.md
 generated/
 node_modules/
+dist-toss/
+*.ait
 .expo/
 dist/
 .vercel/

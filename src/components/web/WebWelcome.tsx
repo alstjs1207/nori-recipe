@@ -8,6 +8,7 @@ import { formatBirthMonthInput, getBirthMonthInputError, parseBirthMonthInput } 
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { trackAnalytics } from "@/analytics/analytics";
+import { appRuntime } from "@/platform/runtime";
 import {
   Icon,
   PageFooter,
@@ -117,7 +118,7 @@ export function WebWelcome() {
             <p className="local-data-note">
               회원가입 없이 시작해요.
               <br />
-              설정과 기록은 이 브라우저에 저장돼요.
+              {appRuntime.target === "toss" ? "설정과 기록은 현재 토스앱의 기기에 저장돼요." : "설정과 기록은 이 브라우저에 저장돼요."}
             </p>
           </section>
         </div>

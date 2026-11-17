@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 // No publication, content approval, real Codex requests or analytics transmission.
 export const commands = [
-  "spec:check", "test:spec-tools", "check:play-content", "check:play-images",
+  "spec:check", "test:spec-tools", "check:play-content", "check:play-images", "test:toss",
   "test", "test:play-review", "test:play-image-storage", "test:material-image-storage", "test:local-review", "test:web", "typecheck", "build:web",
 ];
 export function verificationCommands({ publicImages = false } = {}) {
@@ -16,6 +16,7 @@ export function verificationEnvironment(command, inherited = process.env, { publ
     OPENSPEC_TELEMETRY: "0", EXPO_NO_TELEMETRY: "1", EXPO_NO_DOTENV: "1", CI: "1",
     EXPO_PUBLIC_GA_ENABLED: "false", EXPO_PUBLIC_GA_MEASUREMENT_ID: "",
     EXPO_PUBLIC_ANALYTICS_ORIGIN: "", EXPO_PUBLIC_ANALYTICS_PREVIEW: "false",
+    EXPO_PUBLIC_APP_TARGET: "web", EXPO_PUBLIC_TOSS_APP_NAME: "", TOSS_DEVTOOLS: "",
     VERCEL: "", VERCEL_ENV: "", VERCEL_URL: "", VERCEL_PROJECT_PRODUCTION_URL: "",
     PLAY_IMAGE_PUBLIC_MANIFEST: "", PLAY_IMAGE_PUBLIC_ORIGIN: "", PLAY_IMAGE_PUBLIC_BUCKET: "",
     PLAY_IMAGE_PUBLIC_ASSET_DIR: "",

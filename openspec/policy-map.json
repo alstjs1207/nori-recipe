@@ -865,6 +865,146 @@
           ]
         }
       ]
+    },
+    {
+      "id": "toss-miniapp",
+      "title": "토스 미니앱 실행·저장·공유·출시 준비",
+      "commands": [
+        "pnpm test:toss",
+        "pnpm test",
+        "pnpm typecheck",
+        "pnpm build:toss",
+        "pnpm check:toss"
+      ],
+      "requirements": [
+        {
+          "id": "TOSS-001",
+          "verification": "automated",
+          "sources": [
+            "metro.config.js",
+            "src/platform/runtime.ts",
+            "src/platform/runtime.web.ts",
+            "src/platform/runtime.toss.ts",
+            "app/_layout.tsx",
+            "scripts/build-web.mjs"
+          ],
+          "tests": [
+            "tests/toss-build.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "metro.config.js",
+              "contains": "runtime.toss.ts"
+            }
+          ]
+        },
+        {
+          "id": "TOSS-002",
+          "verification": "automated",
+          "sources": [
+            "src/platform/contract.ts",
+            "src/platform/toss-runtime.ts",
+            "src/store/sessionStore.ts",
+            "src/db/queries.ts"
+          ],
+          "tests": [
+            "src/platform/toss-runtime.test.ts",
+            "tests/toss-session.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "src/platform/toss-runtime.ts",
+              "contains": "scopedKey"
+            }
+          ]
+        },
+        {
+          "id": "TOSS-003",
+          "verification": "automated",
+          "sources": [
+            "src/platform/navigation.ts",
+            "src/components/web/TossPlatform.tsx",
+            "src/components/web/WebShell.web.tsx",
+            "public/toss.css",
+            "src/platform/devtools.ts",
+            "src/platform/devtools.preview.ts"
+          ],
+          "tests": [
+            "src/platform/toss-runtime.test.ts",
+            "tests/toss-build.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "src/platform/navigation.ts",
+              "contains": "tossBackAction"
+            }
+          ]
+        },
+        {
+          "id": "TOSS-004",
+          "verification": "automated",
+          "sources": [
+            "src/platform/toss-runtime.ts",
+            "src/components/web/PlayWebActions.web.tsx"
+          ],
+          "tests": [
+            "src/platform/toss-runtime.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/platform/toss-runtime.ts",
+              "contains": "playDeepLink"
+            }
+          ]
+        },
+        {
+          "id": "TOSS-005",
+          "verification": "automated",
+          "sources": [
+            "src/constants/tossNotices.ts",
+            "src/components/web/TossPlatform.tsx",
+            "src/components/web/PlayImage.web.tsx",
+            "src/analytics/analytics.web.ts",
+            "app/(main)/settings.web.tsx"
+          ],
+          "tests": [
+            "src/analytics/adapter-toss.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/constants/tossNotices.ts",
+              "contains": "TOSS_PRIVACY_NOTICE"
+            }
+          ]
+        },
+        {
+          "id": "TOSS-006",
+          "verification": "automated",
+          "sources": [
+            "apps-in-toss.config.ts",
+            "scripts/build-toss.mjs",
+            "scripts/check-toss.mjs",
+            "scripts/dev-toss.mjs",
+            "scripts/toss/config.mjs",
+            "scripts/toss/check.mjs",
+            "scripts/toss/output.mjs",
+            "docs/toss-miniapp.md"
+          ],
+          "tests": [
+            "tests/toss-build.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/build-toss.mjs",
+              "contains": "buildToss"
+            },
+            {
+              "path": "scripts/toss/output.mjs",
+              "contains": "publishTossBuild"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

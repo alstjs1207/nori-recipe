@@ -1,0 +1,106 @@
+/* Loaded only by the Toss HTML. The browser/PWA stylesheet stays unchanged. */
+.toss-shell {
+  --safe-top: var(--toss-safe-top, 0px);
+  --safe-bottom: var(--toss-safe-bottom, 0px);
+  --safe-left: var(--toss-safe-left, 0px);
+  --safe-right: var(--toss-safe-right, 0px);
+  padding-top: var(--safe-top);
+}
+.toss-contextbar {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  gap: 12px;
+  padding: 6px 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.toss-ai-notice, .toss-platform-error {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 6px 20px 10px;
+  color: #666477;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.toss-contextbar .profile-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 5px 12px 5px 5px;
+  border: 0;
+  border-radius: 30px;
+  background: var(--lavender);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.toss-platform-error { color: #a43232; }
+.toss-checking-user .toss-shell > :not(.toss-session-shield) { visibility: hidden; }
+.toss-session-shield {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--background);
+  color: var(--muted);
+  font-size: 14px;
+}
+.toss-shell .nori-nav-bottom {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-around;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #e8e6f0;
+  border-radius: 32px;
+  background: #fff;
+  min-height: 64px;
+  margin: 8px 20px max(12px, var(--safe-bottom));
+  padding: 8px;
+  box-shadow: 0 4px 24px #312a5010;
+}
+.toss-shell .nori-nav-bottom a {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  font-size: 11px;
+}
+.toss-shell:has(> .nori-nav-bottom) .nori-scroll-page { padding-bottom: 0; }
+.toss-shell .record-entry-heading { position: relative; }
+.toss-shell .feedback-play { position: relative; }
+.toss-shell span.toss-ai-label {
+  position: absolute;
+  display: block;
+  inset: auto 6px 6px auto;
+  z-index: 1;
+  margin: 0;
+  padding: 2px 5px;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+  background: #fffE;
+  color: #625d70;
+  font-size: 9px;
+  line-height: 1.3;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toss-shell .record-entry-heading > .toss-ai-label { left: 2px; right: auto; }
+.toss-shell .feedback-play > .toss-ai-label { left: 6px; right: auto; }
+.toss-shell .search-result-link { position: relative; }
+.toss-shell .search-result-link > .toss-ai-label { left: 6px; right: auto; }
+.toss-shell .detail-art-controls { z-index: 2; }
+@media (max-width: 380px) {
+  .toss-shell .nori-nav-bottom { margin-left: 12px; margin-right: 12px; }
+}

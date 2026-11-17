@@ -7,9 +7,10 @@ declare global {
   interface Window { dataLayer?: unknown[]; gtag?: GoogleTag }
 }
 
-const preview = process.env.EXPO_PUBLIC_ANALYTICS_PREVIEW === "true";
+const toss = process.env.EXPO_PUBLIC_APP_TARGET === "toss";
+const preview = !toss && process.env.EXPO_PUBLIC_ANALYTICS_PREVIEW === "true";
 const consentKey = preview ? ANALYTICS_PREVIEW_CONSENT_KEY : ANALYTICS_CONSENT_KEY;
-const config = !preview && process.env.EXPO_PUBLIC_GA_ENABLED === "true"
+const config = !toss && !preview && process.env.EXPO_PUBLIC_GA_ENABLED === "true"
   ? parseAnalyticsConfig(process.env.EXPO_PUBLIC_GA_MEASUREMENT_ID, process.env.EXPO_PUBLIC_ANALYTICS_ORIGIN)
   : null;
 let ready = false;

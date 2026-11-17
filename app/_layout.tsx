@@ -9,6 +9,7 @@ import { WebShell } from "@/components/web/WebShell";
 import { useAppFonts } from "@/hooks/useAppFonts";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";
+import { appRuntime } from "@/platform/runtime";
 
 export default function RootLayout() {
   const [bootstrapped, setBootstrapped] = useState(false);
@@ -23,6 +24,7 @@ export default function RootLayout() {
     setBootstrapError(null);
 
     try {
+      await appRuntime.initialize();
       await Promise.all([initSession(), loadPlays()]);
       const sessionError = useSessionStore.getState().error;
       const playsError = usePlaysStore.getState().error;

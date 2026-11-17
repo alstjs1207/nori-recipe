@@ -430,6 +430,12 @@
       ]
     },
     {
+      "path": "apps-in-toss.config.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
       "path": "babel.config.js",
       "domains": [
         "web-platform"
@@ -508,9 +514,27 @@
       ]
     },
     {
+      "path": "scripts/build-toss.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
       "path": "scripts/build-web.mjs",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "scripts/check-toss.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "scripts/dev-toss.mjs",
+      "domains": [
+        "toss-miniapp"
       ]
     },
     {
@@ -702,6 +726,24 @@
       ]
     },
     {
+      "path": "scripts/toss/check.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "scripts/toss/config.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "scripts/toss/output.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
       "path": "scripts/upload.ts",
       "domains": [
         "web-platform"
@@ -763,6 +805,12 @@
     },
     {
       "path": "src/analytics/adapter-preview.test.ts",
+      "domains": [
+        "privacy"
+      ]
+    },
+    {
+      "path": "src/analytics/adapter-toss.test.ts",
       "domains": [
         "privacy"
       ]
@@ -933,6 +981,12 @@
       "path": "src/components/web/SearchAgePicker.tsx",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/TossPlatform.tsx",
+      "domains": [
+        "toss-miniapp"
       ]
     },
     {
@@ -1123,6 +1177,12 @@
       "path": "src/constants/theme.ts",
       "domains": [
         "web-platform"
+      ]
+    },
+    {
+      "path": "src/constants/tossNotices.ts",
+      "domains": [
+        "toss-miniapp"
       ]
     },
     {
@@ -1328,6 +1388,60 @@
       ]
     },
     {
+      "path": "src/platform/contract.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/devtools.preview.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/devtools.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/navigation.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/runtime.toss.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/runtime.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/runtime.web.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/toss-runtime.test.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/toss-runtime.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
       "path": "src/play/feedbackSignals.test.ts",
       "domains": [
         "play-records"
@@ -1496,6 +1610,18 @@
       "path": "tests/spec-tools.test.mjs",
       "domains": [
         "spec-governance"
+      ]
+    },
+    {
+      "path": "tests/toss-build.test.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "tests/toss-session.test.mjs",
+      "domains": [
+        "toss-miniapp"
       ]
     },
     {

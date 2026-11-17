@@ -5,8 +5,11 @@ import { useSessionStore } from "@/store/sessionStore";
 import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
 import { WebAnalyticsProvider } from "./WebAnalytics";
 import { WebInstallProvider } from "./WebInstall";
+import { appRuntime } from "@/platform/runtime";
+import { TossPlatform } from "./TossPlatform";
 
 export function WebShell({ children }: PropsWithChildren) {
+  if (appRuntime.target === "toss") return <WebAnalyticsProvider><WebShellContent>{children}</WebShellContent></WebAnalyticsProvider>;
   return (
     <WebAnalyticsProvider>
       <WebInstallProvider>
@@ -38,7 +41,7 @@ function WebShellContent({ children }: PropsWithChildren) {
     window.addEventListener("offline", onOffline);
     window.addEventListener("nori:offline-ready", onReady);
     window.addEventListener("nori:update-ready", onUpdate);
-    if ("serviceWorker" in navigator) {
+    if (appRuntime.target !== "toss" && "serviceWorker" in navigator) {
       void navigator.serviceWorker.ready.then((registration) => {
         setOfflineReady(true);
         if (registration.waiting) setWaiting(registration.waiting);
@@ -75,14 +78,14 @@ function WebShellContent({ children }: PropsWithChildren) {
   }
 
   return (
-    <div className="web-shell">
-      <header className="web-toolbar">
-        <Link href="/" className="web-brand" aria-label="노리 레시피 홈">
+    <div className={`web-shell${appRuntime.target === "toss" ? " toss-shell" : ""}`}>
+      <header className={appRuntime.target === "toss" ? "toss-contextbar" : "web-toolbar"}>
+        {appRuntime.target !== "toss" ? <Link href="/" className="web-brand" aria-label="노리 레시피 홈">
           <BrandMark />
           <span>노리 레시피</span>
           <span className="brand-tagline">아이와의 오늘을, 더 즐겁게</span>
-        </Link>
-        <WebNavigation placement="header" />
+        </Link> : <span>우리 가족의 놀이</span>}
+        {appRuntime.target !== "toss" ? <WebNavigation placement="header" /> : null}
         <div className="web-toolbar-actions">
           <button
             className="profile-button"
@@ -98,6 +101,7 @@ function WebShellContent({ children }: PropsWithChildren) {
           </button>
         </div>
       </header>
+      <TossPlatform />
       {!online ? (
         <div className="web-notice" role="status">
           오프라인이에요. 저장된 놀이와 기록을 볼 수 있어요.

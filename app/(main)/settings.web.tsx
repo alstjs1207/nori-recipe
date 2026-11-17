@@ -15,8 +15,12 @@ import { MaterialPicker } from "@/components/web/MaterialPicker";
 import { AnalyticsSettings } from "@/components/web/WebAnalytics";
 import { InstallSettings } from "@/components/web/WebInstall";
 import { PRIVACY_NOTICE } from "@/constants/legalNotices";
+import { TOSS_PRIVACY_NOTICE } from "@/constants/tossNotices";
+import { appRuntime } from "@/platform/runtime";
 
 export default function SettingsWebScreen() {
+  const toss = appRuntime.target === "toss";
+  const privacyNotice = toss ? TOSS_PRIVACY_NOTICE : PRIVACY_NOTICE;
   const { privacy } = useLocalSearchParams<{ privacy?: string }>();
   const policyRef = useRef<HTMLDetailsElement>(null);
   const profile = useSessionStore((state) => state.userContext);
@@ -171,22 +175,19 @@ export default function SettingsWebScreen() {
             <Icon name="sliders" size={18} />
           </button>
         </section>
-        <InstallSettings />
-        <AnalyticsSettings />
+        {toss ? null : <><InstallSettings /><AnalyticsSettings /></>}
         <section className="settings-panel">
           <h2>이용 안내</h2>
           <details id="privacy-policy" ref={policyRef}>
-            <summary>{PRIVACY_NOTICE.title}</summary>
-            <p>시행일: {PRIVACY_NOTICE.effectiveDate}</p>
-            {PRIVACY_NOTICE.items.map((item) => <p key={item}>{item}</p>)}
-            {PRIVACY_NOTICE.references.map((reference) => <p key={reference.url}><a href={reference.url} target="_blank" rel="noopener noreferrer">{reference.label}</a></p>)}
+            <summary>{privacyNotice.title}</summary>
+            <p>시행일: {privacyNotice.effectiveDate}</p>
+            {privacyNotice.items.map((item) => <p key={item}>{item}</p>)}
+            {privacyNotice.references.map((reference) => <p key={reference.url}><a href={reference.url} target="_blank" rel="noopener noreferrer" onClick={toss ? (event) => { event.preventDefault(); void appRuntime.openExternal?.(reference.url).catch(() => setError("외부 안내를 열지 못했어요. 다시 시도해 주세요.")); } : undefined}>{reference.label}</a></p>)}
           </details>
           <details>
             <summary>기록은 어디에 저장되나요?</summary>
             <p>
-              설정, 저장한 놀이, 놀이 기록은 현재 브라우저에 보관돼요. 다른
-              기기나 브라우저와 자동으로 공유되지 않으며, 브라우저 데이터를
-              지우면 함께 삭제될 수 있어요.
+              {toss ? "설정, 저장한 놀이, 기록은 현재 토스앱의 기기 저장소에 보관돼요. 웹·다른 기기·QR 테스트와 정식 출시 간에는 자동 공유되지 않아요. 토스앱 삭제나 기기 변경으로 사라질 수 있으며 백업·복구는 제공하지 않아요." : "설정, 저장한 놀이, 놀이 기록은 현재 브라우저에 보관돼요. 다른 기기나 브라우저와 자동으로 공유되지 않으며, 브라우저 데이터를 지우면 함께 삭제될 수 있어요."}
             </p>
           </details>
           <details>
@@ -236,7 +237,7 @@ export default function SettingsWebScreen() {
                   disabled={saving}
                   onClick={() => setConfirm(null)}
                 >
-                  취소
+                  {toss ? "닫기" : "취소"}
                 </button>
                 <button
                   className="primary-button"
