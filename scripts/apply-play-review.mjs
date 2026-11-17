@@ -18,7 +18,10 @@ try {
   if (!resultsPath) throw new Error("사용법: pnpm review:apply 검수결과.json [--write] [--batch 배치.json]\n기본값은 변경하지 않는 dry-run입니다.");
   const batch = readJson(path.resolve(root, batchPath));
   const results = readJson(path.resolve(resultsPath));
-  console.info(JSON.stringify(applyApproval(root, batch, results, { write }), null, 2));
+  const report = write
+    ? await (await import("./review/register-review.mjs")).registerReview(root, batchPath, results, "play")
+    : applyApproval(root, batch, results);
+  console.info(JSON.stringify(report, null, 2));
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

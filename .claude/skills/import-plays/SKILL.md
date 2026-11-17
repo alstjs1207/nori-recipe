@@ -13,6 +13,8 @@ description: 정규화 놀이를 play-recipe 마스터에 초안으로 병합한
 
 ---
 
+최종 사용자 승인 이후 등록은 [Supabase 등록 절차](../../../tools/local-review/REGISTRATION.md)를 따른다. 스튜디오와 `review:apply`/`review:materials --write`가 승인한 놀이·새 재료의 비공개 JPEG와 공개 WebP를 업로드·다운로드 검증한 뒤 상태와 공개 등록 기록을 함께 반영한다. 생성·검수 준비 단계는 로컬 JPEG를 유지하며 업로드·승인을 대신하지 않는다. 키/전송 실패 시 초안·이미지를 보존하고 기존 도구로 재시도하며 `status`·`reviewPending`·공개 매니페스트를 직접 고쳐 우회하지 않는다.
+
 ## Step 1: 파일 읽기
 
 ### 기존 plays.json 읽기

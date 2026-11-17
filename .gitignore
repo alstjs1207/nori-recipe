@@ -11,6 +11,8 @@ results/
 /data/*
 !/data/plays.json
 !/data/materials.json
+!/data/play-image-publications.json
+!/data/material-image-publications.json
 !/data/review-batches/
 !/data/review-batches/*.json
 docs/*
@@ -46,6 +48,9 @@ yarn-error.*
 
 # Play originals stay local; deployed web builds verify public Storage assets.
 /images/plays/
+
+# New material originals are local review inputs; approval preserves them in Storage.
+/images/material/*.jpeg
 
 # OpenSpec-generated Claude workflows are project tools.
 !.claude/skills/openspec-*/

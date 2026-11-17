@@ -22,20 +22,21 @@ export const backofficeCss = () => fs.readFileSync(new URL("./backoffice.css", i
 export function sidebar({ page, catalogLink = "play-catalog.html", serverUrls = false, initialView = "plays", plays = 0, materials = 0, batches = 0, registered = 0, total = 0 }) {
   const link = esc(catalogLink);
   const catalog = page === "catalog";
-  const current = page === "recommendations" ? "recommendations" : catalog ? initialView : "reviews";
+  const current = ["recommendations", "guide"].includes(page) ? page : catalog ? initialView : "reviews";
   const item = (id, view, href, glyph, label, count) => {
     const button = catalog && !serverUrls && view !== "reviews";
     const tag = button ? "button" : "a";
     const attributes = button ? ' type="button" aria-pressed="' + (current === view) + '"'
       : ' href="' + esc(href) + '"' + (current === view ? ' aria-current="page"' : '');
-    return '<' + tag + ' class="side-link"' + (catalog || view === "reviews" || view === "recommendations" ? ' id="' + id + '"' : '') + attributes + '>' + icon(glyph) + '<span>' + label + '</span>' + (count === null ? '' : '<small>' + count + '</small>') + '</' + tag + '>';
+    return '<' + tag + ' class="side-link"' + (catalog || ["reviews", "recommendations", "guide"].includes(view) ? ' id="' + id + '"' : '') + attributes + '>' + icon(glyph) + '<span>' + label + '</span>' + (count === null ? '' : '<small>' + count + '</small>') + '</' + tag + '>';
   };
   const navigation = item("plays-tab", "plays", catalogLink, "library", "놀이 라이브러리", catalog ? plays : null) +
     item("materials-tab", "materials", serverUrls ? "/materials" : catalogLink + "#materials", "materials", "재료 라이브러리", catalog ? materials : null);
   const review = item("reviews-nav", "reviews", serverUrls ? "/reviews" : (catalog ? "" : catalogLink) + "#review-batches", "review", "수집 건별 검수", catalog ? batches : null);
   const recommendations = serverUrls ? '<p class="nav-label review-nav-label">추천 엔진</p>' + item("recommendations-nav", "recommendations", "/recommendations", "architecture", "추천 아키텍처", null) : '';
+  const guide = serverUrls ? '<p class="nav-label review-nav-label">도움말</p>' + item("guide-nav", "guide", "/guide", "info", "사용 가이드", null) : '';
   const progress = !catalog && total ? '<div class="sidebar-progress"><span>이번 수집 건</span><div><strong>' + registered + '</strong><small> / ' + total + '개 등록</small></div><div class="progress-track"><span style="width:' + Math.round(registered / total * 100) + '%"></span></div><p>' + (total - registered ? total - registered + '개 항목을 검수하고 있어요.' : '모든 항목이 등록되었어요.') + '</p></div>' : '';
-  return '<aside class="admin-sidebar" aria-label="백오피스 메뉴"><a class="brand" href="' + link + '"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span><b>nori<span class="brand-dot">.</span></b><small>콘텐츠 스튜디오</small></span></a><div class="workspace-switch"><span class="workspace-monogram">N</span><span><b>놀이 레시피</b><small>콘텐츠 워크스페이스</small></span></div><nav aria-label="현황 메뉴"><p class="nav-label">라이브러리</p>' + navigation + '<p class="nav-label review-nav-label">검수</p>' + review + recommendations + '</nav>' + progress + '<div class="sidebar-bottom"><span class="local-dot"></span><span>로컬 워크스페이스<small>승인한 콘텐츠를 차곡차곡</small></span></div></aside>';
+  return '<aside class="admin-sidebar" aria-label="백오피스 메뉴"><a class="brand" href="' + link + '"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span><b>nori<span class="brand-dot">.</span></b><small>콘텐츠 스튜디오</small></span></a><div class="workspace-switch"><span class="workspace-monogram">N</span><span><b>놀이 레시피</b><small>콘텐츠 워크스페이스</small></span></div><nav aria-label="현황 메뉴"><p class="nav-label">라이브러리</p>' + navigation + '<p class="nav-label review-nav-label">검수</p>' + review + recommendations + guide + '</nav>' + progress + '<div class="sidebar-bottom"><span class="local-dot"></span><span>로컬 워크스페이스<small>승인한 콘텐츠를 차곡차곡</small></span></div></aside>';
 }
 
 export const topbar = (section) => '<div class="app-topbar"><div class="breadcrumbs"><span>워크스페이스</span>' + icon("chevron") + '<b id="workspace-current">' + esc(section) + '</b></div><span class="workspace-badge"><i class="local-dot"></i>로컬 모드</span></div>';

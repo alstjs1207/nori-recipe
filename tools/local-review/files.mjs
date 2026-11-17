@@ -3,6 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 
 export const STATE = "results/local-review/state.json";
+export const IMAGE_PUBLICATIONS = { play: "data/play-image-publications.json", material: "data/material-image-publications.json" };
 const TRANSACTIONS = "results/local-review/transactions";
 export const hash = (bytes) => crypto.createHash("sha256").update(bytes).digest("hex");
 export const json = (value) => Buffer.from(JSON.stringify(value, null, 2) + "\n");
@@ -44,7 +45,7 @@ export function walk(root, directory, accept = () => true) {
 // Re-hash file bytes on every operation: external CLI writes need no cooperation.
 export function fingerprint(root) {
   const files = ["data/plays.json", "data/materials.json", "src/constants/playImages.ts",
-    "src/constants/materialImageSources.ts", "assets/icon.png", STATE,
+    "src/constants/materialImageSources.ts", "src/constants/materialImageSourceHashes.json", "assets/icon.png", STATE, ...Object.values(IMAGE_PUBLICATIONS),
     ...walk(root, "data/review-batches", (p) => p.endsWith(".json")),
     ...walk(root, "images/plays"), ...walk(root, "images/material"),
     ...walk(root, "results/review-backups", (p) => p.endsWith("/receipt.json")),
@@ -73,7 +74,7 @@ export function atomicWrite(root, relative, bytes) {
   } finally { fs.rmSync(temp, { force: true }); }
 }
 
-const allowedTarget = (p) => [STATE, "data/plays.json", "data/materials.json", "src/constants/playImages.ts"].includes(p) ||
+const allowedTarget = (p) => [STATE, ...Object.values(IMAGE_PUBLICATIONS), "src/constants/materialImageSourceHashes.json", "data/plays.json", "data/materials.json", "src/constants/playImages.ts"].includes(p) ||
   /^images\/plays\/play_\d{3,}\.jpeg$/.test(p) ||
   p.startsWith("data/review-batches/") && p.endsWith(".json") ||
   /^results\/(?:material-review-backups|review-backups)\/[\w-]+\/[\w.-]+$/.test(p);

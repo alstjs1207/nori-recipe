@@ -3,9 +3,10 @@ import { contentHash } from "../review/review-core.mjs";
 import { validatePublic } from "../play-image-storage/manifest.mjs";
 import { locked, safePath } from "../play-image-storage/files.mjs";
 import { localWebImages, publicPlayImage, storageImages } from "../../src/constants/playImageManifest.ts";
+import { publicationManifest } from "../review/image-publication.mjs";
 
 // Public candidate only: never load admin plans or credentials into the web build.
-export function publicImageInput({ plays, registry, env = process.env }) {
+export function publicImageInput({ root, plays, registry, env = process.env }) {
   const file = env.PLAY_IMAGE_PUBLIC_MANIFEST;
   const origin = env.PLAY_IMAGE_PUBLIC_ORIGIN;
   const bucket = env.PLAY_IMAGE_PUBLIC_BUCKET;
@@ -16,6 +17,7 @@ export function publicImageInput({ plays, registry, env = process.env }) {
   try { candidate = JSON.parse(fs.readFileSync(file, "utf8")); }
   catch { throw new Error("Invalid public image manifest"); }
   const manifest = validatePublic(candidate, bucket);
+  Object.assign(manifest.entries, publicationManifest(root, "play", storage.origin, bucket)?.entries);
   const entries = {};
   const assets = [];
   for (const play of plays.filter(publicPlayImage)) {

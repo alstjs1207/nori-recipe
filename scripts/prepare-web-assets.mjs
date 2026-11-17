@@ -53,7 +53,7 @@ export async function prepareWebAssets({ root = project, env = process.env, fetc
   const plays = bundle.plays.filter((play) => play.status === "live");
   const registry = JSON.parse(await fs.readFile(path.join(root, "data/materials.json"), "utf8"));
   if (validatePlayBundle(bundle, registry).errors.length) throw new Error("Invalid play content for web build");
-  const publicInput = publicImageInput({ plays: bundle.plays, registry, env });
+  const publicInput = publicImageInput({ root, plays: bundle.plays, registry, env });
   const publicReport = publicInput ? await verifyPublicImageAssets(publicInput, { fetchImpl }) : null;
   const materialInput = publicMaterialInput({ root, env });
   const materialReport = materialInput ? await verifyPublicImageAssets(materialInput, { fetchImpl }) : null;

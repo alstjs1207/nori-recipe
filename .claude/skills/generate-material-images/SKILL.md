@@ -9,6 +9,8 @@ description: 수집한 놀이에 새로 필요한 미승인 재료의 이미지�
 [공통 이미지 흐름](../../../tools/local-review/IMAGE-WORKFLOW.md)의 새 재료 이미지 절차를 따른다.
 이미지를 준비해도 재료 승인·대체·보류와 놀이 등록은 사용자가 검수 화면에서 결정한다.
 
+최종 사용자 승인 이후 등록은 [Supabase 등록 절차](../../../tools/local-review/REGISTRATION.md)를 따른다. 스튜디오와 `review:apply`/`review:materials --write`가 승인한 놀이·새 재료의 비공개 JPEG와 공개 WebP를 업로드·다운로드 검증한 뒤 상태와 공개 등록 기록을 함께 반영한다. 생성·검수 준비 단계는 로컬 JPEG를 유지하며 업로드·승인을 대신하지 않는다. 키/전송 실패 시 초안·이미지를 보존하고 기존 도구로 재시도하며 `status`·`reviewPending`·공개 매니페스트를 직접 고쳐 우회하지 않는다.
+
 ## 대상과 재사용
 
 1. 이번에 초안으로 병합한 실제 놀이 ID, 현재 `data/plays.json`, `data/materials.json`,

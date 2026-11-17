@@ -1,10 +1,7 @@
 import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
-import { createManifest, validateResults, applyApproval, DEFAULT_BATCH, canonical, koreanDate } from "../../scripts/review/review-core.mjs";
+import { createManifest, validateResults, DEFAULT_BATCH, canonical, koreanDate } from "../../scripts/review/review-core.mjs";
 import { reviewDefaults } from "../../scripts/review/review-history.mjs";
-import { applyMaterialReview } from "../../scripts/apply-material-review.mjs";
-import { materialImageInfo, materialSourcesPath } from "../../scripts/review/material-images.mjs";
+import { stageApplication } from "../../scripts/review/stage-application.mjs";
 import { STATE, ReviewError, fileAt, bytesAt, readAt, walk, fingerprint, revisionOf, commitTransaction, json, pendingTransactions, hash } from "./files.mjs";
 
 export const isRegistered = (entry) => entry.status === "live" && entry.imageStatus === null;
@@ -101,37 +98,6 @@ function cleanResults(results, manifest) {
       ...materialFields(results.materialRecords.find((r) => r.slug === entry.slug)), updatedAt: new Date().toISOString() })) };
 }
 
-// Existing approval code runs in a scratch copy. Only its validated output is committed
-// under a checked, recoverable transaction in the actual repository.
-function stageApplication(root, snapshot, results, intent) {
-  const staged = fs.mkdtempSync(path.join(os.tmpdir(), "nori-review-apply-"));
-  try {
-    const inputs = ["data/plays.json", "data/materials.json", "src/constants/playImages.ts", snapshot.selected.batchPath,
-      ...snapshot.manifest.entries.map((e) => "images/plays/" + e.id + ".jpeg"), materialSourcesPath,
-      ...snapshot.manifest.materialEntries.map((e) => materialImageInfo(root, e.slug).path)];
-    for (const p of inputs) {
-      const bytes = bytesAt(root, p);
-      if (bytes === null) continue;
-      const target = fileAt(staged, p);
-      fs.mkdirSync(path.dirname(target), { recursive: true }); fs.writeFileSync(target, bytes);
-    }
-    const scoped = structuredClone(results);
-    scoped.records = scoped.records.map((r) => ({ ...r, decision: intent.type === "play" && r.id === intent.id ? r.decision
-      : r.decision === "approved" || r.decision === "changes_requested" && !r.comment.trim() ? "pending" : r.decision }));
-    scoped.materialRecords = scoped.materialRecords.map((r) => ({ ...r, decision: intent.type === "material" && r.slug === intent.id ? r.decision : "pending" }));
-    const summary = intent.type === "play"
-      ? applyApproval(staged, snapshot.selected.batch, scoped, { write: true })
-      : applyMaterialReview(staged, snapshot.selected.batchPath, scoped, { write: true });
-    const updates = new Map();
-    for (const p of inputs.slice(0, 4)) {
-      const after = bytesAt(staged, p);
-      if (after && !after.equals(bytesAt(root, p))) updates.set(p, after);
-    }
-    for (const p of [...walk(staged, "results/review-backups"), ...walk(staged, "results/material-review-backups")]) updates.set(p, bytesAt(staged, p));
-    return { summary: { ...summary, ...(summary.backupDirectory ? { backupDirectory: path.relative(staged, summary.backupDirectory) } : {}) }, updates };
-  } finally { fs.rmSync(staged, { recursive: true, force: true }); }
-}
-
 // Remove active content everywhere it is linked; the transaction keeps recoverable originals.
 function removePlay(root, snapshot, id) {
   const bundle = structuredClone(snapshot.bundle);
@@ -154,10 +120,10 @@ function removePlay(root, snapshot, id) {
   return { updates, summary: { removedIds: [id] } };
 }
 
-export function createService(root) {
+export function createService(root, { storage } = {}) {
   let queue = Promise.resolve();
   function mutate(batchId, body, intent) {
-    const operation = queue.then(() => {
+    const operation = queue.then(async () => {
       const snapshot = readSnapshot(root, batchId);
       if (snapshot.recovery.length) throw new ReviewError(423, "중단된 저장을 먼저 --recover로 복구해 주세요: " + snapshot.recovery.join(", "));
       if (!/^[a-f0-9]{64}$/.test(body?.revision ?? "") || body.revision !== snapshot.revision) throw new ReviewError(409, "다른 화면 또는 수집 도구가 파일을 변경했습니다. 의견을 JSON으로 보관하고 최신 화면을 열어 주세요.");
@@ -172,7 +138,7 @@ export function createService(root) {
           const entry = snapshot.manifest.entries.find((e) => e.id === intent.id);
           if (!record || record.decision !== "approved" || isRegistered(entry)) throw new ReviewError(400, "이번 화면에서 승인한 미등록 놀이 한 개를 지정하세요.");
         } else if (!results.materialRecords.some((m) => m.slug === intent.id && m.decision !== "pending")) throw new ReviewError(400, "반영할 재료 결정을 지정하세요.");
-        if (intent.type !== "unused") ({ updates, summary } = stageApplication(root, snapshot, results, intent));
+        if (intent.type !== "unused") ({ updates, summary } = await stageApplication(root, snapshot, results, intent, storage));
       }
       const stored = { savedAt: new Date().toISOString(), manifest: snapshot.manifest, results, materialImages: materialImages(root) };
       const state = structuredClone({ ...snapshot.state, batches: { ...snapshot.state.batches, [batchId]: stored } });

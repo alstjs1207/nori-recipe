@@ -7,6 +7,8 @@ description: 놀이 ID의 대표 이미지를 기존 스타일로 실제 생성�
 
 `data/plays.json`의 실제 놀이를 읽어 프롬프트를 만들고 이미지 생성 도구로 대표 이미지를 생성·저장합니다. 전체 수집·임포트 흐름에서는 별도 이미지 요청을 기다리지 않고 수행합니다. [실제 생성·저장·재개 절차](../../../tools/local-review/IMAGE-WORKFLOW.md)를 읽고 따릅니다. `ready`는 제작 완료이며 사용자 승인과는 별개입니다.
 
+최종 사용자 승인 이후 등록은 [Supabase 등록 절차](../../../tools/local-review/REGISTRATION.md)를 따른다. 스튜디오와 `review:apply`/`review:materials --write`가 승인한 놀이·새 재료의 비공개 JPEG와 공개 WebP를 업로드·다운로드 검증한 뒤 상태와 공개 등록 기록을 함께 반영한다. 생성·검수 준비 단계는 로컬 JPEG를 유지하며 업로드·승인을 대신하지 않는다. 키/전송 실패 시 초안·이미지를 보존하고 기존 도구로 재시도하며 `status`·`reviewPending`·공개 매니페스트를 직접 고쳐 우회하지 않는다.
+
 ## 기준 파일
 
 - 놀이 데이터: `data/plays.json`

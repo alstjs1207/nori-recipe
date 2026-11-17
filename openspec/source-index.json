@@ -442,7 +442,19 @@
       ]
     },
     {
+      "path": "data/material-image-publications.json",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "data/materials.json",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "data/play-image-publications.json",
       "domains": [
         "content-review"
       ]
@@ -630,6 +642,12 @@
       ]
     },
     {
+      "path": "scripts/review/apply-material.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "scripts/review/backoffice-html.mjs",
       "domains": [
         "content-review"
@@ -649,6 +667,18 @@
     },
     {
       "path": "scripts/review/catalog.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/guide.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/image-publication.mjs",
       "domains": [
         "content-review"
       ]
@@ -684,6 +714,12 @@
       ]
     },
     {
+      "path": "scripts/review/register-review.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "scripts/review/review-client.js",
       "domains": [
         "content-review"
@@ -709,6 +745,12 @@
     },
     {
       "path": "scripts/review/review.css",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
+      "path": "scripts/review/stage-application.mjs",
       "domains": [
         "content-review"
       ]
@@ -1571,6 +1613,12 @@
       ]
     },
     {
+      "path": "tests/image-registration.test.mjs",
+      "domains": [
+        "content-review"
+      ]
+    },
+    {
       "path": "tests/material-image-storage.test.mjs",
       "domains": [
         "content-review"
@@ -1695,6 +1743,13 @@
       ]
     },
     {
+      "path": "tools/local-review/REGISTRATION.md",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
       "path": "tools/local-review/browser.js",
       "domains": [
         "content-review",
@@ -1724,6 +1779,13 @@
     },
     {
       "path": "tools/local-review/files.mjs",
+      "domains": [
+        "content-review",
+        "local-studio"
+      ]
+    },
+    {
+      "path": "tools/local-review/guide.mjs",
       "domains": [
         "content-review",
         "local-studio"

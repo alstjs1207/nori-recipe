@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
-import { fixture, read, write } from "../tools/local-review/tests/fixture.mjs";
+import { fixture, read, write, testStorage } from "../tools/local-review/tests/fixture.mjs";
 import { createService, discoverBatches } from "../tools/local-review/service.mjs";
 import { collectionMaterialSlugs, materialImagePreparation, saveMaterialImage } from "../scripts/prepare-material-images.mjs";
 import { materialDefinitionHash, materialImageInfo } from "../scripts/review/material-images.mjs";
@@ -129,7 +129,7 @@ test("new batch image changes invalidate exports and a missing material image pr
 test("material approval stages the same image hashes and publishes only the user's selected material", async (t) => {
   const { root, ids } = pendingCollection(t); await output(root); await save(root, "basket"); await save(root, "dropper");
   const ready = prepareReview(root, { ids, batchId: "approve-material-image" });
-  const service = createService(root), snapshot = service.read(ready.batchId);
+  const service = createService(root, { storage: testStorage() }), snapshot = service.read(ready.batchId);
   Object.assign(snapshot.results.materialRecords.find((m) => m.slug === "basket"), { decision: "add", confirmed: true });
   const updated = await service.mutate(ready.batchId, { revision: snapshot.revision, results: snapshot.results }, { type: "material", id: "basket" });
   assert.deepEqual(updated.summary.addedSlugs, ["basket"]);

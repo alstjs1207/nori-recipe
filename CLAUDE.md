@@ -39,6 +39,8 @@ play-recipe/
 
 ### 콘텐츠 운영 기본 흐름
 
+- 최종 놀이 승인과 새 재료 신규 추가는 [Supabase 등록 절차](tools/local-review/REGISTRATION.md)를 따름. 스튜디오와 `review:apply`/`review:materials --write`가 원본·공개 파생 업로드 및 다운로드 해시·익명 공개 읽기 검증 후 상태와 공개 등록 매니페스트를 함께 반영. 키 누락·전송 실패에는 등록하지 않고 초안·원본을 보존. 생성·검수 준비·JSON 가져오기·dry-run은 업로드 승인이 아님.
+
 - 수집 스킬 → 재료 정규화 → 초안 병합·ID 부여 → 놀이 대표 이미지·없는 새 재료 이미지 자동 생성·저장 → 새 검수 배치 등록 → 로컬 서버 링크 전달 → 사용자가 UI에서 승인한 항목만 로컬 반영을 기본으로 함. 이미지 생성은 별도 요청을 기다리지 않고 수집 작업에서 이어서 수행. 조사·정규화·프롬프트만 지정한 요청은 그 범위에서 완료.
 - 대표 이미지 생성과 재개는 [이미지 생성 절차](tools/local-review/IMAGE-WORKFLOW.md)와 `.claude/skills/generate-play-images/SKILL.md`를 따름. `review:images`로 대상·현재 내용 해시를 확인하고 실제 `image_gen` 결과를 `review:image`로 저장. 새 검수 배치는 모든 이미지와 생성 기록이 준비돼야 생성되며 실패 시 초안·완료 이미지를 보존하고 미완료 ID를 보고.
 - 새 재료는 `.claude/skills/generate-material-images/SKILL.md`를 이어서 수행. `review:material-images --ids ...`로 이번 놀이가 쓰는 미승인 재료만 확인하고 실제 기존 이미지는 재사용. 이미지가 없으면 실제 생성 후 `review:material-image`로 JPEG·매핑·생성 기록을 준비. 놀이·새 재료 이미지가 모두 준비돼야 새 배치를 등록하며, 재료 이미지도 사용자 검수 대상 해시에 포함. 이미지 준비만으로 `reviewPending`을 해제하지 않음.

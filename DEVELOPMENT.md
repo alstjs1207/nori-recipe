@@ -531,3 +531,7 @@ pnpm verify:local --public-images
 실제 원본67개/공개66개 업로드와 다운로드 해시·원본 전체 복원·원본 없는 실제 공개482개 소스 빌드·익명 원본/변경 차단 검증을 완료했습니다. 원본 JPEG67개는 정확한 파일 경로별 Git 제외이며 로컬에 남습니다. 미매핑1개는 비공개만, 대기5개는 브랜드 기본 표시입니다. 새 이미지는 기존 검수·기준 커밋을 통과하고 공개 매니페스트와 `materialImageSourceHashes.json`의 고정 승인 해시를 함께 갱신해야 합니다. 기준 커밋의 과거 이미지를 복원/재검증 근거로 유지합니다.
 
 Preview에는 `MATERIAL_IMAGE_PUBLIC_MANIFEST`/`ORIGIN`/`BUCKET`에 해당하는 위 세 공개 Config만 추가했습니다. Production 환경·기존 놀이 설정·DB/Auth/쓰기 정책은 유지합니다. 실제 삭제 시험은 새로 생성한 임시 시험 객체에만 수행했고 모두 정리했습니다. RLS로 삭제가 차단돼도 HTTP200/빈 배열을 반환할 수 있어 요청 상태뿐 아니라 실제 객체 목록과 바이트 보존으로 검증합니다. 서비스 SDK 프로토콜은 [Supabase StorageFileApi](https://github.com/supabase/storage-js/blob/master/src/packages/StorageFileApi.ts)를 대조했습니다. 관리자 도구 자체의 원격 삭제 API는 추가하지 않습니다.
+
+## 신규 승인 이미지 등록 파이프라인
+
+스튜디오와 `review:apply`/`review:materials --write`는 [최종 등록 절차](tools/local-review/REGISTRATION.md)를 따른다. 승인한 놀이·신규 재료만 Supabase 원본·공개 WebP를 생성하고 다운로드 해시와 익명 공개 읽기 검증 후 등록한다. 로컬 키 설정과 실패·재시도·거래 복구·새 공개 매니페스트의 빌드 병합은 해당 절차에 정리했다. 기존 이관 evidence와 배포 환경변수는 유지한다. 생성·검수 준비·dry-run은 업로드하지 않으며 공개 배포는 별도 요청 범위다.

@@ -6,7 +6,7 @@ import http from "node:http";
 import { startServer } from "../server.mjs";
 import { createService, readSnapshot } from "../service.mjs";
 import { STATE, fingerprint, bytesAt, commitTransaction, prepareTransaction, recoverTransaction, pendingTransactions, atomicWrite, json } from "../files.mjs";
-import { fixture, read, write, approve } from "./fixture.mjs";
+import { fixture, read, write, approve, testStorage } from "./fixture.mjs";
 import { applyApproval } from "../../../scripts/review/review-core.mjs";
 import { buildCatalog } from "../../../scripts/build-play-catalog.mjs";
 import { buildReview } from "../../../scripts/build-play-review.mjs";
@@ -27,14 +27,14 @@ async function client(instance) {
   };
 }
 async function setup(t) {
-  const root = fixture(t), instance = await startServer({ root, port: 0 });
+  const root = fixture(t), instance = await startServer({ root, port: 0, storage: testStorage() });
   t.after(() => instance.close());
   return { root, instance, api: await client(instance) };
 }
 
 test("start, catalog, review and GET APIs are read-only; only whitelisted files and origins are accepted", async (t) => {
   const root = fixture(t), before = fingerprint(root);
-  const instance = await startServer({ root, port: 0 });
+  const instance = await startServer({ root, port: 0, storage: testStorage() });
   t.after(() => instance.close());
   const api = await client(instance), snapshot = await api.get();
   const catalog = await fetch(instance.url + "/catalog");
@@ -55,7 +55,7 @@ test("start, catalog, review and GET APIs are read-only; only whitelisted files 
   assert.equal((await api.post("save", snapshot, null, { raw: " ".repeat(2 * 1024 * 1024 + 1) })).status, 413);
   assert.deepEqual(fingerprint(root), before);
   assert.equal(fs.existsSync(path.join(root, "results")), false);
-  await assert.rejects(startServer({ root, port: 0 }), /이미 실행/);
+  await assert.rejects(startServer({ root, port: 0, storage: testStorage() }), /이미 실행/);
 });
 
 test("clean URLs link the backoffice, redirect legacy pages and preserve standalone file links without writes", async (t) => {
@@ -64,13 +64,14 @@ test("clean URLs link the backoffice, redirect legacy pages and preserve standal
   batch.reviewOutput = "results/play-image-audit.html";
   write(root, "data/review-batches/fixture.json", batch);
   write(root, "data/review-batches/next-batch.json", { ...batch, batchId: "next-batch", reviewOutput: "results/reviews/next-batch.html" });
-  const before = fingerprint(root), instance = await startServer({ root, port: 0 });
+  const before = fingerprint(root), instance = await startServer({ root, port: 0, storage: testStorage() });
   t.after(() => instance.close());
   const routes = [
     ["/", "/catalog"],
     ["/catalog/", "/catalog"],
     ["/materials/", "/materials"],
     ["/reviews/", "/reviews"],
+    ["/guide/", "/guide"],
     ["/results/play-catalog.html", "/catalog"],
     ["/results/play-image-audit.html", "/reviews/fixture"],
     ["/results/reviews/next-batch.html", "/reviews/next-batch"],
@@ -84,7 +85,7 @@ test("clean URLs link the backoffice, redirect legacy pages and preserve standal
   }
   const listing = await (await fetch(instance.url + "/api/local-review/batches")).json();
   assert.deepEqual(listing.batches.map(({ batchId, url }) => [batchId, url]), [["fixture", "/reviews/fixture"], ["next-batch", "/reviews/next-batch"]]);
-  for (const url of ["/catalog", "/materials", "/reviews", "/reviews/fixture", "/reviews/next-batch"]) {
+  for (const url of ["/catalog", "/materials", "/reviews", "/reviews/fixture", "/reviews/next-batch", "/guide"]) {
     const response = await fetch(instance.url + url);
     assert.equal(response.status, 200, url);
     assert.match(response.headers.get("content-type"), /text\/html/);
@@ -92,6 +93,7 @@ test("clean URLs link the backoffice, redirect legacy pages and preserve standal
     assert.match(html, /href="\/catalog"/);
     assert.match(html, /href="\/materials"/);
     assert.match(html, /href="\/reviews"/);
+    assert.match(html, /id="guide-nav" href="\/guide"/);
     assert.doesNotMatch(html, /href="(?:\/catalog)?#(?:materials|review-batches)"/);
     assert.doesNotMatch(html, /href="[^"]*\.html(?:[?#][^"]*)?"/);
     const view = { "/catalog": "plays", "/materials": "materials", "/reviews": "reviews" }[url];
@@ -102,9 +104,17 @@ test("clean URLs link the backoffice, redirect legacy pages and preserve standal
       assert.match(html, new RegExp('id="' + activeId + '" href="' + url + '" aria-current="page"'));
     }
     const images = [...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map((match) => match[1]);
-    assert.ok(images.length > 0);
-    assert.ok(images.every((src) => src.startsWith("/images/")));
-    assert.equal((await fetch(instance.url + images[0])).status, 200);
+    if (url === "/guide") {
+      assert.match(html, /id="guide-nav" href="\/guide" aria-current="page"/);
+      assert.match(html, /<h1>신규 놀이 등록 가이드<\/h1>/);
+      assert.match(html, /Codex에 검수 요청/);
+      assert.match(html, /Supabase/);
+      assert.doesNotMatch(html, /SERVICE_ROLE|관리자 키|키 설정|키 등록|\.env/);
+    } else {
+      assert.ok(images.length > 0);
+      assert.ok(images.every((src) => src.startsWith("/images/")));
+      assert.equal((await fetch(instance.url + images[0])).status, 200);
+    }
     if (url === "/catalog") assert.match(html, /href="\/reviews\/next-batch"/);
     const head = await fetch(instance.url + url, { method: "HEAD" });
     assert.equal(head.status, 200);
@@ -117,6 +127,7 @@ test("clean URLs link the backoffice, redirect legacy pages and preserve standal
   assert.match(offlineCatalog, /href="play-image-audit\.html"/);
   assert.match(offlineCatalog, /<button[^>]+id="materials-tab"/);
   assert.match(offlineCatalog, /href="#review-batches"/);
+  assert.doesNotMatch(offlineCatalog, /href="\/guide"/);
   const offline = buildReview(root, "data/review-batches/fixture.json", batch.reviewOutput, { write: false }).html;
   assert.match(offline, /href="play-catalog\.html"/);
   assert.match(offline, /src="\.\.\/images\/plays\/play_301\.jpeg\?v=/);
@@ -135,7 +146,7 @@ test("incomplete opinions and statuses persist in files across restart and a new
   assert.equal(read(root, STATE).batches.fixture.results.records[5].comment, "다른 놀이의 검수 의견");
   assert.equal(read(root, "data/plays.json").plays[5].status, "draft");
   await instance.close();
-  const restarted = await startServer({ root, port: 0 });
+  const restarted = await startServer({ root, port: 0, storage: testStorage() });
   t.after(() => restarted.close());
   const newClient = await client(restarted), restored = await newClient.get();
   assert.equal(restored.results.records[0].decision, "changes_requested");

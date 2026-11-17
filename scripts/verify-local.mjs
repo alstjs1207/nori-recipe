@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 // No publication, content approval, real Codex requests or analytics transmission.
 export const commands = [
   "spec:check", "test:spec-tools", "check:play-content", "check:play-images", "test:toss",
-  "test", "test:play-review", "test:play-image-storage", "test:material-image-storage", "test:local-review", "test:web", "typecheck", "build:web",
+  "test", "test:play-review", "test:image-registration", "test:play-image-storage", "test:material-image-storage", "test:local-review", "test:web", "typecheck", "build:web",
 ];
 export function verificationCommands({ publicImages = false } = {}) {
   return publicImages ? commands.filter((command) => command !== "check:play-images") : [...commands];

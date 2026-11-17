@@ -7,7 +7,7 @@ const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const readJson = (root, name) => JSON.parse(readFileSync(path.join(root, name), "utf8"));
 const roots = ["app", "src", "scripts", "tests", "tools", "data/review-batches", ".github/workflows", ".agents/skills"];
 const collectionSkills = ["play-recipe", "normalize-materials", "import-plays", "validate-plays", "generate-play-images", "generate-material-images"];
-const rootFiles = ["data/plays.json", "data/materials.json", "package.json", "pnpm-lock.yaml", "app.json", "vercel.json", "metro.config.js", "babel.config.js", "tsconfig.json", "index.ts", "AGENTS.md", "CLAUDE.md", "README.md", "DEVELOPMENT.md", "HOME_RECOMMENDATION_RULES.md", "ASSET-LICENSE.md", "LICENSE", "NOTICE", "SECURITY.md", ".gitignore"];
+const rootFiles = ["data/plays.json", "data/materials.json", "data/play-image-publications.json", "data/material-image-publications.json", "package.json", "pnpm-lock.yaml", "app.json", "vercel.json", "metro.config.js", "babel.config.js", "tsconfig.json", "index.ts", "AGENTS.md", "CLAUDE.md", "README.md", "DEVELOPMENT.md", "HOME_RECOMMENDATION_RULES.md", "ASSET-LICENSE.md", "LICENSE", "NOTICE", "SECURITY.md", ".gitignore"];
 function walk(root, dir) {
   const absolute = path.join(root, dir);
   if (!existsSync(absolute)) return [];
@@ -45,7 +45,7 @@ export function classify(file) {
   if (/^app\/\(main\)\/(search|play)|^src\/play\//.test(file)) return ["catalog"];
   if (/^tools\/local-review\//.test(file)) return /recommendation/.test(file) ? ["local-studio", "recommendations"] : ["local-studio", "content-review"];
   if (/^scripts\/(?:(?:play|material)-image-storage\/|migrate-(?:play|material)-images\.mjs)|^tests\/(?:play|material)-image-storage\.test\.mjs$/.test(file)) return ["content-review"];
-  if (/^scripts\/review\/|^scripts\/(?:.*review|.*material-images|build-play-catalog|validate-play-content)|^tests\/(?:.*review|material-images)|^data\/|^\.claude\/skills\//.test(file)) return ["content-review"];
+  if (/^scripts\/review\/|^scripts\/(?:.*review|.*material-images|build-play-catalog|validate-play-content)|^tests\/(?:.*review|material-images|image-registration)|^data\/|^\.claude\/skills\//.test(file)) return ["content-review"];
   if (/^scripts\/(prepare-play-images|material-audit)/.test(file)) return ["content-review", "recommendations"];
   if (/^src\/constants\/(?:playImage|materialImage|materials|materialVisuals)/.test(file)) return ["content-review", "catalog"];
   if (/^tests\/web-/.test(file)) return ["web-platform", "catalog", "privacy"];

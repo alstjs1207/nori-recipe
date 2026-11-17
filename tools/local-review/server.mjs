@@ -9,6 +9,7 @@ import { buildReview } from "../../scripts/build-play-review.mjs";
 import { createService } from "./service.mjs";
 import { createCodexRequests } from "./codex-requests.mjs";
 import { buildRecommendations } from "./recommendations.mjs";
+import { buildGuide } from "./guide.mjs";
 import { ReviewError, bytesAt, fingerprint, revisionOf, recoverTransaction, hash } from "./files.mjs";
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -59,16 +60,16 @@ function render(root, snapshot, selected, token, initialView, codex) {
     html = html.replace('<script type="application/json" id="review-data">', bridge + '<script type="application/json" id="review-data">');
     html = html.replace("놀이·재료 검수 상태와 의견은 이 브라우저에 자동 저장됩니다.", "놀이·재료 검수 상태와 의견은 이 컴퓨터의 서버 파일에 자동 저장됩니다.");
     html = html.replace("내보낸 결과는 승인된 항목만 반영하며, 수정 요청·보류·미검수 항목은 현재 등록 상태를 유지합니다.", "승인하면 해당 놀이가 로컬에 등록됩니다. JSON 가져오기는 검수 기록만 저장합니다.");
-    html = html.replace("브라우저 기록은 같은 브라우저·파일 위치에서 유지됩니다. 다른 기기에서 이어갈 때는 내보내기와 가져오기를 사용하세요.", "서버 저장은 재시작·다른 브라우저에서도 복원됩니다. 기존 file:// 검수는 계속 사용할 수 있고, 기록은 JSON으로 가져올 수 있습니다. 반영한 파일과 복구 기록은 results/local-review/transactions/에 보관됩니다.");
+    html = html.replace("브라우저 기록은 같은 브라우저·파일 위치에서 유지됩니다. 다른 기기에서 이어갈 때는 내보내기와 가져오기를 사용하세요.", "승인 시 이미지를 Supabase에 업로드·검증한 뒤 등록합니다. 서버 저장은 재시작·다른 브라우저에서도 복원됩니다. 기존 file:// 검수는 계속 사용할 수 있고, 기록은 JSON으로 가져올 수 있습니다. 반영한 파일과 복구 기록은 results/local-review/transactions/에 보관됩니다.");
   } else html = html.replace("</body>", bridge + "</body>");
   if (revisionOf(fingerprint(root)) !== snapshot.revision) throw new ReviewError(409, "화면을 만드는 중 파일이 변경되었습니다. 새로고침해 주세요.");
   return html;
 }
 
-export async function startServer({ root = project, port = 4317, codex: codexOptions } = {}) {
+export async function startServer({ root = project, port = 4317, codex: codexOptions, storage } = {}) {
   root = fs.realpathSync(root);
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new ReviewError(400, "포트는 0~65535 정수로 지정하세요.");
-  const release = acquireLock(root), service = createService(root), token = crypto.randomBytes(32).toString("hex");
+  const release = acquireLock(root), service = createService(root, { storage }), token = crypto.randomBytes(32).toString("hex");
   const codex = createCodexRequests(root, service, codexOptions);
   const server = http.createServer(async (req, res) => {
     const send = (status, value, type = "application/json; charset=utf-8") => {
@@ -104,7 +105,8 @@ export async function startServer({ root = project, port = 4317, codex: codexOpt
         return send(200, result);
       }
       if (["/", catalogUrl + "/", "/results/play-catalog.html"].includes(pathname)) return redirect(catalogUrl);
-      if (["/materials/", "/reviews/", "/recommendations/"].includes(pathname)) return redirect(pathname.slice(0, -1));
+      if (["/materials/", "/reviews/", "/recommendations/", "/guide/"].includes(pathname)) return redirect(pathname.slice(0, -1));
+      if (pathname === "/guide") return send(200, buildGuide(), "text/html; charset=utf-8");
       if (pathname === "/local-review/browser.js") return send(200, browserScript, "text/javascript; charset=utf-8");
       const api = pathname.match(/^\/api\/local-review\/(batches|version)(?:\/([a-z0-9-]+))?$/);
       if (api) {

@@ -18,3 +18,5 @@
 계정/동기화, 유료 리포트·구독, 네이티브 OTA의 부재는 확인된 현재 범위다. 의존성이나 sync_state만 있다는 이유로 구현 완료로 표시하지 않는다.
 
 2026-11-15 놀이 이미지 웹 이관은 완료했다. 실제 링크 공유 표시는 사용자 확인이며 플랫폼/기종은 미수집이다. 관리자 복원 UI·새 checkout 실제 원본 전체 복원·호스팅 롤백 검증·서비스 내 Supabase 제공처 고지는 [이미지 후속 목록](follow-ups/play-image-operations.md)에서 미완료로 유지한다. 재료 이관은2026-11-16 별도 change에서 실제 Storage·원본 없는 CI266개·Preview Ready/브라우저 검증까지 완료했다. main/운영은 유지한다. 네이티브는 제외한다. 이 기록은 해당 후속 기능의 승인·완료 증거가 아니다.
+
+2026-11-16 신규 승인 이미지 등록 파이프라인의 로컬 구현·278개 회귀·타입·빌드는 완료했다. 현재 로컬 관리자 환경변수가 미설정이므로 실제 신규 승인에서의 Supabase 전송/익명 다운로드 확인은 남아 있다. [설정 절차](../tools/local-review/REGISTRATION.md) · [검증 경계](changes/register-approved-images-to-supabase/verification.md). 기존 이관 전체 전송의 운영 검증 결과와 이번 신규 등록 fixture 결과를 구분한다.

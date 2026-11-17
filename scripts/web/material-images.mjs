@@ -3,6 +3,7 @@ import { materialDefinitionHash } from "../review/material-images.mjs";
 import { approvedSlugs, materialInputs, validatePublic } from "../material-image-storage/manifest.mjs";
 import { locked, safePath, sha256 } from "../play-image-storage/files.mjs";
 import { storageImages } from "../../src/constants/playImageManifest.ts";
+import { publicationManifest } from "../review/image-publication.mjs";
 
 export function publicMaterialInput({root,env=process.env}) {
   const file=env.MATERIAL_IMAGE_PUBLIC_MANIFEST, origin=env.MATERIAL_IMAGE_PUBLIC_ORIGIN, bucket=env.MATERIAL_IMAGE_PUBLIC_BUCKET;
@@ -10,6 +11,7 @@ export function publicMaterialInput({root,env=process.env}) {
   if(!file||!origin||!bucket)throw new Error("Material public manifest, origin and bucket must be configured together");
   const storage=storageImages({origin,bucket});
   const candidate=validatePublic(JSON.parse(fs.readFileSync(file,"utf8")),bucket);
+  Object.assign(candidate.entries,publicationManifest(root,"material",storage.origin,bucket)?.entries);
   const input=materialInputs(root), hashes=JSON.parse(fs.readFileSync(safePath(root,"src/constants/materialImageSourceHashes.json"),"utf8"));
   const entries={}, assets=[];
   for(const slug of approvedSlugs(input)) {

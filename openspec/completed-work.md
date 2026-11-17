@@ -52,8 +52,23 @@ OpenSpec 최초 도입 자체의 완료 작업·검증은 `changes/archive/2026-
 
 [태스크9/9](changes/migrate-material-images-to-supabase-storage/tasks.md) · [검증](changes/migrate-material-images-to-supabase-storage/verification.md). CI/Preview가 공개 매니페스트를 change 경로에서 읽으므로 archive 이동은 하지 않는다. main 병합/운영 배포·네이티브·기존 관리 UI 복원/전체 놀이 롤백·서비스 고지 후속은 이번 완료에 포함하지 않는다.
 
+### 2026-11-16 승인 이미지의 Supabase 등록 파이프라인 — 로컬 구현
+
+스튜디오 선택 승인과 CLI `--write`가 기존 검수 평가 후 비공개 JPEG·공개 WebP를 전송하고 다운로드 해시·익명 공개 읽기를 검증한 뒤 등록 상태·공개 등록 기록·재료 소스 해시를 같은 복구 가능한 거래로 반영한다. 전송 실패·동시 변경에는 초안을 보존한다. 기존 이관 기록은 유지하고 새 등록 기록을 공개 빌드에서 합친다. 수집/이미지 스킬과 로컬 키·재시도 문서를 갱신했다.
+
+Node24/pnpm10.33.0에서 전체278개 회귀·타입·웹 빌드를 통과했다. 실제 키가 미설정이므로 새 원격 등록·배포를 검증한 것은 아니다. 최초 구현 당시 커밋·푸시·배포는 하지 않았다. [구현/태스크](changes/register-approved-images-to-supabase/tasks.md) · [검증과 한계](changes/register-approved-images-to-supabase/verification.md).
+
+### 2026-11-16 스튜디오 신규 놀이 사용 가이드
+
+사이드바의 사용 가이드(`/guide`)에 수집 요청 → 검수 화면 → 새 재료 검수 → 놀이 승인과 Supabase 업로드 → Preview/운영 반영을 안내한다. 사용자 요청으로 일회성 키 설정을 제외하고 수정 요청·이미지 준비·실패 재개 방법과 메뉴 바로가기를 제공한다. 데스크톱·모바일 화면과 메뉴/도움말 동작, 전체278개 회귀·타입·웹 빌드를 확인했다. 기존 스튜디오 프로세스는 유지했으며 재시작 후 새 메뉴가 반영된다. [태스크](changes/add-studio-registration-guide/tasks.md) · [검증](changes/add-studio-registration-guide/verification.md). 최초 구현 당시 커밋·푸시·배포는 하지 않았다.
+
+
 ### 2026-11-17 토스 미니앱 핵심 기능 출시 준비
 
 기존 웹/PWA·저장 키·배포 흐름을 유지하면서 사용자 지정 appName `nori-recipe`의 독립 WebView SDK3.10.0 런타임·사용자별 기기 저장·토스 공유·내비게이션/안전 영역·플로팅 탭·AI 및 개인정보 고지를 구현했다. 로그인·결제·광고·서버 백업은 추가하지 않았다.
 
 Node24.22.1/pnpm10.33.0에서 기존 작업과 함께291개, 토스 커밋 범위만 분리한 상태에서279개 회귀·타입·웹 빌드 및 실제 토스 `.ait` 빌드를 통과했다. 비압축7.43MB·아티팩트3.94MB, 승인 공개 이미지482개 무결성을 확인했다. 공식 모의 SDK에서 월령·추천·찜·기록 저장/복원·공유 링크 생성/복사·전체 초기화를 확인하고 로고·콘솔 입력 정보·636×1048 참고 화면3장을 준비했다. 실제 토스앱 핵심 동작·심사·출시는 미검증이다. [태스크](changes/add-toss-miniapp/tasks.md) · [검증](changes/add-toss-miniapp/verification.md) · [출시 안내](../docs/toss-miniapp.md). 운영 배포는 하지 않았다.
+
+### 2026-11-17 이미지 등록·스튜디오 가이드 통합 검증
+
+사용자의 preview 커밋·푸시 요청에 따라 앞서 로컬에 남겨 둔 승인 이미지 Supabase 등록 파이프라인과 신규 놀이 가이드의55개 파일을 반영 대상으로 확인했다. 원본 checkout에서 Node24.22.1/pnpm10.33.0으로 토스 기능을 포함한 전체291개 회귀·명세·타입·공개482개 자산 검증·실제 웹 빌드를 통과했다. API 키·실제 .env·원본 이미지·빌드 산출물을 제외했다. 실제 신규 이미지 승인/전송과 운영 배포는 수행하지 않았다. [등록 검증](changes/register-approved-images-to-supabase/verification.md) · [가이드 검증](changes/add-studio-registration-guide/verification.md).

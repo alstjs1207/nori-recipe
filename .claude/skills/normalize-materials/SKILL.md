@@ -9,6 +9,8 @@ play-recipe로 추출한 JSON 파일의 재료를 표준 재료 목록으로 변
 
 ---
 
+최종 사용자 승인 이후 등록은 [Supabase 등록 절차](../../../tools/local-review/REGISTRATION.md)를 따른다. 스튜디오와 `review:apply`/`review:materials --write`가 승인한 놀이·새 재료의 비공개 JPEG와 공개 WebP를 업로드·다운로드 검증한 뒤 상태와 공개 등록 기록을 함께 반영한다. 생성·검수 준비 단계는 로컬 JPEG를 유지하며 업로드·승인을 대신하지 않는다. 키/전송 실패 시 초안·이미지를 보존하고 기존 도구로 재시도하며 `status`·`reviewPending`·공개 매니페스트를 직접 고쳐 우회하지 않는다.
+
 ## Step 0: 대상 파일 선택
 
 `$ARGUMENTS`, 사용자 메시지의 파일 경로 또는 현재 대화에서 선정한 후보의 수집 파일이 있으면 그 파일을 바로 처리합니다. 이미 정한 대상을 다시 선택하게 하지 않습니다. 후보 목록 전용 JSON은 먼저 play-recipe의 `meta` + `activities` 수집 구조로 변환합니다.

@@ -68,7 +68,7 @@
       const response = await fetch("/api/local-review/batches/" + config.batchId + "/" + action, {
         method: "POST", headers: { "content-type": "application/json", "x-nori-review-token": config.token },
         body: JSON.stringify({ revision, results: value, ...(intent ? { id: intent.id } : {}) }),
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(intent ? 600000 : 15000),
       });
       const result = await response.json();
       if (!response.ok) throw Object.assign(new Error(result.error ?? "서버에 연결하지 못했습니다."), { status: response.status });
@@ -79,7 +79,7 @@
           window.noriPlayReview.apply(result, intent);
           applying = false;
           lock(blocked);
-          status(intent.type === "unused" ? "사용안함 처리 완료 · 놀이 정보와 이미지를 제거했습니다." : "승인 완료 · 다음 놀이를 계속 검수하세요.");
+          status(intent.type === "unused" ? "사용안함 처리 완료 · 놀이 정보와 이미지를 제거했습니다." : "이미지 업로드·승인 완료 · 다음 놀이를 계속 검수하세요.");
         } else {
           rememberView();
           status("로컬 반영 완료 · 최신 목록을 불러옵니다.");
@@ -99,7 +99,7 @@
       sequence++;
       if (blocked) { status("최신 파일과 충돌했습니다. 현재 기록을 JSON으로 보관한 뒤 새로고침해 주세요.", true); return; }
       pending = { value: JSON.parse(JSON.stringify(value)), intent, seq: sequence };
-      status(intent ? "검증 후 로컬에 반영 중…" : "서버에 저장 중…");
+      status(intent ? "이미지 업로드·검증 후 반영 중…" : "서버에 저장 중…");
       if (intent) { applying = true; lock(true); flush(); }
       else { clearTimeout(timer); timer = setTimeout(flush, 250); }
     },

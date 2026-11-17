@@ -346,7 +346,8 @@
         "pnpm test:play-review",
         "pnpm check:play-images",
         "pnpm test:play-image-storage",
-        "pnpm test:material-image-storage"
+        "pnpm test:material-image-storage",
+        "pnpm test:image-registration"
       ],
       "requirements": [
         {
@@ -393,7 +394,8 @@
             "scripts/review/review-core.mjs",
             "scripts/review/material-review-core.mjs",
             "scripts/apply-play-review.mjs",
-            "scripts/apply-material-review.mjs"
+            "scripts/apply-material-review.mjs",
+            "scripts/review/apply-material.mjs"
           ],
           "tests": [
             "tests/play-review.test.mjs",
@@ -465,6 +467,29 @@
             {
               "path": "scripts/material-image-storage/migration.mjs",
               "contains": "export async function migrate"
+            }
+          ]
+        },
+        {
+          "id": "CON-007",
+          "verification": "automated",
+          "sources": [
+            "scripts/review/image-publication.mjs",
+            "scripts/review/stage-application.mjs",
+            "scripts/review/register-review.mjs",
+            "scripts/web/play-images.mjs",
+            "scripts/web/material-images.mjs",
+            "tools/local-review/REGISTRATION.md",
+            "data/play-image-publications.json",
+            "data/material-image-publications.json"
+          ],
+          "tests": [
+            "tests/image-registration.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "scripts/review/image-publication.mjs",
+              "contains": "export async function publishApprovedImages"
             }
           ]
         }
@@ -545,6 +570,49 @@
             {
               "path": "tools/local-review/recommendation-model.ts",
               "contains": "recommend"
+            }
+          ]
+        },
+        {
+          "id": "STU-005",
+          "verification": "automated",
+          "sources": [
+            "tools/local-review/service.mjs",
+            "tools/local-review/files.mjs",
+            "scripts/review/stage-application.mjs",
+            "scripts/review/register-review.mjs"
+          ],
+          "tests": [
+            "tests/image-registration.test.mjs",
+            "tools/local-review/tests/server.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "tools/local-review/files.mjs",
+              "contains": "IMAGE_PUBLICATIONS"
+            }
+          ]
+        },
+        {
+          "id": "STU-006",
+          "verification": "automated",
+          "sources": [
+            "tools/local-review/guide.mjs",
+            "scripts/review/guide.css",
+            "scripts/review/backoffice-html.mjs",
+            "tools/local-review/server.mjs"
+          ],
+          "tests": [
+            "tools/local-review/tests/server.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "tools/local-review/guide.mjs",
+              "contains": "export function buildGuide"
+            },
+            {
+              "path": "scripts/review/backoffice-html.mjs",
+              "contains": "guide-nav"
             }
           ]
         }
@@ -734,7 +802,8 @@
             "tests/web-content.test.mjs",
             "tests/web-play-images.test.mjs",
             "tests/web-build.test.mjs",
-            "tests/spec-tools.test.mjs"
+            "tests/spec-tools.test.mjs",
+            "tests/image-registration.test.mjs"
           ],
           "anchors": [
             {
