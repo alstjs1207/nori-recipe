@@ -174,14 +174,14 @@ test("새 놀이를 먼저 표시하고 NEW 안에서는 등록일·재료 충�
 test("NEW 종료 시각부터 맞춤 기준으로 돌아가며 미래·잘못된 생성일은 우선 표시하지 않는다", () => {
   const missing: Play["materials"] = { required: ["paint"], optional: [], substitutes: [] };
   const plays = [
-    createPlay({ id: "future", name: "미래 등록일", createdAt: "2026-11-10", materials: missing, prepTime: 0 }),
+    createPlay({ id: "future", name: "미래 등록일", createdAt: "2027-01-08", materials: missing, prepTime: 0 }),
     createPlay({ id: "invalid", name: "잘못된 등록일", createdAt: "2026-02-30", materials: missing, prepTime: 0 }),
     createPlay({ id: "new", name: "기간 종료 NEW", createdAt: "2026-10-09", materials: missing, prepTime: 0 }),
     createPlay({ id: "old-ready", name: "준비 가능한 기존 놀이" }),
   ];
   const base = { availableMaterials: ["paper"] as const };
-  assert.equal(sortSearchPlays(plays, { ...base, now: new Date("2026-11-08T23:59:59.999+09:00") })[0].id, "new");
-  assert.deepEqual(sortSearchPlays(plays, { ...base, now: new Date("2026-11-09T00:00:00+09:00") }).map((play) => play.id), ["old-ready", "future", "invalid", "new"]);
+  assert.equal(sortSearchPlays(plays, { ...base, now: new Date("2027-01-06T23:59:59.999+09:00") })[0].id, "new");
+  assert.deepEqual(sortSearchPlays(plays, { ...base, now: new Date("2027-01-07T00:00:00+09:00") }).map((play) => play.id), ["old-ready", "future", "invalid", "new"]);
 });
 
 test("선택한 맞춤순·놀이 시간순·준비 시간순은 NEW보다 해당 기준을 먼저 적용한다", () => {

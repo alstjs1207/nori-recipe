@@ -201,10 +201,12 @@
           "id": "CAT-003",
           "verification": "automated",
           "sources": [
-            "src/play/newPlay.ts"
+            "src/play/newPlay.ts",
+            "src/play/searchSort.ts"
           ],
           "tests": [
-            "src/play/newPlay.test.ts"
+            "src/play/newPlay.test.ts",
+            "src/play/search.test.ts"
           ],
           "anchors": [
             {
