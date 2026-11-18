@@ -1430,6 +1430,18 @@
       ]
     },
     {
+      "path": "src/platform/completion-ad.test.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "src/platform/completion-ad.ts",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
       "path": "src/platform/contract.ts",
       "domains": [
         "toss-miniapp"

@@ -1,0 +1,55 @@
+{
+  "count": 3,
+  "calls": [
+    {
+      "method": "loadFullScreenAd",
+      "args": [
+        {
+          "options": {
+            "adGroupId": "ait-ad-test-interstitial-id"
+          },
+          "onEvent": "[Function: onEvent]",
+          "onError": "[Function: onError]"
+        }
+      ],
+      "timestamp": 1794980862646,
+      "status": "resolved",
+      "result": "[Function: anonymous]",
+      "fidelity": "faithful"
+    },
+    {
+      "method": "showFullScreenAd",
+      "args": [
+        {
+          "options": {
+            "adGroupId": "ait-ad-test-interstitial-id"
+          },
+          "onEvent": "[Function: onEvent]",
+          "onError": "[Function: onError]"
+        }
+      ],
+      "timestamp": 1794980873686,
+      "status": "resolved",
+      "result": "[Function: anonymous]",
+      "fidelity": "faithful"
+    },
+    {
+      "method": "loadFullScreenAd",
+      "args": [
+        {
+          "options": {
+            "adGroupId": "ait-ad-test-interstitial-id"
+          },
+          "onEvent": "[Function: onEvent]",
+          "onError": "[Function: onError]"
+        }
+      ],
+      "timestamp": 1794980875187,
+      "status": "resolved",
+      "result": "[Function: anonymous]",
+      "fidelity": "faithful"
+    }
+  ],
+  "celebration": true,
+  "confetti": 20
+}

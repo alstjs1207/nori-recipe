@@ -1080,6 +1080,30 @@
               "contains": "publishTossBuild"
             }
           ]
+        },
+        {
+          "id": "TOSS-007",
+          "verification": "automated",
+          "sources": [
+            "src/platform/completion-ad.ts",
+            "src/platform/runtime.toss.ts",
+            "src/platform/contract.ts",
+            "src/components/web/TossPlatform.tsx",
+            "app/(main)/index.tsx",
+            "app/(main)/feedback/[id].web.tsx",
+            "scripts/toss/config.mjs",
+            "scripts/build-toss.mjs"
+          ],
+          "tests": [
+            "src/platform/completion-ad.test.ts",
+            "tests/toss-build.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "src/platform/completion-ad.ts",
+              "contains": "createCompletionAd"
+            }
+          ]
         }
       ]
     }

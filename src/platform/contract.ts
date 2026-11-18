@@ -1,3 +1,5 @@
+import type { CompletionAd } from "./completion-ad";
+
 export interface KeyValueStorage {
   getItem(key: string): Promise<string | null>;
   setItem(key: string, value: string): Promise<void>;
@@ -10,6 +12,7 @@ export interface AppRuntime {
   storage: KeyValueStorage;
   initialize(): Promise<void>;
   checkIdentity?(): Promise<boolean>;
+  completionAd?: CompletionAd;
   createPlayLink?(playId: string): Promise<string>;
   shareMessage?(message: string): Promise<void>;
   copyText?(text: string): Promise<void>;

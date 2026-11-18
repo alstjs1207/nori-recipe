@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { createRequire } from "node:module";
-import { tossAppName, tossExportEnvironment, tossHtml, tossImageEnvironment } from "../scripts/toss/config.mjs";
+import { tossAdSettings, tossAppName, tossExportEnvironment, tossHtml, tossImageEnvironment } from "../scripts/toss/config.mjs";
 import { checkTossDirectory } from "../scripts/toss/check.mjs";
 import { publishTossBuild } from "../scripts/toss/output.mjs";
 
@@ -99,4 +99,18 @@ test("토스 빌드 교체 실패는 웹·직전 토스 export·SDK 번들·보�
   assert.equal(await fs.readFile(path.join(f.root, "dist/index.html"), "utf8"), "previous:dist/index.html");
   assert.equal(await fs.readFile(path.join(f.root, "dist-toss/index.html"), "utf8"), "new");
   assert.ok(!(await fs.readdir(path.join(f.root, "generated"))).some(name => name.startsWith("toss-build-")));
+});
+
+
+test("광고 테스트·운영·비활성 모드를 분리하고 개발 환경에는 테스트 ID만 전달한다", async () => {
+  assert.equal(tossAdSettings({ TOSS_AD_MODE: "production" }).adGroupId, "ait.v2.live.b6af39a4123a41ae");
+  assert.equal(tossAdSettings({}).adGroupId, "ait-ad-test-interstitial-id");
+  assert.equal(tossExportEnvironment({ TOSS_COMPLETION_AD_GROUP_ID: "ait.live.secret" }).EXPO_PUBLIC_TOSS_COMPLETION_AD_GROUP_ID, "ait-ad-test-interstitial-id");
+  assert.equal(tossAdSettings({ TOSS_AD_MODE: "disabled" }).adGroupId, "");
+  assert.throws(() => tossAdSettings({ TOSS_AD_MODE: "production", TOSS_COMPLETION_AD_GROUP_ID: "" }), /console-issued/);
+  assert.throws(() => tossAdSettings({ TOSS_AD_MODE: "production", TOSS_COMPLETION_AD_GROUP_ID: "ait-ad-test-interstitial-id" }), /console-issued/);
+  assert.throws(() => tossAdSettings({ TOSS_AD_MODE: "other" }), /Invalid/);
+  assert.equal(tossExportEnvironment({ TOSS_AD_MODE: "production", TOSS_COMPLETION_AD_GROUP_ID: "ait.live.example" }).EXPO_PUBLIC_TOSS_COMPLETION_AD_GROUP_ID, "ait.live.example");
+  const dev = await fs.readFile(path.join(project, "scripts/dev-toss.mjs"), "utf8");
+  assert.match(dev, /TOSS_AD_MODE: "test"/);
 });

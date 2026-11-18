@@ -9,6 +9,7 @@ export function TossPlatform() {
   currentPath.current = path;
   const [error, setError] = useState(false);
   const [checking, setChecking] = useState(false);
+  useEffect(() => appRuntime.completionAd?.start(), []);
   useEffect(() => {
     if (appRuntime.target !== "toss") return;
     const failed = () => setError(true);

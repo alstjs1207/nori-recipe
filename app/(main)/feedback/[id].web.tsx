@@ -56,6 +56,7 @@ export default function FeedbackWebScreen() {
       );
       useSessionStore.setState({ userContext });
       trackSavedFeedback(guestId, record);
+      appRuntime.completionAd?.saved(record);
       router.replace({
         pathname: "/(main)",
         params: { completedPlayId: play.id },
@@ -191,6 +192,7 @@ export default function FeedbackWebScreen() {
                 {saving ? "저장 중…" : "놀이 기록 저장"}
                 <Icon name="check" size={20} />
               </button>
+              {appRuntime.target === "toss" ? <p className="local-data-note">오늘 추천 놀이 3개를 모두 완료하면 광고가 표시될 수 있어요.</p> : null}
               <p className="local-data-note">{appRuntime.target === "toss" ? "기록은 현재 토스앱의 기기에 저장돼요." : "기록은 이 브라우저에 저장돼요."}</p>
             </form>
           </>

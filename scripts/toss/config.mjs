@@ -25,10 +25,19 @@ export function tossImageEnvironment(root, env = process.env) {
   return settings;
 }
 
+export function tossAdSettings(env = process.env) {
+  const mode = env.TOSS_AD_MODE || "test";
+  if (!["test", "production", "disabled"].includes(mode)) throw new Error("Invalid TOSS_AD_MODE");
+  const adGroupId = mode === "test" ? "ait-ad-test-interstitial-id" : mode === "production" ? (env.TOSS_COMPLETION_AD_GROUP_ID ?? "ait.v2.live.b6af39a4123a41ae").trim() : "";
+  if (mode === "production" && (!/^ait\.[a-zA-Z0-9._-]+$/.test(adGroupId) || adGroupId.includes("test"))) throw new Error("Production ads require a console-issued TOSS_COMPLETION_AD_GROUP_ID (ait.*)");
+  return { mode, adGroupId, placement: "home-recommendations-completed", format: "interstitial" };
+}
+
 export function tossExportEnvironment(env = process.env) {
   const result = Object.fromEntries(["PATH", "HOME", "TMPDIR", "TEMP", "SystemRoot", "LANG"].filter(key => env[key]).map(key => [key, env[key]]));
   return { ...result, CI: "1", EXPO_NO_TELEMETRY: "1", EXPO_NO_DOTENV: "1",
     EXPO_PUBLIC_APP_TARGET: "toss", EXPO_PUBLIC_TOSS_APP_NAME: tossAppName(env), TOSS_APP_NAME: tossAppName(env),
+    EXPO_PUBLIC_TOSS_COMPLETION_AD_GROUP_ID: tossAdSettings(env).adGroupId,
     TOSS_DEVTOOLS: "", EXPO_PUBLIC_GA_ENABLED: "false", EXPO_PUBLIC_GA_MEASUREMENT_ID: "",
     EXPO_PUBLIC_ANALYTICS_ORIGIN: "", EXPO_PUBLIC_ANALYTICS_PREVIEW: "false" };
 }

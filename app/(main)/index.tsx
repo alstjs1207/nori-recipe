@@ -4,7 +4,8 @@ import { WebFirstVisit } from "@/components/web/WebFirstVisit";
 import { HomeRedesign } from "@/components/web/HomeRedesign";
 import { IntentReadinessPanel } from "@/components/IntentReadinessPanel";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { appRuntime } from "@/platform/runtime";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -406,6 +407,7 @@ export default function MainScreen() {
   const [totalPlays, setTotalPlays] = useState(0);
   const [recentLogs, setRecentLogs] = useState<PlayLogRecord[]>([]);
   const [favoritePlayIds, setFavoritePlayIds] = useState<Set<string>>(() => new Set());
+  const adRecommendationIds = useRef<string[]>([]);
 
   const baseMaterials = useMemo(
     () =>
@@ -462,6 +464,7 @@ export default function MainScreen() {
             setTotalPlays(count);
             setRecentLogs(logs);
             setFavoritePlayIds(new Set(favorites.map((favorite) => favorite.playId)));
+            appRuntime.completionAd?.home(adRecommendationIds.current, logs);
           }
         })
         .catch(() => {
@@ -556,6 +559,7 @@ export default function MainScreen() {
 
     return mergeRecommendedPlays(pinned, recommendation.results, 3);
   }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results, childAgeMonths, selectedMaterials, userContext.blockedMaterials, intentReadiness]);
+  adRecommendationIds.current = pinnedResults.map(play => play.id);
 
   useEffect(() => {
     // Repair only removed/ineligible pinned content; ordinary ranking changes keep the set.

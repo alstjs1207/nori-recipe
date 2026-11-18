@@ -1,6 +1,6 @@
 # 노리 레시피 앱인토스 출시 준비
 
-appName은 `nori-recipe`, 표시 이름은 **노리 레시피**다. 기존 웹/PWA와 별도로 로그인·결제·광고 없이 추천·탐색·상세·찜·기록·설정을 제공한다. 사용자 식별키 발급은 토스 로그인 가입을 추가하는 것이 아니다.
+appName은 `nori-recipe`, 표시 이름은 **노리 레시피**다. 기존 웹/PWA와 별도로 로그인·결제 없이 추천·탐색·상세·찜·기록·설정을 제공한다. 사용자 식별키 발급은 토스 로그인 가입을 추가하는 것이 아니다.
 
 ## 실행과 산출물
 
@@ -50,6 +50,25 @@ pnpm dev:toss
 - 그림 위 AI 삽화 라벨은 표시하지 않고 이용 안내의 AI·안전 고지는 유지한다. 추천·안전 필터·검수 정책은 유지한다.
 - 토스에서는 GA를 불러오거나 웹 분석 동의를 읽지 않으며 전용 개인정보·기기 저장 안내를 제공한다.
 
+## 추천 3개 완료 광고
+
+현재 추천 3개의 마지막 미완료 놀이를 기록하고 홈으로 돌아오면, 미리 준비된 **전면형 광고**를 한 번 표시한다. 저장이 먼저 끝나며 광고 실패·로드 지연은 완료 화면과 서비스 이용을 막지 않는다. 과거 기록으로 이미 완료한 세트, 추천 외 놀이, 3개 미만 세트, 단순 재접속에는 표시하지 않는다. 기존 추천·완료 이력 기준은 유지하며 일일 초기화를 추가하지 않는다. 개인정보 안내에 광고 제공자와 로컬 비교 범위를 설명한다.
+
+```sh
+# 기본은 테스트 광고. 개발 실행도 운영 환경변수를 무시하고 테스트 ID만 사용한다.
+pnpm build:toss
+# 공개 출시용: 콘솔의 전면형 그룹 ID를 명시한다. dotenv는 읽지 않는다.
+TOSS_AD_MODE=production pnpm build:toss
+# 광고를 끈 번들이 필요한 경우
+TOSS_AD_MODE=disabled pnpm build:toss
+```
+
+이번 완료 광고 작업의 QR 테스트용 번들은 `generated/toss-completion-ad/test/nori-recipe.ait`, 운영 ID 번들은 `generated/toss-completion-ad/production/nori-recipe.ait`에 보존했다. 테스트는 반드시 전자의 테스트 ID 번들로 진행한다.
+
+기본 테스트 ID는 `ait-ad-test-interstitial-id`다. 운영 모드는 사용자가 전달한 `ait.v2.live.b6af39a4123a41ae`를 사용하며 `TOSS_COMPLETION_AD_GROUP_ID`로 명시적으로 바꿀 수 있다. `generated/toss-release/build-report.json`의 `ads.mode`, `adGroupId`, `placement`, `format`을 확인한다. 테스트 번들을 운영 광고 연결 완료로 표시하지 않는다. 콘솔에서 사업자·정산·약관 상태와 전면형 광고 그룹을 확인해야 한다. 그룹 생성 후 반영에는 최대 2시간이 걸릴 수 있다.
+
+공식 Devtools는 UI 모의 검증용이며 실제 광고는 샌드박스에서 지원하지 않는다. 테스트 ID 번들을 콘솔 QR로 열어 iOS·Android에서 1·2개 완료 무광고, 3개 완료 노출, 광고 닫기·뒤로가기, 실패 시 기록 유지, 재접속 중복 방지를 확인한다. 실제 광고 클릭·노출을 자동화하지 않는다.
+
 ## 콘솔 등록과 최종 테스트
 
 아래는 로컬 구현과 별도로 확인할 외부 작업이다. 실제 수행한 항목만 체크한다.
@@ -58,6 +77,7 @@ pnpm dev:toss
 - [ ] `app-info.json`의 이름·설명·문의 이메일과 로고를 확인해 등록한다. 성인 보호자가 사용하는 서비스라는 점에 맞춰 이용 연령을 설정한다.
 - [ ] 기능별 딥링크를 등록하고 미니앱에서 각 기능을 완결적으로 제공하는지 확인한다.
 - [ ] 현재 소스와 보고서의 버전·해시를 확인하고 `nori-recipe.ait`를 업로드한다.
+- [ ] 테스트 ID로 광고 로드·세 번째 완료 노출·닫기·실패·중복 방지를 QR 실기기에서 확인하고 출시 직전 운영 그룹을 지정해 다시 빌드한다.
 - [ ] QR로 iOS·Android에서 홈·상세·검색·설정을 열고 직접 진입·최초 종료·시스템 뒤로가기·대화상자 닫기를 확인한다.
 - [ ] 월령·재료·찜·완료 기록·평점·반응·메모를 저장하고 종료·재접속·버전 업데이트 후 복원되는지 확인한다.
 - [ ] 다른 사용자에게 기록이 보이지 않는지, 전체 초기화가 현재 사용자 데이터만 지우는지 확인한다.
@@ -80,3 +100,6 @@ pnpm dev:toss
 - [콘솔 등록](https://developers-apps-in-toss.toss.im/guide/operation/console-workspace)
 - [공유](https://developers-apps-in-toss.toss.im/documentation/sdk/domains-api/share/share.createlink)
 - [정책·AI 고지](https://developers-apps-in-toss.toss.im/guide/undefined)
+
+- [공식 인앱 광고 정책](https://developers-apps-in-toss.toss.im/guide/monetization/in-app-ad)
+- [공식 전면형 SDK·테스트 ID·QR 테스트 안내](https://developers-apps-in-toss.toss.im/documentation/common/monetization/iaa/interstitial-rewarded-ad)

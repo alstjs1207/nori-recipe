@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { prepareWebAssets } from "./prepare-web-assets.mjs";
 import { withWebImageManifest } from "./web/play-images.mjs";
 import { withWebMaterialManifest } from "./web/material-images.mjs";
-import { tossAppName, tossExportEnvironment, tossHtml, tossImageEnvironment } from "./toss/config.mjs";
+import { tossAdSettings, tossAppName, tossExportEnvironment, tossHtml, tossImageEnvironment } from "./toss/config.mjs";
 import { checkTossDirectory } from "./toss/check.mjs";
 import { publishTossBuild } from "./toss/output.mjs";
 
@@ -52,10 +52,10 @@ export async function buildToss({ root = project, env = process.env, fetchImpl =
     await sharp(path.join(root, "public/nori-icon.svg")).resize(600, 600).flatten({ background: "#FAFAFE" }).png().toFile(path.join(release, "logo-600.png"));
     const report = { appName, sdk: "3.10.0", target: "toss", ...checked,
       artifact: `${appName}.ait`, artifactBytes: artifact.length, sha256: createHash("sha256").update(artifact).digest("hex"),
-      publicPlays: assets.plays.length, images: assets.report, login: false, payments: false, ads: false,
+      publicPlays: assets.plays.length, images: assets.report, login: false, payments: false, ads: tossAdSettings(env),
       consoleUploadVerified: false, tossDeviceVerified: false, productionReleased: false };
     await fs.writeFile(path.join(release, "build-report.json"), JSON.stringify(report, null, 2) + "\n");
-    await fs.writeFile(path.join(release, "app-info.json"), JSON.stringify({ appName, displayName: "노리 레시피", subtitle: "우리 집 재료로 찾는 오늘의 육아 놀이", supportEmail: "alstjs1207@naver.com", description: "0~48개월 아이를 돌보는 성인 보호자를 위한 놀이 추천 서비스예요. 아이 월령과 집에 있는 재료로 놀이를 찾고, 준비물·진행 방법·안전 안내를 확인해요. 해보고 싶은 놀이는 저장하고, 함께한 놀이는 반응과 메모로 남길 수 있어요. 회원가입·결제·광고 없이 이용하며 기록은 현재 토스앱의 기기에 저장돼요.", keyFeatures: [{ title: "재료로 놀이 찾기", scheme: `intoss://${appName}/search` }, { title: "저장한 놀이", scheme: `intoss://${appName}/favorites` }, { title: "함께한 놀이 기록", scheme: `intoss://${appName}/record` }], privacyPath: "/settings?privacy=1", logo: "logo-600.png" }, null, 2) + "\n");
+    await fs.writeFile(path.join(release, "app-info.json"), JSON.stringify({ appName, displayName: "노리 레시피", subtitle: "우리 집 재료로 찾는 오늘의 육아 놀이", supportEmail: "alstjs1207@naver.com", description: "0~48개월 아이를 돌보는 성인 보호자를 위한 놀이 추천 서비스예요. 아이 월령과 집에 있는 재료로 놀이를 찾고, 준비물·진행 방법·안전 안내를 확인해요. 해보고 싶은 놀이는 저장하고, 함께한 놀이는 반응과 메모로 남길 수 있어요. 회원가입·결제 없이 이용하며 기록은 현재 토스앱의 기기에 저장돼요. 오늘 추천 놀이 3개를 모두 완료하면 전면형 광고가 표시될 수 있어요.", keyFeatures: [{ title: "재료로 놀이 찾기", scheme: `intoss://${appName}/search` }, { title: "저장한 놀이", scheme: `intoss://${appName}/favorites` }, { title: "함께한 놀이 기록", scheme: `intoss://${appName}/record` }], privacyPath: "/settings?privacy=1", logo: "logo-600.png" }, null, 2) + "\n");
     return report;
   });
 }

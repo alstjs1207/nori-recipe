@@ -64,7 +64,7 @@ export function createTossRuntime(bridge: TossBridge, appName: string): AppRunti
     copyText(text) { return bridge.copy(text); },
     close() { return bridge.close(); },
     openExternal(url) {
-      if (!["https://toss.im/privacy-policy", "https://supabase.com/privacy"].includes(url)) return Promise.reject(new Error("허용되지 않은 외부 주소예요."));
+      if (!["https://toss.im/privacy-policy", "https://supabase.com/privacy", "https://policies.google.com/privacy"].includes(url)) return Promise.reject(new Error("허용되지 않은 외부 주소예요."));
       return bridge.openExternal(url);
     },
     navigation(onBack, onHome, onError) {
