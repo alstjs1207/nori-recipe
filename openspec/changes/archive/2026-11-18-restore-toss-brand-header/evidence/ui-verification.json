@@ -1,0 +1,40 @@
+{
+  "viewport": {
+    "width": 393,
+    "height": 852
+  },
+  "brand": {
+    "text": "노리레시피",
+    "logoWidth": 32,
+    "logoHeight": 32,
+    "fontSize": 24,
+    "headerPaddingTop": 13,
+    "bodyPaddingTop": 20
+  },
+  "safeAreaCases": [
+    {
+      "top": 0,
+      "headerTop": 0
+    },
+    {
+      "top": 54,
+      "headerTop": 54
+    },
+    {
+      "top": 100,
+      "headerTop": 100
+    }
+  ],
+  "bottomNavBottom": 818,
+  "profileButtons": 0,
+  "aiLabels": 0,
+  "newBadgesWithTestAge34": 7,
+  "aiGuidePreserved": true,
+  "web": {
+    "logoWidth": 32,
+    "fontSize": 24,
+    "headers": 1,
+    "tossHeaders": 0
+  },
+  "testScope": "Official mock SDK and CSS inset emulation, not a native Toss device test"
+}

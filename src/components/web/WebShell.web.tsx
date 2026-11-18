@@ -100,7 +100,12 @@ function WebShellContent({ children }: PropsWithChildren) {
             <Icon name="chevron" size={15} />
           </button>
         </div>
-      </header> : null}
+      </header> : <header className="web-toolbar toss-brand-toolbar">
+        <Link href="/" className="web-brand" aria-label="노리 레시피 홈">
+          <BrandMark />
+          <span>노리레시피</span>
+        </Link>
+      </header>}
       <TossPlatform />
       {!online ? (
         <div className="web-notice" role="status">

@@ -1010,6 +1010,10 @@
             {
               "path": "src/platform/navigation.ts",
               "contains": "tossBackAction"
+            },
+            {
+              "path": "src/components/web/WebShell.web.tsx",
+              "contains": "toss-brand-toolbar"
             }
           ]
         },

@@ -6,6 +6,13 @@
   --safe-right: var(--toss-safe-right, 0px);
   padding-top: var(--safe-top);
 }
+/* Keep the existing web-brand sizes; the shell applies the top safe area once. */
+.toss-shell .toss-brand-toolbar {
+  padding: 13px 20px;
+}
+.toss-shell .nori-page {
+  padding-top: 20px;
+}
 .toss-platform-error {
   flex-shrink: 0;
   margin: 0;
@@ -54,4 +61,8 @@
 .toss-shell:has(> .nori-nav-bottom) .nori-scroll-page { padding-bottom: 0; }
 @media (max-width: 380px) {
   .toss-shell .nori-nav-bottom { margin-left: 12px; margin-right: 12px; }
+}
+
+@media (max-width: 360px) {
+  .toss-shell .toss-brand-toolbar { padding-left: 16px; padding-right: 16px; }
 }
