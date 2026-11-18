@@ -1,0 +1,14 @@
+{
+  "progress": "3/3개 완료",
+  "stamps": 3,
+  "overlay": {
+    "x": 0,
+    "y": 0,
+    "width": 393,
+    "height": 852,
+    "parent": "BODY",
+    "particles": 72,
+    "pointerEvents": "none"
+  },
+  "tossErrors": null
+}

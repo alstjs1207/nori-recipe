@@ -1,0 +1,13 @@
+{
+  "sourceBaseCommit": "da5f30c1c812bee6201c8b12ce34b73fd46a5988",
+  "sourceHashes": {
+    "public/toss.css": "054c94ac5c1d89a0a0a670c536a6890ee1109219405f7772e8d6d8f2df74ab6f",
+    "public/web.css": "5eefa4e51ddbae16bf21f3798a416e1a34411e5b850694bf9087430486010f72",
+    "src/components/web/NoriUI.tsx": "9f8906836685e1cd38b729f85f62e9116a8187c1ecf1f347b5ff3f222c7f4d8c",
+    "apps-in-toss.config.ts": "34643553283eb1a8a9d7d6fbbe312dcb6c7900a6a0cde50fd8354f67ee9fd07a",
+    "scripts/toss/config.mjs": "295f1315121e74b0f8d581874275bfb17aa256b9f4645f79ce4bb634c1fdd82d"
+  },
+  "sdkPackagingDeploymentId": "01a1ee4d-83c5-7f68-b1b5-56ac7f64ada9",
+  "artifactSha256": "a8ad0f433c01f6f40572dc6f4910faf745a3f0671b0407952be9a4f5b2055d5e",
+  "testDeviceVerified": false
+}

@@ -899,6 +899,10 @@
             {
               "path": "src/components/web/NoriUI.tsx",
               "contains": "entry.scrollY"
+            },
+            {
+              "path": "src/components/web/NoriUI.tsx",
+              "contains": "navigation.isFocused() && entry.version"
             }
           ]
         },
@@ -1090,6 +1094,10 @@
             {
               "path": "src/components/web/WebShell.web.tsx",
               "contains": "toss-brand-toolbar"
+            },
+            {
+              "path": "public/toss.css",
+              "contains": "grid-template-columns: repeat(5, minmax(0, 1fr))"
             }
           ]
         },

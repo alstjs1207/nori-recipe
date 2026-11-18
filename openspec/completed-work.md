@@ -124,3 +124,9 @@ Node24·pnpm10.33.0에서 verify:local의298개 회귀·타입·웹 빌드 통�
 ### 2026-11-18 홈·완료·화면 이동 개선 일괄 preview 반영
 
 후속 사용자 요청으로 이번 대화의 로컬 완료 변경 전체를 preview에 커밋·푸시한다. 추천3개 묶음·로고 도장·hover 고정·화면 전체 폭죽, 새 진입 상단/뒤로 목록 위치 복구, 앱 세션의 미저장 피드백 보존, 상단 월령 제거·하단 마이와 홈 월령 안내 및 각 명세·검증 근거를 포함한다. 원격 preview6f8e461과 로컬 기준이 일치함을 fetch/ls-remote로 확인했고 Node24.21.0·pnpm10.33.0의 verify:local307개 테스트·타입·웹 빌드를 다시 통과했다. spec:changed origin/preview·git diff --check도 통과했다. 실제 Vercel Preview 결과는 이번 푸시의 GitHub 배포 상태에서 확인하며 main/Production은 변경하지 않는다. 기존 원본 checkout을 재사용했고 정리 대상 worktree/clone은 만들지 않았다.
+
+### 2026-11-18 최신 개선 토스 .ait·콘솔20261118-6 등록
+
+사용자 요청으로 preview da5f30c의 홈·도장·전체 화면 폭죽·화면 진입/복귀·미저장 기록·마이 개선을 토스 테스트 번들로 패키징해 노리공방/nori-recipe에 업로드했다. 토스5개 플로팅 메뉴는 동일 너비·56px 높이로 보완했고 통합 검증에서 발견한 대표 이미지 지연 로드의533→886px 복귀 밀림은1:1 공간 확보로 수정해4회533px 복귀를 확인했다. 비활성 화면의 스크롤 저장도 차단한다.
+
+최종 verify:local307개·타입·웹 빌드와 공식 SDK3.10.0 토스 빌드/검사 통과. .ait3,950,505bytes, SHA-256 a8ad0f433c01f6f40572dc6f4910faf745a3f0671b0407952be9a4f5b2055d5e. 콘솔 버전20261118-6의 서버 빌드·검토 필요·테스트 QR 및 deploymentId01a1ee4d-83c5-7f68-b1b5-56ac7f64ada9 일치를 확인했다. 테스트 광고 ID이며 실기기·실제 광고·심사 요청·공개 출시는 미수행이다. 원본 checkout과 최신 테스트/이전 운영 번들을 보존하며 모의4193 서버는 종료했고 QR 콘솔만 남겼다. [검증·등록 근거](changes/archive/2026-11-18-prepare-updated-toss-upload/verification.md).

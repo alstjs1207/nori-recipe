@@ -438,6 +438,7 @@ input[type="radio"] {
 .featured-card > img:not(.completion-stamp) {
   width: 100%;
   height: auto;
+  aspect-ratio: 1;
   display: block;
   object-fit: contain;
 }

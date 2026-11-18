@@ -453,7 +453,7 @@ export function WebPage({
   }, [focused, entry, anchor]);
   return focused ? (
     <div ref={ref} className={`nori-scroll-page ${className}`} onScroll={event => {
-      if (entry.version) screenEntries.save(entry.path, event.currentTarget.scrollTop);
+      if (navigation.isFocused() && entry.version) screenEntries.save(entry.path, event.currentTarget.scrollTop);
     }}>
       {children}
     </div>

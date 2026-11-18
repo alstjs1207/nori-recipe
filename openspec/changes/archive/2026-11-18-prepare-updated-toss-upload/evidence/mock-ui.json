@@ -1,0 +1,114 @@
+[
+  {
+    "viewport": {
+      "width": 320,
+      "height": 852
+    },
+    "pageWidth": 320,
+    "nav": [
+      {
+        "label": "발견",
+        "x": 21,
+        "y": 753,
+        "width": 52.390625,
+        "height": 56
+      },
+      {
+        "label": "탐색",
+        "x": 77.390625,
+        "y": 753,
+        "width": 52.40625,
+        "height": 56
+      },
+      {
+        "label": "저장",
+        "x": 133.796875,
+        "y": 753,
+        "width": 52.390625,
+        "height": 56
+      },
+      {
+        "label": "기록",
+        "x": 190.1875,
+        "y": 753,
+        "width": 52.40625,
+        "height": 56
+      },
+      {
+        "label": "마이",
+        "x": 246.59375,
+        "y": 753,
+        "width": 52.40625,
+        "height": 56
+      }
+    ],
+    "brand": {
+      "fontSize": "24px",
+      "logoWidth": 32
+    },
+    "age": "34개월 아이에게 맞춘 놀이를 만나보세요.",
+    "recommendations": [
+      "/play/play_162?materials=paper%2Cbowl%2Ccup%2Ccrayon",
+      "/play/play_107",
+      "/play/play_016"
+    ],
+    "progress": "0/3개 완료",
+    "errors": null
+  },
+  {
+    "viewport": {
+      "width": 393,
+      "height": 852
+    },
+    "pageWidth": 393,
+    "nav": [
+      {
+        "label": "발견",
+        "x": 29,
+        "y": 753,
+        "width": 63.796875,
+        "height": 56
+      },
+      {
+        "label": "탐색",
+        "x": 96.796875,
+        "y": 753,
+        "width": 63.796875,
+        "height": 56
+      },
+      {
+        "label": "저장",
+        "x": 164.59375,
+        "y": 753,
+        "width": 63.796875,
+        "height": 56
+      },
+      {
+        "label": "기록",
+        "x": 232.390625,
+        "y": 753,
+        "width": 63.796875,
+        "height": 56
+      },
+      {
+        "label": "마이",
+        "x": 300.1875,
+        "y": 753,
+        "width": 63.796875,
+        "height": 56
+      }
+    ],
+    "brand": {
+      "fontSize": "24px",
+      "logoWidth": 32
+    },
+    "age": "34개월 아이에게 맞춘 놀이를 만나보세요.",
+    "recommendations": [
+      "/play/play_162?materials=paper%2Cbowl%2Ccup%2Ccrayon",
+      "/play/play_107",
+      "/play/play_016"
+    ],
+    "progress": "0/3개 완료",
+    "errors": null
+  }
+]
