@@ -52,31 +52,6 @@
   font-size: 11px;
 }
 .toss-shell:has(> .nori-nav-bottom) .nori-scroll-page { padding-bottom: 0; }
-.toss-shell .record-entry-heading { position: relative; }
-.toss-shell .feedback-play { position: relative; }
-.toss-shell span.toss-ai-label {
-  position: absolute;
-  display: block;
-  inset: auto 6px 6px auto;
-  z-index: 1;
-  margin: 0;
-  padding: 2px 5px;
-  width: auto;
-  height: auto;
-  border-radius: 4px;
-  background: #fffE;
-  color: #625d70;
-  font-size: 9px;
-  line-height: 1.3;
-  font-weight: 500;
-  pointer-events: none;
-  white-space: nowrap;
-}
-.toss-shell .record-entry-heading > .toss-ai-label { left: 2px; right: auto; }
-.toss-shell .feedback-play > .toss-ai-label { left: 6px; right: auto; }
-.toss-shell .search-result-link { position: relative; }
-.toss-shell .search-result-link > .toss-ai-label { left: 6px; right: auto; }
-.toss-shell .detail-art-controls { z-index: 2; }
 @media (max-width: 380px) {
   .toss-shell .nori-nav-bottom { margin-left: 12px; margin-right: 12px; }
 }

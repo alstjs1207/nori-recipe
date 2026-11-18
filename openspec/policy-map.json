@@ -1036,6 +1036,7 @@
           "sources": [
             "src/constants/tossNotices.ts",
             "src/components/web/PlayImage.web.tsx",
+            "public/toss.css",
             "src/analytics/analytics.web.ts",
             "app/(main)/settings.web.tsx"
           ],
