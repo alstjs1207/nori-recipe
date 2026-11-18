@@ -1,5 +1,6 @@
 import { WebPage } from "@/components/web/NoriUI";
-import { Link } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+
 import { usePlaysStore } from "@/store/playsStore";
 import {
   EmptyState,

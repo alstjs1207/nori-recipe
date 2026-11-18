@@ -1,11 +1,15 @@
+import { screenEntries } from "@/navigation/entries";
+import { useScreenEntry } from "@/navigation/useScreenEntry";
 import { PlayImage } from "@/components/web/PlayImage.web";
 import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebSelect } from "@/components/web/WebSelect";
 import { SearchAgePicker } from "@/components/web/SearchAgePicker";
-import { Link, router, useLocalSearchParams, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { appRouter as router } from "@/navigation/router";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { rememberPlayEntry, trackAnalytics } from "@/analytics/analytics";
 import { useWebAnalytics } from "@/components/web/WebAnalytics";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
@@ -60,6 +64,8 @@ function readPlace(value: string | string[] | undefined): PlayPlace | null {
 
 export default function SearchWebScreen() {
   const params = useLocalSearchParams<{ situation?: string; place?: string; category?: string | string[]; reset?: string }>();
+  const entry = useScreenEntry();
+  const handledReset = useRef(0);
   const plays = usePlaysStore((state) => state.plays);
   const now = useNewPlayTime(plays);
   const context = useSessionStore((state) => state.userContext);
@@ -105,10 +111,16 @@ export default function SearchWebScreen() {
   }, [params.category]);
   useEffect(() => {
     // Tab screens stay mounted, so consume the record entry flag once.
-    if (params.reset !== "1") return;
-    resetFilters();
-    router.setParams({ reset: undefined, situation: undefined, place: undefined });
-  }, [params.reset, resetFilters]);
+    if (params.reset !== "1" || !entry.version || screenEntries.current() !== entry || handledReset.current === entry.version) return;
+    handledReset.current = entry.version;
+    if (entry.kind === "new") {
+      resetFilters();
+      setCategory(readPlayCategory(params.category));
+      setSituation(readSituation(params.situation));
+      setPlace(readPlace(params.place));
+    }
+    router.setParams({ reset: undefined });
+  }, [entry, params.reset, params.category, params.situation, params.place, resetFilters]);
   const options = {
     ageMonths: age,
     place,

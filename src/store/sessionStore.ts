@@ -1,3 +1,4 @@
+import { useFeedbackDraftStore } from "./feedbackDraftStore";
 import { appRuntime } from "@/platform/runtime";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
@@ -264,6 +265,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     }
 
     await deleteAllUserData(guestId);
+    useFeedbackDraftStore.getState().clearGuest(guestId);
     resetAnalyticsConsent();
     await Promise.all([
       AsyncStorage.removeItem(GUEST_ID_STORAGE_KEY),

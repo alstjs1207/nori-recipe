@@ -1,0 +1,112 @@
+[
+  {
+    "case": "detail prior",
+    "url": "/play/play_010",
+    "y": 300,
+    "tab": "안전 팁"
+  },
+  {
+    "case": "same detail fresh",
+    "url": "/play/play_010",
+    "y": 0,
+    "tab": "놀이 방법"
+  },
+  {
+    "case": "B saved, home fresh",
+    "y": 0
+  },
+  {
+    "case": "A draft after B saved",
+    "y": 0,
+    "rating": "4",
+    "memo": "보존할 초안 A",
+    "reactions": 1
+  },
+  {
+    "case": "submitted A draft cleared only after success",
+    "y": 0,
+    "rating": null,
+    "memo": "",
+    "reactions": 0
+  },
+  {
+    "case": "screen back restores filtered search",
+    "y": 200,
+    "query": "종이",
+    "duration": "30"
+  },
+  {
+    "case": "same result freshly reopened",
+    "y": 0
+  },
+  {
+    "case": "browser back restores filtered search",
+    "y": 200,
+    "query": "종이",
+    "duration": "30"
+  },
+  {
+    "case": "new situation search drops unrelated old filters",
+    "y": 0,
+    "query": "",
+    "duration": "all",
+    "url": "?situation=quiet"
+  },
+  {
+    "case": "record area fresh search",
+    "y": 0,
+    "category": "소근육",
+    "query": ""
+  },
+  {
+    "case": "saved list back restores position",
+    "expected": 249,
+    "y": 249,
+    "cards": 6
+  },
+  {
+    "case": "record list back restores position",
+    "expected": 321,
+    "y": 321
+  },
+  {
+    "case": "profile fresh top",
+    "y": 0
+  },
+  {
+    "case": "same profile button fresh top",
+    "y": 0
+  },
+  {
+    "case": "mobile same detail fresh",
+    "y": 0,
+    "tab": "놀이 방법"
+  },
+  {
+    "case": "mobile draft survives fresh entry",
+    "y": 0,
+    "rating": "3",
+    "memo": "모바일 초안 유지"
+  },
+  {
+    "case": "privacy anchor direct entry",
+    "y": 1391.5,
+    "open": true,
+    "top": 169.9765625
+  },
+  {
+    "case": "ordinary settings after privacy entry",
+    "y": 0,
+    "url": "",
+    "privacyOpen": false
+  },
+  {
+    "case": "mobile browser back restores search",
+    "expected": 600,
+    "y": 600
+  },
+  {
+    "case": "mobile same search tab new entry",
+    "y": 0
+  }
+]

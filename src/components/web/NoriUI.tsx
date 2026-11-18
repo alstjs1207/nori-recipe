@@ -1,8 +1,13 @@
+import { useScreenEntry } from "@/navigation/useScreenEntry";
+import { screenEntries } from "@/navigation/entries";
+import { CompletionStamp } from "./CompletionStamp";
 import { PlayImage } from "@/components/web/PlayImage.web";
-import { Link, useNavigation, usePathname } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { useNavigation, usePathname } from "expo-router";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactNode,
@@ -42,6 +47,7 @@ export type IconName =
   | "sliders"
   | "clock"
   | "timer"
+  | "person"
   | "child"
   | "check"
   | "close"
@@ -96,6 +102,12 @@ const paths: Record<Exclude<IconName, "flower">, ReactNode> = {
     <>
       <circle cx="12" cy="14" r="7" />
       <path d="M9 2h6m-3 0v5m5 2 3-3m-8 4v4l3 2" />
+    </>
+  ),
+  person: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M5 21v-2a7 7 0 0 1 14 0v2" />
     </>
   ),
   child: (
@@ -185,18 +197,23 @@ export function WebNavigation({
     { href: "/search", label: "탐색", icon: "search" },
     { href: "/favorites", label: "저장", icon: "bookmark" },
     { href: "/record", label: "기록", icon: "chart" },
+    { href: "/mypage", label: "마이", icon: "person" },
   ] as const;
   return (
     <nav className={`nori-nav nori-nav-${placement}`} aria-label="주 메뉴">
       {items.map((item) => {
         const active =
-          item.href === "/" ? pathname === "/" || pathname === "/start" : pathname === item.href;
+          item.href === "/" ? pathname === "/" || pathname === "/start"
+          : item.href === "/mypage" ? pathname === "/mypage" || pathname === "/settings"
+          : item.href === "/record" ? pathname === "/record" || pathname === "/history"
+          : pathname === item.href;
         return (
           <Link
             key={item.href}
             href={item.href}
             className={active ? "is-active" : ""}
             aria-current={active ? "page" : undefined}
+            aria-label={item.href === "/mypage" ? "마이페이지" : undefined}
           >
             <span className="nav-icon">
               <Icon
@@ -310,7 +327,7 @@ export function PlayCard({
   const status = getMaterialStatus(play, materials);
   const impressionRef = useRecommendationImpression<HTMLElement>(play, recommendationPosition);
   return (
-    <article ref={impressionRef} className={`nori-play-card ${compact ? "card-compact" : ""}`}>
+    <article ref={impressionRef} className={`nori-play-card ${compact ? "card-compact" : ""} ${completedAt ? "is-completed" : ""}`}>
       <Link href={`/play/${play.id}`} className="play-card-link" onPress={() => {
         rememberPlayEntry(play.id, entryPoint);
         if (recommendationPosition !== undefined) trackAnalytics({ name: "recommendation_click", params: { play_id: play.id, position: recommendationPosition, is_new: Number(isNewPlay(play.createdAt)) } });
@@ -323,9 +340,11 @@ export function PlayCard({
             decoding="async"
           />
           {completedAt ? (
-            <span className="completed-badge">
-              <Icon name="check" size={14} /> 완료
-            </span>
+            recommendationPosition !== undefined ? <CompletionStamp /> : (
+              <span className="completed-badge">
+                <Icon name="check" size={14} /> 놀이 완료
+              </span>
+            )
           ) : null}
         </div>
         <div className="play-card-copy">
@@ -385,28 +404,57 @@ export function PageFooter() {
 export function WebPage({
   children,
   className = "",
+  anchor,
 }: {
   children: ReactNode;
   className?: string;
+  anchor?: string;
 }) {
   const navigation = useNavigation();
   const [focused, setFocused] = useState(navigation.isFocused());
   const ref = useRef<HTMLDivElement>(null);
-  const scrollPosition = useRef(0);
+  const entry = useScreenEntry();
   useFocusEffect(
     useCallback(() => {
       setFocused(true);
-      return () => {
-        if (ref.current) scrollPosition.current = ref.current.scrollTop;
-        setFocused(false);
-      };
+      return () => setFocused(false);
     }, []),
   );
-  useEffect(() => {
-    if (focused && ref.current) ref.current.scrollTop = scrollPosition.current;
-  }, [focused]);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!focused || !element || !entry.version) return;
+    const target = anchor ? document.getElementById(anchor) : null;
+    if (target instanceof HTMLDetailsElement) target.open = true;
+    if (target && entry.kind === "new") {
+      target.scrollIntoView({ block: "start" });
+      return;
+    }
+    let stopped = false;
+    const stop = () => { stopped = true; observer?.disconnect(); };
+    const restore = () => {
+      if (stopped) return;
+      element.scrollTop = entry.scrollY;
+      if (Math.abs(element.scrollTop - entry.scrollY) <= 1) stop();
+    };
+    // A list can grow after images/data arrive. Retry without fighting user input.
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(restore);
+    observer?.observe(element);
+    if (element.firstElementChild) observer?.observe(element.firstElementChild);
+    element.addEventListener("load", restore, true);
+    for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) element.addEventListener(event, stop);
+    restore();
+    const timeout = window.setTimeout(stop, 2500);
+    return () => {
+      stop();
+      window.clearTimeout(timeout);
+      element.removeEventListener("load", restore, true);
+      for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) element.removeEventListener(event, stop);
+    };
+  }, [focused, entry, anchor]);
   return focused ? (
-    <div ref={ref} className={`nori-scroll-page ${className}`}>
+    <div ref={ref} className={`nori-scroll-page ${className}`} onScroll={event => {
+      if (entry.version) screenEntries.save(entry.path, event.currentTarget.scrollTop);
+    }}>
       {children}
     </div>
   ) : null;

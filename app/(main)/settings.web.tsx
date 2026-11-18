@@ -1,6 +1,7 @@
 import { WebPage } from "@/components/web/NoriUI";
 import { BirthMonthField } from "@/components/web/BirthMonthField";
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { MATERIAL_DISPLAY_NAMES } from "@/constants/materials";
 import { resetUserActivity } from "@/db/queries";
@@ -62,11 +63,6 @@ export default function SettingsWebScreen() {
       setNotice(null);
     }, []),
   );
-  useFocusEffect(useCallback(() => {
-    if (privacy !== "1" || !policyRef.current) return;
-    policyRef.current.open = true;
-    policyRef.current.scrollIntoView({ block: "start" });
-  }, [privacy]));
   async function saveProfile() {
     if (saving || getBirthMonthInputError(birthMonth, useSessionStore.getState().userContext.childBirthMonth)) return;
     const monthIndex = parseBirthMonthInput(birthMonth);
@@ -111,7 +107,7 @@ export default function SettingsWebScreen() {
     }
   }
   return (
-    <WebPage>
+    <WebPage anchor={privacy === "1" ? "privacy-policy" : undefined}>
       <div className="nori-page settings-page">
         <header className="page-heading">
           <p className="page-kicker">우리 가족에게 맞게</p>

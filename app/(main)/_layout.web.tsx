@@ -1,9 +1,10 @@
+import { SCREEN_BACK_BEHAVIOR } from "@/navigation/entries";
 import { Tabs } from "expo-router";
 
 export default function MainWebLayout() {
   return (
     <Tabs
-      backBehavior="history"
+      backBehavior={SCREEN_BACK_BEHAVIOR}
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: "#FAFAFE" },

@@ -1,7 +1,9 @@
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { useCallback, useState } from "react";
-import { router, useFocusEffect } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { useFocusEffect } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -14,6 +16,7 @@ import { useSessionStore } from "@/store/sessionStore";
 import type { FavoriteRecord } from "@/types";
 
 export default function FavoritesScreen() {
+  const scroll = useNativeScroll();
   const insets = useSafeAreaInsets();
   const guestId = useSessionStore((state) => state.guestId);
   const plays = usePlaysStore((state) => state.plays);
@@ -51,6 +54,7 @@ export default function FavoritesScreen() {
 
   return (
     <ScrollView
+      {...scroll}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 18 }]}
       showsVerticalScrollIndicator={false}
     >

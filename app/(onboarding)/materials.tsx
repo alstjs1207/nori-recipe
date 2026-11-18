@@ -1,7 +1,8 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useMemo, useState } from "react";
-import { router } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 

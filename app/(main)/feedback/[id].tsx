@@ -1,7 +1,11 @@
+import { useScreenEntry } from "@/navigation/useScreenEntry";
+import { useFeedbackDraft } from "@/store/feedbackDraftStore";
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { type ComponentProps, useEffect, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -19,7 +23,6 @@ import { fadeInUp, layoutTransition } from "@/animations/motion";
 import { MotionPressable } from "@/components/motion/MotionPressable";
 import {
   CHILD_REACTION_OPTIONS,
-  type ChildReaction,
   type ChildReactionOption,
 } from "@/constants/feedback";
 import { getPlayImageSource } from "@/constants/playImages";
@@ -281,15 +284,15 @@ function ReactionCard({
 }
 
 export default function FeedbackScreen() {
+  const scroll = useNativeScroll();
   const params = useLocalSearchParams<{ id?: string }>();
   const playId = readParam(params.id);
   const insets = useSafeAreaInsets();
   const guestId = useSessionStore((state) => state.guestId);
   const childBirthMonth = useSessionStore((state) => state.userContext.childBirthMonth);
   const play = usePlaysStore((state) => state.plays.find((item) => item.id === playId));
-  const [rating, setRating] = useState<number>(0);
-  const [selectedReactions, setSelectedReactions] = useState<ChildReaction[]>([]);
-  const [memo, setMemo] = useState("");
+  const { draft, rating, reactions: selectedReactions, memo, setRating, setReactions: setSelectedReactions, setMemo, saved } = useFeedbackDraft(guestId, playId);
+  const entry = useScreenEntry();
   const [saving, setSaving] = useState(false);
   const [ratingPromptVisible, setRatingPromptVisible] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -298,13 +301,13 @@ export default function FeedbackScreen() {
   const canSave = canAttemptSave && rating > 0;
 
   useEffect(() => {
-    setRating(0);
-    setSelectedReactions([]);
-    setMemo("");
     setSaving(false);
     setRatingPromptVisible(false);
   }, [playId]);
 
+  useEffect(() => {
+    if (entry.version && entry.kind === "new") setRatingPromptVisible(false);
+  }, [entry]);
   function handleBack() {
     if (router.canGoBack()) {
       router.back();
@@ -349,6 +352,7 @@ export default function FeedbackScreen() {
       return;
     }
 
+    const submitted = draft;
     setSaving(true);
 
     try {
@@ -360,6 +364,7 @@ export default function FeedbackScreen() {
         memo.trim().length > 0 ? memo.trim() : null,
       );
 
+      saved(submitted);
       useSessionStore.setState({ userContext: nextUserContext });
       router.replace({
         pathname: "/(main)",
@@ -392,6 +397,9 @@ export default function FeedbackScreen() {
         </View>
 
         <Animated.ScrollView
+
+          {...scroll}
+          key={playId}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[

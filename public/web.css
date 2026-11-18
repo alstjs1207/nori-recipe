@@ -113,11 +113,6 @@ input[type="radio"] {
   color: var(--muted);
   letter-spacing: -0.2px;
 }
-.web-toolbar-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
 .web-toolbar button,
 .web-notice button,
 .install-guide button {
@@ -130,26 +125,6 @@ input[type="radio"] {
   padding: 9px 12px;
   border-radius: 12px;
   min-height: 40px;
-}
-.web-toolbar .profile-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  background: var(--lavender);
-  color: var(--ink);
-  border-radius: 30px;
-  padding: 5px 12px 5px 5px;
-  font-size: 14px;
-}
-.profile-avatar {
-  width: 31px;
-  height: 31px;
-  background: #fff;
-  display: grid;
-  place-items: center;
-  color: var(--violet);
-  border-radius: 50%;
 }
 .nori-nav {
   display: flex;
@@ -392,11 +367,51 @@ input[type="radio"] {
   font-size: 13px;
   font-weight: 650;
 }
+.recommendation-heading {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.recommendation-progress {
+  border-radius: 20px;
+  padding: 6px 12px;
+  color: #286653;
+  background: #e9f5f0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.home-recommendations .is-completed img:not(.completion-stamp) {
+  opacity: 0.55;
+  filter: saturate(0.5);
+}
+.home-recommendations .is-completed .play-card-copy,
+.home-recommendations .is-completed .featured-copy {
+  opacity: 0.78;
+}
+.completion-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(104px, 72%, 148px);
+  height: auto;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px #ffffffe6);
+}
+.play-card-art > .completion-stamp {
+  width: clamp(104px, 72%, 148px);
+  height: auto;
+  object-fit: contain;
+}
+.featured-card > .completion-stamp {
+  width: clamp(144px, 42%, 196px);
+}
 .home-layout {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 28px 30px;
-  grid-template-areas: "hero together" "situations situations";
+  grid-template-areas: "hero together";
 }
 .home-featured {
   grid-area: hero;
@@ -407,8 +422,7 @@ input[type="radio"] {
   min-width: 0;
 }
 .home-situations {
-  grid-area: situations;
-  margin-top: 6px;
+  margin-top: 32px;
 }
 .featured-card {
   display: block;
@@ -421,7 +435,7 @@ input[type="radio"] {
   isolation: isolate;
   background: #e9def2;
 }
-.featured-card > img {
+.featured-card > img:not(.completion-stamp) {
   width: 100%;
   height: auto;
   display: block;
@@ -710,25 +724,27 @@ input[type="radio"] {
   margin-left: auto;
   flex-shrink: 0;
 }
-.confetti {
-  position: absolute;
+.completion-confetti {
+  position: fixed;
   inset: 0;
+  z-index: 1000;
+  overflow: hidden;
   pointer-events: none;
 }
-.confetti i {
+.completion-confetti i {
   position: absolute;
-  top: -12px;
-  width: 6px;
-  height: 10px;
-  animation: celebrate 2.6s ease-out both;
+  animation: completion-confetti-fall 2.8s ease-in both;
 }
-@keyframes celebrate {
+@keyframes completion-confetti-fall {
   from {
-    transform: translateY(-20px) rotate(0);
+    transform: translate3d(0, -20px, 0) rotate(0);
+    opacity: 1;
+  }
+  75% {
     opacity: 1;
   }
   to {
-    transform: translateY(160px) rotate(320deg);
+    transform: translate3d(var(--confetti-drift), calc(100dvh + 40px), 0) rotate(var(--confetti-turn));
     opacity: 0;
   }
 }
@@ -2494,8 +2510,8 @@ fieldset {
     display: none;
   }
   .nori-nav-bottom {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     border-top: 1px solid var(--line);
     padding: 8px 10px calc(8px + var(--safe-bottom));
     background: #fffffffa;
@@ -2506,9 +2522,18 @@ fieldset {
   }
   .nori-nav-bottom a {
     flex-direction: column;
+    justify-content: center;
     gap: 3px;
+    padding: 2px 0;
     font-size: 11px;
-    min-width: 60px;
+    line-height: 15px;
+    min-width: 0;
+    min-height: 56px;
+    white-space: nowrap;
+  }
+  .nori-nav-bottom .nav-icon {
+    width: min(100%, 56px);
+    padding: 4px 0;
   }
   .nav-icon {
     display: grid;
@@ -2557,18 +2582,18 @@ fieldset {
   .home-layout {
     grid-template-columns: 1fr;
     gap: 28px;
-    grid-template-areas: "hero" "situations" "together";
+    grid-template-areas: "hero" "together";
   }
   .featured-card {
     height: auto;
     border-radius: 21px;
   }
-  .featured-card > img {
+  .featured-card > img:not(.completion-stamp) {
     display: block;
     height: auto;
     object-fit: contain;
   }
-  .featured-card:hover > img {
+  .featured-card:hover > img:not(.completion-stamp) {
     transform: none;
   }
   .featured-copy {
@@ -2661,7 +2686,7 @@ fieldset {
     padding: 18px;
     gap: 10px;
   }
-  .home-celebration > div:not(.confetti) {
+  .home-celebration > div {
     flex: 1;
   }
   .home-celebration h2 {
@@ -3053,6 +3078,9 @@ fieldset {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .completion-confetti {
+    display: none;
+  }
   *,
   *::before,
   *::after {

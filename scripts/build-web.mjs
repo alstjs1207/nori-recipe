@@ -87,7 +87,7 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
     const materialImageVersions = JSON.parse(await fs.readFile(path.join(root, "src/constants/materialImageVersions.json"), "utf8"));
     const intro = await writeIntroPage({ root, dist, plays, registry, playImageVersions, playImageManifest, materialImageManifest, materialImageVersions, publicOrigin });
     const assets = (await filesIn(dist)).filter((file) => /\.(js|css|ttf|woff2?)$/.test(file)).map((file) => `/${path.relative(dist, file).split(path.sep).join("/")}`);
-    const precache = [...new Set(["/", "/index.html", "/offline.html", "/nori-icon.svg", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", ...assets])];
+    const precache = [...new Set(["/", "/index.html", "/offline.html", "/nori-icon.svg", "/completion-stamp-v1.svg", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/maskable-512.png", ...assets])];
     // Code, styles, content and media changes all invalidate the previous cache.
     const digest = crypto.createHash("sha256");
     for (const file of (await filesIn(dist)).sort()) {

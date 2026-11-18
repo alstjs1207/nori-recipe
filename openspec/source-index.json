@@ -972,6 +972,24 @@
       ]
     },
     {
+      "path": "src/components/web/CompletionConfetti.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/CompletionConfetti.web.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/CompletionStamp.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/components/web/ContentImage.tsx",
       "domains": [
         "web-platform"
@@ -1400,6 +1418,48 @@
       ]
     },
     {
+      "path": "src/navigation/AppLink.tsx",
+      "domains": [
+        "catalog",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/navigation/entries.test.ts",
+      "domains": [
+        "catalog",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/navigation/entries.ts",
+      "domains": [
+        "catalog",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/navigation/router.ts",
+      "domains": [
+        "catalog",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/navigation/useNativeScroll.ts",
+      "domains": [
+        "catalog",
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/navigation/useScreenEntry.ts",
+      "domains": [
+        "catalog",
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/onboarding/birthMonthInput.test.ts",
       "domains": [
         "onboarding"
@@ -1564,6 +1624,20 @@
     {
       "path": "src/play/stepProgress.ts",
       "domains": [
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/store/feedbackDraftStore.test.ts",
+      "domains": [
+        "local-data",
+        "play-records"
+      ]
+    },
+    {
+      "path": "src/store/feedbackDraftStore.ts",
+      "domains": [
+        "local-data",
         "play-records"
       ]
     },

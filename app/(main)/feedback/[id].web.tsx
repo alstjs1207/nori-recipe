@@ -1,12 +1,15 @@
+import { useScreenEntry } from "@/navigation/useScreenEntry";
+import { useFeedbackDraft } from "@/store/feedbackDraftStore";
 import { PlayImage } from "@/components/web/PlayImage.web";
 import { appRuntime } from "@/platform/runtime";
 import { WebPage } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { appRouter as router } from "@/navigation/router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   CHILD_REACTION_OPTIONS,
-  type ChildReactionOption,
 } from "@/constants/feedback";
 import { recordPlayFeedbackWithRecord } from "@/db/queries";
 import { trackSavedFeedback } from "@/analytics/feedback.web";
@@ -27,23 +30,23 @@ export default function FeedbackWebScreen() {
     state.plays.find((item) => item.id === id),
   );
   const guestId = useSessionStore((state) => state.guestId);
-  const [rating, setRating] = useState(0);
-  const [reactions, setReactions] = useState<ChildReactionOption[]>([]);
-  const [memo, setMemo] = useState("");
+  const { draft, rating, reactions, memo, setRating, setReactions, setMemo, saved } = useFeedbackDraft(guestId, id);
+  const entry = useScreenEntry();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    setRating(0);
-    setReactions([]);
-    setMemo("");
     setError(null);
   }, [id]);
+  useEffect(() => {
+    if (entry.version && entry.kind === "new") setError(null);
+  }, [entry]);
   async function save() {
     if (!guestId || !play || saving) return;
     if (!rating) {
       setError("놀이가 얼마나 즐거웠는지 골라주세요.");
       return;
     }
+    const submitted = draft;
     setSaving(true);
     setError(null);
     try {
@@ -54,6 +57,7 @@ export default function FeedbackWebScreen() {
         reactions,
         memo.trim() || null,
       );
+      saved(submitted);
       useSessionStore.setState({ userContext });
       trackSavedFeedback(guestId, record);
       appRuntime.completionAd?.saved(record);
@@ -68,7 +72,7 @@ export default function FeedbackWebScreen() {
     }
   }
   return (
-    <WebPage>
+    <WebPage key={id}>
       <div className="nori-page feedback-page">
         {appRuntime.target !== "toss" ? <button
           className="text-button feedback-back"

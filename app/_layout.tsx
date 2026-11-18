@@ -1,7 +1,8 @@
+import { screenEntries } from "@/navigation/entries";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { ReduceMotion, ReducedMotionConfig } from "react-native-reanimated";
 
 import { APP_COLORS, APP_FONTS } from "@/constants/theme";
@@ -18,6 +19,14 @@ export default function RootLayout() {
   const initSession = useSessionStore((state) => state.initSession);
   const loadPlays = usePlaysStore((state) => state.loadPlays);
   const fontsLoaded = useAppFonts();
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    // Capture before the router handles browser history traversal.
+    const returning = () => screenEntries.back();
+    window.addEventListener("popstate", returning, true);
+    return () => window.removeEventListener("popstate", returning, true);
+  }, []);
 
   const bootstrap = useCallback(async () => {
     setBootstrapped(false);

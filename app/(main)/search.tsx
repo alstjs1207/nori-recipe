@@ -1,7 +1,11 @@
+import { screenEntries } from "@/navigation/entries";
+import { useScreenEntry } from "@/navigation/useScreenEntry";
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
-import { useEffect, useMemo, useState } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { appRouter as router } from "@/navigation/router";
+import { useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -36,7 +40,10 @@ function readPlaceParam(value: string | string[] | undefined): PlayPlace | null 
 }
 
 export default function SearchScreen() {
+  const scroll = useNativeScroll();
   const insets = useSafeAreaInsets();
+  const entry = useScreenEntry();
+  const handledReset = useRef(0);
   const params = useLocalSearchParams<{ label?: string | string[]; place?: string | string[]; category?: string | string[]; reset?: string }>();
   const plays = usePlaysStore((state) => state.plays);
   const now = useNewPlayTime(plays);
@@ -50,12 +57,15 @@ export default function SearchScreen() {
     setCategory(readPlayCategory(params.category));
   }, [params.category]);
   useEffect(() => {
-    if (params.reset !== "1") return;
-    setQuery("");
-    setPlayType("all");
-    setSort(DEFAULT_SEARCH_SORT);
-    router.setParams({ reset: undefined, place: undefined, label: undefined });
-  }, [params.reset]);
+    if (params.reset !== "1" || !entry.version || screenEntries.current() !== entry || handledReset.current === entry.version) return;
+    handledReset.current = entry.version;
+    if (entry.kind === "new") {
+      setQuery("");
+      setPlayType("all");
+      setSort(DEFAULT_SEARCH_SORT);
+    }
+    router.setParams({ reset: undefined });
+  }, [params.reset, entry]);
   function selectCategory(value: PlayCategory) {
     setCategory(value);
     router.setParams({ category: value === "all" ? undefined : value });
@@ -81,6 +91,7 @@ export default function SearchScreen() {
 
   return (
     <ScrollView
+      {...scroll}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 18 }]}
       showsVerticalScrollIndicator={false}
     >

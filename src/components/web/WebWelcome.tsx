@@ -3,7 +3,9 @@ import { getWelcomeImageUrl } from "@/constants/welcomeImageUrl";
 import { PlayImage } from "./PlayImage.web";
 import { BirthMonthField } from "./BirthMonthField";
 import { useState } from "react";
-import { Link, router } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { appRouter as router } from "@/navigation/router";
+
 import { formatBirthMonthInput, getBirthMonthInputError, parseBirthMonthInput } from "@/onboarding/birthMonthInput";
 import { usePlaysStore } from "@/store/playsStore";
 import { useSessionStore } from "@/store/sessionStore";

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { router, usePathname } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { usePathname } from "expo-router";
 import { appRuntime } from "@/platform/runtime";
 import { tossBackAction } from "@/platform/navigation";
 

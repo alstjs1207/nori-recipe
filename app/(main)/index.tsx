@@ -1,3 +1,4 @@
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { WebFirstVisit } from "@/components/web/WebFirstVisit";
@@ -7,7 +8,8 @@ import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { appRuntime } from "@/platform/runtime";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
@@ -363,7 +365,7 @@ function SituationCard({
       onPress={() =>
         router.push({
           pathname: "/(main)/search",
-          params: { label, place },
+          params: { label, place, reset: "1" },
         })
       }
       style={({ pressed }) => [styles.situationCard, pressed && styles.pressed]}
@@ -386,6 +388,7 @@ function SituationCard({
 }
 
 export default function MainScreen() {
+  const scroll = useNativeScroll();
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
   const { width } = useContentDimensions();
@@ -688,6 +691,7 @@ export default function MainScreen() {
 
   return (
     <Animated.ScrollView
+      {...scroll}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 18 }]}
       showsVerticalScrollIndicator={false}
     >
@@ -716,6 +720,9 @@ export default function MainScreen() {
             {displayName} 육아하느라{"\n"}정말 수고했어요!
           </Text>
           <Text style={styles.headerDate}>{formatTodayLabel()}</Text>
+          {childAgeMonths !== null ? (
+            <Text style={styles.headerDate}>{childAgeMonths}개월 아이에게 맞춘 놀이</Text>
+          ) : null}
         </View>
       </Animated.View>
 

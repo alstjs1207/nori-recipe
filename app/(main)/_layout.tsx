@@ -1,3 +1,4 @@
+import { routePath, screenEntries, SCREEN_BACK_BEHAVIOR } from "@/navigation/entries";
 import { type ComponentProps, useEffect } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Redirect, Tabs } from "expo-router";
@@ -88,6 +89,8 @@ export default function MainLayout() {
 
   return (
     <Tabs
+      backBehavior={SCREEN_BACK_BEHAVIOR}
+      screenListeners={({ route }) => ({ tabPress: () => screenEntries.forward(routePath(route)) })}
       screenOptions={{
         headerShown: false,
         sceneStyle: {
@@ -156,7 +159,7 @@ export default function MainLayout() {
       <Tabs.Screen
         name="mypage"
         options={{
-          title: "마이페이지",
+          title: "마이",
           tabBarIcon: ({ focused }) => <TabIcon glyph="person" focused={focused} />,
         }}
       />

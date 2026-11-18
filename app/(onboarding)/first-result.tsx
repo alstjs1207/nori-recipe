@@ -1,5 +1,6 @@
 import { ContentImage as Image } from "@/components/web/ContentImage";
-import { Redirect, router } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { Redirect } from "expo-router";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 

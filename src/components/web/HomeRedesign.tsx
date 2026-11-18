@@ -1,7 +1,10 @@
+import { CompletionStamp } from "./CompletionStamp";
+import { CompletionConfetti } from "./CompletionConfetti";
 import { PlayImage } from "@/components/web/PlayImage.web";
 import { WebPage } from "./NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
-import { Link } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+
 import { useState, type ReactNode } from "react";
 import {
   MATERIAL_DISPLAY_NAMES,
@@ -80,6 +83,7 @@ export function HomeRedesign({
   const conditionalNotice = getConditionalRecommendationNotice(recommendations, selectedMaterials, age);
   return (
     <WebPage>
+      <CompletionConfetti active={allCompleted} />
       <div className="nori-page home-page">
         <header className="page-heading">
           <p className="page-kicker">집에 있는 재료로, 함께 자라는 시간</p>
@@ -89,8 +93,8 @@ export function HomeRedesign({
               <Icon name="flower" />
             </span>
           </h1>
-          <p className="desktop-only">
-            아이와 함께할 작은 즐거움을 찾아보세요.
+          <p className="home-age-summary">
+            {age}개월 아이에게 맞춘 놀이를 만나보세요.
           </p>
         </header>
         <button
@@ -127,20 +131,6 @@ export function HomeRedesign({
         ) : null}
         {allCompleted ? (
           <div className="home-celebration" role="status">
-            <div className="confetti" aria-hidden="true">
-              {Array.from({ length: 20 }, (_, i) => (
-                <i
-                  key={i}
-                  style={{
-                    left: `${i * 5}%`,
-                    animationDelay: `${(i % 5) * 0.12}s`,
-                    background: ["#796BFF", "#FF9F99", "#FFD27D", "#70CDB3"][
-                      i % 4
-                    ],
-                  }}
-                />
-              ))}
-            </div>
             <Icon name="spark" size={28} />
             <div>
               <h2>오늘의 놀이를 모두 완료했어요</h2>
@@ -158,115 +148,121 @@ export function HomeRedesign({
             </button>
           </div>
         ) : null}
-        <div className="home-layout">
-          <section ref={featuredImpressionRef} className="home-featured" aria-label="오늘의 추천 놀이">
-            {featured ? (
-              <Link
-                className="featured-card"
-                onPress={() => {
-                  rememberPlayEntry(featured.id, "home_recommendation");
-                  trackAnalytics({ name: "recommendation_click", params: { play_id: featured.id, position: 1, is_new: Number(isNewPlay(featured.createdAt)) } });
-                }}
-                href={{
-                  pathname: "/play/[id]",
-                  params: {
-                    id: featured.id,
-                    materials: selectedMaterials.join(","),
-                  },
-                }}
-              >
-                <PlayImage
-                  src={getPlayImageUrl(featured.id)}
-                  alt=""
-                  fetchPriority="high"
-                />
-                <span className="featured-category">
-                  {getPlayCategoryLabel(featured)}
-                  <NewPlayBadge createdAt={featured.createdAt} />
-                </span>
-                {completedDates.has(featured.id) ? (
-                  <span className="completed-badge">
-                    <Icon name="check" size={14} /> 완료
-                  </span>
-                ) : null}
-                <div className="featured-copy">
-                  <p>오늘의 추천 놀이</p>
-                  <h2>{featured.name}</h2>
-                  <div className="featured-meta">
-                    {formatDuration(featured)}
-                    <span>·</span>
-                    {formatPreparation(featured)}
-                  </div>
-                  <span className="featured-age">
-                    {formatAge(featured)} · {status?.label}
-                  </span>
-                </div>
-                <span className="featured-arrow">
-                  <Icon name="arrow" size={28} />
-                </span>
-              </Link>
-            ) : (
-              <EmptyState title="추천할 놀이를 찾고 있어요">
-                <p>우리 집 재료와 아이의 월령을 확인해 주세요.</p>
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => setPickerOpen(true)}
-                >
-                  재료 선택하기
-                </button>
-              </EmptyState>
-            )}
-          </section>
-          <section className="home-situations">
-            <div className="section-heading">
-              <h2>지금 우리에게 필요한 놀이</h2>
-            </div>
-            <div className="situation-grid">
-              {situations.map((situation) => (
+        <section className="home-recommendations" aria-labelledby="home-recommendations-title">
+          <div className="section-heading recommendation-heading">
+            <h2 id="home-recommendations-title">우리 집 재료로 추천하는 놀이 {recommendations.length}개</h2>
+            <span className="recommendation-progress" role="status">
+              {recommendations.filter((play) => completedDates.has(play.id)).length}/{recommendations.length}개 완료
+            </span>
+          </div>
+          <div className="home-layout">
+            <section ref={featuredImpressionRef} className="home-featured" aria-label="오늘의 추천 놀이">
+              {featured ? (
                 <Link
-                  key={situation.value}
+                  className={`featured-card ${completedDates.has(featured.id) ? "is-completed" : ""}`}
+                  onPress={() => {
+                    rememberPlayEntry(featured.id, "home_recommendation");
+                    trackAnalytics({ name: "recommendation_click", params: { play_id: featured.id, position: 1, is_new: Number(isNewPlay(featured.createdAt)) } });
+                  }}
                   href={{
-                    pathname: "/search",
-                    params: { situation: situation.value },
+                    pathname: "/play/[id]",
+                    params: {
+                      id: featured.id,
+                      materials: selectedMaterials.join(","),
+                    },
                   }}
-                  className={`situation-tile tone-${situation.tone}`}
                 >
-                  <Icon name={situation.icon} size={28} />
-                  <span>{situation.label}</span>
-                  <Icon name="chevron" size={16} />
+                  <PlayImage
+                    src={getPlayImageUrl(featured.id)}
+                    alt=""
+                    fetchPriority="high"
+                  />
+                  <span className="featured-category">
+                    {getPlayCategoryLabel(featured)}
+                    <NewPlayBadge createdAt={featured.createdAt} />
+                  </span>
+                  {completedDates.has(featured.id) ? (
+                    <CompletionStamp />
+                  ) : null}
+                  <div className="featured-copy">
+                    <p>오늘의 추천 놀이</p>
+                    <h2>{featured.name}</h2>
+                    <div className="featured-meta">
+                      {formatDuration(featured)}
+                      <span>·</span>
+                      {formatPreparation(featured)}
+                    </div>
+                    <span className="featured-age">
+                      {formatAge(featured)} · {status?.label}
+                    </span>
+                  </div>
+                  <span className="featured-arrow">
+                    <Icon name="arrow" size={28} />
+                  </span>
                 </Link>
-              ))}
-            </div>
-          </section>
-          <section className="home-together">
-            <div className="section-heading">
-              <h2>함께 추천하는 놀이</h2>
-              <span className="section-note">
-                {recommendations.length}개 중 {companions.length}개
-              </span>
-            </div>
-            <div className="recommendation-grid">
-              {companions.map((play, index) => (
-                <PlayCard
-                  key={play.id}
-                  play={play}
-                  entryPoint="home_recommendation"
-                  recommendationPosition={index + 2}
-                  materials={selectedMaterials}
-                  saved={favorites.ids.has(play.id)}
-                  onToggle={(id) => {
-                    void favorites.toggle(id);
-                  }}
-                  completedAt={completedDates.get(play.id)}
-                />
-              ))}
-            </div>
-            <p className="recommendation-note">
-              추천 3개는 완료할 때까지 그대로 만나볼 수 있어요.
-            </p>
-          </section>
-        </div>
+              ) : (
+                <EmptyState title="추천할 놀이를 찾고 있어요">
+                  <p>우리 집 재료와 아이의 월령을 확인해 주세요.</p>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => setPickerOpen(true)}
+                  >
+                    재료 선택하기
+                  </button>
+                </EmptyState>
+              )}
+            </section>
+            <section className="home-together">
+              <div className="section-heading">
+                <h2>함께 추천하는 놀이</h2>
+                <span className="section-note">
+                  나머지 {companions.length}개
+                </span>
+              </div>
+              <div className="recommendation-grid">
+                {companions.map((play, index) => (
+                  <PlayCard
+                    key={play.id}
+                    play={play}
+                    entryPoint="home_recommendation"
+                    recommendationPosition={index + 2}
+                    materials={selectedMaterials}
+                    saved={favorites.ids.has(play.id)}
+                    onToggle={(id) => {
+                      void favorites.toggle(id);
+                    }}
+                    completedAt={completedDates.get(play.id)}
+                  />
+                ))}
+              </div>
+              <p className="recommendation-note">
+                추천 {recommendations.length}개는 모두 완료할 때까지 그대로 만나볼 수 있어요.
+              </p>
+            </section>
+          </div>
+        </section>
+        <section className="home-situations">
+          <div className="section-heading">
+            <h2>지금 우리에게 필요한 놀이</h2>
+          </div>
+          <div className="situation-grid">
+            {situations.map((situation) => (
+              <Link
+                key={situation.value}
+                href={{
+                  pathname: "/search",
+                  params: { situation: situation.value, reset: "1" },
+                }}
+                className={`situation-tile tone-${situation.tone}`}
+              >
+                <Icon name={situation.icon} size={28} />
+                <span>{situation.label}</span>
+                <Icon name="chevron" size={16} />
+              </Link>
+            ))}
+          </div>
+        </section>
         <section className="home-discover">
           <div className="section-heading">
             <div>

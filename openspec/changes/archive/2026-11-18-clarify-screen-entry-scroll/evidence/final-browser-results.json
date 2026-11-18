@@ -1,0 +1,45 @@
+[
+  {
+    "case": "repeated visits compound filters back round 1",
+    "expected": 250,
+    "y": 250,
+    "category": "소근육",
+    "query": "종이",
+    "duration": "30"
+  },
+  {
+    "case": "repeated visits compound filters back round 2",
+    "expected": 250,
+    "y": 250,
+    "category": "소근육",
+    "query": "종이",
+    "duration": "30"
+  },
+  {
+    "case": "final saved list back",
+    "expected": 250,
+    "y": 250
+  },
+  {
+    "case": "final record list back",
+    "expected": 454,
+    "y": 454
+  },
+  {
+    "case": "final profile fresh",
+    "y": 0
+  },
+  {
+    "case": "final fresh situation",
+    "y": 0,
+    "query": "",
+    "duration": "all",
+    "category": "전체"
+  },
+  {
+    "case": "final A draft survives B save",
+    "y": 0,
+    "rating": "4",
+    "memo": "최종 검증 초안 A"
+  }
+]

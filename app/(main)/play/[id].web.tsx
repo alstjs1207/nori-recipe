@@ -1,13 +1,11 @@
+import { useScreenEntry } from "@/navigation/useScreenEntry";
 import { PlayImage } from "@/components/web/PlayImage.web";
 import { appRuntime } from "@/platform/runtime";
 import { WebPage } from "@/components/web/NoriUI";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
-import {
-  Link,
-  router,
-  useLocalSearchParams,
-  useFocusEffect,
-} from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { appRouter as router } from "@/navigation/router";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
 import {
   useCallback,
   useEffect,
@@ -71,6 +69,10 @@ export default function PlayDetailWebScreen() {
           );
   const favorites = useWebFavorites();
   const [tab, setTab] = useState<TabId>("methods");
+  const entry = useScreenEntry();
+  useEffect(() => {
+    if (entry.version && entry.kind === "new") setTab("methods");
+  }, [entry]);
   const [completedAt, setCompletedAt] = useState<string | null>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   useEffect(() => {

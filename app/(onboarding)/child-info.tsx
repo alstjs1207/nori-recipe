@@ -2,7 +2,9 @@ import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useMemo, useRef, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { Link, router } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { appRouter as router } from "@/navigation/router";
+
 import {
   Keyboard,
   PanResponder,

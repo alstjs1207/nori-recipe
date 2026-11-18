@@ -1,7 +1,10 @@
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, router } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { appRouter as router } from "@/navigation/router";
+
 import {
   Alert,
   Keyboard,
@@ -102,6 +105,7 @@ function formatAgeSummary(ageMonths: number): string {
 }
 
 export default function SettingsScreen() {
+  const scroll = useNativeScroll();
   const insets = useSafeAreaInsets();
   const { width } = useContentDimensions();
   const guestId = useSessionStore((state) => state.guestId);
@@ -330,6 +334,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.root}>
       <ScrollView
+        {...scroll}
         contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
         scrollEnabled={screenScrollEnabled}
         showsVerticalScrollIndicator={false}

@@ -1,0 +1,261 @@
+[
+  {
+    "viewport": 320,
+    "age": "23개월 아이에게 맞춘 놀이를 만나보세요.",
+    "headerAgeButton": false,
+    "overflow": false,
+    "bottom": 844,
+    "items": [
+      {
+        "text": "발견",
+        "href": "/",
+        "width": 60,
+        "height": 56,
+        "left": 10,
+        "right": 70
+      },
+      {
+        "text": "탐색",
+        "href": "/search",
+        "width": 60,
+        "height": 56,
+        "left": 70,
+        "right": 130
+      },
+      {
+        "text": "저장",
+        "href": "/favorites",
+        "width": 60,
+        "height": 56,
+        "left": 130,
+        "right": 190
+      },
+      {
+        "text": "기록",
+        "href": "/record",
+        "width": 60,
+        "height": 56,
+        "left": 190,
+        "right": 250
+      },
+      {
+        "text": "마이",
+        "href": "/mypage",
+        "width": 60,
+        "height": 56,
+        "left": 250,
+        "right": 310
+      }
+    ]
+  },
+  {
+    "viewport": 360,
+    "age": "23개월 아이에게 맞춘 놀이를 만나보세요.",
+    "headerAgeButton": false,
+    "overflow": false,
+    "bottom": 844,
+    "items": [
+      {
+        "text": "발견",
+        "href": "/",
+        "width": 68,
+        "height": 56,
+        "left": 10,
+        "right": 78
+      },
+      {
+        "text": "탐색",
+        "href": "/search",
+        "width": 68,
+        "height": 56,
+        "left": 78,
+        "right": 146
+      },
+      {
+        "text": "저장",
+        "href": "/favorites",
+        "width": 68,
+        "height": 56,
+        "left": 146,
+        "right": 214
+      },
+      {
+        "text": "기록",
+        "href": "/record",
+        "width": 68,
+        "height": 56,
+        "left": 214,
+        "right": 282
+      },
+      {
+        "text": "마이",
+        "href": "/mypage",
+        "width": 68,
+        "height": 56,
+        "left": 282,
+        "right": 350
+      }
+    ]
+  },
+  {
+    "viewport": 390,
+    "age": "23개월 아이에게 맞춘 놀이를 만나보세요.",
+    "headerAgeButton": false,
+    "overflow": false,
+    "bottom": 844,
+    "items": [
+      {
+        "text": "발견",
+        "href": "/",
+        "width": 74,
+        "height": 56,
+        "left": 10,
+        "right": 84
+      },
+      {
+        "text": "탐색",
+        "href": "/search",
+        "width": 74,
+        "height": 56,
+        "left": 84,
+        "right": 158
+      },
+      {
+        "text": "저장",
+        "href": "/favorites",
+        "width": 74,
+        "height": 56,
+        "left": 158,
+        "right": 232
+      },
+      {
+        "text": "기록",
+        "href": "/record",
+        "width": 74,
+        "height": 56,
+        "left": 232,
+        "right": 306
+      },
+      {
+        "text": "마이",
+        "href": "/mypage",
+        "width": 74,
+        "height": 56,
+        "left": 306,
+        "right": 380
+      }
+    ]
+  },
+  {
+    "viewport": 768,
+    "age": "23개월 아이에게 맞춘 놀이를 만나보세요.",
+    "headerAgeButton": false,
+    "overflow": false,
+    "bottom": 844,
+    "items": [
+      {
+        "text": "발견",
+        "href": "/",
+        "width": 149.59375,
+        "height": 56,
+        "left": 10,
+        "right": 159.59375
+      },
+      {
+        "text": "탐색",
+        "href": "/search",
+        "width": 149.6015625,
+        "height": 56,
+        "left": 159.59375,
+        "right": 309.1953125
+      },
+      {
+        "text": "저장",
+        "href": "/favorites",
+        "width": 149.6015625,
+        "height": 56,
+        "left": 309.1953125,
+        "right": 458.796875
+      },
+      {
+        "text": "기록",
+        "href": "/record",
+        "width": 149.6015625,
+        "height": 56,
+        "left": 458.796875,
+        "right": 608.3984375
+      },
+      {
+        "text": "마이",
+        "href": "/mypage",
+        "width": 149.6015625,
+        "height": 56,
+        "left": 608.3984375,
+        "right": 758
+      }
+    ]
+  },
+  {
+    "click": "/search",
+    "active": "/search"
+  },
+  {
+    "click": "/favorites",
+    "active": "/favorites"
+  },
+  {
+    "click": "/record",
+    "active": "/record"
+  },
+  {
+    "click": "/mypage",
+    "active": "/mypage"
+  },
+  {
+    "click": "/",
+    "active": "/"
+  },
+  {
+    "myPaddingClick": true,
+    "active": "/mypage"
+  },
+  {
+    "case": "desktop five menu",
+    "labels": [
+      "발견",
+      "탐색",
+      "저장",
+      "기록",
+      "마이"
+    ],
+    "bottomDisplay": "none",
+    "profileButtons": 0,
+    "overflow": false
+  },
+  {
+    "case": "desktop keyboard my",
+    "active": "/mypage"
+  },
+  {
+    "case": "settings alias selects my",
+    "active": "/mypage"
+  },
+  {
+    "case": "detail hides bottom",
+    "menus": 0
+  },
+  {
+    "case": "feedback hides bottom",
+    "menus": 0
+  },
+  {
+    "case": "first visit has five menus without fake age",
+    "items": 5,
+    "ageSummary": null,
+    "profileButton": false
+  },
+  {
+    "case": "first visit my accessible",
+    "path": "/mypage"
+  }
+]

@@ -1,8 +1,7 @@
 import { type PropsWithChildren, useEffect, useState } from "react";
-import { Link, router } from "expo-router";
-import { BrandMark, Icon, WebNavigation } from "./NoriUI";
-import { useSessionStore } from "@/store/sessionStore";
-import { getAgeMonthsFromBirthMonth } from "@/onboarding/utils";
+import { AppLink as Link } from "@/navigation/AppLink";
+
+import { BrandMark, WebNavigation } from "./NoriUI";
 import { WebAnalyticsProvider } from "./WebAnalytics";
 import { WebInstallProvider } from "./WebInstall";
 import { appRuntime } from "@/platform/runtime";
@@ -20,12 +19,6 @@ export function WebShell({ children }: PropsWithChildren) {
 }
 
 function WebShellContent({ children }: PropsWithChildren) {
-  const birthMonth = useSessionStore(
-    (state) => state.userContext.childBirthMonth,
-  );
-  const childName = useSessionStore((state) => state.childName);
-  const age =
-    birthMonth === null ? null : getAgeMonthsFromBirthMonth(birthMonth);
   const [online, setOnline] = useState(true);
   const [offlineReady, setOfflineReady] = useState(false);
   const [waiting, setWaiting] = useState<ServiceWorker | null>(null);
@@ -65,18 +58,6 @@ function WebShellContent({ children }: PropsWithChildren) {
     waiting.postMessage({ type: "SKIP_WAITING" });
   }
 
-  function openProfileSettings() {
-    const birthMonthInput = document.querySelector<HTMLDivElement>(
-      ".settings-page .birth-month-input",
-    );
-    if (birthMonthInput) {
-      birthMonthInput.scrollIntoView({ block: "center" });
-      birthMonthInput.focus({ preventScroll: true });
-      return;
-    }
-    router.push("/mypage");
-  }
-
   return (
     <div className={`web-shell${appRuntime.target === "toss" ? " toss-shell" : ""}`}>
       {appRuntime.target !== "toss" ? <header className="web-toolbar">
@@ -86,20 +67,6 @@ function WebShellContent({ children }: PropsWithChildren) {
           <span className="brand-tagline">아이와의 오늘을, 더 즐겁게</span>
         </Link>
         <WebNavigation placement="header" />
-        <div className="web-toolbar-actions">
-          <button
-            className="profile-button"
-            type="button"
-            aria-label={age === null ? "아이 월령 설정" : "아이 월령과 내 설정"}
-            onClick={openProfileSettings}
-          >
-            <span className="profile-avatar">
-              {childName.trim().slice(0, 1) || <Icon name="child" size={20} />}
-            </span>
-            {age === null ? "월령 설정" : `${age}개월`}
-            <Icon name="chevron" size={15} />
-          </button>
-        </div>
       </header> : <header className="web-toolbar toss-brand-toolbar">
         <Link href="/" className="web-brand" aria-label="노리 레시피 홈">
           <BrandMark />

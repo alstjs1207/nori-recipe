@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type PropsWithChildren } from "react";
-import { Link, useFocusEffect, useNavigation, usePathname, useSegments } from "expo-router";
+import { AppLink as Link } from "@/navigation/AppLink";
+import { useFocusEffect, useNavigation, usePathname, useSegments } from "expo-router";
 import { webAnalytics, consumePlayEntry } from "@/analytics/analytics.web";
 import { type AnalyticsClient } from "@/analytics/client";
 import { importFeedbackAnalytics } from "@/analytics/feedback.web";

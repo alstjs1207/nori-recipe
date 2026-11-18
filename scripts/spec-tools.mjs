@@ -29,6 +29,8 @@ export function sourceFiles(root) {
   ])].sort();
 }
 export function classify(file) {
+  if (/^src\/navigation\//.test(file)) return ["web-platform", "catalog"];
+  if (/^src\/store\/feedbackDraftStore/.test(file)) return ["play-records", "local-data"];
   if (/^src\/platform\/|TossPlatform|tossNotices|^scripts\/(?:toss\/|build-toss|check-toss|dev-toss)|^tests\/toss-|^apps-in-toss\.config\.ts$/.test(file)) return ["toss-miniapp"];
   if (["LICENSE", "NOTICE", "SECURITY.md", "ASSET-LICENSE.md"].includes(file)) return ["spec-governance"];
   if (/openspec-|\/opsx\/|spec-tools|policy-checks|verify-local|AGENTS\.md|CLAUDE\.md/.test(file)) return ["spec-governance"];

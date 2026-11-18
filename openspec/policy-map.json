@@ -120,13 +120,27 @@
             "app/(main)/index.tsx",
             "src/store/sessionStore.ts",
             "src/components/web/HomeRedesign.tsx",
-            "HOME_RECOMMENDATION_RULES.md"
+            "HOME_RECOMMENDATION_RULES.md",
+            "src/components/web/NoriUI.tsx",
+            "public/web.css",
+            "src/components/web/CompletionStamp.tsx",
+            "public/completion-stamp-v1.svg",
+            "src/components/web/CompletionConfetti.web.tsx",
+            "src/components/web/CompletionConfetti.tsx"
           ],
           "tests": [],
           "anchors": [
             {
               "path": "app/(main)/index.tsx",
               "contains": "pinnedRecommendationIds"
+            },
+            {
+              "path": "public/web.css",
+              "contains": ".featured-card:hover > img:not(.completion-stamp)"
+            },
+            {
+              "path": "src/components/web/CompletionConfetti.web.tsx",
+              "contains": "createPortal"
             }
           ]
         },
@@ -225,7 +239,9 @@
             "app/(main)/play/[id].tsx",
             "app/(main)/play/[id].web.tsx",
             "app/(main)/_layout.web.tsx",
-            "src/components/web/NoriUI.tsx"
+            "src/components/web/NoriUI.tsx",
+            "src/navigation/useScreenEntry.ts",
+            "src/navigation/useNativeScroll.ts"
           ],
           "tests": [
             "src/play/safety.test.ts",
@@ -253,9 +269,14 @@
           "verification": "source-reviewed",
           "sources": [
             "src/db/queries.ts",
-            "src/constants/feedback.ts"
+            "src/constants/feedback.ts",
+            "app/(main)/feedback/[id].tsx",
+            "app/(main)/feedback/[id].web.tsx",
+            "src/store/feedbackDraftStore.ts"
           ],
-          "tests": [],
+          "tests": [
+            "src/store/feedbackDraftStore.test.ts"
+          ],
           "anchors": [
             {
               "path": "src/db/queries.ts",
@@ -850,6 +871,61 @@
             {
               "path": "scripts/web/intro.mjs",
               "contains": "collectIntroData"
+            }
+          ]
+        },
+        {
+          "id": "WEB-005",
+          "verification": "automated",
+          "sources": [
+            "src/navigation/entries.ts",
+            "src/navigation/router.ts",
+            "src/navigation/useNativeScroll.ts",
+            "src/navigation/AppLink.tsx",
+            "src/navigation/useScreenEntry.ts",
+            "src/components/web/NoriUI.tsx",
+            "app/_layout.tsx",
+            "app/(main)/_layout.tsx",
+            "app/(main)/_layout.web.tsx"
+          ],
+          "tests": [
+            "src/navigation/entries.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/navigation/entries.ts",
+              "contains": "createScreenEntries"
+            },
+            {
+              "path": "src/components/web/NoriUI.tsx",
+              "contains": "entry.scrollY"
+            }
+          ]
+        },
+        {
+          "id": "WEB-006",
+          "verification": "source-reviewed",
+          "sources": [
+            "src/components/web/WebShell.web.tsx",
+            "src/components/web/NoriUI.tsx",
+            "src/components/web/HomeRedesign.tsx",
+            "public/web.css",
+            "app/(main)/_layout.tsx",
+            "app/(main)/index.tsx"
+          ],
+          "tests": [],
+          "anchors": [
+            {
+              "path": "src/components/web/NoriUI.tsx",
+              "contains": "href: \"/mypage\", label: \"마이\""
+            },
+            {
+              "path": "public/web.css",
+              "contains": "grid-template-columns: repeat(5, minmax(0, 1fr));"
+            },
+            {
+              "path": "src/components/web/HomeRedesign.tsx",
+              "contains": "home-age-summary"
             }
           ]
         }

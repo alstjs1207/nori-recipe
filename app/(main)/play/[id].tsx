@@ -1,9 +1,12 @@
+import { useScreenEntry } from "@/navigation/useScreenEntry";
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { NewPlayBadge } from "@/components/NewPlayBadge";
 import { PlayShareButton, PlayWebActionsProvider } from "@/components/web/PlayWebActions";
 import { type ComponentProps, useEffect, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import {
   Pressable,
   ScrollView,
@@ -373,12 +376,17 @@ function PlayHeroArtwork({ play }: { play: Play }) {
 }
 
 export default function PlayDetailScreen() {
+  const scroll = useNativeScroll();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ id?: string; fallback?: string; materials?: string | string[] }>();
   const playId = readParam(params.id);
   const guestId = useSessionStore((state) => state.guestId);
   const play = usePlaysStore((state) => state.plays.find((item) => item.id === playId));
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
+  const entry = useScreenEntry();
+  useEffect(() => {
+    if (entry.version && entry.kind === "new") setActiveTab("overview");
+  }, [entry]);
   const [favorite, setFavorite] = useState(false);
   const [latestCompletedAt, setLatestCompletedAt] = useState<string | null>(null);
 
@@ -498,6 +506,7 @@ export default function PlayDetailScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.screen}>
         <ScrollView
+          {...scroll}
           bounces={false}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[

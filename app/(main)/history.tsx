@@ -1,7 +1,9 @@
+import { useNativeScroll } from "@/navigation/useNativeScroll";
 import { ContentImage as Image } from "@/components/web/ContentImage";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { router, useFocusEffect } from "expo-router";
+import { appRouter as router } from "@/navigation/router";
+import { useFocusEffect } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
@@ -437,6 +439,7 @@ function PlayThumbnailSlot({ index, play }: { index: number; play: Play | undefi
 }
 
 export default function HistoryScreen() {
+  const scroll = useNativeScroll();
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
   const guestId = useSessionStore((state) => state.guestId);
@@ -521,6 +524,7 @@ export default function HistoryScreen() {
 
   return (
     <Animated.ScrollView
+      {...scroll}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 18 }]}
       showsVerticalScrollIndicator={false}
     >
