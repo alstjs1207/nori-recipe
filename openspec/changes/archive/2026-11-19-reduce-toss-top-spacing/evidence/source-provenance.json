@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-19",
+  "sourceBaseCommit": "134b72ebb6253a985a0201bc2358d7805bbeb432",
+  "sourceHashes": {
+    "public/toss.css": "1f3d1569548fcce3db75dd866d740f3ed22872eb3b7d7b2712bd60977107cbfb",
+    "public/web.css": "5eefa4e51ddbae16bf21f3798a416e1a34411e5b850694bf9087430486010f72",
+    "apps-in-toss.config.ts": "34643553283eb1a8a9d7d6fbbe312dcb6c7900a6a0cde50fd8354f67ee9fd07a",
+    "src/platform/runtime.toss.ts": "710f1ccce55db86d715bfeb6bd4e6ff08d1581d77a47ffff93b0267ac786b42f"
+  },
+  "artifactSha256": "f924a97a504f5fef77ceef793f8d8e99479ef9688393c4320cde8ff6cc29d90d",
+  "sdkPackagingDeploymentId": "01a1f0f8-4f6b-7889-b18d-244e36eeb71e",
+  "consoleUploadVerified": false,
+  "tossDeviceVerified": false,
+  "productionReleased": false,
+  "uploadResponsibility": "user"
+}

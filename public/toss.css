@@ -1,17 +1,21 @@
 /* Loaded only by the Toss HTML. The browser/PWA stylesheet stays unchanged. */
 .toss-shell {
-  --safe-top: var(--toss-safe-top, 0px);
+  /* The non-transparent Toss host places its navigation above this WebView. */
+  --safe-top: 0px;
   --safe-bottom: var(--toss-safe-bottom, 0px);
   --safe-left: var(--toss-safe-left, 0px);
   --safe-right: var(--toss-safe-right, 0px);
-  padding-top: var(--safe-top);
+  padding-top: 0;
 }
-/* Keep the existing web-brand sizes; the shell applies the top safe area once. */
+/* Keep the logo size while giving its home link a compact 44px touch target. */
 .toss-shell .toss-brand-toolbar {
-  padding: 13px 20px;
+  padding: 0 20px;
+}
+.toss-shell .toss-brand-toolbar .web-brand {
+  min-height: 44px;
 }
 .toss-shell .nori-page {
-  padding-top: 20px;
+  padding-top: 8px;
 }
 .toss-platform-error {
   flex-shrink: 0;

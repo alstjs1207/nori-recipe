@@ -1,0 +1,191 @@
+[
+  {
+    "width": 320,
+    "sdkTopEmulation": 0,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 320,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 320,
+    "sdkTopEmulation": 54,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 320,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 320,
+    "sdkTopEmulation": 100,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 320,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 393,
+    "sdkTopEmulation": 0,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 393,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 393,
+    "sdkTopEmulation": 54,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 393,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 393,
+    "sdkTopEmulation": 100,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 393,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 768,
+    "sdkTopEmulation": 0,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 768,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 768,
+    "sdkTopEmulation": 54,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 768,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  },
+  {
+    "width": 768,
+    "sdkTopEmulation": 100,
+    "shellPaddingTop": "0px",
+    "headerTop": 0,
+    "headerHeight": 45,
+    "headerPadding": "0px",
+    "brandTouchHeight": 44,
+    "logoWidth": 32,
+    "brandFont": "24px",
+    "bodyPaddingTop": "8px",
+    "pageWidth": 768,
+    "navBottom": 818,
+    "menuHeights": [
+      56,
+      56,
+      56,
+      56,
+      56
+    ]
+  }
+]

@@ -1098,6 +1098,10 @@
             {
               "path": "public/toss.css",
               "contains": "grid-template-columns: repeat(5, minmax(0, 1fr))"
+            },
+            {
+              "path": "public/toss.css",
+              "contains": "--safe-top: 0px"
             }
           ]
         },
