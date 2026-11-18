@@ -21,3 +21,10 @@ Node24.22.2 / pnpm10.33.0.
 ## 배포
 
 원본 `/Users/msyu/study/play-recipe`의 기존 preview checkout에서 작업하며 별도 clone/worktree는 만들지 않았다. 다른 작업의 기존 worktree는 정리 대상이 아니다. preview 확인 후 main으로 반영한다.
+
+- 구현 커밋 `0c82ffdcfb77e386abdb4da6eef176d790ccd2c7`의 Preview 배포 `7872757284` 성공.
+- 실제 URL: https://nori-recipe-nmq0wjwvw-alstjs1207s-projects.vercel.app/search
+- 브라우저에서 전체 월령 탐색의 NEW32개 및 2026-10-09 등록 `play_193`의 NEW 표시를 확인했다. 변경 전 운영의 같은 탐색에서는 NEW0개였다.
+- 이 기록 시점에는 main 반영 전이다. 사용자 요청에 따라 동일 구현과 이 검증 기록을 main에 반영하고, 원격 최종 커밋·CI·운영 배포 상태를 확인해 최종 보고한다.
+
+- 구현 커밋의 GitHub Policy and regression checks 성공: https://github.com/alstjs1207/nori-recipe/actions/runs/44226609285 . 최종 사례를 포함한291개 회귀·타입·빌드가 통과했다.
