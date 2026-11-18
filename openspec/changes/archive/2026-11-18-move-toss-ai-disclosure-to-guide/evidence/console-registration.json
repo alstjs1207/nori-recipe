@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-18",
+  "workspace": "노리공방",
+  "appName": "nori-recipe",
+  "displayName": "노리 레시피",
+  "version": "20261118-4",
+  "sdk": "3.10.0",
+  "sourceCommit": "30483e26167503e981c01b1e2f4385b73548829d",
+  "deploymentId": "01a1ecbd-f8cb-77d6-b110-0687a3a5c204",
+  "artifactBytes": 3942616,
+  "artifactSha256": "3575d507d7c99f038cd44e4ae4d2716cee8fd15f4278e7516afcdda18198d76d",
+  "consoleUploadVerified": true,
+  "serverBuildCompleted": true,
+  "consoleStatus": "검토 필요",
+  "testQrAvailable": true,
+  "tossDeviceVerified": false,
+  "reviewRequested": false,
+  "productionReleased": false,
+  "consoleUrl": "https://apps-in-toss.toss.im/workspace/108169/mini-app/nori-recipe/app-build"
+}
