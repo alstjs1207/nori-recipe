@@ -72,3 +72,7 @@ Node24.22.1/pnpm10.33.0에서 기존 작업과 함께291개, 토스 커밋 범�
 ### 2026-11-17 이미지 등록·스튜디오 가이드 통합 검증
 
 사용자의 preview 커밋·푸시 요청에 따라 앞서 로컬에 남겨 둔 승인 이미지 Supabase 등록 파이프라인과 신규 놀이 가이드의55개 파일을 반영 대상으로 확인했다. 원본 checkout에서 Node24.22.1/pnpm10.33.0으로 토스 기능을 포함한 전체291개 회귀·명세·타입·공개482개 자산 검증·실제 웹 빌드를 통과했다. API 키·실제 .env·원본 이미지·빌드 산출물을 제외했다. 실제 신규 이미지 승인/전송과 운영 배포는 수행하지 않았다. [등록 검증](changes/register-approved-images-to-supabase/verification.md) · [가이드 검증](changes/add-studio-registration-guide/verification.md).
+
+### 2026-11-18 토스 공통 상단 정리
+
+사용자 요청으로 토스 대상의 가족 요약·월령 단축 버튼과 공통 AI 안내 문단을 제거했다. 그림 AI 라벨과 설정 고지, 하단 내 설정을 통한 월령 수정, 일반 웹 헤더와 저장 데이터는 유지했다. Node24.22.1/pnpm10.33.0에서 전체291개 회귀·타입·웹/토스 빌드와 공식 모의 SDK 화면 확인을 통과했다. 새 테스트 업로드는 네트워크 인증서 오류로 미완료이며 실제 기기 확인은 남아 있다. [태스크](changes/simplify-toss-top-area/tasks.md) · [검증](changes/simplify-toss-top-area/verification.md). 최초 UI 수정 시점에는 커밋·푸시·공개 출시를 하지 않았다.

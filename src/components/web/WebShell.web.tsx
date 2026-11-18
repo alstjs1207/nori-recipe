@@ -79,13 +79,13 @@ function WebShellContent({ children }: PropsWithChildren) {
 
   return (
     <div className={`web-shell${appRuntime.target === "toss" ? " toss-shell" : ""}`}>
-      <header className={appRuntime.target === "toss" ? "toss-contextbar" : "web-toolbar"}>
-        {appRuntime.target !== "toss" ? <Link href="/" className="web-brand" aria-label="노리 레시피 홈">
+      {appRuntime.target !== "toss" ? <header className="web-toolbar">
+        <Link href="/" className="web-brand" aria-label="노리 레시피 홈">
           <BrandMark />
           <span>노리 레시피</span>
           <span className="brand-tagline">아이와의 오늘을, 더 즐겁게</span>
-        </Link> : <span>우리 가족의 놀이</span>}
-        {appRuntime.target !== "toss" ? <WebNavigation placement="header" /> : null}
+        </Link>
+        <WebNavigation placement="header" />
         <div className="web-toolbar-actions">
           <button
             className="profile-button"
@@ -100,7 +100,7 @@ function WebShellContent({ children }: PropsWithChildren) {
             <Icon name="chevron" size={15} />
           </button>
         </div>
-      </header>
+      </header> : null}
       <TossPlatform />
       {!online ? (
         <div className="web-notice" role="status">

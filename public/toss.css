@@ -6,37 +6,13 @@
   --safe-right: var(--toss-safe-right, 0px);
   padding-top: var(--safe-top);
 }
-.toss-contextbar {
-  display: flex;
-  flex-shrink: 0;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 48px;
-  gap: 12px;
-  padding: 6px 20px;
-  color: var(--muted);
-  font-size: 12px;
-}
-.toss-ai-notice, .toss-platform-error {
+.toss-platform-error {
   flex-shrink: 0;
   margin: 0;
   padding: 6px 20px 10px;
   color: #666477;
   font-size: 11px;
   line-height: 1.5;
-}
-.toss-contextbar .profile-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 5px 12px 5px 5px;
-  border: 0;
-  border-radius: 30px;
-  background: var(--lavender);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 600;
 }
 .toss-platform-error { color: #a43232; }
 .toss-checking-user .toss-shell > :not(.toss-session-shield) { visibility: hidden; }

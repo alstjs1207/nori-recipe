@@ -996,7 +996,9 @@
             "src/components/web/WebShell.web.tsx",
             "public/toss.css",
             "src/platform/devtools.ts",
-            "src/platform/devtools.preview.ts"
+            "src/platform/devtools.preview.ts",
+            "src/components/web/NoriUI.tsx",
+            "app/(main)/settings.web.tsx"
           ],
           "tests": [
             "src/platform/toss-runtime.test.ts",
@@ -1031,7 +1033,6 @@
           "verification": "automated",
           "sources": [
             "src/constants/tossNotices.ts",
-            "src/components/web/TossPlatform.tsx",
             "src/components/web/PlayImage.web.tsx",
             "src/analytics/analytics.web.ts",
             "app/(main)/settings.web.tsx"

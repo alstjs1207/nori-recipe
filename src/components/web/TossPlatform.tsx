@@ -61,7 +61,6 @@ export function TossPlatform() {
   if (appRuntime.target !== "toss") return null;
   return <>
     {checking ? <div className="toss-session-shield" role="status">토스 사용자 정보를 확인하고 있어요.</div> : null}
-    <p className="toss-ai-notice">놀이와 재료 그림은 AI로 만든 참고용 삽화예요. 실제 준비물과 안전 안내를 함께 확인해 주세요.</p>
     {error ? <p role="alert" className="toss-platform-error">토스 화면 연결을 확인하지 못했어요. <button type="button" onClick={() => window.location.reload()}>다시 열기</button></p> : null}
   </>;
 }

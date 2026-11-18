@@ -1,0 +1,29 @@
+{
+  "appName": "nori-recipe",
+  "sdk": "3.10.0",
+  "target": "toss",
+  "bytes": 7429022,
+  "files": 457,
+  "scripts": 1,
+  "artifact": "nori-recipe.ait",
+  "artifactBytes": 3942936,
+  "sha256": "1cc835e4e5558270092ed1589cc78a6b3c8a30d737edade0d21539b35032cbc2",
+  "publicPlays": 208,
+  "images": {
+    "plays": 208,
+    "reviewImages": 0,
+    "originalMB": 0,
+    "detailMB": 15.36,
+    "thumbnailMB": 2.54,
+    "imageMode": "public",
+    "verifiedPublicAssets": 416,
+    "materialImageMode": "public",
+    "verifiedMaterialAssets": 66
+  },
+  "login": false,
+  "payments": false,
+  "ads": false,
+  "consoleUploadVerified": false,
+  "tossDeviceVerified": false,
+  "productionReleased": false
+}
