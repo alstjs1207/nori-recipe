@@ -52,9 +52,12 @@ export function HomeRedesign({
   selectedMaterials,
   completedDates,
   allCompleted,
+  celebrateCompletion,
   age,
   onSaveMaterials,
   intentOptions,
+  recommendationError,
+  onRetryRecommendations,
 }: {
   featured: Play | null;
   recommendations: Play[];
@@ -62,9 +65,12 @@ export function HomeRedesign({
   selectedMaterials: MaterialSlug[];
   completedDates: Map<string, string>;
   allCompleted: boolean;
+  celebrateCompletion: boolean;
   age: number;
   onSaveMaterials: (materials: MaterialSlug[]) => Promise<void>;
   intentOptions?: ReactNode;
+  recommendationError?: string | null;
+  onRetryRecommendations?: () => void;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const favorites = useWebFavorites();
@@ -83,7 +89,7 @@ export function HomeRedesign({
   const conditionalNotice = getConditionalRecommendationNotice(recommendations, selectedMaterials, age);
   return (
     <WebPage>
-      <CompletionConfetti active={allCompleted} />
+      <CompletionConfetti active={celebrateCompletion && allCompleted} />
       <div className="nori-page home-page">
         <header className="page-heading">
           <p className="page-kicker">집에 있는 재료로, 함께 자라는 시간</p>
@@ -120,10 +126,27 @@ export function HomeRedesign({
           </span>
         </button>
         {materialNotice ? (
-          <p className="recommendation-material-note" role="status">{materialNotice}</p>
+          <p className="recommendation-material-note" role="status">
+            <Icon name="info" size={14} />
+            <span>{materialNotice}</span>
+          </p>
         ) : null}
         {intentOptions}
-        {conditionalNotice ? <p className="recommendation-material-note" role="status">{conditionalNotice}</p> : null}
+        {recommendationError ? (
+          <p className="error-text" role="alert">
+            {recommendationError}{" "}
+            <button type="button" className="text-button" onClick={onRetryRecommendations}>다시 시도</button>
+          </p>
+        ) : null}
+        {conditionalNotice ? (
+          <div className="recommendation-care-note" role="status">
+            <Icon name="person" size={16} />
+            <div>
+              <strong>함께 도와주세요</strong>
+              <p>{conditionalNotice}</p>
+            </div>
+          </div>
+        ) : null}
         {favorites.error ? (
           <p className="error-text" role="alert">
             {favorites.error}

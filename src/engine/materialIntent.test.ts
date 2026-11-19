@@ -87,6 +87,13 @@ test("부분 일치 3개를 추천하면 추가 준비물을 숨기지 않고 �
   assert.match(getMaterialRecommendationNotice(plays, ["straw"]) ?? "", /추가 준비물/);
 });
 
+test("선택 재료 놀이가 1개 또는 2개인 혼합 추천의 안내 문구를 표시하지 않는다", () => {
+  const matched = play("matched", ["straw", "paper"]);
+  const other = play("other", []);
+  assert.equal(getMaterialRecommendationNotice([matched, other, other], ["straw"]), null);
+  assert.equal(getMaterialRecommendationNotice([matched, matched, other], ["straw"]), null);
+});
+
 test("시간 완화로도 금지 재료·월령 밖·비공개 놀이를 되살리지 않는다", () => {
   const blocked = play("blocked", ["straw"], { durationMin: 10, materials: { required: ["straw"], optional: ["tape"], substitutes: [] } });
   const c = { ...context(["straw"]), blockedMaterials: ["tape"] as FilterInput["blockedMaterials"], availableMinutes: 7 };

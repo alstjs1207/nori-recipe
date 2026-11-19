@@ -1,9 +1,10 @@
+import { useHomeRecommendationStore } from "./homeRecommendationStore";
 import { useFeedbackDraftStore } from "./feedbackDraftStore";
 import { appRuntime } from "@/platform/runtime";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
-import { deleteAllUserData, getUserContext, upsertUserContext } from "@/db/queries";
+import { deleteAllUserData, getLatestPlayLog, getUserContext, upsertUserContext } from "@/db/queries";
 import type { MaterialSlug } from "@/constants/materials";
 import type { HomeIntentConfirmation, UserContext } from "@/types";
 import { parseIntentConfirmation } from "@/engine/intentRecommendation";
@@ -29,8 +30,7 @@ type SessionStore = {
   guestId: string | null;
   userContext: UserContext;
   todayMaterials: MaterialSlug[] | null;
-  pinnedHomeRecommendationIds: string[];
-  pinnedHomeRecommendationKey: string | null;
+  updatingHomeRecommendations: boolean;
   homeIntentConfirmation: HomeIntentConfirmation | null;
   childName: string;
   familyType: FamilyType | null;
@@ -41,7 +41,7 @@ type SessionStore = {
   upsertUserContext: (context: UserContext) => Promise<void>;
   setUserContext: (context: UserContext) => Promise<void>;
   setTodayMaterials: (materials: MaterialSlug[] | null) => Promise<void>;
-  setPinnedHomeRecommendations: (payload: { ids: string[]; key: string }) => Promise<void>;
+  setPinnedHomeRecommendations: (payload: { ids: string[]; key: string; roundId: string | null }) => Promise<void>;
   clearPinnedHomeRecommendations: () => Promise<void>;
   setHomeIntentConfirmation: (confirmation: HomeIntentConfirmation | null) => Promise<void>;
   updateOnboardingProfile: (profile: {
@@ -95,8 +95,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   guestId: null,
   userContext: DEFAULT_USER_CONTEXT,
   todayMaterials: null,
-  pinnedHomeRecommendationIds: [],
-  pinnedHomeRecommendationKey: null,
+  updatingHomeRecommendations: false,
   homeIntentConfirmation: null,
   childName: "",
   familyType: null,
@@ -133,14 +132,19 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         AsyncStorage.getItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
       ]);
 
+      const legacyIds = parseStoredStringArray(savedPinnedRecommendationIds);
+      const legacyRecords = (await Promise.all(legacyIds.map(id => getLatestPlayLog(guestId, id))))
+        .filter((record) => record !== null);
+      await useHomeRecommendationStore.getState().hydrate(guestId, {
+        ids: legacyIds, key: savedPinnedRecommendationKey, records: legacyRecords,
+      });
+
       set({
         guestId,
         childName: childName ?? "",
         familyType: familyType === "single" || familyType === "multiple" ? familyType : null,
         onboardingCompleted: onboardingCompleted === "true",
         todayMaterials: parseStoredMaterials(savedTodayMaterials),
-        pinnedHomeRecommendationIds: parseStoredStringArray(savedPinnedRecommendationIds),
-        pinnedHomeRecommendationKey: savedPinnedRecommendationKey,
         homeIntentConfirmation: parseIntentConfirmation(savedIntentConfirmation),
       });
 
@@ -174,8 +178,12 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     const savedContext = await upsertUserContext(guestId, context);
     const previous = get().userContext;
     if (previous.childBirthMonth !== savedContext.childBirthMonth || JSON.stringify(previous.ownedMaterials) !== JSON.stringify(savedContext.ownedMaterials) || JSON.stringify(previous.blockedMaterials) !== JSON.stringify(savedContext.blockedMaterials)) {
-      await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
-      set({ userContext: savedContext, homeIntentConfirmation: null });
+      set({ updatingHomeRecommendations: true });
+      try {
+        await useHomeRecommendationStore.getState().restart(guestId);
+        await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
+        set({ userContext: savedContext, homeIntentConfirmation: null });
+      } finally { set({ updatingHomeRecommendations: false }); }
     } else {
       set({ userContext: savedContext });
     }
@@ -184,50 +192,51 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     await get().upsertUserContext(context);
   },
   setTodayMaterials: async (materials) => {
-    if (materials === null) {
-      await AsyncStorage.removeItem(TODAY_MATERIALS_STORAGE_KEY);
-    } else {
-      await AsyncStorage.setItem(TODAY_MATERIALS_STORAGE_KEY, JSON.stringify(materials));
-    }
-
-    await Promise.all([
-      AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
-      AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
-      AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
-    ]);
-    set({ todayMaterials: materials, homeIntentConfirmation: null, pinnedHomeRecommendationIds: [], pinnedHomeRecommendationKey: null });
+    const guestId = get().guestId;
+    if (!guestId) throw new Error("Guest session has not been initialized.");
+    set({ updatingHomeRecommendations: true });
+    try {
+      // Persist the new empty round even when the selected materials/IDs repeat.
+      await useHomeRecommendationStore.getState().restart(guestId);
+      if (materials === null) await AsyncStorage.removeItem(TODAY_MATERIALS_STORAGE_KEY);
+      else await AsyncStorage.setItem(TODAY_MATERIALS_STORAGE_KEY, JSON.stringify(materials));
+      await Promise.all([
+        AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
+        AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
+        AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+      ]);
+      set({ todayMaterials: materials, homeIntentConfirmation: null });
+    } finally { set({ updatingHomeRecommendations: false }); }
   },
   setHomeIntentConfirmation: async (confirmation) => {
-    if (confirmation) {
-      await AsyncStorage.setItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY, JSON.stringify(confirmation));
-    } else {
-      await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
-    }
-    set({ homeIntentConfirmation: confirmation });
+    const guestId = get().guestId;
+    if (!guestId) throw new Error("Guest session has not been initialized.");
+    set({ updatingHomeRecommendations: true });
+    try {
+      await useHomeRecommendationStore.getState().restart(guestId);
+      if (confirmation) await AsyncStorage.setItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY, JSON.stringify(confirmation));
+      else await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
+      set({ homeIntentConfirmation: confirmation });
+    } finally { set({ updatingHomeRecommendations: false }); }
   },
-  setPinnedHomeRecommendations: async ({ ids, key }) => {
-    await Promise.all([
-      AsyncStorage.setItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY, JSON.stringify(ids)),
-      AsyncStorage.setItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY, key),
-    ]);
-
-    set({
-      pinnedHomeRecommendationIds: ids,
-      pinnedHomeRecommendationKey: key,
-    });
+  setPinnedHomeRecommendations: async ({ ids, key, roundId }) => {
+    const guestId = get().guestId;
+    if (!guestId || get().updatingHomeRecommendations) return;
+    await useHomeRecommendationStore.getState().pin(guestId, roundId, ids, key);
   },
   clearPinnedHomeRecommendations: async () => {
-    await Promise.all([
-      AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
-      AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
-      AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
-    ]);
-
-    set({
-      pinnedHomeRecommendationIds: [],
-      pinnedHomeRecommendationKey: null,
-      homeIntentConfirmation: null,
-    });
+    const guestId = get().guestId;
+    if (!guestId) return;
+    set({ updatingHomeRecommendations: true });
+    try {
+      await useHomeRecommendationStore.getState().restart(guestId);
+      await Promise.all([
+        AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
+        AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
+        AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
+      ]);
+      set({ homeIntentConfirmation: null });
+    } finally { set({ updatingHomeRecommendations: false }); }
   },
   updateOnboardingProfile: async ({ childName, familyType }) => {
     const updates: Array<Promise<void>> = [];
@@ -280,6 +289,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     ]);
 
     const nextGuestId = await getOrCreateGuestId();
+    await useHomeRecommendationStore.getState().restart(nextGuestId);
     const nextUserContext = await upsertUserContext(nextGuestId, DEFAULT_USER_CONTEXT);
 
     set({
@@ -287,8 +297,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       userContext: nextUserContext,
       homeIntentConfirmation: null,
       todayMaterials: null,
-      pinnedHomeRecommendationIds: [],
-      pinnedHomeRecommendationKey: null,
+      updatingHomeRecommendations: false,
       childName: "",
       familyType: null,
       onboardingCompleted: false,

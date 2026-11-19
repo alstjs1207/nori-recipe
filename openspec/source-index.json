@@ -1328,6 +1328,18 @@
       ]
     },
     {
+      "path": "src/engine/homeCompletion.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/homeCompletion.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
       "path": "src/engine/intentCatalog.json",
       "domains": [
         "recommendations"
@@ -1642,6 +1654,27 @@
       ]
     },
     {
+      "path": "src/store/homeRecommendationRound.test.ts",
+      "domains": [
+        "local-data",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/store/homeRecommendationRound.ts",
+      "domains": [
+        "local-data",
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/store/homeRecommendationStore.ts",
+      "domains": [
+        "local-data",
+        "recommendations"
+      ]
+    },
+    {
       "path": "src/store/playsStore.ts",
       "domains": [
         "catalog"
@@ -1772,6 +1805,14 @@
         "catalog",
         "privacy",
         "web-platform"
+      ]
+    },
+    {
+      "path": "tests/web-home-round.test.mjs",
+      "domains": [
+        "local-data",
+        "play-records",
+        "recommendations"
       ]
     },
     {

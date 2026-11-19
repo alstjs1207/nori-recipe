@@ -298,6 +298,7 @@ export default function SettingsScreen() {
     setResetting(true);
     try {
       const nextUserContext = await resetUserActivity(guestId);
+      await useSessionStore.getState().clearPinnedHomeRecommendations();
       useSessionStore.setState({ userContext: nextUserContext });
       setResetConfirmVisible(false);
       setResetNoticeVisible(true);

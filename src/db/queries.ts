@@ -1,5 +1,7 @@
 import { CHILD_REACTION_PARSE_OPTIONS, type ChildReaction } from "@/constants/feedback";
 import { appRuntime } from "@/platform/runtime";
+import { useHomeRecommendationStore } from "@/store/homeRecommendationStore";
+import { getHomeRoundRecords } from "@/store/homeRecommendationRound";
 import { randomUUID } from "expo-crypto";
 import { Platform } from "react-native";
 
@@ -339,6 +341,31 @@ export async function getPlayLogs(guestId: string, limit = 20): Promise<PlayLogR
   }));
 }
 
+/** Exact round record references are independent of the recent-history display limit. */
+export async function getPlayLogsByIds(guestId: string, recordIds: readonly string[]): Promise<PlayLogRecord[]> {
+  if (recordIds.length === 0) return [];
+  const ids = [...new Set(recordIds)];
+  if (Platform.OS === "web") {
+    const selected = new Set(ids);
+    return (await readWebPlayLogs()).filter(log => log.guestId === guestId && !log.deletedAt && selected.has(log.id))
+      .sort((a, b) => b.completedAt.localeCompare(a.completedAt));
+  }
+  const database = await initializeDatabase();
+  const records: PlayLogRecord[] = [];
+  for (let offset = 0; offset < ids.length; offset += 500) {
+    const chunk = ids.slice(offset, offset + 500);
+    const rows = await database.getAllAsync<{
+      id: string; guest_id: string; play_id: string; completed_at: string;
+      duration_actual: number | null; star_rating: number | null; child_reaction: string | null; memo: string | null;
+    }>(`SELECT id, guest_id, play_id, completed_at, duration_actual, star_rating, child_reaction, memo
+        FROM play_logs WHERE guest_id = ? AND deleted_at IS NULL AND id IN (${chunk.map(() => "?").join(",")})`, guestId, ...chunk);
+    records.push(...rows.map(row => ({ id: row.id, guestId: row.guest_id, playId: row.play_id,
+      completedAt: row.completed_at, durationActual: row.duration_actual, starRating: row.star_rating,
+      childReaction: parseChildReactions(row.child_reaction), memo: row.memo })));
+  }
+  return records.sort((a, b) => b.completedAt.localeCompare(a.completedAt));
+}
+
 export async function getLatestPlayLog(
   guestId: string,
   playId: string,
@@ -666,6 +693,7 @@ export async function recordPlayFeedbackWithRecord(
     throw new Error("Unknown child reaction.");
   }
 
+  const roundAtSave = useHomeRecommendationStore.getState().round;
   const currentContext = await getUserContext(guestId);
   const nextContext = applyFeedbackToUserContext(
     currentContext,
@@ -679,6 +707,13 @@ export async function recordPlayFeedbackWithRecord(
     id: playLogId, guestId, playId, completedAt, durationActual,
     starRating: rating, childReaction: reactions, memo,
   } };
+
+  // Save the round reference first. A failed DB write cannot create a stamp,
+  // because home also requires this exact record to exist in the activity DB.
+  const assignedRecords = await getPlayLogsByIds(guestId, roundAtSave?.records.map(record => record.id) ?? []);
+  if (!getHomeRoundRecords(roundAtSave, guestId, assignedRecords).some(record => record.playId === playId)) {
+    await useHomeRecommendationStore.getState().stage(guestId, roundAtSave?.id ?? null, result.record);
+  }
 
   if (Platform.OS === "web") {
     const [logs, contexts] = await Promise.all([readWebPlayLogs(), readWebUserContexts()]);

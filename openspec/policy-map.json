@@ -82,7 +82,9 @@
           "sources": [
             "src/engine/materialFit.ts",
             "src/engine/diversity.ts",
-            "src/engine/softScore.ts"
+            "src/engine/softScore.ts",
+            "src/components/web/HomeRedesign.tsx",
+            "public/web.css"
           ],
           "tests": [
             "src/engine/materialIntent.test.ts",
@@ -92,6 +94,10 @@
             {
               "path": "src/engine/materialFit.ts",
               "contains": "getMaterialFit"
+            },
+            {
+              "path": "public/web.css",
+              "contains": ".recommendation-material-note {"
             }
           ]
         },
@@ -101,7 +107,9 @@
           "sources": [
             "src/engine/intentRecommendation.ts",
             "src/engine/intentSignals.ts",
-            "src/engine/intentCatalog.json"
+            "src/engine/intentCatalog.json",
+            "src/components/web/HomeRedesign.tsx",
+            "public/web.css"
           ],
           "tests": [
             "src/engine/activityIntent.test.ts"
@@ -110,6 +118,10 @@
             {
               "path": "src/engine/intentRecommendation.ts",
               "contains": "getConditionalIntentCandidates"
+            },
+            {
+              "path": "public/web.css",
+              "contains": ".recommendation-care-note {"
             }
           ]
         },
@@ -126,9 +138,18 @@
             "src/components/web/CompletionStamp.tsx",
             "public/completion-stamp-v1.svg",
             "src/components/web/CompletionConfetti.web.tsx",
-            "src/components/web/CompletionConfetti.tsx"
+            "src/components/web/CompletionConfetti.tsx",
+            "src/engine/homeCompletion.ts",
+            "app/(main)/feedback/[id].web.tsx",
+            "src/store/homeRecommendationRound.ts",
+            "src/store/homeRecommendationStore.ts",
+            "src/db/queries.ts"
           ],
-          "tests": [],
+          "tests": [
+            "src/engine/homeCompletion.test.ts",
+            "src/store/homeRecommendationRound.test.ts",
+            "tests/web-home-round.test.mjs"
+          ],
           "anchors": [
             {
               "path": "app/(main)/index.tsx",
@@ -141,6 +162,14 @@
             {
               "path": "src/components/web/CompletionConfetti.web.tsx",
               "contains": "createPortal"
+            },
+            {
+              "path": "src/engine/homeCompletion.ts",
+              "contains": "createHomeCompletionCelebration"
+            },
+            {
+              "path": "src/store/homeRecommendationRound.ts",
+              "contains": "getHomeRoundRecords"
             }
           ]
         },
@@ -272,15 +301,23 @@
             "src/constants/feedback.ts",
             "app/(main)/feedback/[id].tsx",
             "app/(main)/feedback/[id].web.tsx",
-            "src/store/feedbackDraftStore.ts"
+            "src/store/feedbackDraftStore.ts",
+            "src/store/homeRecommendationRound.ts",
+            "src/store/homeRecommendationStore.ts"
           ],
           "tests": [
-            "src/store/feedbackDraftStore.test.ts"
+            "src/store/feedbackDraftStore.test.ts",
+            "src/store/homeRecommendationRound.test.ts",
+            "tests/web-home-round.test.mjs"
           ],
           "anchors": [
             {
               "path": "src/db/queries.ts",
               "contains": "recordPlayFeedbackWithRecord"
+            },
+            {
+              "path": "src/store/homeRecommendationRound.ts",
+              "contains": "getHomeRoundRecords"
             }
           ]
         },
@@ -334,13 +371,22 @@
             "src/db/schema.ts",
             "src/db/index.ts",
             "src/db/index.web.ts",
-            "src/db/queries.ts"
+            "src/db/queries.ts",
+            "src/store/homeRecommendationRound.ts",
+            "src/store/homeRecommendationStore.ts"
           ],
-          "tests": [],
+          "tests": [
+            "src/store/homeRecommendationRound.test.ts",
+            "tests/web-home-round.test.mjs"
+          ],
           "anchors": [
             {
               "path": "src/db/schema.ts",
               "contains": "DATABASE_VERSION"
+            },
+            {
+              "path": "src/store/homeRecommendationRound.ts",
+              "contains": "getHomeRoundRecords"
             }
           ]
         },
@@ -349,13 +395,22 @@
           "verification": "source-reviewed",
           "sources": [
             "src/db/queries.ts",
-            "src/store/sessionStore.ts"
+            "src/store/sessionStore.ts",
+            "src/store/homeRecommendationRound.ts",
+            "src/store/homeRecommendationStore.ts"
           ],
-          "tests": [],
+          "tests": [
+            "src/store/homeRecommendationRound.test.ts",
+            "tests/web-home-round.test.mjs"
+          ],
           "anchors": [
             {
               "path": "src/db/queries.ts",
               "contains": "resetUserActivity"
+            },
+            {
+              "path": "src/store/homeRecommendationRound.ts",
+              "contains": "getHomeRoundRecords"
             }
           ]
         }

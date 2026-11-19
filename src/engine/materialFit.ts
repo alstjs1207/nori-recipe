@@ -49,10 +49,10 @@ export function getMaterialRecommendationNotice(plays: Play[], selectedMaterials
   const matchedCount = plays.filter((play) => getMaterialFit(play, selected).matched > 0).length;
   if (matchedCount === 0) return "선택한 재료를 활용하는 놀이가 부족해 다른 놀이를 추천해요.";
   if (matchedCount < plays.length) {
-    return `이번 추천에는 선택 재료를 활용한 놀이 ${matchedCount}개와 다른 놀이를 함께 담았어요.`;
+    return null;
   }
   if (plays.some((play) => getMaterialFit(play, selected).missing > 0)) {
-    return "선택한 재료를 활용하는 놀이예요. 추가 준비물은 각 놀이에서 확인해 주세요.";
+    return "추가 준비물은 각 놀이에서 확인해 주세요.";
   }
   return null;
 }

@@ -44,6 +44,7 @@ export type IconName =
   | "run"
   | "moon"
   | "spark"
+  | "info"
   | "sliders"
   | "clock"
   | "timer"
@@ -55,6 +56,12 @@ export type IconName =
   | "settings";
 
 const paths: Record<Exclude<IconName, "flower">, ReactNode> = {
+  info: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v6m0-10v.01" />
+    </>
+  ),
   search: (
     <>
       <circle cx="10.5" cy="10.5" r="6.5" />

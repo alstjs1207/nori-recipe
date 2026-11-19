@@ -38,6 +38,7 @@ export function classify(file) {
   if (/^src\/engine\//.test(file)) return ["recommendations"];
   if (/^src\/analytics\/|WebAnalytics|legalNotices/.test(file)) return ["privacy"];
   if (/^src\/db\/|^src\/types\/db/.test(file)) return ["local-data", "play-records"];
+  if (/^src\/store\/homeRecommendation/.test(file)) return ["recommendations", "local-data"];
   if (/sessionStore/.test(file)) return ["onboarding", "local-data", "recommendations"];
   if (/playsStore|^src\/data\//.test(file)) return ["catalog"];
   if (/^src\/onboarding\/|^app\/\(onboarding\)\/|WebFirstVisit|WebWelcome|^app\/start/.test(file)) return ["onboarding"];
@@ -50,6 +51,7 @@ export function classify(file) {
   if (/^scripts\/review\/|^scripts\/(?:.*review|.*material-images|build-play-catalog|validate-play-content)|^tests\/(?:.*review|material-images|image-registration)|^data\/|^\.claude\/skills\//.test(file)) return ["content-review"];
   if (/^scripts\/(prepare-play-images|material-audit)/.test(file)) return ["content-review", "recommendations"];
   if (/^src\/constants\/(?:playImage|materialImage|materials|materialVisuals)/.test(file)) return ["content-review", "catalog"];
+  if (file === "tests/web-home-round.test.mjs") return ["recommendations", "local-data", "play-records"];
   if (/^tests\/web-/.test(file)) return ["web-platform", "catalog", "privacy"];
   if (/^scripts\/(?:web\/|.*web|upload)/.test(file)) return ["web-platform"];
   if (/^src\/(?:animations|components|hooks|utils|types|constants)\//.test(file) || /^app\/(?:_layout|index)|^app\/\(main\)\/_layout/.test(file)) return ["web-platform"];

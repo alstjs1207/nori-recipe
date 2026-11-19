@@ -12,7 +12,9 @@ import {
   CHILD_REACTION_OPTIONS,
 } from "@/constants/feedback";
 import { recordPlayFeedbackWithRecord } from "@/db/queries";
+import { homeCompletionCelebration } from "@/engine/homeCompletion";
 import { trackSavedFeedback } from "@/analytics/feedback.web";
+import { useHomeRecommendationStore } from "@/store/homeRecommendationStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { usePlaysStore } from "@/store/playsStore";
 import { EmptyState, Icon, PageFooter } from "@/components/web/NoriUI";
@@ -47,6 +49,7 @@ export default function FeedbackWebScreen() {
       return;
     }
     const submitted = draft;
+    const savedRound = useHomeRecommendationStore.getState().round;
     setSaving(true);
     setError(null);
     try {
@@ -61,6 +64,7 @@ export default function FeedbackWebScreen() {
       useSessionStore.setState({ userContext });
       trackSavedFeedback(guestId, record);
       appRuntime.completionAd?.saved(record);
+      homeCompletionCelebration.saved(guestId, record, savedRound?.ids ?? [], savedRound?.id ?? null);
       router.replace({
         pathname: "/(main)",
         params: { completedPlayId: play.id },

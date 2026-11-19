@@ -5,11 +5,11 @@ import { WebFirstVisit } from "@/components/web/WebFirstVisit";
 import { HomeRedesign } from "@/components/web/HomeRedesign";
 import { IntentReadinessPanel } from "@/components/IntentReadinessPanel";
 import { useContentDimensions } from "@/hooks/useContentDimensions";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { appRuntime } from "@/platform/runtime";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { appRouter as router } from "@/navigation/router";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useFocusEffect } from "expo-router";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
@@ -21,8 +21,9 @@ import { MATERIAL_DISPLAY_NAMES, type MaterialSlug } from "@/constants/materials
 import { getMaterialVisualSpec } from "@/constants/materialVisuals";
 import { getPlayThumbnailSource } from "@/constants/playImages";
 import { APP_COLORS, APP_FONTS, APP_SHADOWS } from "@/constants/theme";
-import { getFavorites, getPlayLogCount, getPlayLogs } from "@/db/queries";
+import { getFavorites, getPlayLogCount, getPlayLogs, getPlayLogsByIds } from "@/db/queries";
 import { recommend } from "@/engine/recommend";
+import { homeCompletionCelebration } from "@/engine/homeCompletion";
 import { createMaterialComparator, getMaterialRecommendationNotice, pickFeaturedPlay } from "@/engine/materialFit";
 import { getConditionalIntentCandidates, getConditionalRecommendationNotice, getIntentConfirmationKey, isEligibleHomeRecommendation, readinessAllowsPlay } from "@/engine/intentRecommendation";
 import { isReadyIntentMatch } from "@/engine/intentSignals";
@@ -32,6 +33,8 @@ import {
   ONBOARDING_DEFAULT_MATERIALS,
 } from "@/onboarding/utils";
 import { usePlaysStore } from "@/store/playsStore";
+import { useHomeRecommendationStore } from "@/store/homeRecommendationStore";
+import { getHomeRoundRecords } from "@/store/homeRecommendationRound";
 import { useSessionStore } from "@/store/sessionStore";
 import type { FilterInput, IntentReadiness, Play, PlayLogRecord, PlayPlace } from "@/types";
 
@@ -66,14 +69,6 @@ function mergeRecommendedPlays(primary: Play[], fallback: Play[], limit: number)
   }
 
   return merged.slice(0, limit);
-}
-
-function readParam(value: string | string[] | undefined): string | null {
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
-  }
-
-  return typeof value === "string" ? value : null;
 }
 
 function isSameCalendarDay(value: Date, target: Date): boolean {
@@ -393,8 +388,6 @@ export default function MainScreen() {
   const reduceMotion = useReducedMotion();
   const { width } = useContentDimensions();
   const compactWebHero = Platform.OS === "web" && width < 400;
-  const params = useLocalSearchParams<{ completedPlayId?: string | string[] }>();
-  const [returningCompletedPlayId, setReturningCompletedPlayId] = useState<string | null>(null);
   const [materialsEditorOpen, setMaterialsEditorOpen] = useState(false);
   const plays = usePlaysStore((state) => state.plays);
   const guestId = useSessionStore((state) => state.guestId);
@@ -402,15 +395,19 @@ export default function MainScreen() {
   const userContext = useSessionStore((state) => state.userContext);
   const todayMaterials = useSessionStore((state) => state.todayMaterials);
   const setTodayMaterials = useSessionStore((state) => state.setTodayMaterials);
-  const pinnedRecommendationIds = useSessionStore((state) => state.pinnedHomeRecommendationIds);
-  const pinnedRecommendationKey = useSessionStore((state) => state.pinnedHomeRecommendationKey);
+  const round = useHomeRecommendationStore((state) => state.round);
+  const updatingRecommendations = useSessionStore((state) => state.updatingHomeRecommendations);
+  const pinnedRecommendationIds = round?.ids ?? [];
+  const pinnedRecommendationKey = round?.key ?? null;
   const setPinnedHomeRecommendations = useSessionStore((state) => state.setPinnedHomeRecommendations);
   const homeIntentConfirmation = useSessionStore((state) => state.homeIntentConfirmation);
   const setHomeIntentConfirmation = useSessionStore((state) => state.setHomeIntentConfirmation);
   const [totalPlays, setTotalPlays] = useState(0);
   const [recentLogs, setRecentLogs] = useState<PlayLogRecord[]>([]);
+  const [roundLogs, setRoundLogs] = useState<PlayLogRecord[]>([]);
+  const [celebrateCompletion, setCelebrateCompletion] = useState(false);
+  const [pinError, setPinError] = useState<string | null>(null);
   const [favoritePlayIds, setFavoritePlayIds] = useState<Set<string>>(() => new Set());
-  const adRecommendationIds = useRef<string[]>([]);
 
   const baseMaterials = useMemo(
     () =>
@@ -436,17 +433,11 @@ export default function MainScreen() {
       ? null
       : getAgeMonthsFromBirthMonth(userContext.childBirthMonth);
 
-  useEffect(() => {
-    const completedPlayId = readParam(params.completedPlayId);
-
-    if (completedPlayId) {
-      setReturningCompletedPlayId(completedPlayId);
-    }
-  }, [params.completedPlayId]);
-
   useFocusEffect(
     useCallback(() => {
       let active = true;
+      const focusedRound = useHomeRecommendationStore.getState().round;
+      setCelebrateCompletion(false);
 
       if (!guestId) {
         setTotalPlays(0);
@@ -461,17 +452,23 @@ export default function MainScreen() {
         getPlayLogCount(guestId),
         getPlayLogs(guestId, Platform.OS === "web" ? 10000 : 12),
         getFavorites(guestId, 200),
+        getPlayLogsByIds(guestId, focusedRound?.records.map(record => record.id) ?? []),
       ])
-        .then(([count, logs, favorites]) => {
+        .then(([count, logs, favorites, assignedLogs]) => {
           if (active) {
             setTotalPlays(count);
             setRecentLogs(logs);
+            const completed = getHomeRoundRecords(focusedRound, guestId, assignedLogs);
+            setRoundLogs(completed);
+            setCelebrateCompletion(homeCompletionCelebration.consume(guestId, focusedRound?.ids ?? [], completed, focusedRound?.id ?? null));
             setFavoritePlayIds(new Set(favorites.map((favorite) => favorite.playId)));
-            appRuntime.completionAd?.home(adRecommendationIds.current, logs);
+            appRuntime.completionAd?.home(focusedRound?.ids ?? [], completed);
           }
         })
         .catch(() => {
           if (active) {
+            homeCompletionCelebration.consume(guestId, [], [], focusedRound?.id ?? null);
+            setRoundLogs([]);
             setTotalPlays(0);
             setRecentLogs([]);
             setFavoritePlayIds(new Set());
@@ -480,11 +477,15 @@ export default function MainScreen() {
 
       return () => {
         active = false;
+        // Leaving before the history read finishes must not defer the effect
+        // until a later visit to home.
+        homeCompletionCelebration.consume(guestId, [], [], focusedRound?.id ?? null);
+        setCelebrateCompletion(false);
       };
-    }, [guestId]),
+    }, [guestId, round?.id]),
   );
 
-  const latestCompletedAtByPlayId = getLatestCompletedAtByPlayId(recentLogs);
+  const latestCompletedAtByPlayId = getLatestCompletedAtByPlayId(getHomeRoundRecords(round, guestId, roundLogs));
   const recentCompletedPlayIds = getRecentCompletedPlayIds(recentLogs.slice(0, 12));
 
   const confirmationKey = childAgeMonths === null ? null : getIntentConfirmationKey({ childAgeMonths, availableMaterials: selectedMaterials, blockedMaterials: userContext.blockedMaterials });
@@ -501,7 +502,6 @@ export default function MainScreen() {
   };
   const potentialConditionalCandidate = childAgeMonths === null ? undefined : getConditionalIntentCandidates(plays, filterInput)[0];
   const onConfirmIntent = async (readiness: IntentReadiness | null) => {
-    setReturningCompletedPlayId(null);
     await setHomeIntentConfirmation(readiness && confirmationKey ? { key: confirmationKey, readiness } : null);
   };
   const recommendation =
@@ -527,27 +527,8 @@ export default function MainScreen() {
     [childAgeMonths, plays.length, selectedMaterials, userContext.blockedMaterials, intentReadiness, confirmationKey],
   );
 
-  useEffect(() => {
-    if (pinnedRecommendationKey === recommendationPinKey) {
-      return;
-    }
-
-    void setPinnedHomeRecommendations({
-      ids: recommendation.results.map((play) => play.id),
-      key: recommendationPinKey,
-    });
-  }, [
-    pinnedRecommendationKey,
-    recommendation.results,
-    recommendationPinKey,
-    setPinnedHomeRecommendations,
-  ]);
-
   const pinnedResults = useMemo(() => {
-    if (
-      pinnedRecommendationKey !== recommendationPinKey ||
-      pinnedRecommendationIds.length === 0
-    ) {
+    if (pinnedRecommendationIds.length === 0) {
       return recommendation.results;
     }
 
@@ -562,28 +543,17 @@ export default function MainScreen() {
 
     return mergeRecommendedPlays(pinned, recommendation.results, 3);
   }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results, childAgeMonths, selectedMaterials, userContext.blockedMaterials, intentReadiness]);
-  adRecommendationIds.current = pinnedResults.map(play => play.id);
 
   useEffect(() => {
-    // Repair only removed/ineligible pinned content; ordinary ranking changes keep the set.
-    if (pinnedRecommendationKey === recommendationPinKey && pinnedResults.length > 0 && pinnedResults.map((p) => p.id).join(",") !== pinnedRecommendationIds.join(",")) {
-      void setPinnedHomeRecommendations({ ids: pinnedResults.map((p) => p.id), key: recommendationPinKey });
+    // Age/content changes repair only ineligible items. Explicit new rounds
+    // already have empty IDs; neither midnight nor ordinary re-ranking resets progress.
+    if (!updatingRecommendations && round && (pinnedRecommendationKey !== recommendationPinKey || pinnedResults.map((p) => p.id).join(",") !== pinnedRecommendationIds.join(","))) {
+      void setPinnedHomeRecommendations({ ids: pinnedResults.map((p) => p.id), key: recommendationPinKey, roundId: round.id })
+        .then(() => setPinError(null)).catch(() => setPinError("추천을 저장하지 못했어요. 다시 시도해 주세요."));
     }
-  }, [pinnedRecommendationIds, pinnedRecommendationKey, pinnedResults, recommendationPinKey, setPinnedHomeRecommendations]);
+  }, [pinnedRecommendationIds, pinnedRecommendationKey, pinnedResults, recommendationPinKey, setPinnedHomeRecommendations, updatingRecommendations, round?.id]);
 
-  const visibleRecommendations = useMemo(() => {
-    if (!returningCompletedPlayId) {
-      return pinnedResults;
-    }
-
-    const justCompletedPlay = plays.find((play) => play.id === returningCompletedPlayId);
-
-    if (!justCompletedPlay || pinnedResults.some((play) => play.id === returningCompletedPlayId)) {
-      return pinnedResults;
-    }
-
-    return [...pinnedResults.slice(0, 2), justCompletedPlay];
-  }, [pinnedResults, plays, returningCompletedPlayId]);
+  const visibleRecommendations = pinnedResults;
 
   const featuredPlay = useMemo(
     () => pickFeaturedPlay(visibleRecommendations, selectedMaterials, childAgeMonths ?? undefined),
@@ -629,7 +599,7 @@ export default function MainScreen() {
   ]);
 
   const allRecommendedCompleted =
-    visibleRecommendations.length > 0 &&
+    visibleRecommendations.length === 3 &&
     visibleRecommendations.every((play) => latestCompletedAtByPlayId.has(play.id));
 
   const selectedMaterialsPreview =
@@ -649,12 +619,10 @@ export default function MainScreen() {
       ? selectedMaterials.filter((item) => item !== material)
       : [...selectedMaterials, material];
 
-    setReturningCompletedPlayId(null);
     void setTodayMaterials(nextMaterials);
   }
 
   function clearMaterials() {
-    setReturningCompletedPlayId(null);
     void setTodayMaterials([]);
   }
 
@@ -673,6 +641,13 @@ export default function MainScreen() {
         )}
         selectedMaterials={selectedMaterials}
         completedDates={latestCompletedAtByPlayId}
+        recommendationError={pinError}
+        onRetryRecommendations={() => {
+          if (!round) return;
+          void setPinnedHomeRecommendations({ ids: pinnedResults.map(play => play.id), key: recommendationPinKey, roundId: round.id })
+            .then(() => setPinError(null)).catch(() => setPinError("추천을 저장하지 못했어요. 다시 시도해 주세요."));
+        }}
+        celebrateCompletion={celebrateCompletion}
         allCompleted={pinnedResults.length === 3 && pinnedResults.every(
           (play) => latestCompletedAtByPlayId.has(play.id),
         )}
@@ -682,7 +657,6 @@ export default function MainScreen() {
             confirmed={readinessAllowsPlay(conditionalCandidate, filterInput)} onChange={onConfirmIntent} />
         ) : null}
         onSaveMaterials={async (materials) => {
-          setReturningCompletedPlayId(null);
           await setTodayMaterials(materials);
         }}
       />
@@ -880,6 +854,10 @@ export default function MainScreen() {
             <Text style={styles.sectionLink}>전체보기 ›</Text>
           </Pressable>
         </View>
+        <Text style={styles.panelBody} accessibilityLiveRegion="polite">
+          {visibleRecommendations.filter(play => latestCompletedAtByPlayId.has(play.id)).length}/{visibleRecommendations.length}개 완료
+        </Text>
+        {pinError ? <Text style={styles.panelBody} accessibilityRole="alert">{pinError}</Text> : null}
         {conditionalCandidate ? (
           <IntentReadinessPanel key={confirmationKey} candidate={conditionalCandidate} materials={selectedMaterials}
             confirmed={readinessAllowsPlay(conditionalCandidate, filterInput)} onChange={onConfirmIntent} />

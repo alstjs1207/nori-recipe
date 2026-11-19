@@ -28,7 +28,7 @@ test("실제 세션 스토어는 최초 저장소 실패 후 재시도하고 원
     api.onResolve({ filter: /^(?:@\/platform\/runtime|@\/db\/queries|@\/analytics\/analytics|expo-crypto)$/ }, args => ({ path: args.path, namespace: "fixture" }));
     api.onLoad({ filter: /.*/, namespace: "fixture" }, args => {
       const contents = args.path === "@/platform/runtime" ? `export const appRuntime={storage:globalThis[${JSON.stringify(key)}].storage};`
-        : args.path === "@/db/queries" ? `import { DEFAULT_USER_CONTEXT } from ${JSON.stringify(path.join(project, "src/types/index.ts"))};export async function getUserContext(){return DEFAULT_USER_CONTEXT}export async function upsertUserContext(id,context){return context}export async function deleteAllUserData(){}`
+        : args.path === "@/db/queries" ? `import { DEFAULT_USER_CONTEXT } from ${JSON.stringify(path.join(project, "src/types/index.ts"))};export async function getUserContext(){return DEFAULT_USER_CONTEXT}export async function upsertUserContext(id,context){return context}export async function deleteAllUserData(){}export async function getLatestPlayLog(){return null}`
         : args.path === "expo-crypto" ? 'export { randomUUID } from "node:crypto";' : 'export function resetAnalyticsConsent(){}';
       return { contents, loader: "ts", resolveDir: project };
     });
