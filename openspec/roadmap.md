@@ -4,7 +4,8 @@
 
 | 우선순위/상태 | 작업 | 현재 준비 / 미구현 | 다음 문서 |
 | --- | --- | --- | --- |
-| 우선 확인 / 결정 필요 | 홈 세트 수·수명·완료 후 전환 | 엔진·고정 저장은 구현. 후보 부족 정책과 UI 회귀·다음 세트 시점은 미확인 | `changes/clarify-home-set-lifecycle/` |
+| 완료 / 2026-11-21 · 로컬 | 재료 변경 시 완료 보존·달성 묶음 | 0/3 전체 재추천,1/3·2/3 완료 칸 유지·남은 칸만 교체,3/3 후 새 회차. 최종 홈·기록 시안의 최근3묶음/개별 놀이/월별 보기와 단위168개·전체 로컬 검증·웹/토스 빌드·웹 브라우저 확인 완료. 실기기·배포와 구분 | [제안](changes/preserve-completed-plays-on-material-change/proposal.md) · [태스크](changes/preserve-completed-plays-on-material-change/tasks.md) |
+| 일부 구현·웹 검증 완료 / 잔여 확인 | 홈 세트 수·수명·완료 후 전환 | 회차 저장·웹 진행 보존은17f072a에 구현. 후보 부족0~2개·네이티브 실기기는 잔여이며 부분 완료 재료 변경·완료 묶음은 위 change로 구현 | `changes/clarify-home-set-lifecycle/` |
 | 완료 / 2026-11-15 | 놀이 이미지 웹 Supabase Storage 이관 | 원본224개·공개416개 검증, Git 제외·웹/PWA·공유·원본 없는 CI·Preview/Production 완료. 사용자 실제 공유 표시 확인 | [완료 기록](completed-work.md) · [태스크](changes/migrate-play-images-to-supabase-storage/tasks.md) |
 | 완료 / 2026-11-16 · Preview | 재료 이미지 Storage 이관 | 비공개 원본67개·공개 파생66개 검증, 로컬 원본/Git 제외·웹/PWA·원본 없는 CI266개·Preview Ready 완료. main/운영 유지 | [재료 change](changes/migrate-material-images-to-supabase-storage/tasks.md) |
 | 후속 / 미구현·미검증 | 이미지 관리 복원·운영 롤백·서비스 고지 보강 | 기존3.2·4.2/4.3의 남은 부분. 수동 도구·복구 절차/문서 고지와 UI 자동 연결·실제 복원/롤백·서비스 내 고지를 구분 | [후속 목록](follow-ups/play-image-operations.md) |

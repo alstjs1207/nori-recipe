@@ -1340,6 +1340,18 @@
       ]
     },
     {
+      "path": "src/engine/homeRoundRecommendation.test.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
+      "path": "src/engine/homeRoundRecommendation.ts",
+      "domains": [
+        "recommendations"
+      ]
+    },
+    {
       "path": "src/engine/intentCatalog.json",
       "domains": [
         "recommendations"

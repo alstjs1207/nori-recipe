@@ -3146,3 +3146,73 @@ p.analytics-preview-note { display: block; width: fit-content; max-width: 100%; 
   .analytics-dialog-body { padding: 0 18px 18px; }
   .analytics-choice { gap: 8px; }
 }
+
+/* A round is a small ongoing challenge; completed cards stay in their slots. */
+.home-challenge { background: var(--lavender); padding: 14px 16px; border-radius: 14px; margin-bottom: 18px; }
+.home-challenge-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.home-challenge-heading p { display: flex; align-items: center; gap: 5px; color: var(--violet); font-size: 11px; margin: 0 0 3px; }
+.home-challenge-heading h2 { font-size: 14px; line-height: 1.5; margin: 0; letter-spacing: -.3px; }
+.home-challenge-heading > strong { color: var(--violet); font-size: 24px; white-space: nowrap; }
+.home-challenge-heading > strong span { color: var(--muted); font-size: 13px; font-weight: 400; }
+.home-challenge-track { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; }
+.home-challenge-track span { height: 4px; border-radius: 4px; background: #ddd6f7; }
+.home-challenge-track .is-completed { background: var(--violet); }
+.home-challenge-record { display: inline-flex; align-items: center; gap: 5px; color: var(--violet); font-size: 12px; padding: 9px 0 0; text-decoration: none; }
+.home-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "together"; gap: 4px; max-width: 680px; margin-inline: auto; }
+.home-together .recommendation-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.home-material-summary .summary-edit { white-space: normal; text-align: right; }
+.record-page { max-width: 720px; margin-inline: auto; }
+.record-overview { padding-bottom: 17px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.record-overview-period { font-size: 11px; color: var(--muted); margin: 0 0 9px; }
+.record-overview-stats { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 9px; }
+.record-overview-stats strong { display: block; font-size: 25px; line-height: 1.25; letter-spacing: -.8px; }
+.record-overview-stats strong span { font-size: 11px; letter-spacing: 0; font-weight: 400; color: var(--muted); margin-left: 3px; }
+.record-overview-stats p { font-size: 11px; margin: 6px 0 0; color: var(--muted); word-break: keep-all; }
+.record-development { background: white; border: 1px solid var(--line); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+.record-development summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; list-style: none; cursor: pointer; min-height: 44px; }
+.record-development summary::-webkit-details-marker { display: none; }
+.record-development summary strong { display: block; font-size: 15px; letter-spacing: -.4px; }
+.record-development summary small { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.record-disclosure { display: flex; align-items: center; gap: 3px; color: var(--muted); font-size: 11px; white-space: nowrap; }
+.record-disclosure svg { transform: rotate(90deg); }
+.record-development[open] .record-disclosure svg { transform: rotate(-90deg); }
+.record-development-bars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 21px; row-gap: 6px; margin-top: 12px; }
+.record-development-link { display: flex; flex-direction: column; justify-content: center; gap: 7px; min-height: 44px; color: inherit; text-decoration: none; font-size: 12px; }
+.record-development-link > span:first-child { display: flex; justify-content: space-between; align-items: center; gap: 5px; }
+.record-development-link strong { font-size: 11px; color: var(--muted); font-weight: 400; }
+.record-development-link .area-bar { height: 5px; flex: none; }
+.record-development .panel-note { font-size: 11px; color: var(--muted); margin: 13px 0 0; line-height: 1.6; }
+.record-view-switch { display: grid; grid-template-columns: 1fr 1fr; background: var(--lavender); padding: 4px; border-radius: 12px; gap: 4px; margin-bottom: 22px; }
+.record-view-switch button { border: 0; background: transparent; color: var(--muted); font-size: 13px; min-height: 44px; border-radius: 9px; padding: 8px; }
+.record-view-switch button[aria-pressed="true"] { background: white; color: var(--ink); font-weight: 650; }
+.record-view-switch button span { font-size: 11px; margin-left: 4px; color: var(--muted); }
+.record-section-heading { margin: 0 0 15px; }
+.record-section-heading h2 { font-size: 17px; }
+.record-section-heading > span { font-size: 12px; color: var(--muted); }
+.completed-bundle-dates { display: grid; gap: 24px; }
+.completed-date-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.completed-date-heading p { margin: 0 0 2px; font-size: 11px; color: var(--muted); }
+.completed-date-heading h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 25px; line-height: 1.35; letter-spacing: -.8px; margin: 0; }
+.completed-date-heading h3 span { font-size: 12px; color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.completed-date-count { background: var(--lavender); color: var(--violet); border-radius: 20px; padding: 5px 10px; font-size: 12px; white-space: nowrap; }
+.completed-day-bundles { display: grid; gap: 11px; }
+.completed-bundle { background: white; border: 1px solid var(--line); border-radius: 15px; padding: 10px; }
+.completed-bundle-images { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.completed-bundle-images a { text-decoration: none; min-width: 0; }
+.completed-bundle-images figure { margin: 0; }
+.completed-bundle-images img { width: 100%; aspect-ratio: 1 / 1.07; object-fit: cover; border-radius: 9px; display: block; }
+.completed-bundle-images figcaption { margin-top: 8px; font-size: 12px; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
+.record-all-button { display: flex; width: 100%; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 11px; min-height: 44px; font-size: 13px; margin-top: 18px; padding: 10px; }
+.record-back { font-size: 12px; min-height: 44px; margin: -10px 0 8px; }
+.record-month-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+.record-month-row > label { display: grid; gap: 6px; font-size: 11px; color: var(--muted); }
+.record-month-row > span { font-size: 12px; color: var(--muted); }
+.record-month-row strong { color: var(--ink); }
+@media(max-width: 380px) {
+  .record-development { padding: 12px; }
+  .record-development summary strong { font-size: 14px; }
+  .record-overview-stats { gap: 6px; }
+  .record-overview-stats strong, .completed-date-heading h3 { font-size: 23px; }
+  .completed-date-count { font-size: 11px; padding: 5px 8px; }
+  .completed-bundle-images { gap: 6px; }
+}

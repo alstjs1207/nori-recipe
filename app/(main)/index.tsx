@@ -14,7 +14,7 @@ import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-n
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 
-import { fadeInUp, fadeOutDownSoft, layoutTransition, quickFadeIn } from "@/animations/motion";
+import { fadeInUp, fadeOutDownSoft, layoutTransition } from "@/animations/motion";
 import { MotionPressable } from "@/components/motion/MotionPressable";
 import { DEV_AREA_LABELS } from "@/constants/devAreas";
 import { MATERIAL_DISPLAY_NAMES, type MaterialSlug } from "@/constants/materials";
@@ -262,7 +262,7 @@ function ImageSlot({
           <View style={styles.imageShapeThree} />
         </>
       )}
-      {dimmed ? <View pointerEvents="none" style={styles.completedImageOverlay} /> : null}
+      {dimmed ? <View pointerEvents="none" style={[styles.completedImageOverlay, { alignItems: "center", justifyContent: "center" }]}><View style={styles.nativeStamp}><MaterialCommunityIcons name="flower" size={25} color={APP_COLORS.ink} /><Text style={styles.nativeStampText}>참 잘했어요{`\n`}놀이 완료</Text></View></View> : null}
     </View>
   );
 }
@@ -405,6 +405,7 @@ export default function MainScreen() {
   const [totalPlays, setTotalPlays] = useState(0);
   const [recentLogs, setRecentLogs] = useState<PlayLogRecord[]>([]);
   const [roundLogs, setRoundLogs] = useState<PlayLogRecord[]>([]);
+  const [loadedRoundKey, setLoadedRoundKey] = useState<string | null>(null);
   const [celebrateCompletion, setCelebrateCompletion] = useState(false);
   const [pinError, setPinError] = useState<string | null>(null);
   const [favoritePlayIds, setFavoritePlayIds] = useState<Set<string>>(() => new Set());
@@ -460,6 +461,7 @@ export default function MainScreen() {
             setRecentLogs(logs);
             const completed = getHomeRoundRecords(focusedRound, guestId, assignedLogs);
             setRoundLogs(completed);
+            setLoadedRoundKey(`${focusedRound?.id}:${focusedRound?.revision ?? 0}`);
             setCelebrateCompletion(homeCompletionCelebration.consume(guestId, focusedRound?.ids ?? [], completed, focusedRound?.id ?? null));
             setFavoritePlayIds(new Set(favorites.map((favorite) => favorite.playId)));
             appRuntime.completionAd?.home(focusedRound?.ids ?? [], completed);
@@ -482,7 +484,7 @@ export default function MainScreen() {
         homeCompletionCelebration.consume(guestId, [], [], focusedRound?.id ?? null);
         setCelebrateCompletion(false);
       };
-    }, [guestId, round?.id]),
+    }, [guestId, round?.id, round?.revision]),
   );
 
   const latestCompletedAtByPlayId = getLatestCompletedAtByPlayId(getHomeRoundRecords(round, guestId, roundLogs));
@@ -533,25 +535,27 @@ export default function MainScreen() {
     }
 
     const playMap = new Map(plays.map((play) => [play.id, play]));
+    const completedIds = new Set(getHomeRoundRecords(round, guestId, roundLogs).map(log => log.playId));
     const pinned = pinnedRecommendationIds
       .map((playId) => playMap.get(playId))
-      .filter((play): play is Play => Boolean(play && isEligibleHomeRecommendation(play, filterInput)));
+      .filter((play): play is Play => Boolean(play && (isEligibleHomeRecommendation(play, filterInput) ||
+        (completedIds.has(play.id) && play.status === "live" && !hasBlockedMaterial(play, new Set(userContext.blockedMaterials)) && play.ageMax >= (childAgeMonths ?? 0) && play.ageMin <= (childAgeMonths ?? 0) + 3))));
 
     if (pinned.length === 0) {
       return recommendation.results;
     }
 
     return mergeRecommendedPlays(pinned, recommendation.results, 3);
-  }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results, childAgeMonths, selectedMaterials, userContext.blockedMaterials, intentReadiness]);
+  }, [pinnedRecommendationIds, pinnedRecommendationKey, recommendationPinKey, plays, recommendation.results, childAgeMonths, selectedMaterials, userContext.blockedMaterials, intentReadiness, roundLogs]);
 
   useEffect(() => {
     // Age/content changes repair only ineligible items. Explicit new rounds
     // already have empty IDs; neither midnight nor ordinary re-ranking resets progress.
-    if (!updatingRecommendations && round && (pinnedRecommendationKey !== recommendationPinKey || pinnedResults.map((p) => p.id).join(",") !== pinnedRecommendationIds.join(","))) {
-      void setPinnedHomeRecommendations({ ids: pinnedResults.map((p) => p.id), key: recommendationPinKey, roundId: round.id })
+    if (!updatingRecommendations && round && loadedRoundKey === `${round.id}:${round.revision ?? 0}` && (pinnedRecommendationKey !== recommendationPinKey || pinnedResults.map((p) => p.id).join(",") !== pinnedRecommendationIds.join(","))) {
+      void setPinnedHomeRecommendations({ ids: pinnedResults.map((p) => p.id), key: recommendationPinKey, roundId: round.id, revision: round.revision ?? 0 })
         .then(() => setPinError(null)).catch(() => setPinError("추천을 저장하지 못했어요. 다시 시도해 주세요."));
     }
-  }, [pinnedRecommendationIds, pinnedRecommendationKey, pinnedResults, recommendationPinKey, setPinnedHomeRecommendations, updatingRecommendations, round?.id]);
+  }, [pinnedRecommendationIds, pinnedRecommendationKey, pinnedResults, recommendationPinKey, setPinnedHomeRecommendations, updatingRecommendations, round?.id, round?.revision, loadedRoundKey]);
 
   const visibleRecommendations = pinnedResults;
 
@@ -619,11 +623,11 @@ export default function MainScreen() {
       ? selectedMaterials.filter((item) => item !== material)
       : [...selectedMaterials, material];
 
-    void setTodayMaterials(nextMaterials);
+    void setTodayMaterials(nextMaterials).catch(() => setPinError("재료를 저장하지 못했어요. 다시 시도해 주세요."));
   }
 
   function clearMaterials() {
-    void setTodayMaterials([]);
+    void setTodayMaterials([]).catch(() => setPinError("재료를 저장하지 못했어요. 다시 시도해 주세요."));
   }
 
   if (Platform.OS === "web" && childAgeMonths === null) {
@@ -644,7 +648,7 @@ export default function MainScreen() {
         recommendationError={pinError}
         onRetryRecommendations={() => {
           if (!round) return;
-          void setPinnedHomeRecommendations({ ids: pinnedResults.map(play => play.id), key: recommendationPinKey, roundId: round.id })
+          void setPinnedHomeRecommendations({ ids: pinnedResults.map(play => play.id), key: recommendationPinKey, roundId: round.id, revision: round.revision ?? 0 })
             .then(() => setPinError(null)).catch(() => setPinError("추천을 저장하지 못했어요. 다시 시도해 주세요."));
         }}
         celebrateCompletion={celebrateCompletion}
@@ -761,7 +765,8 @@ export default function MainScreen() {
                       accessibilityRole="checkbox"
                       accessibilityState={{ checked: active }}
                       accessibilityLabel={`${MATERIAL_DISPLAY_NAMES[material]} 선택`}
-                      onPress={() => toggleMaterial(material)}
+                      disabled={updatingRecommendations}
+                        onPress={() => toggleMaterial(material)}
                       style={({ pressed }) => [
                         styles.materialChip,
                         { width: materialTileWidth },
@@ -795,53 +800,18 @@ export default function MainScreen() {
         </Animated.View>
       ) : null}
 
-      <Animated.View
-        entering={reduceMotion ? undefined : fadeInUp(100)}
-        layout={reduceMotion ? undefined : layoutTransition}
-      >
-        <MotionPressable
-          accessibilityRole="button"
-          disabled={!featuredPlay}
-          onPress={() => {
-            if (featuredPlay) {
-              openPlayDetail(featuredPlay, selectedMaterials, recommendation.usedFallback);
-            }
-          }}
-          style={({ pressed }) => [styles.heroBanner, compactWebHero && styles.heroBannerCompact, pressed && featuredPlay && styles.pressed]}
-        >
-          <View style={[styles.heroCopy, compactWebHero && styles.heroCopyCompact]}>
-            <Text style={styles.heroEyebrow}>오늘 뭐하지?</Text>
-            <Text style={[styles.heroTitle, compactWebHero && styles.heroTitleCompact]}>
-              즐거운{"\n"}<Text style={styles.heroAccent}>노리 레시피</Text>
-            </Text>
-            <View style={[styles.heroButton, compactWebHero && styles.heroButtonCompact]}>
-              <Text style={[styles.heroButtonText, compactWebHero && styles.heroButtonTextCompact]}>추천 놀이 보기 ›</Text>
-            </View>
-          </View>
-          <View style={[styles.heroImageWrap, compactWebHero && styles.heroImageWrapCompact]}>
-            <ImageSlot index={0} large playId={featuredPlay?.id} />
-          </View>
-        </MotionPressable>
-      </Animated.View>
-
-      {allRecommendedCompleted ? (
-        <Animated.View
-          entering={reduceMotion ? undefined : quickFadeIn(100)}
-          layout={reduceMotion ? undefined : layoutTransition}
-          style={styles.completionCard}
-        >
-          <Text style={styles.panelEyebrow}>TODAY 완료</Text>
-          <Text style={styles.completionTitle}>오늘의 놀이를 모두 완료했어요</Text>
-          <Text style={styles.panelBody}>재료를 바꾸면 새로운 추천 3개를 받을 수 있어요.</Text>
-          <MotionPressable
-            accessibilityRole="button"
-            onPress={() => setMaterialsEditorOpen(true)}
-            style={({ pressed }) => [styles.completionButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.completionButtonText}>새 추천 받기</Text>
-          </MotionPressable>
-        </Animated.View>
-      ) : null}
+      <View style={styles.nativeChallenge}>
+        <View style={styles.sectionHeader}>
+          <View><Text style={styles.panelEyebrow}>이번 놀이 도전</Text><Text style={styles.nativeChallengeTitle}>{allRecommendedCompleted ? "세 가지 놀이 완성!" : "놀이 3개, 함께해봐요"}</Text></View>
+          <Text style={styles.nativeChallengeCount}>{visibleRecommendations.filter(play => latestCompletedAtByPlayId.has(play.id)).length} / 3</Text>
+        </View>
+        <Text style={styles.nativeChallengeNote}>{allRecommendedCompleted ? "다음 놀이를 시작해도 완성한 묶음은 기록에 남아요." : latestCompletedAtByPlayId.size ? `재료를 바꿔도 완료한 ${latestCompletedAtByPlayId.size}개는 그대로 이어가요.` : "재료를 바꾸면 놀이 3개를 다시 추천해요."}</Text>
+        {allRecommendedCompleted ? <Pressable accessibilityRole="button" onPress={() => router.push("/(main)/record")}><Text style={styles.sectionLink}>완성한 놀이 보기 ›</Text></Pressable> : null}
+      </View>
+      {featuredPlay ? <MotionPressable accessibilityRole="button" onPress={() => openPlayDetail(featuredPlay, selectedMaterials, recommendation.usedFallback)} style={styles.nativeFeatured}>
+        <ImageSlot index={0} playId={featuredPlay.id} dimmed={latestCompletedAtByPlayId.has(featuredPlay.id)} />
+        <View style={styles.nativeFeaturedCopy}><Text style={styles.nativeChallengeNote}>오늘의 추천 놀이</Text><Text style={styles.sectionTitle}>{featuredPlay.name}</Text><Text style={styles.nativeChallengeNote}>{formatDuration(featuredPlay)} · {getPrimaryAreaLabel(featuredPlay)}</Text></View>
+      </MotionPressable> : null}
 
       <Animated.View
         entering={reduceMotion ? undefined : fadeInUp(130)}
@@ -849,14 +819,11 @@ export default function MainScreen() {
         style={styles.section}
       >
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>오늘 추천하는 놀이</Text>
+          <Text style={styles.sectionTitle}>함께 추천하는 놀이</Text>
           <Pressable accessibilityRole="button" onPress={() => router.push("/(main)/search")}>
             <Text style={styles.sectionLink}>전체보기 ›</Text>
           </Pressable>
         </View>
-        <Text style={styles.panelBody} accessibilityLiveRegion="polite">
-          {visibleRecommendations.filter(play => latestCompletedAtByPlayId.has(play.id)).length}/{visibleRecommendations.length}개 완료
-        </Text>
         {pinError ? <Text style={styles.panelBody} accessibilityRole="alert">{pinError}</Text> : null}
         {conditionalCandidate ? (
           <IntentReadinessPanel key={confirmationKey} candidate={conditionalCandidate} materials={selectedMaterials}
@@ -871,12 +838,8 @@ export default function MainScreen() {
           </Text>
         ) : null}
         {visibleRecommendations.length > 0 ? (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.playCardRow}
-          >
-            {visibleRecommendations.map((play, index) => (
+          <View style={styles.nativeCompanions}>
+            {visibleRecommendations.filter(play => play.id !== featuredPlay?.id).map((play, index) => (
               <PlayCard
                 key={play.id}
                 cardWidth={playCardWidth}
@@ -888,7 +851,7 @@ export default function MainScreen() {
                 play={play}
               />
             ))}
-          </ScrollView>
+          </View>
         ) : (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyTitle}>추천할 놀이를 준비 중이에요</Text>
@@ -957,6 +920,15 @@ export default function MainScreen() {
 }
 
 const styles = StyleSheet.create({
+  nativeChallenge: { padding: 14, gap: 7, borderRadius: 14, backgroundColor: APP_COLORS.card },
+  nativeChallengeTitle: { fontSize: 14, color: APP_COLORS.ink, fontFamily: APP_FONTS.heading },
+  nativeChallengeCount: { fontSize: 24, color: APP_COLORS.ink, fontFamily: APP_FONTS.heading },
+  nativeChallengeNote: { fontSize: 12, color: APP_COLORS.muted, fontFamily: APP_FONTS.body },
+  nativeFeatured: { gap: 12, paddingBottom: 15, backgroundColor: APP_COLORS.surface, borderRadius: 22, overflow: "hidden" },
+  nativeFeaturedCopy: { paddingHorizontal: 14, gap: 7 },
+  nativeCompanions: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  nativeStamp: { width: 92, height: 92, alignItems: "center", justifyContent: "center", borderRadius: 46, borderWidth: 1.5, borderColor: APP_COLORS.ink, backgroundColor: APP_COLORS.card, transform: [{ rotate: "-10deg" }] },
+  nativeStampText: { textAlign: "center", fontSize: 12, color: APP_COLORS.ink, lineHeight: 17, fontFamily: APP_FONTS.heading },
   container: {
     gap: 22,
     paddingHorizontal: 20,

@@ -64,3 +64,14 @@ test("a late save cannot celebrate a new round with identical recommendation IDs
   celebration.saved("guest", records[2], ids, "old-round");
   assert.equal(celebration.consume("guest", ids, records, "new-round"), false);
 });
+
+test("replacing only pending C with D does not celebrate; D's actual save completes A/B/D once", () => {
+  const celebration=createHomeCompletionCelebration();
+  const nextIds=["a","b","d"];
+  celebration.saved("guest",records[1],ids,"round");
+  assert.equal(celebration.consume("guest",nextIds,records.slice(0,2),"round"),false);
+  const d={id:"saved-d",playId:"d"};
+  celebration.saved("guest",d,nextIds,"round");
+  assert.equal(celebration.consume("guest",nextIds,[...records.slice(0,2),d],"round"),true);
+  assert.equal(celebration.consume("guest",nextIds,[...records.slice(0,2),d],"round"),false);
+});

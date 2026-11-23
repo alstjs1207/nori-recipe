@@ -87,6 +87,8 @@ export function HomeRedesign({
     : null;
   const materialNotice = getMaterialRecommendationNotice(recommendations, selectedMaterials);
   const conditionalNotice = getConditionalRecommendationNotice(recommendations, selectedMaterials, age);
+  const completedCount = recommendations.filter(play => completedDates.has(play.id)).length;
+  const challengeTitles = ["놀이 3개, 함께해봐요", "첫 놀이를 함께했어요", "남은 한 놀이도 함께해요", "세 가지 놀이 완성!"];
   return (
     <WebPage>
       <CompletionConfetti active={celebrateCompletion && allCompleted} />
@@ -103,6 +105,14 @@ export function HomeRedesign({
             {age}개월 아이에게 맞춘 놀이를 만나보세요.
           </p>
         </header>
+        <section className="home-challenge" aria-label="이번 놀이 도전">
+          <div className="home-challenge-heading">
+            <div><p><Icon name="spark" size={14} /> 이번 놀이 도전</p><h2>{challengeTitles[completedCount]}</h2></div>
+            <strong aria-label={`3개 중 ${completedCount}개 완료`}>{completedCount}<span> / 3</span></strong>
+          </div>
+          <div className="home-challenge-track" aria-hidden="true">{[0, 1, 2].map(index => <span key={index} className={index < completedCount ? "is-completed" : ""} />)}</div>
+          {allCompleted ? <Link href="/record" className="home-challenge-record">완성한 놀이 보기 <Icon name="arrow" size={14} /></Link> : null}
+        </section>
         <button
           className="home-material-summary"
           type="button"
@@ -121,10 +131,11 @@ export function HomeRedesign({
             </span>
           </span>
           <span className="summary-edit">
-            변경
+            {allCompleted ? "다음 놀이 추천받기" : "재료 바꾸기"}
             <Icon name="chevron" size={16} />
           </span>
         </button>
+        <p className="recommendation-material-note"><Icon name="info" size={14} /><span>{allCompleted ? "다음 놀이를 시작해도 완성한 묶음은 기록에 남아요." : completedCount ? `재료를 바꿔도 완료한 ${completedCount}개는 그대로 이어가요.` : "재료를 바꾸면 놀이 3개를 다시 추천해요."}</span></p>
         {materialNotice ? (
           <p className="recommendation-material-note" role="status">
             <Icon name="info" size={14} />
@@ -152,31 +163,9 @@ export function HomeRedesign({
             {favorites.error}
           </p>
         ) : null}
-        {allCompleted ? (
-          <div className="home-celebration" role="status">
-            <Icon name="spark" size={28} />
-            <div>
-              <h2>오늘의 놀이를 모두 완료했어요</h2>
-              <p>
-                함께한 시간을 차곡차곡 쌓았어요. 재료를 바꾸면 새로운 놀이를
-                추천해드려요.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="text-button"
-              onClick={() => setPickerOpen(true)}
-            >
-              새 추천 받기
-            </button>
-          </div>
-        ) : null}
         <section className="home-recommendations" aria-labelledby="home-recommendations-title">
           <div className="section-heading recommendation-heading">
             <h2 id="home-recommendations-title">우리 집 재료로 추천하는 놀이 {recommendations.length}개</h2>
-            <span className="recommendation-progress" role="status">
-              {recommendations.filter((play) => completedDates.has(play.id)).length}/{recommendations.length}개 완료
-            </span>
           </div>
           <div className="home-layout">
             <section ref={featuredImpressionRef} className="home-featured" aria-label="오늘의 추천 놀이">
@@ -260,7 +249,7 @@ export function HomeRedesign({
                 ))}
               </div>
               <p className="recommendation-note">
-                추천 {recommendations.length}개는 모두 완료할 때까지 그대로 만나볼 수 있어요.
+                재료를 바꾸면 완료한 놀이는 유지하고 남은 놀이만 다시 추천해요.
               </p>
             </section>
           </div>
@@ -320,6 +309,7 @@ export function HomeRedesign({
             selected={selectedMaterials}
             onSave={onSaveMaterials}
             onClose={() => setPickerOpen(false)}
+            completedCount={completedCount}
           />
         ) : null}
       </div>

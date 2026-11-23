@@ -90,3 +90,12 @@ test("동기 콜백에서도 SDK 구독을 해제하고 다음 광고를 순차 
   const stop = ad.start(); ad.saved(logs[2]); ad.home(ids, logs);
   assert.equal(loads, 2); assert.equal(offShows, 1); assert.equal(offLoads, 2); stop();
 });
+
+test("재료 변경으로 A/B 완료를 유지해도 광고는 없고 D 실제 완료에서만 표시한다",()=>{
+ const f=fixture(); f.loaded();
+ const next=[ids[0],ids[1],"play_004"];
+ f.ad.home(next,logs.slice(0,2)); assert.equal(f.shows.length,0);
+ const d={id:"saved-d",playId:next[2]};
+ f.ad.saved(d); f.ad.home(next,[...logs.slice(0,2),d]); assert.equal(f.shows.length,1);
+ f.ad.home(next,[...logs.slice(0,2),d]); assert.equal(f.shows.length,1); f.stop();
+});

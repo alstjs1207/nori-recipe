@@ -1,7 +1,7 @@
 import { CHILD_REACTION_PARSE_OPTIONS, type ChildReaction } from "@/constants/feedback";
 import { appRuntime } from "@/platform/runtime";
 import { useHomeRecommendationStore } from "@/store/homeRecommendationStore";
-import { getHomeRoundRecords } from "@/store/homeRecommendationRound";
+import { getHomeRoundRecords, getCompletedHomeBundles } from "@/store/homeRecommendationRound";
 import { randomUUID } from "expo-crypto";
 import { Platform } from "react-native";
 
@@ -712,7 +712,7 @@ export async function recordPlayFeedbackWithRecord(
   // because home also requires this exact record to exist in the activity DB.
   const assignedRecords = await getPlayLogsByIds(guestId, roundAtSave?.records.map(record => record.id) ?? []);
   if (!getHomeRoundRecords(roundAtSave, guestId, assignedRecords).some(record => record.playId === playId)) {
-    await useHomeRecommendationStore.getState().stage(guestId, roundAtSave?.id ?? null, result.record);
+    await useHomeRecommendationStore.getState().stage(guestId, roundAtSave?.id ?? null, result.record, roundAtSave?.revision ?? 0);
   }
 
   if (Platform.OS === "web") {
@@ -1000,4 +1000,13 @@ export async function getDevAreaStats(
     devArea: row.dev_area,
     total: row.total,
   }));
+}
+
+/** Bundles are durable round snapshots validated against exact active activity rows. */
+export async function getCompletedPlayBundles(guestId: string) {
+  const round = useHomeRecommendationStore.getState().round;
+  if (!round || round.guestId !== guestId) return [];
+  const refs = [...round.records, ...(round.archives ?? []).flatMap(bundle => bundle.records)];
+  const records = await getPlayLogsByIds(guestId, refs.map(ref => ref.id));
+  return getCompletedHomeBundles(round, guestId, records);
 }

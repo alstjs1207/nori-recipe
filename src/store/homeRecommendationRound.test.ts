@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createHomeRecommendationStore, getHomeRoundRecords, HOME_ROUND_STORAGE_KEY, parseHomeRound } from "./homeRecommendationRound";
+import { createHomeRecommendationStore, getCompletedHomeBundles, getHomeRoundRecords, HOME_ROUND_STORAGE_KEY, parseHomeRound } from "./homeRecommendationRound";
 import { createHomeCompletionCelebration } from "@/engine/homeCompletion";
 
 const ids = ["a", "b", "c"];
@@ -134,4 +134,46 @@ test("corrupt/foreign round data does not leak and an empty persisted new round 
   const other = f.make(); await other.getState().hydrate("other", empty);
   assert.deepEqual(other.getState().round?.records, []);
   assert.equal(other.getState().round?.guestId, "other");
+});
+
+test("material edits preserve completed slots, reject stale same-round pins and commit context atomically", async () => {
+  const f = fixture(); await f.store.getState().hydrate("guest", { ids, key: "paper", records: oldLogs.slice(0,2) });
+  const before = f.store.getState().round!;
+  const change = () => f.store.getState().edit("guest", async () => ({ ids: ["a","b","d"], key: "water", records: oldLogs.slice(0,2), context: { materials: ["water"], confirmation: null }, startNew: false }));
+  f.fail(true); await assert.rejects(change(), /storage full/); assert.equal(f.store.getState().round, before);
+  f.fail(false); await change();
+  const after = f.store.getState().round!;
+  assert.equal(after.id, before.id); assert.deepEqual(after.ids, ["a","b","d"]); assert.equal(after.revision, 1);
+  assert.deepEqual(after.context?.materials, ["water"]);
+  await f.store.getState().pin("guest", before.id, ids, "stale", 0);
+  assert.equal(f.store.getState().round, after);
+  const reload = f.make(); await reload.getState().hydrate("guest", empty);
+  assert.deepEqual(reload.getState().round?.context, after.context);
+  assert.equal(getHomeRoundRecords(reload.getState().round,"guest",oldLogs).length, 2);
+});
+
+test("queued material edits retain the newest context and completed references", async () => {
+  const f=fixture(); await f.store.getState().hydrate("guest",{ids,key:"paper",records:oldLogs.slice(0,1)});
+  const edit=(key: string)=>f.store.getState().edit("guest", async round=>({ids:["a",key,"c"],key,records:round.records,context:{materials:["water"],confirmation:null},startNew:false}));
+  await Promise.all([edit("first"),edit("latest")]);
+  assert.equal(f.store.getState().round?.key,"latest"); assert.equal(f.store.getState().round?.revision,2);
+  assert.deepEqual(f.store.getState().round?.records,oldLogs.slice(0,1).map(({id,playId})=>({id,playId})));
+});
+
+test("bundles use exact final IDs and final completion date, survive next rounds, and exclude staged or deleted activity",async()=>{
+ const f=fixture(); await f.store.getState().hydrate("guest",{ids,key:"key",records:oldLogs.slice(0,2)});
+ const previous=f.store.getState().round!;
+ await f.store.getState().edit("guest",async()=>({ids:["a","b","d"],key:"water",records:previous.records,context:{materials:["water"],confirmation:null},startNew:false}));
+ const d={...oldLogs[2],id:"new-d",playId:"d",completedAt:"2026-11-21T10:00:00.000Z"};
+ await f.store.getState().stage("guest",previous.id,d);
+ assert.deepEqual(getCompletedHomeBundles(f.store.getState().round,"guest",oldLogs),[]);
+ const history=[...oldLogs,d];
+ const bundles=getCompletedHomeBundles(f.store.getState().round,"guest",history);
+ assert.deepEqual(bundles,[{id:previous.id,ids:["a","b","d"],completedAt:d.completedAt}]);
+ await f.store.getState().restart("guest");
+ assert.deepEqual(getCompletedHomeBundles(f.store.getState().round,"guest",history),bundles);
+ assert.deepEqual(getCompletedHomeBundles(f.store.getState().round,"other",history),[]);
+ assert.deepEqual(getCompletedHomeBundles(f.store.getState().round,"guest",history.filter(r=>r.playId!=="a")),[]);
+ const reload=f.make(); await reload.getState().hydrate("guest",empty);
+ assert.deepEqual(getCompletedHomeBundles(reload.getState().round,"guest",history),bundles);
 });

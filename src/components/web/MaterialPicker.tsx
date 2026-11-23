@@ -12,10 +12,12 @@ export function MaterialPicker({
   selected,
   onSave,
   onClose,
+  completedCount = 0,
 }: {
   selected: MaterialSlug[];
   onSave: (materials: MaterialSlug[]) => Promise<void>;
   onClose: () => void;
+  completedCount?: number;
 }) {
   const [draft, setDraft] = useState(selected);
   const [saving, setSaving] = useState(false);
@@ -26,6 +28,7 @@ export function MaterialPicker({
     ref.current?.showModal();
   }, []);
   async function save() {
+    if (saving) return;
     setSaving(true);
     try {
       await onSave(draft);
@@ -50,7 +53,7 @@ export function MaterialPicker({
         <div>
           <span className="eyebrow">우리 집 재료</span>
           <h2 id={titleId}>지금 사용할 재료를 골라주세요</h2>
-          <p>선택한 재료로 추천 놀이 3개를 다시 찾아드려요.</p>
+          <p>{completedCount === 3 ? "다른 놀이를 먼저 추천하고, 대안이 부족하면 방금 한 놀이도 포함해요. 완성한 묶음은 기록에 남아요." : completedCount ? `완료한 ${completedCount}개는 유지하고 남은 ${3 - completedCount}개만 다시 추천해요.` : "선택한 재료로 추천 놀이 3개를 다시 찾아드려요."}</p>
         </div>
         <button
           type="button"
@@ -124,7 +127,7 @@ export function MaterialPicker({
             void save();
           }}
         >
-          {saving ? "추천 준비 중…" : `${draft.length}개 재료로 추천 받기`}
+          {saving ? "추천 준비 중…" : completedCount === 3 ? "다음 놀이 3개 시작" : completedCount ? `남은 ${3 - completedCount}개 다시 추천` : `${draft.length}개 재료로 추천 받기`}
           <Icon name="arrow" size={20} />
         </button>
       </div>

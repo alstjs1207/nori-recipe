@@ -4,7 +4,12 @@ import { appRuntime } from "@/platform/runtime";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
-import { deleteAllUserData, getLatestPlayLog, getUserContext, upsertUserContext } from "@/db/queries";
+import { deleteAllUserData, getLatestPlayLog, getPlayLogs, getPlayLogsByIds, getUserContext, upsertUserContext } from "@/db/queries";
+import { getHomeRoundRecords } from "./homeRecommendationRound";
+import { getHomeRecommendationKey, recommendNextHomeRound, replacePendingHomeRecommendations } from "@/engine/homeRoundRecommendation";
+import { usePlaysStore } from "./playsStore";
+import { getAgeMonthsFromBirthMonth, ONBOARDING_DEFAULT_MATERIALS } from "@/onboarding/utils";
+import { getIntentConfirmationKey } from "@/engine/intentRecommendation";
 import type { MaterialSlug } from "@/constants/materials";
 import type { HomeIntentConfirmation, UserContext } from "@/types";
 import { parseIntentConfirmation } from "@/engine/intentRecommendation";
@@ -41,7 +46,7 @@ type SessionStore = {
   upsertUserContext: (context: UserContext) => Promise<void>;
   setUserContext: (context: UserContext) => Promise<void>;
   setTodayMaterials: (materials: MaterialSlug[] | null) => Promise<void>;
-  setPinnedHomeRecommendations: (payload: { ids: string[]; key: string; roundId: string | null }) => Promise<void>;
+  setPinnedHomeRecommendations: (payload: { ids: string[]; key: string; roundId: string | null; revision?: number }) => Promise<void>;
   clearPinnedHomeRecommendations: () => Promise<void>;
   setHomeIntentConfirmation: (confirmation: HomeIntentConfirmation | null) => Promise<void>;
   updateOnboardingProfile: (profile: {
@@ -144,8 +149,12 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         childName: childName ?? "",
         familyType: familyType === "single" || familyType === "multiple" ? familyType : null,
         onboardingCompleted: onboardingCompleted === "true",
-        todayMaterials: parseStoredMaterials(savedTodayMaterials),
-        homeIntentConfirmation: parseIntentConfirmation(savedIntentConfirmation),
+        todayMaterials: useHomeRecommendationStore.getState().round?.context
+          ? useHomeRecommendationStore.getState().round!.context!.materials
+          : parseStoredMaterials(savedTodayMaterials),
+        homeIntentConfirmation: useHomeRecommendationStore.getState().round?.context
+          ? useHomeRecommendationStore.getState().round!.context!.confirmation
+          : parseIntentConfirmation(savedIntentConfirmation),
       });
 
       fallbackBirthMonth = savedBirthMonth !== null ? Number(savedBirthMonth) : null;
@@ -192,37 +201,15 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     await get().upsertUserContext(context);
   },
   setTodayMaterials: async (materials) => {
-    const guestId = get().guestId;
-    if (!guestId) throw new Error("Guest session has not been initialized.");
-    set({ updatingHomeRecommendations: true });
-    try {
-      // Persist the new empty round even when the selected materials/IDs repeat.
-      await useHomeRecommendationStore.getState().restart(guestId);
-      if (materials === null) await AsyncStorage.removeItem(TODAY_MATERIALS_STORAGE_KEY);
-      else await AsyncStorage.setItem(TODAY_MATERIALS_STORAGE_KEY, JSON.stringify(materials));
-      await Promise.all([
-        AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY),
-        AsyncStorage.removeItem(HOME_RECOMMENDATION_IDS_STORAGE_KEY),
-        AsyncStorage.removeItem(HOME_RECOMMENDATION_KEY_STORAGE_KEY),
-      ]);
-      set({ todayMaterials: materials, homeIntentConfirmation: null });
-    } finally { set({ updatingHomeRecommendations: false }); }
+    await editHomeContext(materials, null, true);
   },
   setHomeIntentConfirmation: async (confirmation) => {
-    const guestId = get().guestId;
-    if (!guestId) throw new Error("Guest session has not been initialized.");
-    set({ updatingHomeRecommendations: true });
-    try {
-      await useHomeRecommendationStore.getState().restart(guestId);
-      if (confirmation) await AsyncStorage.setItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY, JSON.stringify(confirmation));
-      else await AsyncStorage.removeItem(HOME_INTENT_CONFIRMATION_STORAGE_KEY);
-      set({ homeIntentConfirmation: confirmation });
-    } finally { set({ updatingHomeRecommendations: false }); }
+    await editHomeContext(get().todayMaterials, confirmation, false);
   },
-  setPinnedHomeRecommendations: async ({ ids, key, roundId }) => {
+  setPinnedHomeRecommendations: async ({ ids, key, roundId, revision }) => {
     const guestId = get().guestId;
     if (!guestId || get().updatingHomeRecommendations) return;
-    await useHomeRecommendationStore.getState().pin(guestId, roundId, ids, key);
+    await useHomeRecommendationStore.getState().pin(guestId, roundId, ids, key, revision);
   },
   clearPinnedHomeRecommendations: async () => {
     const guestId = get().guestId;
@@ -306,3 +293,40 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     });
   },
 }));
+
+let homeEdits = 0;
+async function editHomeContext(materials: MaterialSlug[] | null, confirmation: HomeIntentConfirmation | null, advanceCompleted: boolean) {
+  const guestId = useSessionStore.getState().guestId;
+  if (!guestId) throw new Error("Guest session has not been initialized.");
+  homeEdits++;
+  useSessionStore.setState({ updatingHomeRecommendations: true });
+  try {
+    const updated = await useHomeRecommendationStore.getState().edit(guestId, async round => {
+      const { userContext } = useSessionStore.getState();
+      const plays = usePlaysStore.getState().plays;
+      const logs = await getPlayLogs(guestId, 10000);
+      const assigned = await getPlayLogsByIds(guestId, round.records.map(record => record.id));
+      const completed = getHomeRoundRecords(round, guestId, assigned);
+      const completedIds = new Set(completed.map(record => record.playId));
+      const startNew = advanceCompleted && round.ids.length === 3 && completedIds.size === 3;
+      const selectedMaterials = materials ?? (userContext.ownedMaterials.length ? userContext.ownedMaterials : ONBOARDING_DEFAULT_MATERIALS);
+      const childAgeMonths = userContext.childBirthMonth === null ? null : getAgeMonthsFromBirthMonth(userContext.childBirthMonth);
+      const confirmationKey = childAgeMonths === null ? undefined : getIntentConfirmationKey({ childAgeMonths, availableMaterials: selectedMaterials, blockedMaterials: userContext.blockedMaterials });
+      const validConfirmation = confirmation?.key === confirmationKey ? confirmation : null;
+      const filter = { childAgeMonths: childAgeMonths ?? 0, availableMaterials: selectedMaterials, blockedMaterials: userContext.blockedMaterials, availableMinutes: 999, place: "any" as const, devGaps: userContext.devGaps, userFeedback: userContext.userFeedback, intentReadiness: validConfirmation?.readiness };
+      const stats = { totalPlays: logs.length, recentCompletedPlayIds: [...new Set(logs.slice(0, 12).map(log => log.playId))] };
+      return {
+        ids: childAgeMonths === null ? [] : startNew
+          ? recommendNextHomeRound(plays, filter, stats, round.ids)
+          : replacePendingHomeRecommendations(plays, filter, stats, round.ids, completedIds),
+        key: getHomeRecommendationKey(filter, plays.length, confirmationKey),
+        records: startNew ? [] : completed.map(record => ({ id: record.id, playId: record.playId })),
+        context: { materials, confirmation: validConfirmation }, startNew,
+      };
+    });
+    if (updated && useSessionStore.getState().guestId === guestId) useSessionStore.setState({ todayMaterials: updated.context!.materials, homeIntentConfirmation: updated.context!.confirmation });
+  } finally {
+    homeEdits--;
+    useSessionStore.setState({ updatingHomeRecommendations: homeEdits > 0 });
+  }
+}

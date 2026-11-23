@@ -84,11 +84,13 @@
             "src/engine/diversity.ts",
             "src/engine/softScore.ts",
             "src/components/web/HomeRedesign.tsx",
-            "public/web.css"
+            "public/web.css",
+            "src/engine/homeRoundRecommendation.ts"
           ],
           "tests": [
             "src/engine/materialIntent.test.ts",
-            "src/engine/engine.test.ts"
+            "src/engine/engine.test.ts",
+            "src/engine/homeRoundRecommendation.test.ts"
           ],
           "anchors": [
             {
@@ -143,12 +145,15 @@
             "app/(main)/feedback/[id].web.tsx",
             "src/store/homeRecommendationRound.ts",
             "src/store/homeRecommendationStore.ts",
-            "src/db/queries.ts"
+            "src/db/queries.ts",
+            "src/engine/homeRoundRecommendation.ts",
+            "src/components/web/MaterialPicker.tsx"
           ],
           "tests": [
             "src/engine/homeCompletion.test.ts",
             "src/store/homeRecommendationRound.test.ts",
-            "tests/web-home-round.test.mjs"
+            "tests/web-home-round.test.mjs",
+            "src/engine/homeRoundRecommendation.test.ts"
           ],
           "anchors": [
             {
@@ -170,6 +175,10 @@
             {
               "path": "src/store/homeRecommendationRound.ts",
               "contains": "getHomeRoundRecords"
+            },
+            {
+              "path": "src/engine/homeRoundRecommendation.ts",
+              "contains": "recommendNextHomeRound"
             }
           ]
         },
@@ -351,6 +360,31 @@
             {
               "path": "src/db/queries.ts",
               "contains": "getDevAreaStats"
+            }
+          ]
+        },
+        {
+          "id": "LOG-004",
+          "verification": "automated",
+          "sources": [
+            "src/store/homeRecommendationRound.ts",
+            "src/db/queries.ts",
+            "app/(main)/record.web.tsx",
+            "app/(main)/record.tsx",
+            "public/web.css"
+          ],
+          "tests": [
+            "src/store/homeRecommendationRound.test.ts",
+            "tests/web-home-round.test.mjs"
+          ],
+          "anchors": [
+            {
+              "path": "src/db/queries.ts",
+              "contains": "getCompletedPlayBundles"
+            },
+            {
+              "path": "app/(main)/record.web.tsx",
+              "contains": "완성한 묶음 전체 보기"
             }
           ]
         }
