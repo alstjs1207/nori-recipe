@@ -1,0 +1,14 @@
+
+> nori-recipe@1.1.0 build:web /Users/msyu/study/play-recipe
+> node scripts/build-web.mjs
+
+(node:97092) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Web images: {"plays":208,"reviewImages":0,"originalMB":128.9,"detailMB":15.36,"thumbnailMB":2.54,"imageMode":"local","verifiedPublicAssets":0,"materialImageMode":"local","verifiedMaterialAssets":0}
+Web Bundled 6618ms node_modules/.pnpm/expo-router@6.0.24_f93de378c15382db21b9977b3f39f944/node_modules/expo-router/entry.js (1188 modules)
+_expo/static/js/web/entry-cee792bcac0c27a8d713d0828a093ab9.js (3.09 MB)
+Exported: /Users/msyu/study/play-recipe/generated/web-build-gvZtL4/next
+PWA ready: 208 public play links, 15 shell assets, cache e5ee4b02e6b1
+Intro page: /intro with 208 plays, 66 materials, 7 screens

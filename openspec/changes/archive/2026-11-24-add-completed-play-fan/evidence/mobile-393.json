@@ -1,0 +1,95 @@
+{
+  "width": 393,
+  "fanCount": 3,
+  "overflow": false,
+  "photos": [
+    {
+      "box": {
+        "x": 43.568336486816406,
+        "y": 329.74688720703125,
+        "width": 149.08111572265625,
+        "height": 155.0504150390625,
+        "top": 329.74688720703125,
+        "right": 192.64945220947266,
+        "bottom": 484.79730224609375,
+        "left": 43.568336486816406
+      },
+      "transform": "translate(calc(-50% - 64.66px), 9.95px) rotate(-12deg) scale(1)",
+      "offsetParent": "completed-play-fan"
+    },
+    {
+      "box": {
+        "x": 134.33203125,
+        "y": 329.8359375,
+        "width": 124.3359375,
+        "height": 132.0859375,
+        "top": 329.8359375,
+        "right": 258.66796875,
+        "bottom": 461.921875,
+        "left": 134.33203125
+      },
+      "transform": "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+      "offsetParent": "completed-play-fan"
+    },
+    {
+      "box": {
+        "x": 200.35055541992188,
+        "y": 329.74688720703125,
+        "width": 149.08111572265625,
+        "height": 155.0504150390625,
+        "top": 329.74688720703125,
+        "right": 349.4316711425781,
+        "bottom": 484.79730224609375,
+        "left": 200.35055541992188
+      },
+      "transform": "translate(calc(-50% + 64.66px), 9.95px) rotate(12deg) scale(1)",
+      "offsetParent": "completed-play-fan"
+    }
+  ],
+  "captions": [
+    {
+      "text": "큰 전지 협동 그림 그리기",
+      "box": {
+        "x": 31,
+        "y": 492.3046875,
+        "width": 105,
+        "height": 37.1875,
+        "top": 492.3046875,
+        "right": 136,
+        "bottom": 529.4921875,
+        "left": 31
+      }
+    },
+    {
+      "text": "큰 종이에 함께 그리기",
+      "box": {
+        "x": 144,
+        "y": 492.3046875,
+        "width": 105,
+        "height": 37.1875,
+        "top": 492.3046875,
+        "right": 249,
+        "bottom": 529.4921875,
+        "left": 144
+      }
+    },
+    {
+      "text": "색종이 접기",
+      "box": {
+        "x": 257,
+        "y": 492.3046875,
+        "width": 105,
+        "height": 18.59375,
+        "top": 492.3046875,
+        "right": 362,
+        "bottom": 510.8984375,
+        "left": 257
+      }
+    }
+  ],
+  "animating": "false",
+  "storage": {
+    "bundles": 4,
+    "logs": 12
+  }
+}

@@ -768,6 +768,12 @@
       ]
     },
     {
+      "path": "scripts/toss/babel-static-web.cjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
       "path": "scripts/toss/check.mjs",
       "domains": [
         "toss-miniapp"
@@ -924,6 +930,18 @@
       ]
     },
     {
+      "path": "src/animations/fanSpring.test.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/animations/fanSpring.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/animations/motion.ts",
       "domains": [
         "web-platform"
@@ -967,6 +985,12 @@
     },
     {
       "path": "src/components/web/BirthMonthField.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/CompletedPlayFan.web.tsx",
       "domains": [
         "web-platform"
       ]
@@ -1799,6 +1823,12 @@
     },
     {
       "path": "tests/toss-session.test.mjs",
+      "domains": [
+        "toss-miniapp"
+      ]
+    },
+    {
+      "path": "tests/toss-static-web.test.mjs",
       "domains": [
         "toss-miniapp"
       ]

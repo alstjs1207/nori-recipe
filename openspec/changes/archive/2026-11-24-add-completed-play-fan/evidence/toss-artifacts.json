@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "test",
+    "artifactBytes": 3960400,
+    "sha256": "ff6462cc58fbb3d4950f2e169718d33b99759fc1ae6aa9ca9f9b2a9c43560673",
+    "jsFiles": 1,
+    "evalTokens": 0,
+    "functionConstructors": 0,
+    "fanComponentIncluded": true
+  },
+  {
+    "mode": "production",
+    "artifactBytes": 3960408,
+    "sha256": "0640344c073e2f38f8b75c319b15f97e20e05f376fcfa1bf8343054e13053bdf",
+    "jsFiles": 1,
+    "evalTokens": 0,
+    "functionConstructors": 0,
+    "fanComponentIncluded": true
+  }
+]

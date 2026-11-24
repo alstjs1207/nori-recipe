@@ -1,0 +1,29 @@
+{
+  "offscreen": {
+    "bottom": -452.625,
+    "animating": "false"
+  },
+  "archive": {
+    "fanCount": 0,
+    "grids": 3,
+    "columns": "227.328px 227.336px 227.328px"
+  },
+  "october": {
+    "fanCount": 0,
+    "grids": 1,
+    "date": "2026-10-18"
+  },
+  "returned": {
+    "fans": 3,
+    "progress": [
+      "1.0000",
+      "1.0000",
+      "1.0000",
+      "1.0000",
+      "1.0000",
+      "1.0000"
+    ],
+    "logs": 12
+  },
+  "keyboardLink": "http://127.0.0.1:4329/play/play_107"
+}

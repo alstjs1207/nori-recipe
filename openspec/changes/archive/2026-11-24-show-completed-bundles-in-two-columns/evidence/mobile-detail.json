@@ -1,0 +1,41 @@
+{
+  "section": {
+    "x": 20,
+    "y": 269.9296875,
+    "width": 353,
+    "height": 357.828125,
+    "top": 269.9296875,
+    "right": 373,
+    "bottom": 627.7578125,
+    "left": 20
+  },
+  "grid": {
+    "x": 20,
+    "y": 269.9296875,
+    "width": 353,
+    "height": 678.828125,
+    "top": 269.9296875,
+    "right": 373,
+    "bottom": 948.7578125,
+    "left": 20
+  },
+  "fan": {
+    "x": 28,
+    "y": 322.9296875,
+    "width": 337,
+    "height": 250.828125,
+    "top": 322.9296875,
+    "right": 365,
+    "bottom": 573.7578125,
+    "left": 28
+  },
+  "focusedPanel": true,
+  "point": {
+    "x": 196.5,
+    "y": 418.26953125
+  },
+  "pointHref": "/play/play_107",
+  "links": 3,
+  "overflow": false,
+  "url": "http://127.0.0.1:4329/play/play_107"
+}

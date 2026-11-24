@@ -1,0 +1,62 @@
+{
+  "initial": {
+    "progress": "0.0000",
+    "animating": "false",
+    "reduced": "false",
+    "hover": true,
+    "transforms": [
+      "translate(calc(-50% - 6px), 0px) rotate(-3deg) scale(1)",
+      "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+      "translate(calc(-50% + 6px), 0px) rotate(3deg) scale(1)"
+    ],
+    "focused": null
+  },
+  "hover": {
+    "progress": "1.0000",
+    "animating": "false",
+    "reduced": "false",
+    "hover": true,
+    "transforms": [
+      "translate(calc(-50% - 78px), 12px) rotate(-12deg) scale(1)",
+      "translate(calc(-50% + 0px), -22px) rotate(0deg) scale(1.06)",
+      "translate(calc(-50% + 78px), 12px) rotate(12deg) scale(1)"
+    ],
+    "focused": null
+  },
+  "leave": {
+    "progress": "0.0000",
+    "animating": "false",
+    "reduced": "false",
+    "hover": true,
+    "transforms": [
+      "translate(calc(-50% - 6px), 0px) rotate(-3deg) scale(1)",
+      "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+      "translate(calc(-50% + 6px), 0px) rotate(3deg) scale(1)"
+    ],
+    "focused": null
+  },
+  "keyboard": {
+    "progress": "1.0000",
+    "animating": "false",
+    "reduced": "false",
+    "hover": true,
+    "transforms": [
+      "translate(calc(-50% - 78px), -10px) rotate(-12deg) scale(1.06)",
+      "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+      "translate(calc(-50% + 78px), 12px) rotate(12deg) scale(1)"
+    ],
+    "focused": "/play/play_162"
+  },
+  "blur": {
+    "progress": "0.0000",
+    "animating": "true",
+    "reduced": "false",
+    "hover": true,
+    "transforms": [
+      "translate(calc(-50% - 6px), 0px) rotate(-3deg) scale(1)",
+      "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+      "translate(calc(-50% + 6px), 0px) rotate(3deg) scale(1)"
+    ],
+    "focused": "/"
+  }
+}

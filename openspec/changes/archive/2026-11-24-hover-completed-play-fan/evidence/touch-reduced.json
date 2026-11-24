@@ -1,0 +1,28 @@
+{
+  "touch": {
+    "hover": false,
+    "progress": "1.0000",
+    "overflow": false,
+    "x": 196.5,
+    "y": 493.58984375,
+    "href": "/play/play_107",
+    "url": "http://127.0.0.1:4329/play/play_107"
+  },
+  "reduced": [
+    {
+      "fanReduced": "true",
+      "fanAnimating": "false",
+      "fanProgress": "1.0000"
+    },
+    {
+      "fanReduced": "true",
+      "fanAnimating": "false",
+      "fanProgress": "1.0000"
+    },
+    {
+      "fanReduced": "true",
+      "fanAnimating": "false",
+      "fanProgress": "1.0000"
+    }
+  ]
+}

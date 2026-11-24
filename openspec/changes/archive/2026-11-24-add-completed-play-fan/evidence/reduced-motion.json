@@ -1,0 +1,50 @@
+{
+  "initialReduced": [
+    {
+      "reduced": "true",
+      "progress": "1.0000",
+      "animating": "false",
+      "transforms": [
+        "translate(calc(-50% - 64.66px), 9.95px) rotate(-12deg) scale(1)",
+        "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+        "translate(calc(-50% + 64.66px), 9.95px) rotate(12deg) scale(1)"
+      ],
+      "scales": [
+        1.0000004548238965,
+        1,
+        1.0000004548238965
+      ]
+    },
+    {
+      "reduced": "true",
+      "progress": "1.0000",
+      "animating": "false",
+      "transforms": [
+        "translate(calc(-50% - 64.66px), 9.95px) rotate(-12deg) scale(1)",
+        "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+        "translate(calc(-50% + 64.66px), 9.95px) rotate(12deg) scale(1)"
+      ],
+      "scales": [
+        1.0000004548238965,
+        1,
+        1.0000004548238965
+      ]
+    },
+    {
+      "reduced": "true",
+      "progress": "1.0000",
+      "animating": "false",
+      "transforms": [
+        "translate(calc(-50% - 64.66px), 9.95px) rotate(-12deg) scale(1)",
+        "translate(calc(-50% + 0px), 0px) rotate(0deg) scale(1)",
+        "translate(calc(-50% + 64.66px), 9.95px) rotate(12deg) scale(1)"
+      ],
+      "scales": [
+        1.0000004548238965,
+        1,
+        1.0000004548238965
+      ]
+    }
+  ],
+  "dynamicPreferenceChanged": true
+}

@@ -1,0 +1,18 @@
+{
+  "focus": {
+    "transform": "translate(calc(-50% - 78px), -10px) rotate(-12deg) scale(1.06)",
+    "scale": 1.060003384237994,
+    "zIndex": "5",
+    "imageTransform": "none",
+    "titleTransform": "none",
+    "focused": true,
+    "title": "01큰 전지 협동 그림 그리기"
+  },
+  "touch": {
+    "x": 196.5,
+    "y": 493.58984375,
+    "href": "/play/play_107",
+    "title": "큰 종이에 함께 그리기",
+    "url": "http://127.0.0.1:4329/play/play_107"
+  }
+}

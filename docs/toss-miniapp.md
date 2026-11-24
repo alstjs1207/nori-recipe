@@ -26,6 +26,8 @@ pnpm check:toss
 
 `TOSS_APP_NAME` 변경 시 콘솔 값도 맞춰야 한다. 기본값은 사용자가 지정한 `nori-recipe`다. 번들 검사는 모의 SDK·소스맵·PWA 등록·기밀·원본 JPEG와 100MB 초과를 거부한다. export·SDK 포장·검사가 끝난 뒤 디렉터리·아티팩트·보고서를 함께 교체하며 실패하면 직전 출력을 복원한다. 복원 자체가 실패하면 오류가 알려주는 staging 경로를 보존한다.
 
+토스 배포 빌드는 Expo의 서버 UUID와 서버·개발 번들 로더 fallback을 제외한다. 실제 브라우저 crypto.randomUUID·UUID v5와 브라우저 로더 구현은 유지하며 일반 웹/네이티브·Devtools에는 적용하지 않는다. 최종 JS 및 HTML inline script를 구문 분석해 eval 참조·Function 생성자가 있으면 공식 SDK 포장 전에 실패한다. 라이브러리의 예상 분기가 바뀌어도 변환을 중단한다. build-report.json의 dynamicCodeChecked=true는 이 로컬 검사 통과이며 콘솔 검수 승인을 뜻하지 않는다. [공식 eval 반려 안내](https://techchat-apps-in-toss.toss.im/t/eval/3671).
+
 기존 `pnpm build:web`, `dist`, Vercel 배포 흐름은 유지한다. 커밋·푸시·배포는 위 명령에 포함되지 않는다. 토스 빌드는 GA·Vercel·dotenv·관리자 변수를 export/포장 프로세스에 전달하지 않는다.
 
 ## 브라우저 화면 확인
@@ -103,6 +105,12 @@ TOSS_AD_MODE=disabled pnpm build:toss
 - `generated/toss-top-spacing/2026-11-19/test/nori-recipe.ait` (3,950,568bytes). 루트 `nori-recipe.ait`도 같은 새 번들이다. 이전20261118-6 파일은 위 보존 경로에 유지한다.
 - 기존과 같은 테스트 광고 ID다. 사용자 요청으로 파일만 생성했으며 콘솔 업로드/QR·실기기 확인은 사용자 진행 후 확인한다.
 - [검증·빌드 보고서](../openspec/changes/archive/2026-11-19-reduce-toss-top-spacing/verification.md).
+
+## eval 반려 수정 파일 — 2026-11-24
+
+- 이전 2026-11-24 테스트/운영 번들의 Expo 서버·개발용 eval2곳을 제거했다. 새 경로는 `generated/toss-eval-fix/2026-11-24/test/nori-recipe.ait`와 `production/nori-recipe.ait`다.
+- 두 파일 내부 ZIP의 JS에서 eval0개·Function 생성자0개를 확인했고 전체353개 회귀·타입·웹/토스 빌드·강화된 번들 검사를 통과했다. 일반 웹 출력과 원본 manifest를 보존했다.
+- 이전 `generated/toss-home-rounds/2026-11-24/` 파일은 반려 원인 재현용으로 보존한다. 재제출에는 새 파일을 사용한다. 콘솔 업로드·실기기·최종 검수 승인은 이번에 실행하지 않았다.
 
 ## 공식 근거
 

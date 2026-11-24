@@ -1,0 +1,38 @@
+[
+  {
+    "mode": "test",
+    "bytes": 3960937,
+    "sha256": "0b1e258f7ad0bcb99b344b3f3c2a5f758a0a9d5d0b86d3bcc8d34a9ad95dd0cc",
+    "scripts": [
+      "sources/_expo/static/js/web/entry-7ca6855e933a78c43470b07a2abdd23d.js"
+    ],
+    "eval": 0,
+    "functionConstructors": 0,
+    "integratedCardComponent": true,
+    "ads": {
+      "mode": "test",
+      "adGroupId": "ait-ad-test-interstitial-id",
+      "placement": "home-recommendations-completed",
+      "format": "interstitial"
+    },
+    "dynamicCodeChecked": true
+  },
+  {
+    "mode": "production",
+    "bytes": 3961791,
+    "sha256": "1ac2cb5338d1be4fc789bda5915c68d0263c46fa6baf370e89b78dc8f56d1065",
+    "scripts": [
+      "sources/_expo/static/js/web/entry-af06251319835371194745f4c0e00183.js"
+    ],
+    "eval": 0,
+    "functionConstructors": 0,
+    "integratedCardComponent": true,
+    "ads": {
+      "mode": "production",
+      "adGroupId": "ait.v2.live.b6af39a4123a41ae",
+      "placement": "home-recommendations-completed",
+      "format": "interstitial"
+    },
+    "dynamicCodeChecked": true
+  }
+]

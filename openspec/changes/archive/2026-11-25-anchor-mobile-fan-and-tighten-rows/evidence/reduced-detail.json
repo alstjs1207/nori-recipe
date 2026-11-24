@@ -1,0 +1,41 @@
+{
+  "before": {
+    "point": {
+      "x": 287.75,
+      "y": 419.421875
+    },
+    "cover": {
+      "x": 216.5,
+      "y": 311.421875,
+      "width": 142.5,
+      "height": 180,
+      "top": 311.421875,
+      "right": 359,
+      "bottom": 491.421875,
+      "left": 216.5
+    }
+  },
+  "reduced": {
+    "data": {
+      "fanReduced": "true",
+      "fanAnimating": "false",
+      "fanProgress": "1.0000"
+    },
+    "cover": {
+      "x": 216.5,
+      "y": 311.421875,
+      "width": 142.5,
+      "height": 180,
+      "top": 311.421875,
+      "right": 359,
+      "bottom": 491.421875,
+      "left": 216.5
+    },
+    "point": {
+      "x": 155.1866455078125,
+      "y": 333.58172607421875
+    },
+    "href": "/play/play_001"
+  },
+  "url": "http://127.0.0.1:4329/play/play_001"
+}

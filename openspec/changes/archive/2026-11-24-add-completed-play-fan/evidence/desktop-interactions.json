@@ -1,0 +1,16 @@
+{
+  "hover": {
+    "settled": true,
+    "scale": 1.06,
+    "lift": -22
+  },
+  "keyboard": {
+    "href": "/play/play_107",
+    "focusVisible": true,
+    "transform": "translate(calc(-50% + 0px), -22px) rotate(0deg) scale(1.06)"
+  },
+  "pointerAfterKeyboard": {
+    "transform": "translate(calc(-50% + 78px), -10px) rotate(12deg) scale(1.06)",
+    "animating": "false"
+  }
+}

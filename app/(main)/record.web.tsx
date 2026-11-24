@@ -1,10 +1,11 @@
 import { PlayImage } from "@/components/web/PlayImage.web";
+import { CompletedPlayFan, CompletedPlayFanCover } from "@/components/web/CompletedPlayFan.web";
 import { WebPage, EmptyState, Icon, PageFooter } from "@/components/web/NoriUI";
 import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { WebSelect } from "@/components/web/WebSelect";
 import { AppLink as Link } from "@/navigation/AppLink";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DEV_AREA_LABELS, DEV_AREA_SLUGS } from "@/constants/devAreas";
 import { getPlayLogs, getCompletedPlayBundles } from "@/db/queries";
 import { useSessionStore } from "@/store/sessionStore";
@@ -22,6 +23,35 @@ export default function RecordWebScreen() {
     const [bundles, setBundles] = useState<CompletedHomeBundle[]>([]);
     const [tab, setTab] = useState<"bundles" | "plays">("bundles");
     const [archive, setArchive] = useState(false);
+    const [expandedBundle, setExpandedBundle] = useState<string | null>(null);
+    const coverTrigger = useRef<HTMLButtonElement | null>(null);
+    useLayoutEffect(() => {
+        if (expandedBundle) {
+            const panel = document.getElementById(`completed-fan-${expandedBundle}`);
+            panel?.focus({ preventScroll: true });
+        } else if (coverTrigger.current) {
+            coverTrigger.current.focus({ preventScroll: true });
+            coverTrigger.current = null;
+        }
+    }, [expandedBundle]);
+    useEffect(() => {
+        if (!expandedBundle) return;
+        function dismissOnBlankClick(event: MouseEvent) {
+            if (!window.matchMedia("(max-width: 599px)").matches) return;
+            const target = event.target;
+            if (target instanceof Element && target.closest('a, button, input, select, textarea, label, summary, [role="button"], [role="link"], [contenteditable="true"]')) return;
+            setExpandedBundle(null);
+        }
+        function dismissOnEscape(event: KeyboardEvent) {
+            if (event.key === "Escape") { event.preventDefault(); setExpandedBundle(null); }
+        }
+        document.addEventListener("click", dismissOnBlankClick, true);
+        document.addEventListener("keydown", dismissOnEscape);
+        return () => {
+            document.removeEventListener("click", dismissOnBlankClick, true);
+            document.removeEventListener("keydown", dismissOnEscape);
+        };
+    }, [expandedBundle]);
     const [month, setMonth] = useState("");
     const [limit, setLimit] = useState(8);
     const [error, setError] = useState<string | null>(null);
@@ -57,11 +87,28 @@ export default function RecordWebScreen() {
     const selectedMonth = months.includes(month) ? month : months[0];
     const visibleBundles = archive ? bundles.filter(bundle => dateKey(bundle.completedAt).startsWith(selectedMonth)) : bundles.slice(0, 3);
     const dates = [...new Set(visibleBundles.map(bundle => dateKey(bundle.completedAt)))];
-    const renderBundles = () => <div className="completed-bundle-dates">{dates.map(date => {
+    const bundleCards = (bundle: CompletedHomeBundle) => bundle.ids.map(id => ({ id, title: playMap.get(id)?.name ?? "함께한 놀이", image: playMap.has(id) ? getPlayImageUrl(id, "thumbnail") : "/nori-icon.svg" }));
+    const renderDateHeading = (date: string, count?: number) => {
+        const achieved = new Date(`${date}T12:00:00`);
+        return <div className="completed-date-heading"><div><p>{achieved.getFullYear()}년</p><h3><time dateTime={date}>{achieved.getMonth() + 1}월 {achieved.getDate()}일</time><span>{achieved.toLocaleDateString("ko-KR", { weekday: "long" })}</span></h3></div>{count !== undefined ? <span className="completed-date-count">{count}묶음 달성</span> : null}</div>;
+    };
+    const renderBundles = () => !archive ? <div className="completed-recent-bundles">{visibleBundles.map(bundle => {
+        const date = dateKey(bundle.completedAt);
+        const cards = bundleCards(bundle);
+        return <section className={`completed-recent-bundle${expandedBundle === bundle.id ? " is-expanded" : ""}`} key={bundle.id} aria-label={`${date} 달성 묶음`}>
+          {renderDateHeading(date)}
+          <div className="completed-recent-cards">
+          <CompletedPlayFanCover cards={cards} label={`${date} 완성한 놀이 3개 펼치기`} controlsId={`completed-fan-${bundle.id}`} onOpen={trigger => { coverTrigger.current = trigger; setExpandedBundle(bundle.id); }} />
+          <div className="completed-recent-fan" id={`completed-fan-${bundle.id}`} tabIndex={-1} role="group" aria-label="펼친 놀이 3개">
+            <article className="completed-bundle completed-bundle-fan" aria-label="완성한 놀이 3개"><CompletedPlayFan bundleId={bundle.id} cards={cards} expanded={expandedBundle === bundle.id} /></article>
+            <p className="completed-bundle-dismiss-hint">빈 곳을 누르면 접혀요</p>
+          </div>
+          </div>
+        </section>;
+    })}</div> : <div className="completed-bundle-dates">{dates.map(date => {
             const completed = visibleBundles.filter(bundle => dateKey(bundle.completedAt) === date);
-            const achieved = new Date(`${date}T12:00:00`);
             return <section className="completed-bundle-day" key={date} aria-label={`${date} 달성 기록`}>
-      <div className="completed-date-heading"><div><p>{achieved.getFullYear()}년</p><h3><time dateTime={date}>{achieved.getMonth() + 1}월 {achieved.getDate()}일</time><span>{achieved.toLocaleDateString("ko-KR", { weekday: "long" })}</span></h3></div><span className="completed-date-count">{completed.length}묶음 달성</span></div>
+      {renderDateHeading(date, completed.length)}
       <div className="completed-day-bundles">{completed.map(bundle => <article className="completed-bundle" key={bundle.id} aria-label="완성한 놀이 3개"><div className="completed-bundle-images">{bundle.ids.map(id => {
                         const play = playMap.get(id);
                         return <Link href={`/play/${id}`} key={id}><figure><PlayImage src={play ? getPlayImageUrl(id, "thumbnail") : "/nori-icon.svg"} alt="" loading="lazy"/><figcaption>{play?.name ?? "함께한 놀이"}</figcaption></figure></Link>;

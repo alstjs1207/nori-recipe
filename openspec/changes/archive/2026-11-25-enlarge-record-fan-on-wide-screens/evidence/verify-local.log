@@ -1,0 +1,651 @@
+
+> nori-recipe@1.1.0 verify:local /Users/msyu/study/play-recipe
+> node scripts/verify-local.mjs
+
+
+Checking spec:check
+
+> nori-recipe@1.1.0 spec:check /Users/msyu/study/play-recipe
+> openspec validate --all --strict --no-interactive && openspec validate --archived --strict --no-interactive && node scripts/spec-tools.mjs check
+
+✓ change/add-favorite-collections
+✓ change/add-recently-viewed-plays
+✓ change/add-same-material-recommendation-refresh
+✓ change/add-studio-registration-guide
+✓ change/add-toss-completion-ad
+  ℹ [INFO] toss-miniapp/spec.md: Archive would refuse this delta: toss-miniapp ADDED failed for header "### Requirement: TOSS-007 추천 세트 완료 전면형 광고" - already exists
+✓ change/add-toss-miniapp
+  ℹ [INFO] toss-miniapp/spec.md: Archive would refuse this delta: toss-miniapp ADDED failed for header "### Requirement: TOSS-001 독립 실행과 기존 서비스 보존" - already exists
+✓ spec/catalog
+✓ change/clarify-home-set-lifecycle
+✓ spec/content-review
+✓ change/enlarge-record-fan-on-wide-screens
+✓ spec/local-data
+✓ spec/local-studio
+✓ change/migrate-material-images-to-supabase-storage
+✓ change/migrate-play-images-to-supabase-storage
+✓ spec/onboarding
+✓ change/plan-account-sync
+✓ change/plan-native-ota
+✓ change/plan-reports-subscriptions
+✓ spec/play-records
+✓ change/preserve-completed-plays-on-material-change
+✓ spec/privacy
+✓ spec/recommendations
+✓ change/register-approved-images-to-supabase
+✓ change/simplify-toss-top-area
+✓ spec/spec-governance
+✓ spec/toss-miniapp
+✓ spec/web-platform
+Totals: 27 passed, 0 failed (27 items)
+✓ change/2026-11-09-add-license-and-security-policy
+✓ change/2026-11-09-establish-spec-management
+✓ change/2026-11-10-fix-pwa-navigation-birth-month
+✓ change/2026-11-13-add-intro-landing-page
+✓ change/2026-11-18-add-brand-completion-stamp
+✓ change/2026-11-18-clarify-screen-entry-scroll
+✓ change/2026-11-18-extend-new-play-badge-to-90-days
+✓ change/2026-11-18-fix-featured-stamp-hover
+✓ change/2026-11-18-fullscreen-completion-confetti
+✓ change/2026-11-18-improve-home-recommendation-feedback
+✓ change/2026-11-18-move-profile-to-main-navigation
+✓ change/2026-11-18-move-toss-ai-disclosure-to-guide
+✓ change/2026-11-18-prepare-updated-toss-upload
+✓ change/2026-11-18-restore-toss-brand-header
+✓ change/2026-11-18-simplify-header-age-button
+✓ change/2026-11-19-fix-home-completion-replay
+✓ change/2026-11-19-implement-home-round-progress
+✓ change/2026-11-19-reduce-toss-top-spacing
+✓ change/2026-11-19-restyle-home-recommendation-notices
+✓ change/2026-11-24-add-completed-play-fan
+✓ change/2026-11-24-avoid-previous-completed-home-round
+✓ change/2026-11-24-hover-completed-play-fan
+✓ change/2026-11-24-integrate-fan-card-content
+✓ change/2026-11-24-overlay-completed-fan-within-two-columns
+✓ change/2026-11-24-remove-toss-eval-fallbacks
+✓ change/2026-11-24-show-completed-bundles-in-two-columns
+✓ change/2026-11-25-anchor-mobile-fan-and-tighten-rows
+✓ change/2026-11-25-mirror-mobile-card-order-and-dismiss-on-blank
+✓ change/2026-11-25-reorder-fan-stack-on-highlight
+Totals: 29 passed, 0 failed (29 items)
+Policy evidence: {"domains":11,"requirements":51,"scenarios":166,"automated":41,"sourceReviewed":10,"files":327}
+
+Checking test:spec-tools
+
+> nori-recipe@1.1.0 test:spec-tools /Users/msyu/study/play-recipe
+> node --test tests/spec-tools.test.mjs
+
+✔ repository baseline maps all current requirements and managed sources (21.442333ms)
+✔ reject removed source anchors and automated claims without tests (3.3365ms)
+✔ reject orphan, duplicate and non-scenario requirement contracts (2.565375ms)
+✔ reject unsafe evidence paths, symlinks, fake test paths and missing evidence (3.977208ms)
+✔ detect stale indexes and unknown feature roots without mutating them (4.246583ms)
+✔ require domain-specific change evidence for runtime, data, deletion and tooling changes (0.56125ms)
+✔ local verification isolates build origins from server fixtures and disables analytics (0.584042ms)
+✔ public verification replaces only the private-original check and isolates public inputs to the build (0.273084ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 73.343791
+
+Checking check:play-content
+
+> nori-recipe@1.1.0 check:play-content /Users/msyu/study/play-recipe
+> node scripts/validate-play-content.mjs
+
+{
+  "plays": 224,
+  "statuses": {
+    "live": 208,
+    "draft": 9,
+    "archived": 7
+  },
+  "errors": [],
+  "warnings": []
+}
+
+Checking check:play-images
+
+> nori-recipe@1.1.0 check:play-images /Users/msyu/study/play-recipe
+> tsx scripts/prepare-play-images.ts --verify-only
+
+Verified 223 required play images; 1 plays use image review fallbacks.
+
+Checking test:toss
+
+> nori-recipe@1.1.0 test:toss /Users/msyu/study/play-recipe
+> node --test tests/toss-*.test.mjs
+
+✔ 토스 export는 기밀·Vercel·분석·개발 mock 환경을 전달하지 않는다 (0.615167ms)
+✔ 토스 HTML에서 PWA·웹 공유 메타데이터를 제거하고 일반 원본을 보존한다 (1.667291ms)
+✔ Metro는 토스 프로덕션·개발 모의 SDK·웹·네이티브 해석을 분리한다 (187.660333ms)
+✔ 번들 검사는 잘못된 런타임·모의 SDK·소스맵·기밀·PWA·용량 초과를 거부한다 (11.53825ms)
+✔ 토스 빌드 교체 실패는 웹·직전 토스 export·SDK 번들·보고서를 모두 보존한다 (5.878875ms)
+✔ 광고 테스트·운영·비활성 모드를 분리하고 개발 환경에는 테스트 ID만 전달한다 (0.364833ms)
+✔ 실제 세션 스토어는 최초 저장소 실패 후 재시도하고 원래 guestId·프로필을 유지한다 (61.937542ms)
+✔ Toss UUID keeps browser crypto and leaves UUID v5 and namespace exports intact (117.219167ms)
+✔ Toss loader preserves the production browser loader without the server/development dependency (16.498209ms)
+✔ ordinary web, native, and Toss Devtools retain Expo's original fallbacks (2.962375ms)
+✔ unexpected upstream fallback changes stop the targeted transform (3.725083ms)
+✔ dynamic-code gate rejects executable direct, indirect, computed and escaped forms, but permits strings and comments (0.994208ms)
+✔ bundle gate checks scripts and inline HTML scripts before accepting a Toss export (4.785125ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 356.6595
+
+Checking test
+
+> nori-recipe@1.1.0 test /Users/msyu/study/play-recipe
+> tsx --test 'src/**/*.test.ts' 'src/**/*.test.tsx'
+
+✔ Preview 웹 어댑터는 운영 동의를 보존하고 동의 후에도 태그·쿠키·이벤트를 만들지 않는다 (5.620875ms)
+✔ 토스는 잘못 주입된 운영·Preview 분석 설정과 기존 동의도 읽거나 전송하지 않는다 (5.548834ms)
+✔ 실제 웹 어댑터는 동의 후에만 태그를 로드하고 URL 정리·광고 제한·철회를 적용한다 (13.428292ms)
+✔ 운영 HTTPS 도메인과 올바른 측정 ID가 있을 때만 설정을 허용한다 (1.964875ms)
+✔ 동의 전·거부·미설정 상태에서는 태그 로드와 모든 이벤트 전송이 없다 (9.958291ms)
+✔ Preview는 참여·거부·초기화를 허용하지만 잘못된 운영 설정이 있어도 전송하지 않는다 (2.5065ms)
+✔ Preview 선택은 같은 미리보기 주소에서만 복원되며 운영 동의와 섞이지 않는다 (0.220417ms)
+✔ 동의 후 페이지를 한 번씩 측정하고 같은 URL의 시작·추천 화면도 구분한다 (1.029667ms)
+✔ 개인 입력값·임의 식별값·검색어를 전달해도 허용된 행동 항목만 전송한다 (0.240167ms)
+✔ 검색 분석은 7개 발달 영역을 허용하고 이전 혼합 분류와 임의 값을 거부한다 (0.127083ms)
+✔ 태그 로드 중 철회하면 이전 동의의 페이지·행동 이벤트를 버린다 (2.942125ms)
+✔ 오프라인·태그 차단은 놀이 동작을 막지 않고 과거 행동을 재전송하지 않는다 (1.179875ms)
+✔ 같은 운영 도메인·측정 ID·방침 버전의 선택만 복원하고 초기화 시 철회한다 (0.915625ms)
+✔ 현재·이전 선택형 반응을 각각 0/1로 전송하고 복수 선택도 평가 한 건으로 유지한다 (0.626375ms)
+✔ 잘못된 별점·반응은 거부하고 원문·개인 식별값은 제거한다 (0.152042ms)
+✔ 동의 전·거부·Preview·오프라인·다른 프로필·저장소 불가에서는 소급 전송과 표시가 없다 (0.606708ms)
+✔ 새 기록을 수집한 뒤 소급 수집·동시 요청·재접속에도 같은 기록을 다시 보내지 않는다 (0.182375ms)
+✔ 여러 탭이 같은 전송 표시와 잠금을 사용하면 동시에 소급 요청해도 한 번만 보낸다 (0.158ms)
+✔ 소급 수집은 20개보다 많은 기록도 전송하고 같은 놀이의 서로 다른 평가는 보존한다 (0.581292ms)
+✔ 차단·실패한 전송은 표시하지 않고 다음 시도에 소급 수집한다 (0.386792ms)
+✔ 태그를 기다리는 중 철회하면 소급 전송과 전송 표시를 남기지 않는다 (0.213791ms)
+✔ 백그라운드 시간을 제외하고 상세를 실제로 본 20초만 누적한다 (0.368084ms)
+✔ 보이는 상세의 본문 절반을 읽으면 시간 조건 없이 안내 대상이 된다 (0.0675ms)
+✔ 짧게 보고 나간 상세의 시간을 다음 상세 열람에 이어 붙이지 않는다 (0.062667ms)
+✔ opening overshoots once and settles without an idle loop at 30Hz (0.612084ms)
+✔ opening overshoots once and settles without an idle loop at 60Hz (0.209667ms)
+✔ opening overshoots once and settles without an idle loop at 120Hz (0.736459ms)
+✔ focus moves to exactly one card and releasing it settles back (3.200042ms)
+✔ reduced motion finishes an entrance and a lift immediately (0.120417ms)
+✔ a long background pause is capped to the original 1/30-second integration (0.40425ms)
+✔ leaving during opening reverses into a closed settled stack (0.087333ms)
+✔ the anchored cover remains fixed throughout unfolding and spring overshoot (0.129833ms)
+✔ anchored outer cards stay inside the row on both sides, including overshoot and focus scale (0.384042ms)
+✔ mobile fans mirror the 1-2-3 sequence with the outside card in front (0.145542ms)
+✔ highlight changes reorder the entire mobile stack by neighbouring card distance (0.138167ms)
+✔ 보류·보관 놀이와 검토 중인 그림은 이미지 주소를 제공하지 않는다 (1.599166ms)
+✔ 교체한 놀이의 상세와 썸네일은 이미지 버전이 포함된 주소를 공유한다 (1.088583ms)
+✔ 도구와 작업 재료의 조합으로 4가지 활동 의도를 구분한다 (0.477834ms)
+✔ 정의하지 않았거나 경쟁 활동이 섞이면 의도 추정을 보류한다 (0.065209ms)
+✔ 보호자 준비용 가위·테이프는 아이의 자르기·테이프 조작이 아니다 (0.125625ms)
+✔ 조건 미확인 시 월령 밖 후보를 자동으로 추천하지 않는다 (6.553959ms)
+✔ 33개월의 준비 완료 가위 조합은 확인 후 괴물 미용실을 상단에 보충한다 (0.498542ms)
+✔ 추가 필수 재료가 한 종이라도 부족하면 상위 후보로 승격하지 않는다 (0.388542ms)
+✔ 감독·제품 연령·입 탐색·가위 준비 조건 각각이 필요하다 (0.848292ms)
+✔ +3개월 범위를 넘기거나 이미 지난 월령의 놀이를 되살리지 않는다 (0.394625ms)
+✔ 같은 가위 자르기 두 종류로 여러 자리를 채우지 않는다 (0.729ms)
+✔ 테이프 의도는 걷기 대신 장난감 테이프 떼기에 연결한다 (0.2675ms)
+✔ 테이프 미술에는 물감 조건 확인도 필요하다 (0.069083ms)
+✔ 조건부 경로도 제외 재료·장소·시간 제한을 보존한다 (0.219167ms)
+✔ 검수 후 본문·준비물·월령·게시 상태가 바뀌면 조건부 자격이 해제된다 (0.079291ms)
+✔ 작은 부품·풍선·미검수 상위 놀이는 카테고리만으로 확장하지 않는다 (0.058042ms)
+✔ 고정 추천 복원에서도 확인 철회·콘텐츠 수정은 상위 자격을 해제한다 (0.053333ms)
+✔ 저장된 확인은 월령·재료·제외 재료 범위에만 재사용한다 (0.069042ms)
+✔ 저장값 파싱은 문자열 true나 손상된 값을 준비 완료로 간주하지 않는다 (0.354584ms)
+✔ 원래 컵 조합은 미판별 상태로 기존 추천을 유지한다 (0.124917ms)
+✔ 준비 완료 의도 승격은 준비물 전체가 있는 활동으로 한정한다 (0.349708ms)
+✔ 조건부 추천은 원본 콘텐츠의 월령과 동작을 바꾸지 않는다 (1.039875ms)
+✔ 뚜껑 놀이는 페트병만 있을 때 준비 완료나 완전 재료 일치로 표시하지 않는다 (0.506ms)
+✔ 의자 통로 놀이는 무재료 놀이에 포함하지 않고 의자가 없으면 준비가 필요하다 (0.1005ms)
+✔ 큰 뚜껑 용기와 의자 없는 추천은 해당 활동을 준비 완료 후보로 묶지 않는다 (0.400458ms)
+✔ 현재 plays 번들 기준으로 추천 결과 3개를 반환한다 (6.604ms)
+✔ 재료가 부족하면 폴백을 적용해 후보를 확장한다 (0.145959ms)
+✔ 콜드 스타트에서는 콜드 스타트 가중치를 사용한다 (0.09ms)
+✔ 최근 완료한 추천은 대체 후보가 있으면 홈에서 우선 제외한다 (0.246292ms)
+✔ 대체 후보가 부족하면 최근 완료한 추천도 보충 후보로 다시 포함한다 (0.073208ms)
+✔ pickTop3는 발달 영역 다양성을 우선한다 (0.065084ms)
+✔ 재료 관련 후보 2개를 먼저 고르고 남은 한 자리에 무재료 놀이를 보충한다 (0.079375ms)
+✔ 재료 의도가 강하면 부분 일치 재료가 무재료 놀이보다 우선한다 (0.084292ms)
+✔ place가 any면 실내와 실외 놀이를 모두 후보로 본다 (0.093209ms)
+✔ 조건을 만족하는 놀이가 없으면 빈 결과를 반환한다 (1.29575ms)
+✔ third distinct recommendation save celebrates once, including after home remount (0.754292ms)
+✔ first and second saves do not celebrate; the third still does (0.264333ms)
+✔ existing completed history and repeated feedback do not replay confetti (0.187458ms)
+✔ new recommendation set can celebrate its own third completion (0.112958ms)
+✔ unrelated save, changed set, different guest, incomplete load and invalid sets consume without celebration (0.115334ms)
+✔ a late save cannot celebrate a new round with identical recommendation IDs (0.051375ms)
+✔ replacing only pending C with D does not celebrate; D's actual save completes A/B/D once (0.055125ms)
+✔ next round with 0 alternatives repeats only the missing slots (6.876792ms)
+✔ next round with 1 alternatives repeats only the missing slots (0.156375ms)
+✔ next round with 2 alternatives repeats only the missing slots (0.137125ms)
+✔ next round with 3 alternatives repeats only the missing slots (0.063375ms)
+✔ next round with 4 alternatives repeats only the missing slots (0.058167ms)
+✔ next round never fills unavailable alternatives or repeats by relaxing safety conditions (0.367541ms)
+✔ alternative and repeat pools together allow at most one confirmed upper-age play (0.52225ms)
+✔ neither alternatives nor repeats bypass location and time restrictions (0.086959ms)
+✔ A/B remain in their slots while C is replaced by D, even when the fixed plays do not use new materials (0.108417ms)
+✔ one completed ID cannot occupy a pending candidate slot (0.103916ms)
+✔ eligible alternatives may remain but unsafe/unpublished/age-ineligible candidates never fill a missing slot (0.100417ms)
+✔ 재료 하나를 골라도 부분 일치 도구 놀이가 무재료 3개보다 먼저 나온다 (11.408875ms)
+✔ 필수 준비물이 모두 있는 선택 재료 놀이가 일치 재료 개수가 많은 미완성 놀이보다 우선한다 (0.152584ms)
+✔ 추가 준비물이 적은 놀이를 발달 점수와 영역 다양성보다 우선한다 (0.111042ms)
+✔ 선택 재료 3개를 모두 쓰지 않아도 그중 하나를 쓰면 관련 놀이로 추천한다 (0.1035ms)
+✔ 선택 재료와 무관한 놀이의 선택 준비물은 도구 활용 의도로 계산하지 않는다 (0.066166ms)
+✔ 최근 완료한 관련 놀이를 무관한 새 놀이로 밀어내지 않는다 (0.104583ms)
+✔ 선택 재료가 없으면 무재료 놀이로 3개를 채운다 (0.124042ms)
+✔ 33개월 도구 후보가 없으면 월령 밖 놀이를 끌어오지 않고 공백을 안내한다 (0.098458ms)
+✔ 부분 일치 3개를 추천하면 추가 준비물을 숨기지 않고 안내한다 (0.100333ms)
+✔ 선택 재료 놀이가 1개 또는 2개인 혼합 추천의 안내 문구를 표시하지 않는다 (0.097042ms)
+✔ 시간 완화로도 금지 재료·월령 밖·비공개 놀이를 되살리지 않는다 (0.403709ms)
+✔ 재료 1개 선택도 무재료 점수보다 부분 일치 점수를 높인다 (0.284125ms)
+✔ hardFilter는 optional/substitutes에 포함된 금지 재료도 제외한다 (0.662291ms)
+✔ hardFilter는 시간 제한 1.3배까지는 허용하고 초과하면 제외한다 (0.082833ms)
+✔ softScore는 선택한 재료가 없으면 무재료 놀이를 불이익 없이 본다 (0.130375ms)
+✔ softScore는 재료 선택 의도가 강하면 무재료 놀이 점수를 낮춘다 (0.051458ms)
+✔ softScore는 강한 재료 의도에서 부분 일치를 0점보다 높게 보상한다 (0.088875ms)
+✔ applyFallback는 무재료 후보로 3개를 채울 수 있어도 부분 일치 후보를 유지한다 (0.165958ms)
+✔ applyFallback는 strict 후보가 3개 이상이면 완전 일치 후 부분 일치, 불일치 순으로 확장한다 (0.064083ms)
+✔ applyFallback는 strict 후보가 부족하면 시간 범위를 1.5배까지 넓힌다 (0.079417ms)
+✔ same-play fresh entry resets while an actual return preserves the source list (1.0405ms)
+✔ home / record fresh entry and same-screen presses never inherit old positions (0.216041ms)
+✔ hardware-back history shrink restores, forward tab revisits start at top (0.229625ms)
+✔ parameter-only updates and multiple observers do not create a new visit (0.244584ms)
+✔ route normalization handles groups, dynamic IDs, aliases and external URLs (1.108167ms)
+✔ real TabRouter retains repeated visits so back cannot skip the latest filtered search (17.144375ms)
+✔ 생년월은 연도 경계를 포함해 기존 출생월 인덱스와 왕복한다 (0.514625ms)
+✔ 빈 값·잘못된 형식·미래·49개월 이상 신규 생년월을 거부한다 (0.096083ms)
+✔ 48개월을 넘은 저장 생년월은 보존하되 다른 범위 밖 입력을 허용하지 않는다 (0.058458ms)
+✔ 월말·연말과 시간대는 기기의 현재 연월 규칙을 따른다 (0.043917ms)
+✔ 년·월 휠은 0~48개월 범위와 기존의 오래된 출생월만 제공한다 (0.422375ms)
+✔ 년·월을 어느 순서로 골라도 되며 년도 변경 시 가장 가까운 유효 월을 선택한다 (0.107666ms)
+✔ formatBirthMonth는 월을 두 자리로 포맷한다 (0.336792ms)
+✔ getAgeMonthsFromBirthMonth는 기준 월 차이를 계산하고 미래 월은 0으로 고정한다 (1.601708ms)
+✔ getBirthMonthOptions는 19~24개월을 우선 노출하고 전체 49개월 범위를 유지한다 (0.505667ms)
+✔ getVisibleMaterialCategories는 온보딩 노출 카테고리 순서를 유지한다 (0.20725ms)
+✔ buildOnboardingFilterInput keeps an explicitly empty materials selection (1.885208ms)
+✔ buildOnboardingFilterInput returns null when birth month is missing (0.093458ms)
+✔ 새 기록으로 추천 세 번째 놀이를 완료할 때만 같은 그룹의 광고를 한 번 표시한다 (0.8815ms)
+✔ 부족·중복 추천, 추천 외 완료, 저장되지 않은 기록은 광고를 표시하지 않는다 (0.196625ms)
+✔ 로드 전 완료·로드 실패·미지원·숨긴 화면에서는 건너뛰고 늦게 광고를 띄우지 않는다 (0.141ms)
+✔ 노출 실패와 예외를 삼키며 자동 재시도나 중복 노출을 하지 않는다 (0.17875ms)
+✔ 화면 종료는 구독과 대기 중 완료를 제거한다 (0.115875ms)
+✔ 동기 콜백에서도 SDK 구독을 해제하고 다음 광고를 순차 로드한다 (0.084583ms)
+✔ 재료 변경으로 A/B 완료를 유지해도 광고는 없고 D 실제 완료에서만 표시한다 (0.058458ms)
+✔ 토스 초기화는 중복 식별을 합치고 기존 형식의 키·guestId·기록을 재접속 후 복원한다 (1.930375ms)
+✔ 다른 토스 사용자의 기록을 읽거나 초기화하지 않고 계정 변경 후 기존 상태의 쓰기도 막는다 (0.732917ms)
+✔ 식별·저장·삭제 실패는 성공으로 바꾸지 않고 사용자 재시도로 회복한다 (0.35475ms)
+✔ 빈 식별키나 오류 응답은 익명 대체 프로필로 시작하지 않는다 (0.138667ms)
+✔ 공유는 정식 토스 놀이 경로만 사용하며 query·다른 URL·개인정보를 허용하지 않는다 (0.78575ms)
+✔ 뒤로가기는 대화상자·이전 화면·홈·최초 종료를 구분하며 SDK 구독을 해제한다 (0.400708ms)
+✔ 높은 만족도와 긍정 반응을 추천 신호에 반영한다 (0.384958ms)
+✔ 낮은 만족도와 어려운 반응을 추천 신호에 반영한다 (0.060375ms)
+✔ 추천 점수는 0에서 100 사이로 제한한다 (0.051833ms)
+✔ NEW는 한국 생성일 자정부터 90일 뒤 자정 직전까지 표시한다 (1.22675ms)
+✔ 기존 한 달이 지난 놀이도 90일 이내면 NEW를 유지한다 (0.073542ms)
+✔ 월말·연말·윤년에도 달력 3개월이 아닌 고정 90일을 적용한다 (0.089959ms)
+✔ 생성일이 없거나 유효하지 않은 놀이와 미래·오래된 놀이는 NEW에서 제외한다 (0.076125ms)
+✔ 등록된 주의사항이 없어도 보호자 감독 안내를 제공한다 (0.546166ms)
+✔ 작은 재료에는 삼킴·질식 경고를 추가한다 (0.156334ms)
+✔ 생가루 금지 안내와 이미 적합한 식재료의 탐색 안내를 구분한다 (0.081458ms)
+✔ 무독성 미술 재료에도 사용 연령과 비식용 안내를 제공한다 (0.060667ms)
+✔ 콘텐츠 주의사항을 유지하면서 재료별 안내를 보완한다 (0.057042ms)
+✔ 실내·실외 필터에는 어디서나 놀이도 포함한다 (0.992459ms)
+✔ 어디서나 필터는 모든 장소를 검색한다 (0.085958ms)
+✔ 재료 표시명과 발달 영역 이름으로 검색한다 (1.001834ms)
+✔ 출시 상태와 월령 범위를 적용한다 (0.208833ms)
+✔ 시간 상한은 놀이의 최대 시간에 적용하고 결과 수를 임의로 줄이지 않는다 (0.196875ms)
+✔ 필수 준비물이 없는 놀이와 보유 재료 조건은 선택 재료를 요구하지 않는다 (0.128959ms)
+✔ 분류와 상황 조건을 월령·시간 조건과 함께 적용한다 (0.082834ms)
+✔ 발달 영역은 두 번째 태그에도 일치하고 본문에만 언급된 영역은 포함하지 않는다 (0.091042ms)
+✔ 기록에서 전달한 영역을 읽고 잘못된 영역은 전체로 되돌린다 (0.0965ms)
+✔ 미술 유형은 선택 재료·그림책·일반 만들기에 끌려가지 않고 영역과 함께 걸러진다 (0.207417ms)
+✔ 새 놀이를 먼저 표시하고 NEW 안에서는 등록일·재료 충족도·준비 시간순을 따른다 (6.080375ms)
+✔ NEW 종료 시각부터 맞춤 기준으로 돌아가며 미래·잘못된 생성일은 우선 표시하지 않는다 (0.097375ms)
+✔ 선택한 맞춤순·놀이 시간순·준비 시간순은 NEW보다 해당 기준을 먼저 적용한다 (0.097792ms)
+✔ 필터와 결과 수 제한 사이에서 정렬하여 뒤에 등록된 NEW도 첫 결과에 포함한다 (0.153792ms)
+✔ getNextIncompleteStepIndex는 가장 앞의 미완료 단계를 찾는다 (0.41975ms)
+✔ completeStep은 단계를 중복 없이 정렬된 상태로 추가한다 (0.341958ms)
+✔ advanceAutoProgress는 한 번 호출할 때마다 다음 단계 하나만 순서대로 완료한다 (0.089833ms)
+✔ advanceAutoProgress는 일부 단계가 이미 완료된 상태에서도 남은 단계를 이어서 완료한다 (0.057667ms)
+✔ advanceAutoProgress는 모든 단계가 완료된 뒤에는 상태를 그대로 유지한다 (0.055584ms)
+✔ unsaved feedback survives A → B → A without leaking between plays or guests (0.414083ms)
+✔ save completion clears only its submitted revision, retaining edits made during the write (0.0835ms)
+✔ explicit full guest reset clears that guest only (0.088542ms)
+✔ legacy 2/3 migrates once and survives next-day reload without using a date key (1.041584ms)
+✔ same materials and identical play IDs start 0/3 in each explicitly restarted round (0.201792ms)
+✔ two rounds of repeated plays each celebrate once; duplicate feedback stays one completed play (0.373542ms)
+✔ failed activity write, unrelated history, deleted rows and foreign guests cannot create stamps (0.522458ms)
+✔ storage failure preserves the last durable round and the queue remains usable (0.38675ms)
+✔ stale pin/save operations cannot resurrect a previous round after reset (0.245459ms)
+✔ ineligible-content repair retains progress for retained IDs but never imports replacement history (0.159041ms)
+✔ corrupt/foreign round data does not leak and an empty persisted new round overrides legacy history (0.114417ms)
+✔ material edits preserve completed slots, reject stale same-round pins and commit context atomically (0.239458ms)
+✔ queued material edits retain the newest context and completed references (0.158375ms)
+✔ bundles use exact final IDs and final completion date, survive next rounds, and exclude staged or deleted activity (0.247417ms)
+✔ 놀이 이름 키워드로 대표 이모지를 선택한다 (0.440167ms)
+✔ 이름 매칭이 없으면 준비물 이모지를 사용한다 (0.072708ms)
+✔ 이름과 준비물 매칭이 모두 없으면 발달영역 이모지로 fallback 한다 (0.073667ms)
+ℹ tests 187
+ℹ suites 0
+ℹ pass 187
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 441.938458
+
+Checking test:play-review
+
+> nori-recipe@1.1.0 test:play-review /Users/msyu/study/play-recipe
+> node --test tests/play-review.test.mjs tests/material-review.test.mjs tests/review-workflow.test.mjs tests/material-images.test.mjs
+
+✔ collection planning deduplicates only used pending materials and reuses real existing images (7.905833ms)
+✔ both material images are required before a new collection appears with images in review and catalog (25.469ms)
+✔ default brand image is missing; an unlinked real file is linked without regenerating it (5.377667ms)
+✔ stale definitions, registered materials, invalid rasters and implicit replacements write nothing (13.455625ms)
+✔ new batch image changes invalidate exports and a missing material image prevents addition (27.687875ms)
+✔ material approval stages the same image hashes and publishes only the user's selected material (205.679709ms)
+✔ pending materials block publication; confirmed add releases only the chosen material (19.260334ms)
+✔ replacement changes only batch drafts, removes overlap and requires method re-review (7.065ms)
+✔ unconfirmed add and invalid or unapproved replacement reject all writes (3.791791ms)
+✔ replacement target definition changes invalidate an exported decision (2.713709ms)
+✔ dry-run writes nothing; only approved item is published and its native mapping is added (21.84825ms)
+✔ missing image, unconfirmed approval and a modification request without opinion are rejected (7.495667ms)
+✔ an old approval cannot clear a newly reopened image review (8.539125ms)
+✔ changed content, relevant material definition and replacement image invalidate old approval (5.4025ms)
+✔ unknown/duplicate IDs and an archived approval fail without partial writes (7.003417ms)
+✔ native mapping and final live validation failures prevent the entire write (6.479375ms)
+✔ review generator includes only selected IDs, full content and escaped text (8.992459ms)
+✔ prepare creates a reusable draft review with only relevant material proposals and no master changes (17.95325ms)
+✔ invalid selection or an unsafe output is rejected before preparing files (6.242292ms)
+✔ new collections wait for every generated image, then appear together without publishing drafts (20.253208ms)
+✔ untracked, stale or corrupted images cannot publish a new collection (7.020959ms)
+✔ image saves reject changed content, registered plays and unreadable raster data without overwriting (7.870583ms)
+✔ requested replacement preserves the original and invalidates prior image review hashes (9.68375ms)
+✔ thumbnail and non-square outputs are rejected before writing images or receipts (8.395667ms)
+✔ existing batches remain inspectable when an image goes missing (10.960416ms)
+✔ catalog includes registered, draft and archived contents without making them live (6.860958ms)
+✔ current held decisions survive publication while stale decisions and automatic approvals do not (18.954125ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 377.0585
+
+Checking test:image-registration
+
+> nori-recipe@1.1.0 test:image-registration /Users/msyu/study/play-recipe
+> node --test tests/image-registration.test.mjs
+
+(node:77670) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Studio uploads only the selected approved play and commits its public manifest with status (184.021333ms)
+✔ partial upload leaves every local file unchanged; retry verifies existing bytes and completes (182.215709ms)
+✔ anonymous public-read failure and existing-object corruption prevent registration (40.949958ms)
+✔ content or publication changes during upload reject the final commit without losing external edits (28.887083ms)
+✔ new material approval publishes its icon and source hashes before permitting play registration (343.790417ms)
+✔ material upload failure preserves reviewPending; held materials never upload (118.690334ms)
+✔ missing local credentials block approval, while saves and CLI dry-runs remain offline (57.266542ms)
+✔ CLI batch registration shares uploads, manifests and transaction recovery with Studio (223.705417ms)
+✔ CLI material registration is idempotent and retains current approval receipts (175.057459ms)
+✔ real adapter contract keeps credentials on authenticated requests and verifies anonymous derivatives (186.61675ms)
+✔ web build merges new play registrations with migration evidence without original JPEGs (185.484333ms)
+✔ web build uses newly approved material and rejects mapping changes without reading originals (187.290541ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2005.81325
+
+Checking test:play-image-storage
+
+> nori-recipe@1.1.0 test:play-image-storage /Users/msyu/study/play-recipe
+> node --test tests/play-image-storage.test.mjs
+
+✔ deterministic full hashes, versioned paths and dry-run leave sources and store untouched (548.5315ms)
+✔ missing, truncated and non-JPEG sources cannot produce a plan or overwrite any source (235.640708ms)
+✔ only baseline-approved live derivatives upload; private originals and approval hashes survive (1470.665625ms)
+✔ partial success is checkpointed, failed IDs do not activate, and replay verifies actual objects (1849.419292ms)
+✔ a changed original or content cannot reuse a plan or establish its own approval (700.167833ms)
+✔ conflicting original objects are never overwritten; verified IDs and prior good candidates survive another ID's failure (909.06825ms)
+✔ a crash after creation retains the object and unverified checkpoint for safe restart (1088.307875ms)
+✔ public projection whitelists fields and state cannot be reused against a different target (1466.1815ms)
+✔ a lost upload response still leaves a cleanup candidate after concurrent revocation (689.428917ms)
+✔ status changes during transfer prevent activation and preserve original and completed objects (722.76575ms)
+✔ draft, archived and review transitions remove public candidates and generate cleanup without deleting objects (5520.742792ms)
+✔ download verification restores exact original without changing review results; conflicts and corruption preserve files (820.0895ms)
+✔ untrusted plans, duplicate IDs, output collisions, symlinks and concurrent state writers fail closed (184.105875ms)
+✔ CLI defaults to dry-run and ignores admin env without explicit remote; filesystem mode needs no secrets (506.909166ms)
+✔ Supabase wire fixture uses authenticated GET/create-only POST, handles missing/conflict and redacts failures (8.915833ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16785.704125
+
+Checking test:material-image-storage
+
+> nori-recipe@1.1.0 test:material-image-storage /Users/msyu/study/play-recipe
+> node --test tests/material-image-storage.test.mjs
+
+(node:87875) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 재료 계획은 기준 승인·미사용/공유 원본을 보존하고 대기 브랜드를 제외한다 (153.37475ms)
+✔ dry-run은 키·전송·체크포인트 쓰기 없이 계획하며 경로·옵션을 차단한다 (158.170792ms)
+✔ 부분 실패·재개는 실제 GET 재검증·불변 생성·완전 후보만 활성화한다 (502.9745ms)
+✔ 전송 중 승인 철회는 부분 객체도 정리 후보로 기록하고 원격 삭제하지 않는다 (205.79ms)
+✔ 복원은 다운로드 JPEG/해시 확인 후 없는 파일만 만들고 충돌/손상을 보존한다 (218.227667ms)
+✔ 원본 없는 공개 입력은 정의·매핑/바이트·필수 항목·192px WebP를 검사한다 (215.96175ms)
+✔ 공개 경로·version·private 필드를 검증하고 snapshot은 실패에도 복원한다 (216.477083ms)
+✔ 재료 HTTP 어댑터는 익명 쓰기 대신 로컬 키·no-upsert·제한된 경로를 쓴다 (8.23175ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1782.488125
+
+Checking test:local-review
+
+> nori-recipe@1.1.0 test:local-review /Users/msyu/study/play-recipe
+> node --import tsx --test tools/local-review/tests/*.test.mjs tools/local-review/tests/*.test.cts
+
+✔ a request creates its own chat, captures the full batch and reuses its receipt across restart (169.776792ms)
+✔ stale versions, unknown batches, unavailable Codex and recovery never create chats (9.318792ms)
+✔ known launch failures can retry while uncertain creation never creates a duplicate (92.12825ms)
+✔ the detached worker creates and names a fresh thread, starts its turn and persists completion (663.392417ms)
+✔ a partial creation failure retains the new chat and retries delivery there without creating another (596.834583ms)
+✔ HTTP returns the new chat link and saved batch only; clients cannot choose a target chat (129.766084ms)
+✔ Studio observation preserves actual engine results and input content across material/age/history combinations (100.432834ms)
+✔ readiness, missing supplies, ambiguity, age and exclusion traces agree with conditional eligibility (6.940958ms)
+✔ recommendation menu is served read-only across Studio routes and stays absent in standalone exports (128.768917ms)
+✔ reload embeds fresh catalog and safely escapes user content without exposing files or write credentials (38.964625ms)
+✔ start, catalog, review and GET APIs are read-only; only whitelisted files and origins are accepted (77.549625ms)
+✔ clean URLs link the backoffice, redirect legacy pages and preserve standalone file links without writes (88.5775ms)
+✔ incomplete opinions and statuses persist in files across restart and a new browser; imports do not publish (89.424958ms)
+✔ simultaneous writes serialize and reject stale versions without losing the winning opinion (76.664292ms)
+✔ bad records, missing confirmations, unknown IDs and archived approvals cause no writes (29.85325ms)
+✔ only the clicked approval publishes, with the existing image mapping and receipt logic; other states survive (183.566458ms)
+✔ external content, images, material definitions, mappings and new batches invalidate a previous request (87.353125ms)
+✔ material add, hold and replacement apply separately; drafts cannot bypass re-review (883.213417ms)
+✔ an image change clears saved material confirmation and never reuses an unapplied add (78.934625ms)
+✔ newer CLI receipts take precedence over older server opinions even with old browser timestamps (76.05375ms)
+✔ interrupted transactions block writes and explicitly recover without overwriting subsequent external edits (78.834875ms)
+✔ a failed multi-file replacement rolls back completely; corrupt state and symlinks fail closed (71.207917ms)
+✔ an external image edit during commit is detected; own changes roll back and the external edit survives (79.024583ms)
+✔ unused removes only the selected play, its image and every batch link, then allows continued review (322.879167ms)
+✔ unused can remove registered plays and native mappings; deletion journals recover removed images (170.626417ms)
+✔ catalog excludes applied unused replacements from pending without registering them, and reopens reused materials (152.240292ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2745.147167
+
+Checking test:web
+
+> nori-recipe@1.1.0 test:web /Users/msyu/study/play-recipe
+> node --test tests/web-*.test.mjs
+
+(node:89477) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Web images: {"plays":2,"reviewImages":1,"originalMB":0,"detailMB":0,"thumbnailMB":0,"imageMode":"public","verifiedPublicAssets":2,"materialImageMode":"public","verifiedMaterialAssets":66}
+
+PWA ready: 2 public play links, 14 shell assets, cache 8bc4c5928524
+Intro page: /intro with 2 plays, 66 materials, 7 screens
+✔ 공개 자산만으로 빌드하며 놀이 원본·관리자 키 없이 검증 완료 출력만 교체한다 (552.548458ms)
+✔ 필수 후보·파일 누락과 해시 오류는 export 전에 중단하고 마지막 출력을 보존한다 (103.595625ms)
+✔ 맞는 해시라도 손상 WebP·크기 초과와 심볼릭 링크는 빌드 입력에서 거부한다 (97.982125ms)
+✔ 공개 GET은 익명·정확한 공개 경로만 쓰며 오류·손상·redirect·opaque는 거부한다 (40.171208ms)
+Web images: {"plays":2,"reviewImages":1,"originalMB":0,"detailMB":0,"thumbnailMB":0,"imageMode":"public","verifiedPublicAssets":2,"materialImageMode":"public","verifiedMaterialAssets":66}
+Web images: {"plays":2,"reviewImages":1,"originalMB":0,"detailMB":0,"thumbnailMB":0,"imageMode":"public","verifiedPublicAssets":2,"materialImageMode":"public","verifiedMaterialAssets":66}
+
+✔ export 실패·후처리 실패·출력 교체 실패에서도 기존 배포와 소스 스냅샷을 보존한다 (284.006125ms)
+✔ 웹 export 환경은 관리자 값과 dotenv를 필요로 하지 않는다 (0.231416ms)
+Web images: {"plays":208,"reviewImages":0,"originalMB":0,"detailMB":0.01,"thumbnailMB":0.01,"imageMode":"public","verifiedPublicAssets":416,"materialImageMode":"public","verifiedMaterialAssets":66}
+Web Bundled 4012ms ../../../../../../../Users/msyu/study/play-recipe/node_modules/.pnpm/expo-router@6.0.24_f93de378c15382db21b9977b3f39f944/node_modules/expo-router/entry.js (1188 modules)
+_expo/static/js/web/entry-52cc6bfd754b297060008108869ea5a4.js (3.16 MB)
+Exported: /private/var/folders/xl/s4c4r9612wx4p18_p_zybwwm0000gn/T/nori-public-build-Jk7R4h/generated/web-build-ATUNGH/next
+PWA ready: 208 public play links, 15 shell assets, cache fb1b0f7e0f04
+Intro page: /intro with 208 plays, 66 materials, 7 screens
+✔ 깨끗한 소스 fixture의 실제 앱 Expo export는 놀이/재료 JPEG·관리자 키 없이 성공한다 (10946.166959ms)
+✔ 재료 필수 후보·파일·해시 오류는 export 전에 중단하고 기존 출력을 보존한다 (136.71625ms)
+(node:89478) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 현재 카탈로그는 게시 여부를 포함한 콘텐츠 검증을 통과한다 (5.019208ms)
+✔ 생성일은 실제 날짜로 검증하고 날짜가 없는 기존 놀이도 허용한다 (0.321541ms)
+✔ 출처 플랫폼 오표기와 검색 URL을 개별 영상 출처로 등록하지 않는다 (0.154875ms)
+✔ 작은 부품과 생가루는 추천에 복귀하지 않고 제외 이력은 보존할 수 있다 (0.25325ms)
+✔ 0분 놀이와 필수·선택 중복 재료를 거부한다 (0.073875ms)
+✔ 시작 전 준비 조건은 비어 있지 않은 문자열 배열로 검증한다 (0.135459ms)
+✔ 공유 이미지에도 교체한 그림의 버전 주소를 사용한다 (0.540708ms)
+✔ 메인 공유 이미지는 공개된 1200×630 JPEG이며 운영·미리보기 주소를 따른다 (2.731875ms)
+✔ 놀이 상세는 메인 공유 정보를 중복 없이 해당 놀이 이미지로 대체한다 (0.354958ms)
+✔ Vercel 정적 HTML의 공유 주소는 운영 도메인과 미리보기 배포를 구분한다 (0.276167ms)
+✔ Vercel에서 도메인이 누락되거나 잘못 설정되면 깨진 공유 HTML을 만들지 않는다 (0.2485ms)
+✔ 검토 이미지의 웹 상세·썸네일은 원본 JPEG 없이도 브랜드 기본 이미지로 생성한다 (116.217583ms)
+✔ 추천에서 제외한 놀이의 오래된 웹 이미지도 게시 출력에서 제거한다 (3.750875ms)
+✔ 기본 아이콘을 실제 재료 이미지로 교체하면 주소 버전이 바뀌고 재빌드에서는 유지된다 (5.904083ms)
+✔ 웰컴 대표 이미지는 가벼운 가로형 WebP와 캐시 버전으로 생성한다 (168.807667ms)
+✔ actual feedback DB keeps lifetime history while the same three plays start a fresh round (57.250917ms)
+✔ round-reference failure blocks the DB write; activity failure never produces a phantom stamp (24.310916ms)
+✔ real material saves handle 0/1/2/3 completions and keep final A/B/D bundles across restarts (21.277708ms)
+✔ failed third writes cannot create albums; failed edits preserve materials and progress (22.274791ms)
+✔ completed-round material save uses 0 alternatives and preserves lifetime records (16.529125ms)
+✔ completed-round material save uses 1 alternatives and preserves lifetime records (14.413375ms)
+✔ completed-round material save uses 2 alternatives and preserves lifetime records (17.901ms)
+✔ completed-round material save uses 3 alternatives and preserves lifetime records (15.262084ms)
+✔ reopening uses atomic round materials including null instead of stale legacy keys (17.349833ms)
+(node:89480) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/materialImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 소개 페이지 숫자는 공개 놀이·재료 데이터에서 계산한다 (17.602042ms)
+✔ 발달영역 표시명은 앱 상수와 같은 순서·이름을 사용한다 (2.685ms)
+✔ 소개 페이지는 노리 레시피 브랜드·공개 링크만 쓰고 분석 스크립트를 넣지 않는다 (1.673208ms)
+✔ 빌드는 실제 화면 캡처를 해시 WebP로 만들고 운영 주소를 채운다 (343.986167ms)
+✔ /intro는 로컬 서버와 Vercel에서 정적 소개 페이지로 제공된다 (8.861125ms)
+✔ 동작 효과는 스크립트·동작 줄이기 설정을 따르고 내용을 숨긴 채 두지 않는다 (0.936875ms)
+(node:89481) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 새 버전 설치는 HTTP 캐시에 남은 이전 스타일 대신 새 스타일을 저장한다 (18.558041ms)
+✔ 허용한 Storage CORS 이미지는 방문 후 오프라인에서 표시하고 미방문 이미지는 기본 표시한다 (2.720959ms)
+✔ Storage 404·5xx·opaque·비이미지·redirect 응답은 캐시하지 않고 기본 표시 후 재시도한다 (6.124041ms)
+✔ Storage origin·버킷·객체 경로·요청 모드를 정확히 제한한다 (2.34775ms)
+✔ 동시 요청에서도 로컬+Storage 이미지 합계 80개를 유지하고 버전 경로를 별도 캐시한다 (11.839625ms)
+✔ 이전 워커가 활성 상태여도 새 HTML의 해시 스타일은 이전 CSS와 섞이지 않는다 (1.323916ms)
+✔ 오프라인에서 기존 상세 HTML, 처음 여는 놀이의 앱 셸, 방문한 이미지를 제공한다 (1.209333ms)
+✔ 온라인 설치 직후 앱을 한 번도 열지 않아도 첫 오프라인 기본 화면·설정 셸을 제공한다 (0.968083ms)
+✔ 서버 장애 시 캐시로 돌아가고 잘못된 놀이의 404는 그대로 유지한다 (1.420083ms)
+✔ 오래된 앱 캐시만 지우며 새 버전은 사용자 요청 뒤 적용한다 (0.562ms)
+✔ 이미지 캐시는 최대 80개이며 외부 서비스와 쓰기 요청을 가로채지 않는다 (4.693625ms)
+✔ 기존 기본 아이콘 캐시가 있어도 새 주소의 재료 그림을 받고 오프라인에서도 유지한다 (3.289416ms)
+✔ 이전 놀이 그림이 캐시에 있어도 새 버전 상세·썸네일을 받고 오프라인에서 유지한다 (0.6945ms)
+✔ 재료 CORS·오프라인·에러·정확한 경로와 놀이/로컬 합계80개를 유지한다 (8.026ms)
+(node:89482) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 웹·공유·소개 페이지는 동일한 공개 매니페스트 버전을 사용하고 비공개·잘못된 ID는 제외한다 (17.679333ms)
+✔ Preview/Production canonical은 배포 origin을 따르고 Storage OG URL은 치환하지 않는다 (3.990084ms)
+✔ 버전 교체는 상세·썸네일·OG에 함께 반영되고 필수 후보 누락은 빌드를 거부한다 (4.796167ms)
+✔ 관리용/손상 매니페스트, 잘못된 origin/버킷, stale 내용은 거부하고 비공개 원본은 읽지 않는다 (4.016875ms)
+✔ Expo export는 동일 공개 스냅샷을 받고 성공·실패 모두 소스 JSON을 복원한다 (6.232375ms)
+✔ 미설정 빌드는 기존 로컬 버전 주소와 검토 기본 표시를 유지한다 (2.165ms)
+✔ 공유 크롤러 형태의 HTTP 요청은 JavaScript 없이 정적 OG와 공개 이미지를 읽고 비공개 ID는 노출하지 않는다 (44.401917ms)
+✔ 첫 온라인 준비는 셸 설치가 끝나기 전 완료를 알리지 않는다 (3.681042ms)
+✔ 필수 셸 설치가 실패하면 완료 대신 오류를 알리고 대기를 끝낸다 (0.819417ms)
+✔ 오프라인 재실행의 등록 실패에서도 기존 활성 셸은 이용 가능하다 (1.5675ms)
+✔ 대기 업데이트는 알리기만 하며 자동 적용하지 않는다 (0.349583ms)
+(node:89484) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 놀이 직접 링크는 온보딩 없이 HTML과 안전하게 인코딩된 공유 정보를 반환한다 (16.345292ms)
+✔ 검색·설정·피드백 경로를 새로고침해도 앱 셸이 제공된다 (6.665416ms)
+✔ 없는 놀이와 정적 파일은 404이며 JS 요청에 HTML을 돌려주지 않는다 (3.599791ms)
+✔ 서비스 워커·설치 설정은 갱신 가능하고 pnpm 경로의 아이콘 폰트는 압축 제공된다 (7.355875ms)
+✔ 쓰기 요청, 경로 탈출과 숨김 파일 접근을 허용하지 않는다 (3.361375ms)
+ℹ tests 68
+ℹ suites 0
+ℹ pass 68
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12281.718042
+
+Checking typecheck
+
+> nori-recipe@1.1.0 typecheck /Users/msyu/study/play-recipe
+> tsc --noEmit
+
+
+Checking build:web
+
+> nori-recipe@1.1.0 build:web /Users/msyu/study/play-recipe
+> node scripts/build-web.mjs
+
+(node:89794) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/msyu/study/play-recipe/src/constants/playImageManifest.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/msyu/study/play-recipe/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Web images: {"plays":208,"reviewImages":0,"originalMB":128.9,"detailMB":15.36,"thumbnailMB":2.54,"imageMode":"local","verifiedPublicAssets":0,"materialImageMode":"local","verifiedMaterialAssets":0}
+Web Bundled 4081ms node_modules/.pnpm/expo-router@6.0.24_f93de378c15382db21b9977b3f39f944/node_modules/expo-router/entry.js (1188 modules)
+_expo/static/js/web/entry-49a1ad2a780d02f2fed5469a39d0d85e.js (3.09 MB)
+Exported: /Users/msyu/study/play-recipe/generated/web-build-RngXUo/next
+PWA ready: 208 public play links, 15 shell assets, cache 2f92868504dc
+Intro page: /intro with 208 plays, 66 materials, 7 screens

@@ -1,0 +1,90 @@
+[
+  {
+    "index": 0,
+    "initial": {
+      "order": [
+        1,
+        2,
+        3
+      ],
+      "animating": "false"
+    },
+    "hover": {
+      "order": [
+        3,
+        2,
+        1
+      ],
+      "animating": "false"
+    },
+    "leave": {
+      "order": [
+        1,
+        2,
+        3
+      ],
+      "animating": "false"
+    },
+    "keyboard": {
+      "order": [
+        3,
+        2,
+        1
+      ],
+      "animating": "false"
+    },
+    "blur": {
+      "order": [
+        1,
+        2,
+        3
+      ],
+      "animating": "false"
+    },
+    "blankDismissed": true
+  },
+  {
+    "index": 1,
+    "initial": {
+      "order": [
+        3,
+        2,
+        1
+      ],
+      "animating": "false"
+    },
+    "hover": {
+      "order": [
+        1,
+        2,
+        3
+      ],
+      "animating": "false"
+    },
+    "leave": {
+      "order": [
+        3,
+        2,
+        1
+      ],
+      "animating": "false"
+    },
+    "keyboard": {
+      "order": [
+        1,
+        2,
+        3
+      ],
+      "animating": "false"
+    },
+    "blur": {
+      "order": [
+        3,
+        2,
+        1
+      ],
+      "animating": "false"
+    },
+    "blankDismissed": true
+  }
+]

@@ -167,3 +167,63 @@ Node24 전체324개 테스트·콘텐츠/이미지·명세·타입·웹 빌드�
 REC-004의 전체3개 완료 후 다음 추천은 직전3개를 제외한 적격 대안을 먼저 선택하고 부족한 칸만 적격 직전 놀이로 보충한다. REC-002 재료 순위는 각 후보 풀 안에서 유지하고 합친 조건부 상위 월령은 최대1개다. 부분 완료·새 회차0/3·누적 기록/묶음을 보존했다. Node24 전체347개 회귀·명세·타입·웹 빌드를 통과했다. preview 로컬 변경이며 커밋·푸시·배포와 실제 기기 검증은 실행하지 않았다.
 
 [완료 태스크](changes/archive/2026-11-24-avoid-previous-completed-home-round/tasks.md) · [검증 기록](changes/archive/2026-11-24-avoid-previous-completed-home-round/verification.md).
+
+### 2026-11-24 토스 eval 반려 수정과 재발 검사
+
+반려 대상 테스트/운영 번들의 Expo eval2곳을 추적하고 토스 배포 웹에서만 서버·개발 fallback을 제외했다. 실제 브라우저 UUID·v5·로더와 일반 웹/네이티브·Devtools를 보존하며, 포장 전에 JS/inline script의 eval 참조·Function 생성자를 구문 분석해 차단한다. 전체353개·명세·타입·웹/토스 빌드를 통과했고 새 두 .ait 내부도 eval0개를 확인했다. preview 로컬 수정으로 커밋·푸시·콘솔 업로드·심사·실제 토스 기기 검증은 포함하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-24-remove-toss-eval-fallbacks/tasks.md) · [검증 기록](changes/archive/2026-11-24-remove-toss-eval-fallbacks/verification.md).
+
+### 2026-11-24 최근 완성 묶음 Fan cards
+
+웹/PWA/토스 기록 기본 보기의 최근3묶음에 원본 스프링 수치를 유지한 사진 팬 모션을 적용했다. 날짜·제목 고정, 터치/키보드 상세 이동, 모션 감소와 rAF 정리를 제공하며 월별 전체 보기는 기존3열이다. 별도 테스트 origin의320/393px·데스크톱 입력/월별 보기와 최종 전체359개·타입·웹/토스 빌드를 확인했다. 새 테스트/운영 .ait 내부eval0개와 이전 웹 출력 보존을 확인했다. preview 로컬 변경이며 사용자 기록·커밋·푸시·운영/콘솔 배포는 포함하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-24-add-completed-play-fan/tasks.md) · [검증 기록](changes/archive/2026-11-24-add-completed-play-fan/verification.md).
+
+### 2026-11-24 팬 카드 이미지·제목 통합
+
+사용자 원본 이미지 정정에 맞춰 최근 완성 묶음의 이미지·순번·제목을 한 카드 안에 넣고 카드 전체를 움직이도록 수정했다. 넓은 외곽 패널을 없애고 반응형 높이를 연결했다. 전체359개·타입·웹 및 토스 두 모드 빌드,320/393/1280px 실제 카드 배치·키보드 강조·모바일 제목 탭과 .ait 내부 eval0개를 확인했다. preview 로컬 변경이며 커밋·푸시·콘솔/운영 배포는 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-24-integrate-fan-card-content/tasks.md) · [검증 기록](changes/archive/2026-11-24-integrate-fan-card-content/verification.md).
+
+### 2026-11-24 마우스 호버로 완성 카드 펼침
+
+최근 완성 묶음은 마우스 사용 시 기본 겹침으로 표시하고 호버·키보드 포커스에서 펼치며 모두 이탈하면 다시 접는다. 터치/동작 줄이기는 세 링크 접근을 위해 펼친다. 전체360개·타입·웹 빌드와 실제 마우스 진입/이탈·키보드·모바일 제목 탭을 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-24-hover-completed-play-fan/tasks.md) · [검증 기록](changes/archive/2026-11-24-hover-completed-play-fan/verification.md).
+
+### 2026-11-24 최근 완성 묶음 두 열
+
+사용자가 모바일도 두 열을 선택해 최근3묶음을 날짜와 함께 두 열로 표시했다.600px 미만은 접힌 표지 버튼·선택 묶음 전체 행 펼침·접기와 포커스 복귀를 제공한다. 넓은 화면은 기존 팬 호버를 유지하고 월별 전체 보기는 기존 날짜별3열이다. 전체360개·최종 타입/웹 빌드와320/393/1280px 실제 배치·터치 상세 이동·접기·옆 묶음 침범 없음·월별 배열을 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-24-show-completed-bundles-in-two-columns/tasks.md) · [검증 기록](changes/archive/2026-11-24-show-completed-bundles-in-two-columns/verification.md).
+
+### 2026-11-24 두 열을 유지한 카드 겹침 펼침
+
+모바일에서 펼친 묶음이 행 전체를 차지하며 재배치되던 동작을 바꿔 두 열·날짜·다음 행 위치를 유지하고 실제 카드만 옆 묶음 위로 겹쳐 펼친다. 양쪽 열의 가장자리 정렬·선택 묶음 레이어·포인터 통과/카드 선택을 연결했다. 전체360개·타입·웹 빌드와320/393/599px 양쪽 열6경우의 위치 불변·겹침·잘림 없음·접기, 실제 상세 터치 및1280px 기존 배열을 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-24-overlay-completed-fan-within-two-columns/tasks.md) · [검증 기록](changes/archive/2026-11-24-overlay-completed-fan-within-two-columns/verification.md).
+
+### 2026-11-25 모바일 원래 자리 펼침과 행 간격 축소
+
+모바일에서 선택한 카드가 중앙으로 옮겨지던 원인을 없애고 표지의 가운데 카드와 실제 카드 크기/위치를 고정한 채 옆 카드만 이웃 열 방향으로 펼친다. 자동 스크롤과340~430px 행 높이 예약을 제거했다. 전체362개·타입·웹 빌드와320/393px 터치·551px 마우스 양쪽 열에서 기준 카드 위치/크기 변화0px, 행 간격333px·잘림 없음·세 카드 선택 영역·접기, 모션 감소와 실제 바깥 카드 상세/1280px 호버를 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-25-anchor-mobile-fan-and-tighten-rows/tasks.md) · [검증 기록](changes/archive/2026-11-25-anchor-mobile-fan-and-tighten-rows/verification.md).
+
+### 2026-11-25 모바일 앞 카드 순서와 빈 영역 접기
+
+작은 화면의 왼쪽은1번·오른쪽은3번을 앞 표지/펼침 기준으로 두고 순서를 거울처럼 맞췄다. 접기 버튼을 제거해 빈 화면 click·Escape로 닫고 카드/버튼 선택과 스크롤은 구분한다. 전체363개·타입·웹 빌드와320/393px 터치·551px 마우스 양쪽 열에서 앞 카드/위치 변화0·빈 곳 접기·터치 스크롤 유지, 버튼 전환·Esc 포커스 복귀·실제 카드 상세 이동을 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-25-mirror-mobile-card-order-and-dismiss-on-blank/tasks.md) · [검증 기록](changes/archive/2026-11-25-mirror-mobile-card-order-and-dismiss-on-blank/verification.md).
+
+### 2026-11-25 강조 카드 뒤 겹침 순서 보정
+
+모바일 강조 카드만 올리던 식 대신 전체 레이어를 가까운 번호 순으로 정해 왼쪽3번은3/2/1, 오른쪽1번은1/2/3으로 겹친다. 강조 해제는 기본 열 순서로 돌아간다. 전체364개·타입·웹 빌드와393/551px 실제 호버·551px 키보드/해제 복원·빈 곳 접기를 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-25-reorder-fan-stack-on-highlight/tasks.md) · [검증 기록](changes/archive/2026-11-25-reorder-fan-stack-on-highlight/verification.md).
+
+### 2026-11-25 큰 화면 기록 영역과 카드 확대
+
+1024px 이상에서 기록 최대 폭1000px, 카드 약190~200px와 비례 이미지/높이·제목14~15px로 확대했다. 두 열과 기존 호버를 유지하고1024px 미만은 기존 크기/모바일 동작을 유지한다. 전체364개·타입·웹 빌드와393/1023/1024/1280/1440px 실제 크기·큰 화면 바깥 카드 호버의 잘림/이웃 카드 겹침 없음·모바일 제자리 펼침/빈 곳 접기를 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
+
+[완료 태스크](changes/archive/2026-11-25-enlarge-record-fan-on-wide-screens/tasks.md) · [검증 기록](changes/archive/2026-11-25-enlarge-record-fan-on-wide-screens/verification.md).

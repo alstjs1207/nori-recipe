@@ -371,11 +371,14 @@
             "src/db/queries.ts",
             "app/(main)/record.web.tsx",
             "app/(main)/record.tsx",
-            "public/web.css"
+            "public/web.css",
+            "src/components/web/CompletedPlayFan.web.tsx",
+            "src/animations/fanSpring.ts"
           ],
           "tests": [
             "src/store/homeRecommendationRound.test.ts",
-            "tests/web-home-round.test.mjs"
+            "tests/web-home-round.test.mjs",
+            "src/animations/fanSpring.test.ts"
           ],
           "anchors": [
             {
@@ -385,6 +388,34 @@
             {
               "path": "app/(main)/record.web.tsx",
               "contains": "완성한 묶음 전체 보기"
+            },
+            {
+              "path": "src/components/web/CompletedPlayFan.web.tsx",
+              "contains": "CompletedPlayFan"
+            },
+            {
+              "path": "public/web.css",
+              "contains": "completed-recent-bundles"
+            },
+            {
+              "path": "public/web.css",
+              "contains": "--fan-local-anchor"
+            },
+            {
+              "path": "src/animations/fanSpring.ts",
+              "contains": "getAnchoredFanPose"
+            },
+            {
+              "path": "app/(main)/record.web.tsx",
+              "contains": "dismissOnBlankClick"
+            },
+            {
+              "path": "src/animations/fanSpring.ts",
+              "contains": "getFanStackLayer"
+            },
+            {
+              "path": "public/web.css",
+              "contains": "--fan-max-fit"
             }
           ]
         }
@@ -1242,10 +1273,13 @@
             "scripts/toss/config.mjs",
             "scripts/toss/check.mjs",
             "scripts/toss/output.mjs",
-            "docs/toss-miniapp.md"
+            "docs/toss-miniapp.md",
+            "babel.config.js",
+            "scripts/toss/babel-static-web.cjs"
           ],
           "tests": [
-            "tests/toss-build.test.mjs"
+            "tests/toss-build.test.mjs",
+            "tests/toss-static-web.test.mjs"
           ],
           "anchors": [
             {
@@ -1255,6 +1289,14 @@
             {
               "path": "scripts/toss/output.mjs",
               "contains": "publishTossBuild"
+            },
+            {
+              "path": "scripts/toss/check.mjs",
+              "contains": "assertNoDynamicCode"
+            },
+            {
+              "path": "scripts/toss/babel-static-web.cjs",
+              "contains": "toss-static-web"
             }
           ]
         },
