@@ -1,0 +1,24 @@
+{
+  "mode": "Toss CSS simulation",
+  "viewport": 320,
+  "safe": {
+    "left": 12,
+    "right": 16,
+    "bottom": 34
+  },
+  "bar": {
+    "x": 12,
+    "y": 680,
+    "width": 292,
+    "height": 66,
+    "top": 680,
+    "right": 304,
+    "bottom": 746,
+    "left": 12
+  },
+  "bottomGap": 34,
+  "minTouchWidth": 45.140625,
+  "minTouchHeight": 56,
+  "overflow": false,
+  "documentWidth": 320
+}

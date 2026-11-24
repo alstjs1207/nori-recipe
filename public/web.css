@@ -151,6 +151,84 @@ input[type="radio"] {
   display: none;
   flex-shrink: 0;
 }
+.nori-bottom-bar {
+  position: relative;
+  align-items: center;
+  gap: 4px;
+  width: calc(100% - 24px);
+  min-width: min(100%, 296px);
+  max-width: 420px;
+  min-height: 66px;
+  margin: 8px auto max(12px, var(--safe-bottom));
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  background: white;
+  box-shadow: 0 4px 24px #312a5010;
+}
+.nori-bottom-bar .bottom-bar-link {
+  position: relative;
+  z-index: 1;
+  flex: 1 0 auto;
+  justify-content: center;
+  gap: 0;
+  min-width: 44px;
+  height: 56px;
+  padding: 0 11px;
+  border-radius: 25px;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  transition: color 250ms;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-bar-link:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: -2px;
+}
+.bottom-bar-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  will-change: transform;
+}
+.bottom-bar-icon > svg,
+.bottom-bar-icon .nori-flower-icon {
+  width: 22px;
+  height: 22px;
+}
+.bottom-bar-label {
+  display: block;
+  box-sizing: border-box;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+.bottom-bar-label-text {
+  display: block;
+  width: max-content;
+}
+.bottom-bar-link[aria-current="page"] .bottom-bar-label {
+  width: auto;
+  padding-left: 8px;
+  opacity: 1;
+}
+.bottom-bar-highlight {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  height: 44px;
+  width: 0;
+  border-radius: 25px;
+  background: var(--lavender);
+  pointer-events: none;
+  will-change: transform, width;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nori-bottom-bar .bottom-bar-link { transition: none; }
+}
 .nori-flower-icon {
   display: inline-flex;
   width: 24px;
@@ -2545,30 +2623,10 @@ fieldset {
     display: none;
   }
   .nori-nav-bottom {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    border-top: 1px solid var(--line);
-    padding: 8px 10px calc(8px + var(--safe-bottom));
-    background: #fffffffa;
-    min-height: 73px;
+    display: flex;
   }
   .web-shell:has(> .nori-nav-bottom) .nori-scroll-page {
     padding-bottom: 0;
-  }
-  .nori-nav-bottom a {
-    flex-direction: column;
-    justify-content: center;
-    gap: 3px;
-    padding: 2px 0;
-    font-size: 11px;
-    line-height: 15px;
-    min-width: 0;
-    min-height: 56px;
-    white-space: nowrap;
-  }
-  .nori-nav-bottom .nav-icon {
-    width: min(100%, 56px);
-    padding: 4px 0;
   }
   .nav-icon {
     display: grid;

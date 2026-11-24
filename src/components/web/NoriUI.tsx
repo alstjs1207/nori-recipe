@@ -1,6 +1,7 @@
 import { useScreenEntry } from "@/navigation/useScreenEntry";
 import { screenEntries } from "@/navigation/entries";
 import { CompletionStamp } from "./CompletionStamp";
+import { AnimatedBottomBar } from "./AnimatedBottomBar.web";
 import { PlayImage } from "@/components/web/PlayImage.web";
 import { AppLink as Link } from "@/navigation/AppLink";
 import { useNavigation, usePathname } from "expo-router";
@@ -206,14 +207,24 @@ export function WebNavigation({
     { href: "/record", label: "기록", icon: "chart" },
     { href: "/mypage", label: "마이", icon: "person" },
   ] as const;
+  const activeIndex = items.findIndex(item =>
+    item.href === "/" ? pathname === "/" || pathname === "/start"
+    : item.href === "/mypage" ? pathname === "/mypage" || pathname === "/settings"
+    : item.href === "/record" ? pathname === "/record" || pathname === "/history"
+    : pathname === item.href,
+  );
+  if (placement === "bottom") {
+    return <AnimatedBottomBar activeIndex={activeIndex} items={items.map((item, index) => ({
+      href: item.href,
+      label: item.label,
+      ariaLabel: item.href === "/mypage" ? "마이페이지" : item.label,
+      icon: <Icon name={item.icon} filled={index === activeIndex && item.icon === "bookmark"} />,
+    }))} />;
+  }
   return (
     <nav className={`nori-nav nori-nav-${placement}`} aria-label="주 메뉴">
-      {items.map((item) => {
-        const active =
-          item.href === "/" ? pathname === "/" || pathname === "/start"
-          : item.href === "/mypage" ? pathname === "/mypage" || pathname === "/settings"
-          : item.href === "/record" ? pathname === "/record" || pathname === "/history"
-          : pathname === item.href;
+      {items.map((item, index) => {
+        const active = index === activeIndex;
         return (
           <Link
             key={item.href}

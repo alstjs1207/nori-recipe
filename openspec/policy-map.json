@@ -1028,28 +1028,36 @@
         },
         {
           "id": "WEB-006",
-          "verification": "source-reviewed",
+          "verification": "automated",
           "sources": [
             "src/components/web/WebShell.web.tsx",
             "src/components/web/NoriUI.tsx",
             "src/components/web/HomeRedesign.tsx",
             "public/web.css",
             "app/(main)/_layout.tsx",
-            "app/(main)/index.tsx"
+            "app/(main)/index.tsx",
+            "src/components/web/AnimatedBottomBar.web.tsx",
+            "src/animations/bottomBarSpring.ts"
           ],
-          "tests": [],
+          "tests": [
+            "src/animations/bottomBarSpring.test.ts"
+          ],
           "anchors": [
             {
               "path": "src/components/web/NoriUI.tsx",
               "contains": "href: \"/mypage\", label: \"마이\""
             },
             {
-              "path": "public/web.css",
-              "contains": "grid-template-columns: repeat(5, minmax(0, 1fr));"
-            },
-            {
               "path": "src/components/web/HomeRedesign.tsx",
               "contains": "home-age-summary"
+            },
+            {
+              "path": "src/components/web/AnimatedBottomBar.web.tsx",
+              "contains": "bottom-bar-highlight"
+            },
+            {
+              "path": "src/animations/bottomBarSpring.ts",
+              "contains": "spring(1, 520, 14)"
             }
           ]
         }
@@ -1200,11 +1208,14 @@
             "src/platform/devtools.ts",
             "src/platform/devtools.preview.ts",
             "src/components/web/NoriUI.tsx",
-            "app/(main)/settings.web.tsx"
+            "app/(main)/settings.web.tsx",
+            "src/components/web/AnimatedBottomBar.web.tsx",
+            "src/animations/bottomBarSpring.ts"
           ],
           "tests": [
             "src/platform/toss-runtime.test.ts",
-            "tests/toss-build.test.mjs"
+            "tests/toss-build.test.mjs",
+            "src/animations/bottomBarSpring.test.ts"
           ],
           "anchors": [
             {
@@ -1217,11 +1228,15 @@
             },
             {
               "path": "public/toss.css",
-              "contains": "grid-template-columns: repeat(5, minmax(0, 1fr))"
+              "contains": "--safe-top: 0px"
             },
             {
-              "path": "public/toss.css",
-              "contains": "--safe-top: 0px"
+              "path": "src/components/web/AnimatedBottomBar.web.tsx",
+              "contains": "bottom-bar-highlight"
+            },
+            {
+              "path": "src/animations/bottomBarSpring.ts",
+              "contains": "spring(1, 520, 14)"
             }
           ]
         },

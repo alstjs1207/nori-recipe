@@ -227,3 +227,10 @@ REC-004의 전체3개 완료 후 다음 추천은 직전3개를 제외한 적격
 1024px 이상에서 기록 최대 폭1000px, 카드 약190~200px와 비례 이미지/높이·제목14~15px로 확대했다. 두 열과 기존 호버를 유지하고1024px 미만은 기존 크기/모바일 동작을 유지한다. 전체364개·타입·웹 빌드와393/1023/1024/1280/1440px 실제 크기·큰 화면 바깥 카드 호버의 잘림/이웃 카드 겹침 없음·모바일 제자리 펼침/빈 곳 접기를 확인했다. preview 로컬 변경이며 커밋·푸시·배포·토스 파일 재생성은 하지 않았다.
 
 [완료 태스크](changes/archive/2026-11-25-enlarge-record-fan-on-wide-screens/tasks.md) · [검증 기록](changes/archive/2026-11-25-enlarge-record-fan-on-wide-screens/verification.md).
+
+
+### 2026-11-25 하단 메뉴 Bottom bar 모션
+
+기존 웹 모바일/PWA·토스 하단의 발견·탐색·저장·기록·마이를 React Bottom bar로 재구성했다. 선택 라벨 확장·라벤더 강조 배경 추적·아이콘 팝은 원본의300/26·340/28·520/14 스프링과4회 적분을 사용한다. 실제 AppLink·경로 별칭·뒤로/앞으로·재선택 스크롤·상세 숨김·접근성 이름을 유지하고 reduced-motion에서는 즉시 전환한다. 320px에서 좌우/하단 안전 영역을 적용해도44×56px 이상 터치 영역을 보존하며 큰 화면의 기존 헤더는 유지한다.
+
+`pnpm verify:local`370개 회귀·타입·웹 빌드, 마지막 CSS 보완 뒤 웹 빌드 및 실제 브라우저 검증, spec:changed HEAD/spec:check/diff 검사를 통과했다. 현재 localhost:8081에서 확인했으며 직접 실행한4329 QA 서버와 브라우저 공간은 정리했다. 원본 preview checkout을 사용했으며 커밋·푸시·배포는 이번 요청 범위에 포함되지 않았다. 토스 안전 여백은 CSS 모의 검증이며 새 .ait/QR·실기기 검증과 구분한다. [변경·검증 근거](changes/archive/2026-11-25-add-animated-bottom-bar/verification.md).

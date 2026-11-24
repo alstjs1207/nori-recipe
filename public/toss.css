@@ -39,33 +39,9 @@
   font-size: 14px;
 }
 .toss-shell .nori-nav-bottom {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  flex-shrink: 0;
-  align-items: center;
-  gap: 4px;
-  border: 1px solid #e8e6f0;
-  border-radius: 32px;
-  background: #fff;
-  min-height: 64px;
-  margin: 8px 20px max(12px, var(--safe-bottom));
-  padding: 8px;
-  box-shadow: 0 4px 24px #312a5010;
-}
-.toss-shell .nori-nav-bottom a {
-  flex: 1;
-  min-width: 0;
-  min-height: 56px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  font-size: 11px;
 }
 .toss-shell:has(> .nori-nav-bottom) .nori-scroll-page { padding-bottom: 0; }
-@media (max-width: 380px) {
-  .toss-shell .nori-nav-bottom { margin-left: 12px; margin-right: 12px; }
-}
 
 @media (max-width: 360px) {
   .toss-shell .toss-brand-toolbar { padding-left: 16px; padding-right: 16px; }
