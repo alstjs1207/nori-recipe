@@ -1060,6 +1060,37 @@
               "contains": "spring(1, 520, 14)"
             }
           ]
+        },
+        {
+          "id": "WEB-007",
+          "verification": "automated",
+          "sources": [
+            "src/components/web/NoriUI.tsx",
+            "src/components/web/BookmarkBurstIcon.tsx",
+            "src/animations/bookmarkBurst.ts",
+            "public/web.css"
+          ],
+          "tests": [
+            "src/animations/bookmarkBurst.test.ts"
+          ],
+          "anchors": [
+            {
+              "path": "src/animations/bookmarkBurst.ts",
+              "contains": "spring(1, 520, 13)"
+            },
+            {
+              "path": "src/components/web/BookmarkBurstIcon.tsx",
+              "contains": "requested.current"
+            },
+            {
+              "path": "public/web.css",
+              "contains": ".bookmark-burst-icon"
+            },
+            {
+              "path": "public/web.css",
+              "contains": ".bookmark-burst i:nth-child(7) { background: #ff6ad5; }"
+            }
+          ]
         }
       ]
     },

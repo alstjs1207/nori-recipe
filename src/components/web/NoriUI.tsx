@@ -2,6 +2,7 @@ import { useScreenEntry } from "@/navigation/useScreenEntry";
 import { screenEntries } from "@/navigation/entries";
 import { CompletionStamp } from "./CompletionStamp";
 import { AnimatedBottomBar } from "./AnimatedBottomBar.web";
+import { BookmarkBurstIcon } from "./BookmarkBurstIcon";
 import { PlayImage } from "@/components/web/PlayImage.web";
 import { AppLink as Link } from "@/navigation/AppLink";
 import { useNavigation, usePathname } from "expo-router";
@@ -309,6 +310,7 @@ export function BookmarkButton({
   busy?: boolean;
   onToggle: (id: string) => void;
 }) {
+  const requested = useRef(false);
   return (
     <button
       className={`icon-button bookmark-button ${saved ? "is-saved" : ""}`}
@@ -316,9 +318,11 @@ export function BookmarkButton({
       aria-label={`${play.name} ${saved ? "저장 취소" : "저장"}`}
       aria-pressed={saved}
       disabled={busy}
-      onClick={() => onToggle(play.id)}
+      onClick={() => { requested.current = true; onToggle(play.id); }}
     >
-      <Icon name="bookmark" filled={saved} />
+      <BookmarkBurstIcon key={play.id} saved={saved} requested={requested}>
+        <Icon name="bookmark" filled={saved} />
+      </BookmarkBurstIcon>
     </button>
   );
 }

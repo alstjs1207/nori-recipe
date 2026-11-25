@@ -375,6 +375,39 @@ input[type="radio"] {
 .icon-button.is-saved {
   color: var(--violet);
 }
+.bookmark-burst-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+.bookmark-burst-icon svg {
+  fill: color-mix(in srgb, var(--violet) var(--bookmark-fill, 0%), transparent);
+}
+.bookmark-burst {
+  position: fixed;
+  width: 0;
+  height: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+.bookmark-burst i {
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4d6d;
+  opacity: 0;
+}
+/* Original Like burst palette; the bookmark itself keeps the brand violet. */
+.bookmark-burst i:nth-child(2) { background: #ff9f0a; }
+.bookmark-burst i:nth-child(3) { background: #ffd23f; }
+.bookmark-burst i:nth-child(4) { background: #34d17a; }
+.bookmark-burst i:nth-child(5) { background: #3ec9ff; }
+.bookmark-burst i:nth-child(6) { background: #c69bff; }
+.bookmark-burst i:nth-child(7) { background: #ff6ad5; }
 .section-heading {
   display: flex;
   align-items: center;

@@ -930,6 +930,18 @@
       ]
     },
     {
+      "path": "src/animations/bookmarkBurst.test.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/animations/bookmarkBurst.ts",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/animations/bottomBarSpring.test.ts",
       "domains": [
         "web-platform"
@@ -1003,6 +1015,12 @@
     },
     {
       "path": "src/components/web/BirthMonthField.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
+      "path": "src/components/web/BookmarkBurstIcon.tsx",
       "domains": [
         "web-platform"
       ]
