@@ -1,9 +1,18 @@
-export type CompletionRecord = { id: string; playId: string };
+import type { KeyValueStorage } from "./contract";
 
-export interface CompletionAd {
+export const AD_SHOWN_AT_KEY = "nori-recipe/next-round-ad-shown-at-v1";
+export const AD_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+export const AD_REQUEST_TIMEOUT_MS = 5000;
+export const AD_CLOSE_TIMEOUT_MS = 60000;
+
+export interface RecommendationAd {
   start(): () => void;
-  saved(record: CompletionRecord): void;
-  home(recommendationIds: string[], records: CompletionRecord[]): void;
+  subscribe(listener: () => void): () => void;
+  getSnapshot(): boolean;
+  beforeNext(): Promise<boolean>;
+  background(): void;
+  resume(): void;
+  reset(): Promise<void>;
 }
 
 type AdEvent = { type: string };
@@ -13,21 +22,38 @@ export interface FullScreenAdBridge {
   show(params: { options: { adGroupId: string }; onEvent(event: AdEvent): void; onError(error: unknown): void }): () => void;
 }
 
-// Only the ad group is sent to the SDK. Records are compared locally and never persisted here.
-export function createCompletionAd(bridge: FullScreenAdBridge, adGroupId: string, canShow: () => boolean): CompletionAd {
-  let active = false;
-  let ready = false;
-  let showing = false;
-  let pending: CompletionRecord | null = null;
+// Only the group goes to the SDK. The timestamp uses the runtime's user-scoped storage.
+export function createRecommendationAd(bridge: FullScreenAdBridge, adGroupId: string, canShow: () => boolean, storage: KeyValueStorage): RecommendationAd {
+  let active = false, supported = false, hydrated = false, ready = false, loading = false;
+  let generation = 0;
+  let shownAt: number | null = null;
+  let displayed = false, leftAd = false;
   let offLoad = () => {};
   let offShow = () => {};
-
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let expiry: ReturnType<typeof setTimeout> | undefined;
+  let pending: Promise<boolean> | null = null;
+  let settle: ((proceed: boolean) => void) | null = null;
+  let writes = Promise.resolve();
+  const listeners = new Set<() => void>();
+  const due = () => active && supported && hydrated && (shownAt === null || Date.now() - shownAt >= AD_COOLDOWN_MS);
+  const notify = () => { for (const listener of listeners) listener(); };
+  function scheduleExpiry() {
+    clearTimeout(expiry);
+    if (shownAt !== null) {
+      const remaining = shownAt + AD_COOLDOWN_MS - Date.now();
+      // Future timestamps (clock rollback) also suppress ads, with a bounded timer.
+      if (remaining > 0) expiry = setTimeout(() => { notify(); scheduleExpiry(); }, Math.min(remaining, AD_COOLDOWN_MS));
+    }
+    notify();
+  }
   function load() {
-    ready = false;
-    offLoad();
+    if (!active || !supported || loading || ready) return;
+    loading = true;
     let finished = false;
     let off = () => {};
-    const finish = () => { if (finished) return; finished = true; off(); };
+    const finish = () => { if (finished) return; finished = true; loading = false; off(); };
+    offLoad = finish;
     try {
       off = bridge.load({
         options: { adGroupId },
@@ -35,54 +61,96 @@ export function createCompletionAd(bridge: FullScreenAdBridge, adGroupId: string
           if (finished || !active) return;
           if (event.type === "loaded") { ready = true; finish(); }
         },
-        onError() { if (!finished) { ready = false; finish(); } },
+        onError() { finish(); },
       });
     } catch { finish(); }
-    offLoad = finish;
     if (finished) off();
   }
-
+  function finish(proceed: boolean) {
+    if (!pending) return;
+    clearTimeout(timer);
+    offShow(); offShow = () => {};
+    const resolve = settle;
+    pending = null; settle = null;
+    displayed = false; leftAd = false;
+    resolve?.(proceed);
+    // Prepare only; a late loaded event can never trigger a show.
+    if (active) load();
+  }
   return {
+    subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
+    getSnapshot: due,
     start() {
       active = true;
-      try { if (adGroupId && bridge.isSupported()) load(); } catch { /* Ads must not block the app. */ }
+      const current = ++generation;
+      hydrated = false;
+      try { supported = Boolean(adGroupId) && bridge.isSupported(); } catch { supported = false; }
+      if (supported) {
+        load();
+        void writes.then(() => storage.getItem(AD_SHOWN_AT_KEY)).then(value => {
+          if (!active || generation !== current) return;
+          const timestamp = value === null ? null : Number(value);
+          // Corrupt storage fails open for content, without risking repeated ads.
+          if (value !== null && (!value.trim() || !Number.isFinite(timestamp) || timestamp! <= 0)) return;
+          shownAt = timestamp;
+          hydrated = true;
+          scheduleExpiry();
+        }).catch(() => { /* Skip ads when their cooldown cannot be restored. */ });
+      }
+      notify();
       return () => {
-        active = false; ready = false; showing = false; pending = null;
-        offLoad(); offShow();
+        active = false; generation++;
+        ready = false; hydrated = false;
+        offLoad(); finish(false);
+        clearTimeout(expiry);
+        notify();
       };
     },
-    saved(record) { pending = { id: record.id, playId: record.playId }; },
-    home(recommendationIds, records) {
-      const saved = pending;
-      pending = null; // Consume even when unavailable; never show a late ad after navigation.
-      if (!active || !ready || showing || !saved || !canShow()) return;
-      const ids = new Set(recommendationIds);
-      if (ids.size !== 3 || recommendationIds.length !== 3 || !ids.has(saved.playId)) return;
-      if (!records.some(record => record.id === saved.id && record.playId === saved.playId)) return;
-      const before = new Set(records.filter(record => record.id !== saved.id).map(record => record.playId));
-      const after = new Set(records.map(record => record.playId));
-      if (![...ids].every(id => after.has(id)) || [...ids].every(id => before.has(id))) return;
+    beforeNext() {
+      if (pending) return pending;
+      if (!due() || !canShow()) return Promise.resolve(true);
+      if (!ready) { load(); return Promise.resolve(true); }
       ready = false;
-      showing = true;
+      pending = new Promise<boolean>(resolve => { settle = resolve; });
+      const result = pending;
       let finished = false;
       let off = () => {};
-      const finish = (next: boolean) => {
-        if (finished) return;
-        finished = true; showing = false; off();
-        if (next && active) load();
-      };
+      offShow = () => { finished = true; off(); };
+      // This advances content only; it never closes or manipulates the SDK ad.
+      // Native ad content can remain above the prepared next round.
+      timer = setTimeout(() => finish(true), AD_REQUEST_TIMEOUT_MS);
       try {
         off = bridge.show({
           options: { adGroupId },
           onEvent(event) {
-            if (event.type === "dismissed") finish(true);
-            else if (event.type === "failedToShow") finish(false);
+            if (finished || !active) return;
+            if (event.type === "show" && !displayed) {
+              displayed = true;
+              shownAt = Date.now();
+              const timestamp = shownAt;
+              writes = writes.then(() => storage.setItem(AD_SHOWN_AT_KEY, String(timestamp))).catch(() => {});
+              scheduleExpiry();
+              clearTimeout(timer);
+              timer = setTimeout(() => finish(true), AD_CLOSE_TIMEOUT_MS);
+            } else if (event.type === "dismissed" || event.type === "failedToShow") finish(true);
           },
-          onError() { finish(false); },
+          onError() { if (!finished) finish(true); },
         });
-      } catch { finish(false); }
-      offShow = () => finish(false);
+      } catch { finish(true); }
       if (finished) off();
+      return result;
+    },
+    background() { if (pending && displayed) leftAd = true; },
+    resume() { if (pending && displayed && leftAd && canShow()) finish(true); },
+    async reset() {
+      generation++;
+      hydrated = false;
+      finish(false);
+      await writes;
+      await storage.removeItem(AD_SHOWN_AT_KEY);
+      shownAt = null;
+      hydrated = supported;
+      scheduleExpiry();
     },
   };
 }

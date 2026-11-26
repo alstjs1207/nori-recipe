@@ -1,0 +1,26 @@
+{
+  "environment": "isolated markup from NextRoundStart with actual web.css and toss.css; no SDK",
+  "results": [
+    {
+      "width": "320",
+      "title": "광고 안내",
+      "border": "0px",
+      "gap": 24,
+      "dialogWidth": 288
+    },
+    {
+      "width": "393",
+      "title": "광고 안내",
+      "border": "0px",
+      "gap": 24,
+      "dialogWidth": 361
+    },
+    {
+      "width": "430",
+      "title": "광고 안내",
+      "border": "0px",
+      "gap": 24,
+      "dialogWidth": 398
+    }
+  ]
+}

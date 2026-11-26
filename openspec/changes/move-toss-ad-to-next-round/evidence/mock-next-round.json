@@ -1,0 +1,173 @@
+{
+  "environment": "localhost:4219 official Devtools3.10.0; no real ads",
+  "firstRound": {
+    "ids": [
+      "play_162",
+      "play_107",
+      "play_016"
+    ],
+    "completed": 3,
+    "showOnCompletion": 0,
+    "showOnPickerOpen": 0,
+    "showOnNextStart": 1
+  },
+  "secondCompleted": {
+    "notice": false,
+    "shows": 0,
+    "round": {
+      "version": 1,
+      "id": "b04a7bee-7e78-41f5-89b2-cfb571b4f4f5",
+      "guestId": "9a65898a-7d89-45a8-a66c-3981ae3372bb",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_020",
+        "play_218",
+        "play_145"
+      ],
+      "records": [
+        {
+          "id": "ad8579db-4c27-4b5a-9b6d-08c4bd447317",
+          "playId": "play_020"
+        },
+        {
+          "id": "90f27bd2-c63d-4472-b4e3-4cd65eb81843",
+          "playId": "play_218"
+        },
+        {
+          "id": "b88eeffe-c6ad-43b6-be1a-b0e6b34585d6",
+          "playId": "play_145"
+        }
+      ],
+      "revision": 1,
+      "archives": [
+        {
+          "id": "00bbadac-836d-4b7e-9130-e64ce3e0c077",
+          "ids": [
+            "play_162",
+            "play_107",
+            "play_016"
+          ],
+          "records": [
+            {
+              "id": "afb635cd-39ad-4964-926f-7a1c249bdeea",
+              "playId": "play_162"
+            },
+            {
+              "id": "f5aeccbf-23fe-4285-8390-5d406ccf9f51",
+              "playId": "play_107"
+            },
+            {
+              "id": "2716d147-d905-4390-91ff-4e99c942f0be",
+              "playId": "play_016"
+            }
+          ]
+        },
+        {
+          "id": "b04a7bee-7e78-41f5-89b2-cfb571b4f4f5",
+          "ids": [
+            "play_020",
+            "play_218",
+            "play_145"
+          ],
+          "records": [
+            {
+              "id": "ad8579db-4c27-4b5a-9b6d-08c4bd447317",
+              "playId": "play_020"
+            },
+            {
+              "id": "90f27bd2-c63d-4472-b4e3-4cd65eb81843",
+              "playId": "play_218"
+            },
+            {
+              "id": "b88eeffe-c6ad-43b6-be1a-b0e6b34585d6",
+              "playId": "play_145"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon"
+        ],
+        "confirmation": null
+      }
+    },
+    "logs": 6
+  },
+  "retryAndDoubleClick": {
+    "challenge": " 이번 놀이 도전놀이 3개, 함께해봐요0 / 3",
+    "shows": 0,
+    "round": {
+      "version": 1,
+      "id": "85c620c3-5937-4699-ba26-19302b837312",
+      "guestId": "9a65898a-7d89-45a8-a66c-3981ae3372bb",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_162",
+        "play_107",
+        "play_016"
+      ],
+      "records": [],
+      "revision": 2,
+      "archives": [
+        {
+          "id": "00bbadac-836d-4b7e-9130-e64ce3e0c077",
+          "ids": [
+            "play_162",
+            "play_107",
+            "play_016"
+          ],
+          "records": [
+            {
+              "id": "afb635cd-39ad-4964-926f-7a1c249bdeea",
+              "playId": "play_162"
+            },
+            {
+              "id": "f5aeccbf-23fe-4285-8390-5d406ccf9f51",
+              "playId": "play_107"
+            },
+            {
+              "id": "2716d147-d905-4390-91ff-4e99c942f0be",
+              "playId": "play_016"
+            }
+          ]
+        },
+        {
+          "id": "b04a7bee-7e78-41f5-89b2-cfb571b4f4f5",
+          "ids": [
+            "play_020",
+            "play_218",
+            "play_145"
+          ],
+          "records": [
+            {
+              "id": "ad8579db-4c27-4b5a-9b6d-08c4bd447317",
+              "playId": "play_020"
+            },
+            {
+              "id": "90f27bd2-c63d-4472-b4e3-4cd65eb81843",
+              "playId": "play_218"
+            },
+            {
+              "id": "b88eeffe-c6ad-43b6-be1a-b0e6b34585d6",
+              "playId": "play_145"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon"
+        ],
+        "confirmation": null
+      }
+    },
+    "logs": 6
+  }
+}

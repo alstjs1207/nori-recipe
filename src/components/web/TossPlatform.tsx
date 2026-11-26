@@ -10,7 +10,7 @@ export function TossPlatform() {
   currentPath.current = path;
   const [error, setError] = useState(false);
   const [checking, setChecking] = useState(false);
-  useEffect(() => appRuntime.completionAd?.start(), []);
+  useEffect(() => appRuntime.recommendationAd?.start(), []);
   useEffect(() => {
     if (appRuntime.target !== "toss") return;
     const failed = () => setError(true);
@@ -44,19 +44,26 @@ export function TossPlatform() {
       const current = ++revision;
       document.documentElement.classList.add("toss-checking-user");
       setChecking(true);
-      if (document.visibilityState !== "visible") return;
+      if (document.visibilityState !== "visible") { appRuntime.recommendationAd?.background(); return; }
       const valid = await appRuntime.checkIdentity?.();
       if (current !== revision || document.visibilityState !== "visible") return;
       if (!valid) { window.location.reload(); return; }
       document.documentElement.classList.remove("toss-checking-user");
       setChecking(false);
+      appRuntime.recommendationAd?.resume();
     };
+    const onBlur = () => appRuntime.recommendationAd?.background();
+    const onFocus = () => appRuntime.recommendationAd?.resume();
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", checkUser);
     return () => {
       revision++;
       document.documentElement.classList.remove("toss-checking-user");
       offNavigation?.(); offInsets?.();
       document.removeEventListener("visibilitychange", checkUser);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("focus", onFocus);
       for (const edge of ["top", "bottom", "left", "right"]) document.documentElement.style.removeProperty(`--toss-safe-${edge}`);
     };
   }, []);

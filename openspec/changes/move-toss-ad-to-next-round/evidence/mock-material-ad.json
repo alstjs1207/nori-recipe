@@ -1,0 +1,1406 @@
+[
+  {
+    "step": "0/3-material-save",
+    "challenge": " 이번 놀이 도전놀이 3개, 함께해봐요0 / 3",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [],
+      "revision": 1,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    },
+    "shows": 0,
+    "dialogs": 0
+  },
+  {
+    "step": "1/3-material-save",
+    "challenge": " 이번 놀이 도전첫 놀이를 함께했어요1 / 3",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+          "playId": "play_218"
+        }
+      ],
+      "revision": 2,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon"
+        ],
+        "confirmation": null
+      }
+    },
+    "shows": 0,
+    "dialogs": 0
+  },
+  {
+    "step": "2/3-material-save",
+    "challenge": " 이번 놀이 도전남은 한 놀이도 함께해요2 / 3",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+          "playId": "play_162"
+        },
+        {
+          "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+          "playId": "play_218"
+        }
+      ],
+      "revision": 3,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    },
+    "shows": 0,
+    "dialogs": 0
+  },
+  {
+    "step": "3/3-completion",
+    "challenge": " 이번 놀이 도전세 가지 놀이 완성!3 / 3완성한 놀이 보기 ",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+          "playId": "play_162"
+        },
+        {
+          "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+          "playId": "play_218"
+        },
+        {
+          "id": "763e4934-8b91-45a6-a077-748193b42ade",
+          "playId": "play_107"
+        }
+      ],
+      "revision": 3,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      },
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ]
+    },
+    "shows": 0,
+    "dialogs": 0
+  },
+  {
+    "step": "material-ad-cancel",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+          "playId": "play_162"
+        },
+        {
+          "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+          "playId": "play_218"
+        },
+        {
+          "id": "763e4934-8b91-45a6-a077-748193b42ade",
+          "playId": "play_107"
+        }
+      ],
+      "revision": 3,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      },
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ]
+    },
+    "draftTape": true,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog material-picker"
+    ]
+  },
+  {
+    "step": "material-ad-back",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+          "playId": "play_162"
+        },
+        {
+          "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+          "playId": "play_218"
+        },
+        {
+          "id": "763e4934-8b91-45a6-a077-748193b42ade",
+          "playId": "play_107"
+        }
+      ],
+      "revision": 3,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      },
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ]
+    },
+    "draftTape": true,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog material-picker"
+    ]
+  },
+  {
+    "step": "material-ad-escape",
+    "round": {
+      "version": 1,
+      "id": "7d813725-575d-4197-b059-208e8f41094b",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+          "playId": "play_162"
+        },
+        {
+          "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+          "playId": "play_218"
+        },
+        {
+          "id": "763e4934-8b91-45a6-a077-748193b42ade",
+          "playId": "play_107"
+        }
+      ],
+      "revision": 3,
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      },
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ]
+    },
+    "draftTape": true,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog material-picker"
+    ]
+  },
+  {
+    "step": "material-ad-confirm-twice",
+    "round": {
+      "version": 1,
+      "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\",\"tape\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_016",
+        "play_219",
+        "play_020"
+      ],
+      "records": [],
+      "revision": 4,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker",
+          "tape"
+        ],
+        "confirmation": null
+      }
+    },
+    "shows": 1,
+    "dialogs": []
+  },
+  {
+    "step": "settings-material-before-confirm",
+    "path": "/settings",
+    "round": {
+      "version": 1,
+      "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\",\"tape\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_016",
+        "play_219",
+        "play_020"
+      ],
+      "records": [
+        {
+          "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+          "playId": "play_016"
+        },
+        {
+          "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+          "playId": "play_219"
+        },
+        {
+          "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+          "playId": "play_020"
+        }
+      ],
+      "revision": 4,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker",
+          "tape"
+        ],
+        "confirmation": null
+      }
+    },
+    "userContext": "{\"2371ec75-921d-42e9-bb3d-c4ed60d8f480\":{\"childBirthMonth\":24291,\"ownedMaterials\":[],\"blockedMaterials\":[],\"preferredDevAreas\":[],\"devGaps\":{},\"userFeedback\":{\"fine_motor\":100,\"cognitive\":90,\"social\":70,\"emotional\":70}}}",
+    "draftTape": false,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog next-round-ad-dialog"
+    ]
+  },
+  {
+    "step": "settings-material-cancel",
+    "path": "/settings",
+    "round": {
+      "version": 1,
+      "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\",\"tape\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_016",
+        "play_219",
+        "play_020"
+      ],
+      "records": [
+        {
+          "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+          "playId": "play_016"
+        },
+        {
+          "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+          "playId": "play_219"
+        },
+        {
+          "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+          "playId": "play_020"
+        }
+      ],
+      "revision": 4,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker",
+          "tape"
+        ],
+        "confirmation": null
+      }
+    },
+    "userContext": "{\"2371ec75-921d-42e9-bb3d-c4ed60d8f480\":{\"childBirthMonth\":24291,\"ownedMaterials\":[],\"blockedMaterials\":[],\"preferredDevAreas\":[],\"devGaps\":{},\"userFeedback\":{\"fine_motor\":100,\"cognitive\":90,\"social\":70,\"emotional\":70}}}",
+    "draftTape": false,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog material-picker"
+    ]
+  },
+  {
+    "step": "settings-material-back",
+    "path": "/settings",
+    "round": {
+      "version": 1,
+      "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\",\"tape\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_016",
+        "play_219",
+        "play_020"
+      ],
+      "records": [
+        {
+          "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+          "playId": "play_016"
+        },
+        {
+          "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+          "playId": "play_219"
+        },
+        {
+          "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+          "playId": "play_020"
+        }
+      ],
+      "revision": 4,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker",
+          "tape"
+        ],
+        "confirmation": null
+      }
+    },
+    "userContext": "{\"2371ec75-921d-42e9-bb3d-c4ed60d8f480\":{\"childBirthMonth\":24291,\"ownedMaterials\":[],\"blockedMaterials\":[],\"preferredDevAreas\":[],\"devGaps\":{},\"userFeedback\":{\"fine_motor\":100,\"cognitive\":90,\"social\":70,\"emotional\":70}}}",
+    "draftTape": false,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog material-picker"
+    ]
+  },
+  {
+    "step": "settings-material-confirm-twice",
+    "path": "/settings",
+    "round": {
+      "version": 1,
+      "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [],
+      "revision": 1,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    },
+    "userContext": "{\"2371ec75-921d-42e9-bb3d-c4ed60d8f480\":{\"childBirthMonth\":24291,\"ownedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"preferredDevAreas\":[],\"devGaps\":{},\"userFeedback\":{\"fine_motor\":100,\"cognitive\":90,\"social\":70,\"emotional\":70}}}",
+    "shows": 1,
+    "dialogs": []
+  },
+  {
+    "step": "home-material-write-failure-within-24h",
+    "round": {
+      "version": 1,
+      "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "17704013-1cf6-41a9-a797-104524e7866a",
+          "playId": "play_218"
+        },
+        {
+          "id": "4a285016-4190-4908-9682-8761e4c3afcd",
+          "playId": "play_162"
+        },
+        {
+          "id": "1fa7c3fe-f312-4e77-a24f-4b79302f358b",
+          "playId": "play_107"
+        }
+      ],
+      "revision": 1,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        },
+        {
+          "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "17704013-1cf6-41a9-a797-104524e7866a",
+              "playId": "play_218"
+            },
+            {
+              "id": "4a285016-4190-4908-9682-8761e4c3afcd",
+              "playId": "play_162"
+            },
+            {
+              "id": "1fa7c3fe-f312-4e77-a24f-4b79302f358b",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    },
+    "draftTape": true,
+    "shows": 0,
+    "dialogs": [
+      "nori-dialog material-picker"
+    ],
+    "error": "재료를 저장하지 못했어요. 다시 시도해 주세요.",
+    "logs": 9
+  },
+  {
+    "step": "home-material-retry-within-24h",
+    "round": {
+      "version": 1,
+      "id": "108025ca-a1c2-4b68-99f8-490c05c30c13",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\",\"tape\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_016",
+        "play_219",
+        "play_145"
+      ],
+      "records": [],
+      "revision": 2,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        },
+        {
+          "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "17704013-1cf6-41a9-a797-104524e7866a",
+              "playId": "play_218"
+            },
+            {
+              "id": "4a285016-4190-4908-9682-8761e4c3afcd",
+              "playId": "play_162"
+            },
+            {
+              "id": "1fa7c3fe-f312-4e77-a24f-4b79302f358b",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker",
+          "tape"
+        ],
+        "confirmation": null
+      }
+    },
+    "shows": 0,
+    "dialogs": [],
+    "logs": 9
+  },
+  {
+    "step": "settings-material-within-24h",
+    "round": {
+      "version": 1,
+      "id": "74eb274d-15bc-4257-9259-cf4c6be2a5d0",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [],
+      "revision": 3,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        },
+        {
+          "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "17704013-1cf6-41a9-a797-104524e7866a",
+              "playId": "play_218"
+            },
+            {
+              "id": "4a285016-4190-4908-9682-8761e4c3afcd",
+              "playId": "play_162"
+            },
+            {
+              "id": "1fa7c3fe-f312-4e77-a24f-4b79302f358b",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "108025ca-a1c2-4b68-99f8-490c05c30c13",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_145"
+          ],
+          "records": [
+            {
+              "id": "a89261f7-ff22-41b8-afff-38e33477a7eb",
+              "playId": "play_016"
+            },
+            {
+              "id": "25d37f5f-3300-4e4d-aa89-09663eee9198",
+              "playId": "play_219"
+            },
+            {
+              "id": "178be87c-35fd-4ace-922b-c0100e0da717",
+              "playId": "play_145"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    },
+    "shows": 0,
+    "dialogs": [],
+    "logs": 12
+  },
+  {
+    "step": "navigate-home-during-settings-confirmation",
+    "path": "/",
+    "dialogs": 0,
+    "shows": 0,
+    "round": {
+      "version": 1,
+      "id": "74eb274d-15bc-4257-9259-cf4c6be2a5d0",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_218",
+        "play_162",
+        "play_107"
+      ],
+      "records": [
+        {
+          "id": "0013b830-86bd-4832-ae57-bf9c8f8f4dd3",
+          "playId": "play_218"
+        },
+        {
+          "id": "114afe39-20e3-4263-ae1d-9c7165a0fb28",
+          "playId": "play_162"
+        },
+        {
+          "id": "691223df-a4d7-4339-89ec-8d3c8480d226",
+          "playId": "play_107"
+        }
+      ],
+      "revision": 3,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        },
+        {
+          "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "17704013-1cf6-41a9-a797-104524e7866a",
+              "playId": "play_218"
+            },
+            {
+              "id": "4a285016-4190-4908-9682-8761e4c3afcd",
+              "playId": "play_162"
+            },
+            {
+              "id": "1fa7c3fe-f312-4e77-a24f-4b79302f358b",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "108025ca-a1c2-4b68-99f8-490c05c30c13",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_145"
+          ],
+          "records": [
+            {
+              "id": "a89261f7-ff22-41b8-afff-38e33477a7eb",
+              "playId": "play_016"
+            },
+            {
+              "id": "25d37f5f-3300-4e4d-aa89-09663eee9198",
+              "playId": "play_219"
+            },
+            {
+              "id": "178be87c-35fd-4ace-922b-c0100e0da717",
+              "playId": "play_145"
+            }
+          ]
+        },
+        {
+          "id": "74eb274d-15bc-4257-9259-cf4c6be2a5d0",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "0013b830-86bd-4832-ae57-bf9c8f8f4dd3",
+              "playId": "play_218"
+            },
+            {
+              "id": "114afe39-20e3-4263-ae1d-9c7165a0fb28",
+              "playId": "play_162"
+            },
+            {
+              "id": "691223df-a4d7-4339-89ec-8d3c8480d226",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    }
+  },
+  {
+    "step": "home-button-shared-gate-regression",
+    "path": "/",
+    "dialogs": 0,
+    "shows": 1,
+    "round": {
+      "version": 1,
+      "id": "dd1bbfe1-78e0-4460-b830-68d949dab352",
+      "guestId": "2371ec75-921d-42e9-bb3d-c4ed60d8f480",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\",\"sticker\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_016",
+        "play_219",
+        "play_020"
+      ],
+      "records": [],
+      "revision": 4,
+      "archives": [
+        {
+          "id": "7d813725-575d-4197-b059-208e8f41094b",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "121fc09c-4157-4641-8102-36f4fd1890ac",
+              "playId": "play_162"
+            },
+            {
+              "id": "2e87b3f9-581a-4da9-9fa6-c8756bd71754",
+              "playId": "play_218"
+            },
+            {
+              "id": "763e4934-8b91-45a6-a077-748193b42ade",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "a3aa688a-fbdd-49b4-84e7-09b6a8de7ee0",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_020"
+          ],
+          "records": [
+            {
+              "id": "02aada3e-c8b5-4b82-8ecd-bb5f801938c3",
+              "playId": "play_016"
+            },
+            {
+              "id": "f547df1b-bf05-4a61-b94e-7d843fc54d55",
+              "playId": "play_219"
+            },
+            {
+              "id": "8677e240-95a9-4ef0-a87f-3891bedad01b",
+              "playId": "play_020"
+            }
+          ]
+        },
+        {
+          "id": "e4238137-5161-4d61-9aec-2e6ee39ad422",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "17704013-1cf6-41a9-a797-104524e7866a",
+              "playId": "play_218"
+            },
+            {
+              "id": "4a285016-4190-4908-9682-8761e4c3afcd",
+              "playId": "play_162"
+            },
+            {
+              "id": "1fa7c3fe-f312-4e77-a24f-4b79302f358b",
+              "playId": "play_107"
+            }
+          ]
+        },
+        {
+          "id": "108025ca-a1c2-4b68-99f8-490c05c30c13",
+          "ids": [
+            "play_016",
+            "play_219",
+            "play_145"
+          ],
+          "records": [
+            {
+              "id": "a89261f7-ff22-41b8-afff-38e33477a7eb",
+              "playId": "play_016"
+            },
+            {
+              "id": "25d37f5f-3300-4e4d-aa89-09663eee9198",
+              "playId": "play_219"
+            },
+            {
+              "id": "178be87c-35fd-4ace-922b-c0100e0da717",
+              "playId": "play_145"
+            }
+          ]
+        },
+        {
+          "id": "74eb274d-15bc-4257-9259-cf4c6be2a5d0",
+          "ids": [
+            "play_218",
+            "play_162",
+            "play_107"
+          ],
+          "records": [
+            {
+              "id": "0013b830-86bd-4832-ae57-bf9c8f8f4dd3",
+              "playId": "play_218"
+            },
+            {
+              "id": "114afe39-20e3-4263-ae1d-9c7165a0fb28",
+              "playId": "play_162"
+            },
+            {
+              "id": "691223df-a4d7-4339-89ec-8d3c8480d226",
+              "playId": "play_107"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon",
+          "sticker"
+        ],
+        "confirmation": null
+      }
+    }
+  }
+]

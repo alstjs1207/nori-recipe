@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
 import { getVisibleMaterialCategories } from "@/onboarding/utils";
 import {
   MATERIAL_DISPLAY_NAMES,
@@ -12,15 +13,23 @@ export function MaterialPicker({
   selected,
   onSave,
   onClose,
-  completedCount = 0,
+  startNextRound,
+  completedCount,
 }: {
   selected: MaterialSlug[];
   onSave: (materials: MaterialSlug[]) => Promise<void>;
   onClose: () => void;
-  completedCount?: number;
+  startNextRound: (materials: MaterialSlug[]) => Promise<boolean>;
+  completedCount: number;
 }) {
   const [draft, setDraft] = useState(selected);
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const focusEpoch = useRef(0);
+  useFocusEffect(useCallback(() => {
+    focusEpoch.current++;
+    return () => { focusEpoch.current++; };
+  }, []));
   const [error, setError] = useState<string | null>(null);
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -28,14 +37,29 @@ export function MaterialPicker({
     ref.current?.showModal();
   }, []);
   async function save() {
-    if (saving) return;
+    if (savingRef.current) return;
+    savingRef.current = true;
+    const current = focusEpoch.current;
     setSaving(true);
+    setError(null);
     try {
-      await onSave(draft);
+      if (completedCount === 3) {
+        // Keep this component/draft mounted, but remove the modal before the
+        // shared notice and SDK ad. Cancellation returns to the same draft.
+        ref.current?.close();
+        if (!await startNextRound(draft)) {
+          if (current === focusEpoch.current && ref.current?.isConnected) ref.current.showModal();
+          return;
+        }
+      } else await onSave(draft);
       onClose();
     } catch {
-      setError("재료를 저장하지 못했어요. 다시 시도해 주세요.");
+      if (current === focusEpoch.current) {
+        setError("재료를 저장하지 못했어요. 다시 시도해 주세요.");
+        if (ref.current?.isConnected && !ref.current.open) ref.current.showModal();
+      }
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
@@ -47,7 +71,10 @@ export function MaterialPicker({
       onCancel={(event) => {
         if (saving) event.preventDefault();
       }}
-      onClose={onClose}
+      onClose={() => {
+        // Ignore the handoff close, including a queued event after reopening.
+        if (!savingRef.current && !ref.current?.open) onClose();
+      }}
     >
       <div className="dialog-heading">
         <div>

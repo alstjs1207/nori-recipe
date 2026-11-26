@@ -263,6 +263,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     await deleteAllUserData(guestId);
     useFeedbackDraftStore.getState().clearGuest(guestId);
     resetAnalyticsConsent();
+    await appRuntime.recommendationAd?.reset();
     await Promise.all([
       AsyncStorage.removeItem(GUEST_ID_STORAGE_KEY),
       AsyncStorage.removeItem(ONBOARDING_COMPLETE_STORAGE_KEY),

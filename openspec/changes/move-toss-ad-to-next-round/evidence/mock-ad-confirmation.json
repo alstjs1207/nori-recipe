@@ -1,0 +1,144 @@
+[
+  {
+    "step": "cancel",
+    "shows": 0,
+    "challenge": " 이번 놀이 도전세 가지 놀이 완성!3 / 3완성한 놀이 보기 "
+  },
+  {
+    "step": "escape",
+    "shows": 0,
+    "challenge": " 이번 놀이 도전세 가지 놀이 완성!3 / 3완성한 놀이 보기 "
+  },
+  {
+    "step": "toss-back",
+    "path": "/",
+    "shows": 0,
+    "challenge": " 이번 놀이 도전세 가지 놀이 완성!3 / 3완성한 놀이 보기 "
+  },
+  {
+    "step": "confirm-twice",
+    "shows": 1,
+    "openDialogs": 0,
+    "challenge": " 이번 놀이 도전놀이 3개, 함께해봐요0 / 3",
+    "round": {
+      "version": 1,
+      "id": "b18c8490-1b06-45e3-8628-6e7049fcd53b",
+      "guestId": "7b192ab8-a267-4632-8207-9df2280e18c0",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_020",
+        "play_218",
+        "play_145"
+      ],
+      "records": [],
+      "revision": 1,
+      "archives": [
+        {
+          "id": "6d6d0122-193c-4953-bf61-703ec971da69",
+          "ids": [
+            "play_162",
+            "play_107",
+            "play_016"
+          ],
+          "records": [
+            {
+              "id": "6d9ebb0c-7856-410e-8d9c-2529ee767879",
+              "playId": "play_162"
+            },
+            {
+              "id": "332f1954-148f-4e51-90a2-f31437c741aa",
+              "playId": "play_107"
+            },
+            {
+              "id": "6605c0a0-5097-4d34-aabf-b81ae6ad8283",
+              "playId": "play_016"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon"
+        ],
+        "confirmation": null
+      }
+    }
+  },
+  {
+    "step": "within-24h",
+    "openDialogs": 0,
+    "shows": 0,
+    "challenge": " 이번 놀이 도전놀이 3개, 함께해봐요0 / 3",
+    "round": {
+      "version": 1,
+      "id": "83dc63d4-66bb-4d06-b2d4-213515c1c41a",
+      "guestId": "7b192ab8-a267-4632-8207-9df2280e18c0",
+      "key": "{\"childAgeMonths\":31,\"selectedMaterials\":[\"paper\",\"bowl\",\"cup\",\"crayon\"],\"blockedMaterials\":[],\"playCount\":208}",
+      "ids": [
+        "play_162",
+        "play_107",
+        "play_016"
+      ],
+      "records": [],
+      "revision": 2,
+      "archives": [
+        {
+          "id": "6d6d0122-193c-4953-bf61-703ec971da69",
+          "ids": [
+            "play_162",
+            "play_107",
+            "play_016"
+          ],
+          "records": [
+            {
+              "id": "6d9ebb0c-7856-410e-8d9c-2529ee767879",
+              "playId": "play_162"
+            },
+            {
+              "id": "332f1954-148f-4e51-90a2-f31437c741aa",
+              "playId": "play_107"
+            },
+            {
+              "id": "6605c0a0-5097-4d34-aabf-b81ae6ad8283",
+              "playId": "play_016"
+            }
+          ]
+        },
+        {
+          "id": "b18c8490-1b06-45e3-8628-6e7049fcd53b",
+          "ids": [
+            "play_020",
+            "play_218",
+            "play_145"
+          ],
+          "records": [
+            {
+              "id": "83bcbc63-559f-4273-88b5-62ef34a03240",
+              "playId": "play_020"
+            },
+            {
+              "id": "e680abdc-98fc-4688-9d66-d1988e5e5913",
+              "playId": "play_218"
+            },
+            {
+              "id": "ea752373-f251-43c3-bc76-8f0298418641",
+              "playId": "play_145"
+            }
+          ]
+        }
+      ],
+      "context": {
+        "materials": [
+          "paper",
+          "bowl",
+          "cup",
+          "crayon"
+        ],
+        "confirmation": null
+      }
+    }
+  }
+]

@@ -6,6 +6,7 @@ import { getPlayImageUrl } from "@/constants/playImageUrls";
 import { AppLink as Link } from "@/navigation/AppLink";
 
 import { useState, type ReactNode } from "react";
+import { useNextRoundStart } from "./NextRoundStart";
 import {
   MATERIAL_DISPLAY_NAMES,
   type MaterialSlug,
@@ -55,6 +56,7 @@ export function HomeRedesign({
   celebrateCompletion,
   age,
   onSaveMaterials,
+  onStartNextRound,
   intentOptions,
   recommendationError,
   onRetryRecommendations,
@@ -68,11 +70,15 @@ export function HomeRedesign({
   celebrateCompletion: boolean;
   age: number;
   onSaveMaterials: (materials: MaterialSlug[]) => Promise<void>;
+  onStartNextRound: () => Promise<void>;
   intentOptions?: ReactNode;
   recommendationError?: string | null;
   onRetryRecommendations?: () => void;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
+  const nextRound = useNextRoundStart();
+  const { starting } = nextRound;
   const favorites = useWebFavorites();
   const featuredImpressionRef = useRecommendationImpression<HTMLElement>(featured ?? undefined, 1);
   const summary = selectedMaterials.length
@@ -113,10 +119,17 @@ export function HomeRedesign({
           <div className="home-challenge-track" aria-hidden="true">{[0, 1, 2].map(index => <span key={index} className={index < completedCount ? "is-completed" : ""} />)}</div>
           {allCompleted ? <Link href="/record" className="home-challenge-record">완성한 놀이 보기 <Icon name="arrow" size={14} /></Link> : null}
         </section>
+        {allCompleted ? <section className="home-next-round" aria-label="다음 놀이 시작">
+          <button type="button" className="primary-button" disabled={starting} onClick={() => { setStartError(null); void nextRound.run(onStartNextRound).catch(() => setStartError("다음 놀이를 준비하지 못했어요. 다시 시도해 주세요.")); }}>
+            {starting ? "다음 놀이 준비 중…" : "다음 놀이 3개 시작"}<Icon name="arrow" size={18} />
+          </button>
+          {startError ? <p className="error-text" role="alert">{startError}</p> : null}
+        </section> : null}
         <button
           className="home-material-summary"
           type="button"
           onClick={() => setPickerOpen(true)}
+          disabled={starting}
         >
           <span className="summary-icon">
             <Icon name="sliders" size={20} />
@@ -131,7 +144,7 @@ export function HomeRedesign({
             </span>
           </span>
           <span className="summary-edit">
-            {allCompleted ? "다음 놀이 추천받기" : "재료 바꾸기"}
+            재료 바꾸기
             <Icon name="chevron" size={16} />
           </span>
         </button>
@@ -304,10 +317,12 @@ export function HomeRedesign({
           </div>
         </section>
         <PageFooter />
+        {nextRound.notice}
         {pickerOpen ? (
           <MaterialPicker
             selected={selectedMaterials}
             onSave={onSaveMaterials}
+            startNextRound={(materials) => nextRound.run(() => onSaveMaterials(materials))}
             onClose={() => setPickerOpen(false)}
             completedCount={completedCount}
           />

@@ -1,7 +1,7 @@
 import { Clipboard, Device, NavigationBar, SafeArea, Screen, Share, Storage, User, graniteEvent, loadFullScreenAd, showFullScreenAd } from "@apps-in-toss/web-framework";
 import "@/platform/devtools";
 import { createTossRuntime } from "./toss-runtime";
-import { createCompletionAd } from "./completion-ad";
+import { createRecommendationAd } from "./completion-ad";
 
 export const appRuntime = createTossRuntime({
   storage: Storage,
@@ -20,12 +20,12 @@ export const appRuntime = createTossRuntime({
   onInsets: (onEvent) => SafeArea.subscribe({ onEvent }),
 }, process.env.EXPO_PUBLIC_TOSS_APP_NAME || "nori-recipe");
 
-appRuntime.completionAd = createCompletionAd({
+appRuntime.recommendationAd = createRecommendationAd({
   isSupported: () => loadFullScreenAd.isSupported() && showFullScreenAd.isSupported(),
   load: loadFullScreenAd,
   show: showFullScreenAd,
 }, process.env.EXPO_PUBLIC_TOSS_COMPLETION_AD_GROUP_ID || "", () =>
   document.visibilityState === "visible" &&
   !document.documentElement.classList.contains("toss-checking-user") &&
-  !document.querySelector("dialog[open]"),
+  !document.querySelector("dialog[open]"), appRuntime.storage,
 );

@@ -1,101 +1,145 @@
-import test from "node:test";
+import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
-import { createCompletionAd, type FullScreenAdBridge } from "./completion-ad";
+import { AD_SHOWN_AT_KEY, AD_COOLDOWN_MS, AD_REQUEST_TIMEOUT_MS, AD_CLOSE_TIMEOUT_MS, createRecommendationAd, type FullScreenAdBridge } from "./completion-ad";
 
-const ids = ["play_001", "play_002", "play_003"];
-const logs = ids.map((playId, index) => ({ id: `log-${index}`, playId }));
-function fixture({ supported = true, visible = true } = {}) {
+const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
+const now = Date.parse("2026-11-24T23:59:00+09:00");
+function clock(t: TestContext) { t.mock.timers.enable({ apis: ["setTimeout", "Date"], now }); }
+async function fixture(t: TestContext, { supported = true, visible = true, values = new Map<string, string>(), readFails = false, writeFails = false, throws = false, synchronous = false } = {}) {
   const loads: Parameters<FullScreenAdBridge["load"]>[0][] = [];
   const shows: Parameters<FullScreenAdBridge["show"]>[0][] = [];
   let offLoads = 0, offShows = 0;
-  const ad = createCompletionAd({
-    isSupported: () => supported,
-    load(params) { loads.push(params); return () => { offLoads++; }; },
-    show(params) { shows.push(params); return () => { offShows++; }; },
-  }, "test-group", () => visible);
-  const stop = ad.start();
+  const ad = createRecommendationAd({
+    isSupported() { return supported; },
+    load(params) { loads.push(params); if (synchronous) params.onEvent({ type: "loaded" }); return () => { offLoads++; }; },
+    show(params) { shows.push(params); if (throws) throw Error("bridge"); if (synchronous) { params.onEvent({ type: "show" }); params.onEvent({ type: "dismissed" }); } return () => { offShows++; }; },
+  }, "test-group", () => visible, {
+    async getItem(key) { if (readFails) throw Error("read"); return values.get(key) ?? null; },
+    async setItem(key, value) { if (writeFails) throw Error("write"); values.set(key, value); },
+    async removeItem(key) { values.delete(key); },
+  });
+  const stop = ad.start(); t.after(stop);
+  await flush();
   const loaded = () => loads.at(-1)?.onEvent({ type: "loaded" });
-  return { ad, loads, shows, stop, loaded, cleanups: () => ({ offLoads, offShows }) };
+  const event = (type: string) => shows.at(-1)?.onEvent({ type });
+  return { ad, loads, shows, stop, loaded, event, values, cleanups: () => ({ offLoads, offShows }) };
 }
 
-test("새 기록으로 추천 세 번째 놀이를 완료할 때만 같은 그룹의 광고를 한 번 표시한다", () => {
-  const f = fixture(); f.loaded();
-  f.ad.home(ids, logs); // Past records / ordinary home entry.
-  for (let i = 0; i < 2; i++) {
-    f.ad.saved(logs[i]); f.ad.home(ids, logs.slice(0, i + 1));
-  }
+test("사전 로드·홈 재진입에는 광고 없이 명시적 다음 시작에서만 표시하고 닫힌 뒤 진행한다", async t => {
+  clock(t);
+  const f = await fixture(t); f.loaded();
   assert.equal(f.shows.length, 0);
-  f.ad.saved(logs[2]); f.ad.home(ids, logs);
-  f.ad.home(ids, logs);
-  assert.equal(f.shows.length, 1);
+  let proceeded = false;
+  const result = f.ad.beforeNext();
+  void result.then(() => { proceeded = true; });
+  assert.equal(f.ad.beforeNext(), result); // Repeated clicks share one operation.
+  await flush(); assert.equal(proceeded, false);
+  assert.deepEqual(f.shows[0].options, { adGroupId: "test-group" });
   assert.deepEqual(f.shows[0].options, f.loads[0].options);
-  assert.deepEqual(Object.keys(f.shows[0].options), ["adGroupId"]);
-  f.shows[0].onEvent({ type: "dismissed" }); f.loaded();
-  f.ad.saved({ id: "repeat", playId: ids[2] });
-  f.ad.home(ids, [...logs, { id: "repeat", playId: ids[2] }]);
-  assert.equal(f.shows.length, 1);
-  assert.equal(f.loads.length, 2);
+  f.event("requested"); f.event("impression"); await flush();
+  assert.equal(f.values.has(AD_SHOWN_AT_KEY), false);
+  f.event("show"); await flush();
+  assert.equal(f.values.get(AD_SHOWN_AT_KEY), String(now));
+  assert.equal(proceeded, false);
+  f.event("dismissed"); assert.equal(await result, true);
+  assert.equal(proceeded, true);
+  assert.equal(f.cleanups().offShows, 1);
+});
+
+test("실제 표시부터 24시간: 자정·재접속·여러 시작에도 추가 광고 없이 정확한 경계에서 재개한다", async t => {
+  clock(t);
+  const values = new Map<string, string>();
+  const f = await fixture(t, { values }); f.loaded();
+  const result = f.ad.beforeNext();
+  t.mock.timers.tick(2000); // Request time must not be used.
+  f.event("show"); const shownAt = Date.now(); await flush();
+  t.mock.timers.tick(1000); f.event("show"); f.event("dismissed"); await result;
+  assert.equal(values.get(AD_SHOWN_AT_KEY), String(shownAt));
+  f.loaded(); t.mock.timers.tick(60 * 1000);
+  assert.equal(await f.ad.beforeNext(), true); assert.equal(f.shows.length, 1);
   f.stop();
+  const resumed = await fixture(t, { values }); resumed.loaded();
+  for (let i = 0; i < 3; i++) assert.equal(await resumed.ad.beforeNext(), true);
+  assert.equal(resumed.shows.length, 0);
+  t.mock.timers.tick(shownAt + AD_COOLDOWN_MS - Date.now() - 1);
+  assert.equal(resumed.ad.getSnapshot(), false);
+  t.mock.timers.tick(1);
+  assert.equal(resumed.ad.getSnapshot(), true);
+  const next = resumed.ad.beforeNext(); resumed.event("dismissed"); await next;
+  assert.equal(resumed.shows.length, 1);
 });
 
-test("부족·중복 추천, 추천 외 완료, 저장되지 않은 기록은 광고를 표시하지 않는다", () => {
-  for (const recommendationIds of [ids.slice(0, 2), [ids[0], ids[0], ids[2]], [ids[0], ids[1], "play_004"]]) {
-    const f = fixture(); f.loaded(); f.ad.saved(logs[2]); f.ad.home(recommendationIds, logs);
-    assert.equal(f.shows.length, 0); f.stop();
+test("미준비·로드 실패·미지원·숨김은 즉시 진행하고 늦은 loaded로 광고를 띄우지 않는다", async t => {
+  clock(t);
+  for (const options of [{}, { supported: false }, { visible: false }]) {
+    const f = await fixture(t, options);
+    assert.equal(await f.ad.beforeNext(), true);
+    f.loaded(); await flush();
+    assert.equal(f.shows.length, 0);
   }
-  const f = fixture(); f.loaded(); f.ad.saved({ id: "unsaved", playId: ids[2] }); f.ad.home(ids, logs);
-  assert.equal(f.shows.length, 0); f.stop();
+  const f = await fixture(t); f.loads[0].onError(Error("no fill"));
+  assert.equal(await f.ad.beforeNext(), true); f.loaded();
+  assert.equal(f.shows.length, 0); assert.equal(f.values.size, 0);
 });
 
-test("로드 전 완료·로드 실패·미지원·숨긴 화면에서는 건너뛰고 늦게 광고를 띄우지 않는다", () => {
-  for (const config of [{}, { supported: false }, { visible: false }]) {
-    const f = fixture(config);
-    f.ad.saved(logs[2]); f.ad.home(ids, logs);
-    f.loaded(); f.ad.home(ids, logs);
-    assert.equal(f.shows.length, 0); f.stop();
+test("노출 실패·예외·show 누락은 진행을 막지 않고 24시간을 소비하지 않는다", async t => {
+  clock(t);
+  for (const failure of ["event", "error", "throw", "timeout"]) {
+    const f = await fixture(t, { throws: failure === "throw" }); f.loaded();
+    const result = f.ad.beforeNext();
+    if (failure === "event") f.event("failedToShow");
+    if (failure === "error") f.shows[0].onError(Error("offline"));
+    if (failure === "timeout") t.mock.timers.tick(AD_REQUEST_TIMEOUT_MS);
+    assert.equal(await result, true); await flush();
+    assert.equal(f.values.size, 0); assert.equal(f.ad.getSnapshot(), true);
+    f.event("show"); f.event("dismissed"); f.loaded(); await flush();
+    assert.equal(f.shows.length, 1); assert.equal(f.values.size, 0);
   }
-  const f = fixture(); f.loads[0].onError(new Error("no fill"));
-  f.loaded(); f.ad.saved(logs[2]); f.ad.home(ids, logs);
-  assert.equal(f.shows.length, 0); f.stop();
 });
 
-test("노출 실패와 예외를 삼키며 자동 재시도나 중복 노출을 하지 않는다", () => {
-  for (const failure of ["event", "error"]) {
-    const f = fixture(); f.loaded(); f.ad.saved(logs[2]); f.ad.home(ids, logs);
-    if (failure === "event") f.shows[0].onEvent({ type: "failedToShow" });
-    else f.shows[0].onError(new Error("offline"));
-    f.ad.home(ids, logs);
-    assert.equal(f.shows.length, 1); assert.equal(f.loads.length, 1); f.stop();
+test("dismissed 누락에도 복귀 신호 또는 60초 안전장치로 한 번만 진행한다", async t => {
+  clock(t);
+  for (const recovery of ["focus", "timeout"]) {
+    const f = await fixture(t); f.loaded();
+    const result = f.ad.beforeNext(); f.event("show");
+    let done = false; void result.then(() => { done = true; });
+    f.ad.resume(); await flush(); assert.equal(done, false); // Unrelated focus.
+    if (recovery === "focus") { f.ad.background(); f.ad.resume(); }
+    else { t.mock.timers.tick(AD_CLOSE_TIMEOUT_MS - 1); await flush(); assert.equal(done, false); t.mock.timers.tick(1); }
+    assert.equal(await result, true); f.event("dismissed");
+    assert.equal(f.cleanups().offShows, 1);
+    assert.equal(f.ad.getSnapshot(), false);
   }
-  const ad = createCompletionAd({ isSupported() { throw new Error("bridge"); }, load() { throw new Error(); }, show() { throw new Error(); } }, "group", () => true);
-  assert.doesNotThrow(() => { const stop = ad.start(); ad.saved(logs[2]); ad.home(ids, logs); stop(); });
 });
 
-test("화면 종료는 구독과 대기 중 완료를 제거한다", () => {
-  const f = fixture(); f.ad.saved(logs[2]); f.stop(); f.loaded(); f.ad.home(ids, logs);
-  assert.equal(f.shows.length, 0);
-  assert.ok(f.cleanups().offLoads > 0);
-  const shown = fixture(); shown.loaded(); shown.ad.saved(logs[2]); shown.ad.home(ids, logs); shown.stop();
-  shown.shows[0].onEvent({ type: "dismissed" });
-  assert.equal(shown.loads.length, 1); assert.equal(shown.cleanups().offShows, 1);
+test("저장 실패에도 세션의 24시간 제한을 유지하고 읽기 실패·손상 시 추천은 이용할 수 있다", async t => {
+  clock(t);
+  const f = await fixture(t, { writeFails: true }); f.loaded();
+  const result = f.ad.beforeNext(); f.event("show"); f.event("dismissed"); await result; await flush();
+  assert.equal(f.ad.getSnapshot(), false); assert.equal(await f.ad.beforeNext(), true);
+  assert.equal(f.shows.length, 1);
+  for (const options of [{ readFails: true }, { values: new Map([[AD_SHOWN_AT_KEY, "oops"]]) }, { values: new Map([[AD_SHOWN_AT_KEY, ""]]) }]) {
+    const broken = await fixture(t, options); broken.loaded();
+    assert.equal(await broken.ad.beforeNext(), true); assert.equal(broken.shows.length, 0);
+  }
 });
 
-test("동기 콜백에서도 SDK 구독을 해제하고 다음 광고를 순차 로드한다", () => {
-  let loads = 0, offLoads = 0, offShows = 0;
-  const ad = createCompletionAd({
-    isSupported: () => true,
-    load(params) { loads++; params.onEvent({ type: "loaded" }); return () => { offLoads++; }; },
-    show(params) { params.onEvent({ type: "dismissed" }); return () => { offShows++; }; },
-  }, "group", () => true);
-  const stop = ad.start(); ad.saved(logs[2]); ad.home(ids, logs);
-  assert.equal(loads, 2); assert.equal(offShows, 1); assert.equal(offLoads, 2); stop();
+test("종료는 대기를 취소하고 늦은 SDK 콜백을 무시하며 동기 콜백도 구독을 정리한다", async t => {
+  clock(t);
+  const f = await fixture(t); f.loaded();
+  const result = f.ad.beforeNext(); f.stop();
+  assert.equal(await result, false); f.event("show"); f.event("dismissed"); await flush();
+  assert.equal(f.values.size, 0); assert.equal(f.cleanups().offShows, 1);
+  const sync = await fixture(t, { synchronous: true });
+  assert.equal(await sync.ad.beforeNext(), true);
+  assert.equal(sync.cleanups().offShows, 1); assert.equal(sync.cleanups().offLoads, 2);
 });
 
-test("재료 변경으로 A/B 완료를 유지해도 광고는 없고 D 실제 완료에서만 표시한다",()=>{
- const f=fixture(); f.loaded();
- const next=[ids[0],ids[1],"play_004"];
- f.ad.home(next,logs.slice(0,2)); assert.equal(f.shows.length,0);
- const d={id:"saved-d",playId:next[2]};
- f.ad.saved(d); f.ad.home(next,[...logs.slice(0,2),d]); assert.equal(f.shows.length,1);
- f.ad.home(next,[...logs.slice(0,2),d]); assert.equal(f.shows.length,1); f.stop();
+test("시계가 뒤로 가면 추가 광고를 막고 전체 초기화는 해당 사용자의 시각만 삭제한다", async t => {
+  clock(t);
+  const f = await fixture(t, { values: new Map([[AD_SHOWN_AT_KEY, String(now + 3600000)], ["unrelated", "keep"]]) }); f.loaded();
+  assert.equal(f.ad.getSnapshot(), false); assert.equal(await f.ad.beforeNext(), true);
+  await f.ad.reset();
+  assert.equal(f.values.has(AD_SHOWN_AT_KEY), false); assert.equal(f.values.get("unrelated"), "keep");
+  assert.equal(f.ad.getSnapshot(), true);
 });

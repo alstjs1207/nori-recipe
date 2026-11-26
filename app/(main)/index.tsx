@@ -464,7 +464,6 @@ export default function MainScreen() {
             setLoadedRoundKey(`${focusedRound?.id}:${focusedRound?.revision ?? 0}`);
             setCelebrateCompletion(homeCompletionCelebration.consume(guestId, focusedRound?.ids ?? [], completed, focusedRound?.id ?? null));
             setFavoritePlayIds(new Set(favorites.map((favorite) => favorite.playId)));
-            appRuntime.completionAd?.home(focusedRound?.ids ?? [], completed);
           }
         })
         .catch(() => {
@@ -662,6 +661,12 @@ export default function MainScreen() {
         ) : null}
         onSaveMaterials={async (materials) => {
           await setTodayMaterials(materials);
+        }}
+        onStartNextRound={async () => {
+          const current = useHomeRecommendationStore.getState().round;
+          // Navigation/context edits while the SDK is open must not restart another round.
+          if (!allRecommendedCompleted || current?.id !== round?.id || current?.revision !== round?.revision) return;
+          await setTodayMaterials([...selectedMaterials]);
         }}
       />
     );

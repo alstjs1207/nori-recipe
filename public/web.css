@@ -3249,6 +3249,13 @@ p.analytics-preview-note { display: block; width: fit-content; max-width: 100%; 
 .home-challenge-track span { height: 4px; border-radius: 4px; background: #ddd6f7; }
 .home-challenge-track .is-completed { background: var(--violet); }
 .home-challenge-record { display: inline-flex; align-items: center; gap: 5px; color: var(--violet); font-size: 12px; padding: 9px 0 0; text-decoration: none; }
+.home-next-round { margin-bottom: 18px; }
+.home-next-round .primary-button { width: 100%; }
+.next-round-ad-dialog { max-width: 420px; }
+.next-round-ad-dialog .dialog-heading { padding: 24px 24px 0; }
+.next-round-ad-dialog .dialog-heading p { font-size: 14px; line-height: 1.7; }
+.next-round-ad-dialog .dialog-footer { display: flex; gap: 10px; padding: 24px; border-top: 0; background: transparent; }
+.next-round-ad-dialog .dialog-footer > button { flex: 1; }
 .home-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "together"; gap: 4px; max-width: 680px; margin-inline: auto; }
 .home-together .recommendation-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .home-material-summary .summary-edit { white-space: normal; text-align: right; }

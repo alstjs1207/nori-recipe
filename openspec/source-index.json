@@ -1074,6 +1074,12 @@
       ]
     },
     {
+      "path": "src/components/web/NextRoundStart.tsx",
+      "domains": [
+        "web-platform"
+      ]
+    },
+    {
       "path": "src/components/web/NoriUI.tsx",
       "domains": [
         "web-platform"

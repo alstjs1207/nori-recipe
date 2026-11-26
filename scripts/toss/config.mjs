@@ -30,7 +30,7 @@ export function tossAdSettings(env = process.env) {
   if (!["test", "production", "disabled"].includes(mode)) throw new Error("Invalid TOSS_AD_MODE");
   const adGroupId = mode === "test" ? "ait-ad-test-interstitial-id" : mode === "production" ? (env.TOSS_COMPLETION_AD_GROUP_ID ?? "ait.v2.live.b6af39a4123a41ae").trim() : "";
   if (mode === "production" && (!/^ait\.[a-zA-Z0-9._-]+$/.test(adGroupId) || adGroupId.includes("test"))) throw new Error("Production ads require a console-issued TOSS_COMPLETION_AD_GROUP_ID (ait.*)");
-  return { mode, adGroupId, placement: "home-recommendations-completed", format: "interstitial" };
+  return { mode, adGroupId, placement: "home-next-recommendations", format: "interstitial" };
 }
 
 export function tossExportEnvironment(env = process.env) {

@@ -4,7 +4,10 @@ import { appRouter as router } from "@/navigation/router";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { MATERIAL_DISPLAY_NAMES } from "@/constants/materials";
-import { resetUserActivity } from "@/db/queries";
+import { getPlayLogsByIds, resetUserActivity } from "@/db/queries";
+import { useHomeRecommendationStore } from "@/store/homeRecommendationStore";
+import { getHomeRoundRecords } from "@/store/homeRecommendationRound";
+import { useNextRoundStart } from "@/components/web/NextRoundStart";
 import { formatBirthMonthInput, getBirthMonthInputError, parseBirthMonthInput } from "@/onboarding/birthMonthInput";
 import { useSessionStore } from "@/store/sessionStore";
 import {
@@ -45,6 +48,10 @@ export default function SettingsWebScreen() {
   );
   const [saving, setSaving] = useState(false);
   const [picker, setPicker] = useState(false);
+  const [pickerLoading, setPickerLoading] = useState(false);
+  const [completedCount, setCompletedCount] = useState(0);
+  const pickerRequest = useRef(0);
+  const nextRound = useNextRoundStart();
   const [confirm, setConfirm] = useState<"activity" | "all" | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -59,10 +66,35 @@ export default function SettingsWebScreen() {
       );
       setConfirm(null);
       setPicker(false);
+      setPickerLoading(false);
       setError(null);
       setNotice(null);
+      return () => { pickerRequest.current++; };
     }, []),
   );
+  async function openMaterials() {
+    if (pickerLoading || nextRound.starting) return;
+    const current = ++pickerRequest.current;
+    setPickerLoading(true);
+    setError(null);
+    try {
+      const round = useHomeRecommendationStore.getState().round;
+      if (!guestId) throw new Error("Guest session has not been initialized.");
+      const logs = await getPlayLogsByIds(guestId, round?.records.map(record => record.id) ?? []);
+      if (current !== pickerRequest.current) return;
+      setCompletedCount(new Set(getHomeRoundRecords(round, guestId, logs).map(record => record.playId)).size);
+      setPicker(true);
+    } catch {
+      if (current === pickerRequest.current) setError("재료 설정을 불러오지 못했어요. 다시 시도해 주세요.");
+    } finally {
+      if (current === pickerRequest.current) setPickerLoading(false);
+    }
+  }
+  async function saveMaterials(selected: typeof materials) {
+    await upsert({ ...useSessionStore.getState().userContext, ownedMaterials: selected });
+    await setTodayMaterials(selected);
+    setNotice("우리 집 재료를 저장했어요.");
+  }
   async function saveProfile() {
     if (saving || getBirthMonthInputError(birthMonth, useSessionStore.getState().userContext.childBirthMonth)) return;
     const monthIndex = parseBirthMonthInput(birthMonth);
@@ -165,7 +197,8 @@ export default function SettingsWebScreen() {
           <button
             className="secondary-button"
             type="button"
-            onClick={() => setPicker(true)}
+            disabled={pickerLoading || nextRound.starting}
+            onClick={() => { void openMaterials(); }}
           >
             재료 변경하기
             <Icon name="sliders" size={18} />
@@ -250,18 +283,14 @@ export default function SettingsWebScreen() {
           ) : null}
         </section>
         <PageFooter />
+        {nextRound.notice}
         {picker ? (
           <MaterialPicker
             selected={materials}
             onClose={() => setPicker(false)}
-            onSave={async (selected) => {
-              await upsert({
-                ...useSessionStore.getState().userContext,
-                ownedMaterials: selected,
-              });
-              await setTodayMaterials(selected);
-              setNotice("우리 집 재료를 저장했어요.");
-            }}
+            completedCount={completedCount}
+            startNextRound={(selected) => nextRound.run(() => saveMaterials(selected))}
+            onSave={saveMaterials}
           />
         ) : null}
       </div>

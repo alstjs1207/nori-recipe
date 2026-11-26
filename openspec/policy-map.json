@@ -1355,9 +1355,14 @@
             "src/platform/contract.ts",
             "src/components/web/TossPlatform.tsx",
             "app/(main)/index.tsx",
-            "app/(main)/feedback/[id].web.tsx",
             "scripts/toss/config.mjs",
-            "scripts/build-toss.mjs"
+            "scripts/build-toss.mjs",
+            "src/components/web/HomeRedesign.tsx",
+            "src/store/sessionStore.ts",
+            "src/constants/tossNotices.ts",
+            "src/components/web/MaterialPicker.tsx",
+            "src/components/web/NextRoundStart.tsx",
+            "app/(main)/settings.web.tsx"
           ],
           "tests": [
             "src/platform/completion-ad.test.ts",
@@ -1366,7 +1371,19 @@
           "anchors": [
             {
               "path": "src/platform/completion-ad.ts",
-              "contains": "createCompletionAd"
+              "contains": "createRecommendationAd"
+            },
+            {
+              "path": "src/platform/completion-ad.ts",
+              "contains": "AD_COOLDOWN_MS"
+            },
+            {
+              "path": "src/components/web/NextRoundStart.tsx",
+              "contains": "광고 안내"
+            },
+            {
+              "path": "src/components/web/MaterialPicker.tsx",
+              "contains": "startNextRound"
             }
           ]
         }
