@@ -15,6 +15,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/toss-intro",
+      "destination": "/toss-intro/index.html"
+    },
+    {
       "source": "/intro",
       "destination": "/intro/index.html"
     },

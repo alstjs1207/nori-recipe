@@ -3,9 +3,8 @@ import test from "node:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import http from "node:http";
 import { fileURLToPath } from "node:url";
-import { DEV_AREAS, INTRO_PATH, INTRO_SCREENS, QUICK_PREP_MINUTES, collectIntroData, renderIntroPage, writeIntroPage } from "../scripts/web/intro.mjs";
+import { DEV_AREAS, INTRO_PATH, TOSS_INTRO_PATH, TOSS_SHARE_URL, INTRO_SCREENS, QUICK_PREP_MINUTES, collectIntroData, renderIntroPage, writeIntroPage } from "../scripts/web/intro.mjs";
 import { createWebServer } from "../scripts/serve-web.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -59,6 +58,29 @@ test("소개 페이지는 노리 레시피 브랜드·공개 링크만 쓰고 �
   for (const key of Object.keys(INTRO_SCREENS)) assert.ok(html.includes(`${INTRO_PATH}/media/${INTRO_SCREENS[key].file}`), key);
 });
 
+test("웹 소개와 토스 홍보는 실행·데모·공유 주소를 분리한다", () => {
+  const data = collectIntroData({ plays: bundle.plays, registry });
+  const web = renderIntroPage({ data, screens: screensFor() });
+  const toss = renderIntroPage({ data, screens: screensFor(), target: "toss" });
+  const embedded = (html) => JSON.parse(html.match(/<script type="application\/json" id="intro-data">([^<]*)<\/script>/)[1]);
+  assert.ok(!web.includes(`href="${TOSS_SHARE_URL}"`));
+  assert.ok(!web.includes('id="toss"'));
+  assert.ok(embedded(web).plays.every((play) => play.href === `/play/${play.id}`));
+  assert.match(toss, /<title>노리 레시피 · 토스에서 만나는/);
+  assert.ok(toss.includes(`href="__NORI_ORIGIN__${TOSS_INTRO_PATH}"`));
+  assert.ok(toss.includes(`content="__NORI_ORIGIN__${TOSS_INTRO_PATH}"`));
+  const actions = [...toss.matchAll(/<a class="btn btn-primary[^"]*" href="([^"]+)"/g)];
+  assert.equal(actions.length, 4);
+  assert.ok(actions.every(([, href]) => href === TOSS_SHARE_URL));
+  assert.ok(embedded(toss).plays.every((play) => play.href === TOSS_SHARE_URL));
+  const links = [...toss.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(([, href]) => href);
+  assert.ok(links.every((href) => href.startsWith("#") || [TOSS_SHARE_URL, INTRO_PATH, TOSS_INTRO_PATH].includes(href)));
+  assert.match(toss, /<footer>[\s\S]*href="\/intro">웹 서비스 소개/);
+  assert.match(toss, /현재 토스앱의 기기/);
+  assert.match(toss, /24시간/);
+  assert.doesNotMatch(toss, /gtag|googletagmanager|google-analytics|serviceWorker\.register/);
+});
+
 test("빌드는 실제 화면 캡처를 해시 WebP로 만들고 운영 주소를 채운다", async () => {
   const dist = await fs.mkdtemp(path.join(os.tmpdir(), "nori-intro-"));
   try {
@@ -67,38 +89,43 @@ test("빌드는 실제 화면 캡처를 해시 WebP로 만들고 운영 주소�
     assert.match(written, /href="https:\/\/example\.test\/intro"/);
     assert.doesNotMatch(written, /__NORI_ORIGIN__/);
     assert.ok(html.includes("__NORI_ORIGIN__"));
+    const toss = await fs.readFile(path.join(dist, "toss-intro/index.html"), "utf8");
+    assert.match(toss, /href="https:\/\/example\.test\/toss-intro"/);
+    assert.doesNotMatch(toss, /__NORI_ORIGIN__/);
+    assert.match(toss, /토스에서 무료로 시작하기/);
     const sources = [...written.matchAll(/src="(\/intro\/media\/[^"]+)"/g)].map(([, src]) => src);
     assert.equal(new Set(sources).size, Object.keys(INTRO_SCREENS).length);
     for (const src of sources) {
       assert.match(src, /\/intro\/media\/[a-z-]+\.[0-9a-f]{12}\.webp$/);
       await fs.access(path.join(dist, src));
+      assert.ok(toss.includes(src));
     }
   } finally {
     await fs.rm(dist, { recursive: true, force: true });
   }
 });
 
-test("/intro는 로컬 서버와 Vercel에서 정적 소개 페이지로 제공된다", async () => {
+test("두 소개 경로는 로컬 서버와 Vercel에서 정적 페이지로 제공된다", async () => {
   const vercel = await readJson("vercel.json");
-  assert.ok(vercel.rewrites.some((rule) => rule.source === "/intro" && rule.destination === "/intro/index.html"));
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "nori-intro-serve-"));
-  await fs.mkdir(path.join(directory, "intro"), { recursive: true });
+  const paths = [INTRO_PATH, TOSS_INTRO_PATH];
+  for (const route of paths) {
+    assert.ok(vercel.rewrites.some((rule) => rule.source === route && rule.destination === `${route}/index.html`));
+    await fs.mkdir(path.join(directory, route), { recursive: true });
+    await fs.writeFile(path.join(directory, route, "index.html"), `<html><link rel="canonical" href="__NORI_ORIGIN__${route}" />${route}</html>`);
+  }
   await fs.writeFile(path.join(directory, "index.html"), "<html>app shell</html>");
-  await fs.writeFile(path.join(directory, "intro/index.html"), '<html><link rel="canonical" href="__NORI_ORIGIN__/intro" />intro</html>');
   const server = createWebServer({ directory });
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   try {
     const { port } = server.address();
-    const body = await new Promise((resolve, reject) => {
-      http.get({ hostname: "127.0.0.1", port, path: "/intro" }, (response) => {
-        let text = "";
-        response.on("data", (chunk) => { text += chunk; });
-        response.on("end", () => resolve({ status: response.statusCode, text }));
-      }).on("error", reject);
-    });
-    assert.equal(body.status, 200);
-    assert.match(body.text, new RegExp(`http://127.0.0.1:${port}/intro`));
-    assert.doesNotMatch(body.text, /app shell/);
+    for (const route of paths) {
+      const response = await fetch(`http://127.0.0.1:${port}${route}`);
+      const body = await response.text();
+      assert.equal(response.status, 200);
+      assert.ok(body.includes(`http://127.0.0.1:${port}${route}`));
+      assert.doesNotMatch(body, /app shell/);
+    }
   } finally {
     await new Promise((resolve) => server.close(resolve));
     await fs.rm(directory, { recursive: true, force: true });

@@ -991,6 +991,22 @@
             {
               "path": "scripts/web/intro.mjs",
               "contains": "collectIntroData"
+            },
+            {
+              "path": "scripts/web/intro.mjs",
+              "contains": "TOSS_SHARE_URL"
+            },
+            {
+              "path": "scripts/web/intro.mjs",
+              "contains": "TOSS_INTRO_PATH"
+            },
+            {
+              "path": "scripts/web/intro.mjs",
+              "contains": "전체 놀이 기록 요약과 완성한 놀이 묶음"
+            },
+            {
+              "path": "scripts/web/intro.mjs",
+              "contains": "하루에 3개씩, 작은 미션처럼."
             }
           ]
         },

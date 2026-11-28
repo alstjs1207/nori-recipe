@@ -6,9 +6,11 @@ import sharp from "sharp";
 import { localWebImages, playImageUrl } from "../../src/constants/playImageManifest.ts";
 import { escapeHtml, withPublicOrigin } from "./html.mjs";
 
-// 서비스 소개 페이지(/intro). 숫자는 모두 빌드 시점의 공개 놀이·재료 데이터에서 계산한다.
+// 웹·토스 홍보 소개 페이지(/intro, /toss-intro). 숫자는 모두 빌드 시점의 공개 놀이·재료 데이터에서 계산한다.
 export const INTRO_PATH = "/intro";
+export const TOSS_INTRO_PATH = "/toss-intro";
 export const QUICK_PREP_MINUTES = 5;
+export const TOSS_SHARE_URL = "https://minion.toss.im/F3OAPpVy";
 
 // src/constants/devAreas.ts의 순서·표시명과 같아야 한다(tests/web-intro.test.mjs에서 대조).
 export const DEV_AREAS = [
@@ -21,7 +23,7 @@ export const DEV_AREAS = [
   { slug: "sensory", label: "감각", detail: "만지고 듣고 보며 느낌을 탐색해요" },
 ];
 
-// 실제 서비스 화면 캡처 원본(assets/intro). 캡처 조건은 OpenSpec change design에 기록한다.
+// 2026-11-28 최신 웹 화면 캡처(assets/intro), 390×844 DPR2. 테스트 게스트·상세 위치는 refresh-intro-screenshots 검증 기록 참조.
 export const INTRO_SCREENS = {
   home: { file: "home.png", alt: "노리 레시피 발견 화면. 오늘의 추천 놀이와 우리 집 재료 요약" },
   materials: { file: "materials.png", alt: "우리 집 재료를 고르는 화면. 종이·박스·스티커 등 재료 그림 목록" },
@@ -29,7 +31,7 @@ export const INTRO_SCREENS = {
   detailPrep: { file: "detail-prep.png", alt: "놀이 상세의 준비물 영역. 필수·선택 재료와 시작 전 확인 사항" },
   detailSafety: { file: "detail-safety.png", alt: "놀이 상세의 안전 팁 영역. 놀이별 안전 유의사항 목록" },
   favorites: { file: "favorites.png", alt: "저장한 놀이 화면. 찜해 둔 놀이 카드 목록" },
-  record: { file: "record.png", alt: "놀이 기록 화면. 이번 달 함께한 놀이 수와 발달 영역별 경험" },
+  record: { file: "record.png", alt: "놀이 기록 화면. 전체 놀이 기록 요약과 완성한 놀이 묶음" },
 };
 
 function activeMaterials(registry) {
@@ -123,13 +125,15 @@ header.top{position:sticky;top:0;z-index:10;background:rgba(250,250,254,.88);bac
 header.top .wrap{display:flex;align-items:center;gap:16px;height:60px}
 .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;text-decoration:none;letter-spacing:-.02em}
 .brand img{width:28px;height:28px}
-header nav{display:none;gap:24px;margin-left:auto;font-size:15px;color:var(--muted)}
+header nav{display:none;gap:18px;margin-left:auto;font-size:15px;color:var(--muted)}
 header nav a{text-decoration:none}header nav a:hover{color:var(--ink)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;font-weight:700;font-size:16px;text-decoration:none;border:1px solid transparent;transition:transform .15s ease,box-shadow .15s ease}
 .btn:focus-visible,.chip:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .btn-primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 8px 20px rgba(88,70,232,.25)}
 .btn-primary:hover{transform:translateY(-1px)}
 .btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+body.toss-intro{--accent:#005CE6;--pill:#DCEAFF;--card:#EFF5FF}
+.toss-intro .btn-primary{box-shadow:0 8px 20px rgba(0,92,230,.16)}
 .btn-sm{min-height:40px;padding:0 16px;font-size:14px;margin-left:auto}
 .eyebrow{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--pill);color:var(--accent);font-weight:700;font-size:13px}
 h1,h2,h3{letter-spacing:-.03em;line-height:1.25;margin:0}
@@ -143,6 +147,8 @@ section{padding:72px 0;scroll-margin-top:60px}
 .hero-grid{display:grid;gap:40px;align-items:center}
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
 .hero-note{color:var(--muted);font-size:14px;margin:12px 0 0}
+.steps.mission-flow{margin-top:32px}
+.mission-note{max-width:680px;color:var(--muted);font-size:14px;margin:20px 0 0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:32px 0 0;padding:0;list-style:none}
 .stats li{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 12px}
 .stats strong{display:block;font-size:clamp(22px,5vw,30px);font-weight:800;color:var(--accent);line-height:1.2}
@@ -206,6 +212,14 @@ section{padding:72px 0;scroll-margin-top:60px}
 .steps li::before{content:counter(step,decimal-leading-zero);position:absolute;left:16px;top:16px;width:32px;height:32px;border-radius:50%;background:var(--pill);color:var(--accent);font-weight:800;font-size:13px;display:grid;place-items:center}
 .steps strong{display:block}
 .steps span{font-size:14px;color:var(--muted)}
+.toss-section{background:#EFF5FF}
+.toss-section .eyebrow{background:#DCEAFF;color:#0053CE}
+.toss-section h2 em{color:#0053CE}
+.toss-card{background:var(--surface);border:1px solid #D5E3FA;border-radius:var(--radius);padding:24px}
+.toss-card h3{font-size:22px;margin-bottom:20px}
+.toss-card .steps li{background:#F6F9FF;border-color:#E0E9F8}
+.toss-card .steps li::before{background:#DCEAFF;color:#0053CE}
+.toss-card .hero-note{margin-top:20px}
 .faq{max-width:760px}
 .faq details{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0 20px;margin-top:10px}
 .faq summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:700;display:flex;justify-content:space-between;gap:16px}
@@ -226,6 +240,7 @@ footer nav{display:flex;gap:16px}
   .feature.flip .copy{order:2}
   .stats{max-width:460px}
   .phone{width:320px}
+  .mission-flow{grid-template-columns:repeat(3,1fr)}
   .ages{grid-template-columns:repeat(4,1fr)}
   .areas{grid-template-columns:repeat(4,1fr)}
   .wrap{padding:0 24px}
@@ -296,7 +311,7 @@ function tween(el, from, to, ms){
     matches.slice(0, 3).forEach(function(p){
       var li = document.createElement('li');
       var a = document.createElement('a');
-      a.className = 'card'; a.href = '/play/' + encodeURIComponent(p.id);
+      a.className = 'card'; a.href = p.href;
       var img = document.createElement('img');
       img.crossOrigin = 'anonymous';
       img.onerror = () => { img.onerror = null; img.src = '/nori-icon.svg'; };
@@ -323,7 +338,11 @@ function tween(el, from, to, ms){
 })();
 `;
 
-export function renderIntroPage({ data, screens, playImageVersions = {}, playImageManifest = localWebImages(data.plays.map((play) => ({ id: play.id, status: "live", imageStatus: play.hasImage ? null : "review" })), playImageVersions), materialImageManifest = { schemaVersion: 1, storage: null, entries: {} }, materialImageVersions = {} }) {
+export function renderIntroPage({ data, screens, playImageVersions = {}, playImageManifest = localWebImages(data.plays.map((play) => ({ id: play.id, status: "live", imageStatus: play.hasImage ? null : "review" })), playImageVersions), materialImageManifest = { schemaVersion: 1, storage: null, entries: {} }, materialImageVersions = {}, target = "web" }) {
+  const toss = target === "toss";
+  const pagePath = toss ? TOSS_INTRO_PATH : INTRO_PATH;
+  const startUrl = toss ? TOSS_SHARE_URL : "/";
+  const startLabel = toss ? "토스에서 무료로 시작하기" : "웹에서 바로 시작하기";
   const n = (value) => escapeHtml(value.toLocaleString("ko-KR"));
   const ageLabel = `${data.ageMin}–${data.ageMax}개월`;
   // 숫자를 0부터 세어 올리는 표시. 화면 낭독기는 최종 값만 읽고, 스크립트가 없으면 최종 값이 그대로 보인다.
@@ -344,19 +363,24 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, playIma
     plays: data.plays.map((play) => ({
       id: play.id, name: play.name, ageMin: play.ageMin, ageMax: play.ageMax, prepTime: play.prepTime,
       durationMin: play.durationMin, durationMax: play.durationMax, required: play.required,
+      href: toss ? TOSS_SHARE_URL : `/play/${encodeURIComponent(play.id)}`,
       thumb: play.hasImage ? playImageUrl(playImageManifest, play.id, "thumbnail") : "/nori-icon.svg",
     })),
   };
-  const title = "노리 레시피 · 집에 있는 재료로 찾는 오늘의 놀이";
-  const description = `${ageLabel} 아이의 월령과 우리 집 재료로 오늘 함께할 놀이를 찾아요. 놀이 ${data.playCount}개, 준비물·순서·안전 팁까지 회원가입 없이 바로 시작하는 노리 레시피.`;
+  const title = toss ? "노리 레시피 · 토스에서 만나는 오늘의 놀이" : "노리 레시피 · 집에 있는 재료로 찾는 오늘의 놀이";
+  const description = toss
+    ? `토스에서 무료로 만나는 노리 레시피. 우리 집 재료와 ${ageLabel} 아이의 월령에 맞는 놀이 3개를 추천해요. 별도 앱 설치·회원가입 없이 준비물부터 놀이 순서·안전 팁까지 확인해요.`
+    : `${ageLabel} 아이의 월령과 우리 집 재료로 알맞은 놀이 3개를 추천해요. 공개 놀이 ${data.playCount}개에서 준비물·순서·안전 팁까지 회원가입 없이 확인해요.`;
   const faqs = [
-    ["회원가입을 해야 하나요?", "아니요. 웹에서 아이의 생년월만 고르면 바로 추천을 볼 수 있어요. 아이 정보는 서버로 보내지 않고 이용 중인 기기에만 저장해요."],
+    ["재료를 고르면 어떤 놀이를 추천해 주나요?", "지금 사용할 재료를 고르면 아이의 월령과 준비물을 함께 살펴 놀이 3개를 추천해요. 추가로 필요한 준비물은 놀이별로 확인할 수 있어요. 조건에 맞는 놀이가 부족하면 가능한 놀이만 안내해요."],
+    ["회원가입을 해야 하나요?", toss ? "별도 회원가입이나 토스 로그인 없이 아이의 생년월만 고르면 바로 추천을 볼 수 있어요. 아이 정보는 서버로 보내지 않고 현재 토스앱의 기기에만 저장해요." : "아니요. 웹에서 아이의 생년월만 고르면 바로 추천을 볼 수 있어요. 아이 정보는 서버로 보내지 않고 이용 중인 기기에만 저장해요."],
     ["몇 개월 아이까지 이용할 수 있나요?", `${ageLabel} 아이를 위한 놀이를 모았어요. 월령이 바뀌면 그에 맞는 놀이로 추천도 달라져요.`],
-    ["앱을 설치해야 하나요?", "휴대폰과 PC의 웹 브라우저에서 바로 이용할 수 있어요. 자주 쓴다면 설정의 ‘앱처럼 이용하기’ 안내를 따라 홈 화면에 추가해 보세요."],
-    ["찜과 놀이 기록은 어디에 저장되나요?", "이용 중인 기기·브라우저에 저장돼요. 계정 백업이나 기기 간 동기화는 아직 제공하지 않아서, 브라우저 저장소를 지우면 기록도 함께 사라질 수 있어요."],
+    ["앱을 설치해야 하나요?", toss ? "토스앱을 이용 중이라면 노리 레시피를 따로 설치할 필요가 없어요. 이 페이지의 시작 버튼을 눌러 토스앱에서 이용해 주세요." : "휴대폰과 PC의 웹 브라우저에서 바로 이용할 수 있어요. 자주 쓴다면 설정의 ‘앱처럼 이용하기’ 안내를 따라 홈 화면에 추가해 보세요."],
+    ["찜과 놀이 기록은 어디에 저장되나요?", toss ? "현재 토스앱의 기기에 저장돼요. 웹·다른 기기와 자동으로 공유되지 않으며, 토스앱 삭제나 기기 변경으로 사라질 수 있어요. 백업·복구는 제공하지 않아요." : "이용 중인 기기·브라우저에 저장돼요. 계정 백업이나 기기 간 동기화는 아직 제공하지 않아서, 브라우저 저장소를 지우면 기록도 함께 사라질 수 있어요."],
     ["재료가 부족하면 어떻게 하나요?", `놀이마다 꼭 필요한 재료와 없어도 되는 재료를 나눠 보여 줘요. 필수 재료 없이 시작할 수 있는 놀이도 ${n(data.noMaterialCount)}개 있어요.`],
     ["안전은 어떻게 확인하나요?", "놀이마다 시작 전 확인할 점과 안전 팁을 함께 적어 두었어요. 작은 부품처럼 주의가 필요한 재료는 따로 안내해요. 놀이하는 동안에는 보호자가 곁에서 아이의 반응을 살펴 주세요."],
-    ["마음에 드는 놀이를 공유할 수 있나요?", "놀이 상세의 공유 버튼으로 링크를 보내면, 받은 사람도 앱 설정 없이 바로 놀이 방법을 볼 수 있어요."],
+    ["마음에 드는 놀이를 공유할 수 있나요?", toss ? "놀이 상세의 공유 버튼으로 토스 링크를 보낼 수 있어요. 링크에는 아이 정보나 놀이 기록을 담지 않아요." : "놀이 상세의 공유 버튼으로 링크를 보내면, 받은 사람도 앱 설정 없이 바로 놀이 방법을 볼 수 있어요."],
+    ...(toss ? [["이용 요금이나 광고가 있나요?", "무료로 이용할 수 있어요. 추천 놀이 3개를 마친 뒤 다음 추천을 시작할 때 광고가 표시될 수 있어요. 실제 광고가 표시된 뒤 24시간 동안은 추가 광고 없이 다음 추천을 시작할 수 있어요."]] : []),
   ];
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -368,37 +392,37 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, playIma
 <meta name="theme-color" content="#FAFAFE" />
 <link rel="icon" href="/nori-favicon.png" />
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-<link rel="canonical" href="__NORI_ORIGIN__${INTRO_PATH}" />
+<link rel="canonical" href="__NORI_ORIGIN__${pagePath}" />
 <meta property="og:type" content="website" /><meta property="og:site_name" content="노리 레시피" /><meta property="og:locale" content="ko_KR" />
 <meta property="og:title" content="${escapeHtml(title)}" /><meta property="og:description" content="${escapeHtml(description)}" />
-<meta property="og:url" content="__NORI_ORIGIN__${INTRO_PATH}" /><meta property="og:image" content="__NORI_ORIGIN__/og/nori-recipe-20261105-v2.jpg" />
+<meta property="og:url" content="__NORI_ORIGIN__${pagePath}" /><meta property="og:image" content="__NORI_ORIGIN__/og/nori-recipe-20261105-v2.jpg" />
 <meta property="og:image:type" content="image/jpeg" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <style>${STYLE}</style>
 <script>try{if(window.matchMedia&&matchMedia("(prefers-reduced-motion: no-preference)").matches&&"IntersectionObserver" in window)document.documentElement.classList.add("js-motion")}catch(e){}</script>
 </head>
-<body>
+<body${toss ? ' class="toss-intro"' : ""}>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <header class="top"><div class="wrap">
-<a class="brand" href="${INTRO_PATH}"><img src="/nori-icon.svg" alt="" width="28" height="28" />노리 레시피</a>
-<nav aria-label="소개 메뉴"><a href="#recommend">맞춤 추천</a><a href="#materials">재료</a><a href="#guide">놀이 가이드</a><a href="#record">기록</a><a href="#faq">자주 묻는 질문</a></nav>
-<a class="btn btn-primary btn-sm" href="/">시작하기</a>
+<a class="brand" href="${pagePath}"><img src="/nori-icon.svg" alt="" width="28" height="28" />노리 레시피</a>
+<nav aria-label="소개 메뉴"><a href="#recommend">맞춤 추천</a><a href="#materials">재료</a><a href="#guide">놀이 가이드</a><a href="#record">기록</a>${toss ? '<a href="#toss">이용 방법</a>' : ""}<a href="#faq">자주 묻는 질문</a></nav>
+<a class="btn btn-primary btn-sm" href="${startUrl}">${toss ? "토스에서 시작" : "시작하기"}</a>
 </div></header>
 <main id="main">
 <section class="hero"><div class="wrap hero-grid">
 <div>
-<span class="eyebrow">${escapeHtml(ageLabel)} · 집에 있는 재료로</span>
+<span class="eyebrow">${toss ? "앱인토스 · 무료 놀이 추천" : `${escapeHtml(ageLabel)} · 집에 있는 재료로`}</span>
 <h1>오늘은 뭐 하고 놀지?<br /><em>노리 레시피</em></h1>
-<p class="lead">아이의 월령과 우리 집 재료를 고르면,<br />지금 함께하기 좋은 놀이를 추천해 드려요.</p>
-<div class="hero-actions"><a class="btn btn-primary" href="/">웹에서 바로 시작하기</a><a class="btn btn-ghost" href="/search">놀이 둘러보기</a></div>
-<p class="hero-note">회원가입 없이, 생년월만 고르면 시작해요.</p>
+<p class="lead">${toss ? "토스에서 우리 집 재료를 고르면,<br />아이의 월령에 맞는 놀이 3개를 추천해 드려요." : "우리 집 재료와 아이의 월령을 고르면,<br />지금 함께하기 좋은 놀이 3개를 추천해 드려요."}</p>
+<div class="hero-actions"><a class="btn btn-primary" href="${startUrl}">${startLabel}</a>${toss ? '<a class="btn btn-ghost" href="#toss">이용 방법 알아보기</a>' : '<a class="btn btn-ghost" href="/search">놀이 둘러보기</a>'}</div>
+<p class="hero-note">${toss ? "토스앱에서 별도 설치·회원가입 없이 시작해요." : "회원가입 없이, 생년월만 고르면 시작해요."}</p>
 <ul class="stats" aria-label="노리 레시피 놀이 현황">
 <li><strong>${count(data.playCount)}개</strong><span>함께할 놀이</span></li>
 <li><strong>${count(data.materialCount)}가지</strong><span>집에 있는 재료</span></li>
 <li><strong>${count(data.devAreas.length)}개</strong><span>발달 영역</span></li>
 </ul>
 </div>
-<div class="hero-visual">${phone(screens.home, { loading: "eager" })}</div>
+<div class="hero-visual">${phone(screens.home, { loading: "eager" })}${toss ? '<p class="hero-note" style="text-align:center">서비스 기능 예시 · 웹 화면<br />토스앱에서는 화면 구성이 다를 수 있어요.</p>' : ""}</div>
 </div></section>
 
 <section class="marquee bg-white" aria-labelledby="mat-title"><div class="wrap" data-reveal>
@@ -411,23 +435,36 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, playIma
 <section id="recommend"><div class="wrap feature">
 <div class="copy" data-reveal>
 <span class="eyebrow">맞춤 추천</span>
-<h2 style="margin-top:14px">월령과 재료만 고르면<br /><em>오늘의 놀이</em>가 나와요</h2>
-<p class="lead">아이의 월령, 우리 집 재료, 최근에 한 놀이를 함께 살펴 오늘 해볼 놀이를 골라 드려요. 직접 골라 보세요.</p>
-<ul class="points"><li>놀이 시간·준비 시간·난이도를 먼저 보고 고를 수 있어요</li><li>부족한 재료가 있으면 시작 전에 알려 드려요</li><li>아래 결과는 실제 서비스의 공개 놀이 ${n(data.playCount)}개에서 찾아요</li></ul>
+<h2 style="margin-top:14px">월령과 재료만 고르면<br /><em>놀이 3개</em>를 추천해요</h2>
+<p class="lead">아이의 월령, 우리 집 재료, 최근에 한 놀이를 함께 살펴 놀이 3개를 골라 드려요. 아래에서는 월령과 재료를 바꾸며 가능한 놀이를 미리 찾아볼 수 있어요.</p>
+<ul class="points"><li>추천받은 3개를 하나씩 해보고 이번 놀이 도전을 완성해요</li><li>놀이 시간·준비 시간·난이도를 먼저 보고 고를 수 있어요</li><li>부족한 재료가 있으면 시작 전에 알려 드려요</li><li>아래 결과는 실제 서비스의 공개 놀이 ${n(data.playCount)}개에서 찾아요</li></ul>
 </div>
 <div class="demo" id="demo" data-reveal style="--d:120ms" hidden>
+<p class="hero-note" style="margin:0 0 16px">재료로 놀이 미리 찾아보기 · 실제 홈 추천은 아이의 월령과 최근 놀이도 함께 살펴요.</p>
 <div class="group"><h3 id="demo-age">아이 월령</h3><div class="chips" role="group" aria-labelledby="demo-age">${data.buckets.map((bucket, index) => `<button type="button" class="chip" data-bucket="${index}" aria-pressed="${index === defaultBucket}">${bucket.min}–${bucket.max}개월</button>`).join("")}</div></div>
 <div class="group"><h3 id="demo-mat">우리 집 재료</h3><div class="chips" role="group" aria-labelledby="demo-mat">${data.popularMaterials.map((slug) => `<button type="button" class="chip" data-material="${escapeHtml(slug)}" aria-pressed="false">${escapeHtml(data.displayNames[slug])}</button>`).join("")}</div></div>
 <div class="result" aria-live="polite"><p class="result-count">지금 바로 할 수 있는 놀이 <em data-count>0</em>개</p><ul class="cards" data-list></ul><p class="empty" data-empty hidden>재료를 하나 더 골라 보세요.</p></div>
 </div>
-<noscript><p class="lead">자바스크립트를 켜면 월령과 재료로 놀이를 미리 찾아볼 수 있어요. <a href="/search">놀이 둘러보기</a></p></noscript>
+<noscript><p class="lead">자바스크립트를 켜면 월령과 재료로 놀이를 미리 찾아볼 수 있어요. <a href="${toss ? TOSS_SHARE_URL : "/search"}">${toss ? "토스에서 놀이 찾아보기" : "놀이 둘러보기"}</a></p></noscript>
+</div></section>
+
+<section id="mission" class="bg-card" aria-labelledby="mission-title"><div class="wrap" data-reveal>
+<span class="eyebrow">하루에 3개씩, 작은 미션처럼.</span>
+<h2 id="mission-title" style="margin-top:14px">재료를 고르고,<br /><em>놀이 3개</em>를 함께 완성해요</h2>
+<p class="lead">무엇을 할지 고민하는 시간은 줄이고, 아이와 함께하는 시간을 채워요.</p>
+<ol class="steps mission-flow">
+<li><strong>오늘 쓸 재료를 골라요</strong><span>종이, 블록, 크레용처럼 지금 집에 있는 재료를 선택해요.</span></li>
+<li><strong>알맞은 놀이 3개를 추천받아요</strong><span>아이의 월령과 고른 재료를 살펴 함께하기 좋은 놀이를 골라 드려요.</span></li>
+<li><strong>하나씩 즐기고, 추억 한 묶음!</strong><span>함께한 놀이를 기록하며 하나씩 완성해요. 3개를 마치면 완성한 묶음으로 남아요.</span></li>
+</ol>
+<p class="mission-note">하루 3개를 가벼운 목표로 삼아 보세요. 바쁜 날엔 하나만 해도 좋아요. 남은 놀이는 다음 날 이어가고, 더 놀고 싶다면 3개를 마친 뒤 다음 추천을 시작할 수 있어요.</p>
 </div></section>
 
 <section id="materials" class="bg-card"><div class="wrap feature flip">
 <div class="copy" data-reveal>
 <span class="eyebrow">재료로 찾기</span>
 <h2 style="margin-top:14px">놀이 이름을 몰라도<br /><em>재료</em>에서 시작해요</h2>
-<p class="lead">가지고 있는 재료를 그림으로 골라 두면, 그 재료로 할 수 있는 놀이를 먼저 보여 드려요. 재료는 ${n(data.categoryCount)}개 분류로 정리되어 있어요.</p>
+<p class="lead">가지고 있는 재료를 그림으로 골라 두면, 그 재료를 활용할 수 있는 놀이를 우선해 3개를 추천해 드려요. 재료는 ${n(data.categoryCount)}개 분류로 정리되어 있어요.</p>
 <div class="meter" data-reveal style="--d:150ms">
 <div class="meter-head"><strong>${count(data.quickPrepCount)}개</strong><span>준비 ${QUICK_PREP_MINUTES}분 이내 놀이 · 전체 ${n(data.playCount)}개 중 ${quickRatio}%</span></div>
 <div class="bar" role="img" aria-label="전체 놀이 중 준비 ${QUICK_PREP_MINUTES}분 이내 놀이 비율 ${quickRatio}%"><i style="width:${quickRatio}%"></i></div>
@@ -466,11 +503,31 @@ export function renderIntroPage({ data, screens, playImageVersions = {}, playIma
 <div class="copy" data-reveal>
 <span class="eyebrow">찜과 기록</span>
 <h2 style="margin-top:14px">아이가 좋아했던 놀이,<br /><em>다시 꺼내 봐요</em></h2>
-<p class="lead">해보고 싶은 놀이는 찜해 두고, 함께한 놀이는 별점과 아이 반응, 한 줄 메모로 남겨요. 남긴 기록은 다음 추천에 반영돼요.</p>
-<ul class="points"><li>이번 달 함께한 놀이 수와 경험한 발달 영역을 한눈에 봐요</li><li>기록은 이용 중인 기기에만 저장돼요</li></ul>
+<p class="lead">해보고 싶은 놀이는 찜해 두고, 함께한 놀이는 별점과 아이 반응, 한 줄 메모로 남겨요. 추천 놀이 3개를 완성하면 추억 한 묶음이 쌓이고, 남긴 기록은 다음 추천에도 반영돼요.</p>
+<ul class="points"><li>함께한 놀이 수와 경험한 발달 영역을 한눈에 봐요</li><li>놀이 3개를 완성한 묶음을 다시 꺼내 볼 수 있어요</li><li>기록은 이용 중인 기기에만 저장돼요</li></ul>
 </div>
 <div class="duo"><div data-reveal style="--d:80ms">${phone(screens.favorites)}</div><div data-reveal style="--d:240ms">${phone(screens.record)}</div></div>
 </div></section>
+
+${toss ? `<section id="toss" class="toss-section" aria-labelledby="toss-title"><div class="wrap feature">
+<div class="copy" data-reveal>
+<span class="eyebrow">앱인토스 · 노리 레시피</span>
+<h2 id="toss-title" style="margin-top:14px">늘 쓰던 토스에서<br /><em>오늘의 놀이</em>를 만나요</h2>
+<p class="lead">토스앱 안에서도 노리 레시피를 이용할 수 있어요. 별도 앱 설치나 회원가입 없이, 아이와 함께할 놀이를 찾아보세요.</p>
+<ul class="points"><li>아이의 월령과 우리 집 재료로 맞춤 놀이 3개를 추천받아요</li><li>준비물·놀이 순서·안전 팁을 한곳에서 확인해요</li><li>마음에 드는 놀이를 찜하고 함께한 순간을 기록해요</li></ul>
+<div class="hero-actions"><a class="btn btn-primary" href="${TOSS_SHARE_URL}">토스에서 무료로 시작하기</a></div>
+<p class="hero-note">토스앱을 이용 중인 휴대폰에서 열어 주세요.</p>
+</div>
+<div class="toss-card" data-reveal style="--d:120ms">
+<h3>토스에서 시작하는 방법</h3>
+<ol class="steps">
+<li><strong>토스에서 노리 레시피 열기</strong><span>시작 버튼을 눌러 토스앱으로 이동해요.</span></li>
+<li><strong>우리 아이와 재료 고르기</strong><span>아이의 생년월과 집에 있는 재료를 알려 주세요.</span></li>
+<li><strong>추천 놀이로 함께 놀기</strong><span>마음에 드는 놀이를 고르고, 아이의 반응을 남겨요.</span></li>
+</ol>
+<p class="hero-note">찜과 기록은 현재 토스앱의 기기에 저장돼요. 웹이나 다른 기기의 기록과 자동으로 공유되지 않아요.</p>
+</div>
+</div></section>` : ""}
 
 <section id="faq"><div class="wrap faq" data-reveal>
 <h2>자주 묻는 질문</h2>
@@ -478,12 +535,12 @@ ${faqs.map(([q, a]) => `<details><summary>${escapeHtml(q)}</summary><p>${escapeH
 </div></section>
 
 <section class="final"><div class="wrap" data-reveal>
-<h2>아이와의 오늘,<br /><em>지금 시작해요</em></h2>
+<h2>아이와의 오늘,<br /><em>${toss ? "토스에서 시작해요" : "지금 시작해요"}</em></h2>
 <p class="lead">생년월을 고르고 우리 집 재료를 골라 보세요.</p>
-<div class="hero-actions"><a class="btn btn-primary" href="/">웹에서 바로 시작하기</a><a class="btn btn-ghost" href="/search">놀이 둘러보기</a></div>
+<div class="hero-actions"><a class="btn btn-primary" href="${startUrl}">${startLabel}</a>${toss ? '<a class="btn btn-ghost" href="#toss">이용 방법 알아보기</a>' : '<a class="btn btn-ghost" href="/search">놀이 둘러보기</a>'}</div>
 </div></section>
 </main>
-<footer><div class="wrap"><span>© 노리 레시피</span><nav aria-label="바로가기"><a href="/">놀이 시작하기</a><a href="/search">놀이 탐색</a><a href="/settings">설정·이용 안내</a></nav></div></footer>
+<footer><div class="wrap"><span>© 노리 레시피</span><nav aria-label="바로가기">${toss ? `<a href="${TOSS_SHARE_URL}">토스에서 시작하기</a><a href="${INTRO_PATH}">웹 서비스 소개</a>` : '<a href="/">놀이 시작하기</a><a href="/search">놀이 탐색</a><a href="/settings">설정·이용 안내</a>'}</nav></div></footer>
 <script type="application/json" id="intro-data">${jsonForScript(demoData)}</script>
 <script>${SCRIPT}</script>
 </body>
@@ -491,7 +548,7 @@ ${faqs.map(([q, a]) => `<details><summary>${escapeHtml(q)}</summary><p>${escapeH
 `;
 }
 
-// 캡처 원본을 내용 해시 이름의 WebP로 변환하고 /intro/index.html을 쓴다.
+// 화면 캡처를 한 번만 변환하고 웹·토스 홍보 페이지가 /intro/media를 공유한다.
 export async function writeIntroPage({ root, dist, plays, registry, playImageVersions = {}, playImageManifest, materialImageManifest = { schemaVersion: 1, storage: null, entries: {} }, materialImageVersions = {}, publicOrigin = null }) {
   const data = collectIntroData({ plays, registry });
   const mediaDirectory = path.join(dist, "intro", "media");
@@ -505,5 +562,8 @@ export async function writeIntroPage({ root, dist, plays, registry, playImageVer
   }
   const html = renderIntroPage({ data, screens, playImageVersions, playImageManifest, materialImageManifest, materialImageVersions });
   await fs.writeFile(path.join(dist, "intro", "index.html"), withPublicOrigin(html, publicOrigin));
-  return { data, screens, html };
+  const tossHtml = renderIntroPage({ data, screens, playImageVersions, playImageManifest, materialImageManifest, materialImageVersions, target: "toss" });
+  await fs.mkdir(path.join(dist, "toss-intro"), { recursive: true });
+  await fs.writeFile(path.join(dist, "toss-intro", "index.html"), withPublicOrigin(tossHtml, publicOrigin));
+  return { data, screens, html, tossHtml };
 }

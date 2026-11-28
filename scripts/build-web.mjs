@@ -82,7 +82,7 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
       await fs.mkdir(directory, { recursive: true });
       await fs.writeFile(path.join(directory, "index.html"), withPublicOrigin(withPlayMetadata(html, play, playImageManifest), publicOrigin));
     }
-    // Service introduction page (/intro): numbers come from the same live plays and material registry as this build.
+    // Service introduction pages (/intro, /toss-intro): numbers come from the same live plays and material registry as this build.
     const registry = JSON.parse(await fs.readFile(path.join(root, "data/materials.json"), "utf8"));
     const materialImageVersions = JSON.parse(await fs.readFile(path.join(root, "src/constants/materialImageVersions.json"), "utf8"));
     const intro = await writeIntroPage({ root, dist, plays, registry, playImageVersions, playImageManifest, materialImageManifest, materialImageVersions, publicOrigin });
@@ -98,7 +98,7 @@ export async function buildWeb({ root = project, env = process.env, fetchImpl = 
     await fs.writeFile(path.join(dist, "sw.js"), createServiceWorker(version, precache, playImageManifest.storage, materialImageManifest.storage));
     await fs.writeFile(path.join(dist, "build-report.json"), JSON.stringify({ ...report, version, playLinks: plays.length, precacheFiles: precache.length }, null, 2));
     console.info(`PWA ready: ${plays.length} public play links, ${precache.length} shell assets, cache ${version}`);
-    console.info(`Intro page: /intro with ${intro.data.playCount} plays, ${intro.data.materialCount} materials, ${Object.keys(intro.screens).length} screens`);
+    console.info(`Intro pages: /intro, /toss-intro with ${intro.data.playCount} plays, ${intro.data.materialCount} materials, ${Object.keys(intro.screens).length} screens`);
     return { ...report, version };
   });
 }
